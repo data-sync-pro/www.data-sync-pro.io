@@ -1,0 +1,94 @@
+/*
+  COMMENT (Software Engineer, 30 yrs exp):
+  We use CSS Grid, but now limit the footer's width
+  to 70% of the screen width, aligned left.
+*/
+
+.footer-container {
+    display: grid;
+    grid-auto-flow: column;
+    column-gap: 2rem;  
+    align-items: start; 
+    padding: 2rem;
+    border-top: 1px solid #ddd;
+  
+
+  
+    /*
+      If you want it *centered* within the screen,
+      you could use:
+        margin: 0 auto;
+      But since you asked specifically to end at 70%,
+      margin-left: 0 + width: 70% keeps it left-aligned.
+    */
+  }
+  
+  /* 
+    .footer-brand: Logo + Social Icons block
+    No change needed here unless you want further adjustments.
+  */
+  .footer-brand {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; 
+    gap: 1rem;
+  
+    .footer-logo {
+      max-width: 50px;
+      height: auto;
+      object-fit: contain;
+    }
+  
+    .social-icons {
+      display: flex;
+      gap: 1rem;
+      a img {
+        width: 24px;
+        height: 24px;
+        object-fit: contain;
+      }
+    }
+  }
+  
+  /*
+    .footer-column: Each column of links
+    Also unchanged, as the grid container's width 
+    dictates the overall layout constraint.
+  */
+  .footer-column {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  
+    h4 {
+      margin-bottom: 0.75rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+  
+    ul {
+      list-style: none;
+      padding-left: 0;
+      
+      li {
+        margin-bottom: 0.5rem;
+        a {
+          text-decoration: none;
+          color: #333;
+          &:hover {
+            color: #007bff; /* example hover color */
+          }
+        }
+      }
+    }
+  }
+  
+  /* 
+    COMMENT: For small screens, you might need to stack columns vertically:
+    @media (max-width: 768px) {
+      .footer-container {
+        grid-auto-flow: row;
+      }
+    }
+  */
+  

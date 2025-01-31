@@ -1,0 +1,85 @@
+<div class="pricing-page">
+
+    <!-- Page Heading -->
+    <h1>Honest pricing. No hidden fees.</h1>
+    <p>
+      You won’t pay a cent until you’re ready to run Data Sync Pro.
+    </p>
+  
+    <!-- Top 3 Plans -->
+    <div class="plans-container">
+      <div class="plan-card" *ngFor="let plan of plans">
+        <!-- Plan Badge (BEST VALUE) -->
+        <div class="badge" *ngIf="plan.badge">{{ plan.badge }}</div>
+  
+        <h2 class="plan-name">{{ plan.name }}</h2>
+        <p class="plan-subtitle">{{ plan.subtitle }}</p>
+  
+        <div class="price-row">
+          <!-- Strikethrough old price if present -->
+          <span class="old-price" *ngIf="plan.oldPrice">{{ plan.oldPrice }}</span>
+          <span class="current-price">{{ plan.currentPrice }}</span>
+          <span class="per-person" *ngIf="plan.perPerson">{{ plan.perPerson }}</span>
+        </div>
+  
+        <button class="cta-button" *ngIf="plan.buttonLabel && plan.buttonLabel.length">
+          {{ plan.buttonLabel }}
+        </button>
+  
+        <!-- Detailed features (always visible in the card) -->
+        <div class="plan-details" *ngIf="plan.features && plan.features.length">
+          <h3>Plan details:</h3>
+          <ul>
+            <li *ngFor="let feat of plan.features">{{ feat }}</li>
+          </ul>
+        </div>
+  
+        <!-- Optional add-ons -->
+        <div class="featured-addons" *ngIf="plan.addOns && plan.addOns.length">
+          <ul>
+            <li *ngFor="let addOn of plan.addOns">{{ addOn }}</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Accordion Heading -->
+    <h2>Compare additional features by category</h2>
+    <p>Expand each section to see which plan includes or offers them as add-ons.</p>
+  
+    <!-- Accordion for Feature Categories -->
+    <div class="category-accordion">
+      <div class="category-section" *ngFor="let category of categories; let i = index">
+        
+        <!-- Accordion Header -->
+        <div
+          class="category-header"
+          [class.open]="openIndex === i"
+          (click)="toggleCategory(i)"
+        >
+          {{ category.title }}
+          <span class="arrow" [class.up]="openIndex === i"></span>
+        </div>
+  
+        <!-- Accordion Panel -->
+        <div class="category-panel" *ngIf="openIndex === i">
+          <table>
+            <tbody>
+              <tr *ngFor="let feat of category.features">
+                <!-- Feature Name -->
+                <td class="feature-name">{{ feat.name }}</td>
+                <!-- Simple Column -->
+                <td class="center">{{ getDisplay(feat.simple) }}</td>
+                <!-- Plus Column -->
+                <td class="center">{{ getDisplay(feat.plus) }}</td>
+                <!-- Premium Column -->
+                <td class="center">{{ getDisplay(feat.premium) }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  
+  </div>
+  

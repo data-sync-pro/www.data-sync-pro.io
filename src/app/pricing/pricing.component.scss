@@ -1,0 +1,198 @@
+.pricing-page {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: Arial, sans-serif;
+    color: #333;
+    text-align: center;
+    margin-top: 80px;
+
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+  
+    p {
+      max-width: 650px;
+      margin: 0 auto 2rem;
+      line-height: 1.4;
+      color: #666;
+    }
+  
+    /* ===== Top Plan Cards ===== */
+    .plans-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+      justify-content: center;
+      margin-bottom: 3rem;
+  
+      .plan-card {
+        background: #fff;
+        border: 1px solid #eee;
+        border-radius: 4px;
+        width: 300px;
+        text-align: left;
+        position: relative;
+        padding: 1.5rem;
+  
+        .badge {
+          position: absolute;
+          top: 1rem;
+          right: 1rem;
+          background: #00a68a;
+          color: #fff;
+          font-size: 0.7rem;
+          font-weight: 600;
+          padding: 0.3rem 0.5rem;
+          border-radius: 4px;
+        }
+  
+        .plan-name {
+          font-size: 1.2rem;
+          font-weight: 600;
+          margin-bottom: 0.25rem;
+        }
+  
+        .plan-subtitle {
+          font-size: 0.9rem;
+          color: #666;
+          margin-bottom: 1rem;
+        }
+  
+        .price-row {
+          margin-bottom: 1rem;
+          .old-price {
+            color: #999;
+            text-decoration: line-through;
+            margin-right: 0.3rem;
+          }
+          .current-price {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #d44626;
+          }
+          .per-person {
+            display: block;
+            font-size: 0.9rem;
+            color: #666;
+          }
+        }
+  
+        .cta-button {
+          background-color: #d44626;
+          color: #fff;
+          border: none;
+          border-radius: 4px;
+          font-size: 0.9rem;
+          font-weight: 600;
+          padding: 0.6rem 1.2rem;
+          margin-bottom: 1rem;
+          cursor: pointer;
+          &:hover {
+            background-color: #b73b1f;
+          }
+        }
+  
+        .plan-details {
+          margin-bottom: 1rem;
+          h3 {
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+          }
+          ul {
+            list-style: disc inside;
+            margin: 0;
+            padding: 0;
+            li {
+              margin: 0.25rem 0;
+              font-size: 0.9rem;
+              line-height: 1.3;
+            }
+          }
+        }
+  
+        .featured-addons {
+          h4 {
+            font-size: 1rem;
+            margin-bottom: 0.25rem;
+          }
+          ul {
+            list-style: disc inside;
+            margin: 0;
+            padding: 0;
+            li {
+              margin: 0.25rem 0;
+              font-size: 0.9rem;
+              line-height: 1.3;
+            }
+          }
+        }
+      }
+    }
+  
+    /* ===== ACCORDION SECTION ===== */
+    .category-accordion {
+      text-align: left; /* so the table lines up well */
+  
+      .category-section {
+        margin-bottom: 0.5rem;
+        border: 1px solid #eee;
+        border-radius: 4px;
+        overflow: hidden; /* helps contain the panel */
+  
+        .category-header {
+          background-color: #faf8f6;
+          padding: 1rem;
+          font-size: 1rem;
+          font-weight: 600;
+          cursor: pointer;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          position: relative;
+  
+          &.open {
+            background-color: #f2e9e4; /* highlight if open */
+          }
+  
+          .arrow {
+            width: 1rem;
+            height: 1rem;
+            border: solid #666;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+            transition: transform 0.3s;
+            margin-left: 1rem;
+          }
+          &.up {
+            transform: rotate(-135deg);
+          }
+        }
+  
+        .category-panel {
+          background-color: #fff;
+          padding: 1rem;
+  
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            td {
+              border-bottom: 1px solid #eee;
+              padding: 0.75rem;
+              font-size: 0.9rem;
+              vertical-align: middle;
+            }
+            .feature-name {
+              width: 40%;
+            }
+            .center {
+              text-align: center;
+              width: 20%;
+            }
+          }
+        }
+      }
+    }
+  }
+  

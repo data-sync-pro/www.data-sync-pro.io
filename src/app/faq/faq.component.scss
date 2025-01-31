@@ -1,0 +1,154 @@
+/*********************************************************
+ * src/app/faq/faq.component.scss
+ *********************************************************/
+ .faq-container {
+  width: 80%;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 20px;
+  margin-top: 80px;
+
+  .faq-search {
+    margin-bottom: 20px;
+    position: relative;
+
+    .visually-hidden {
+      position: absolute !important;
+      height: 1px;
+      width: 1px;
+      overflow: hidden;
+      clip: rect(1px,1px,1px,1px);
+      white-space: nowrap;
+    }
+
+    .search-wrapper {
+      position: relative;
+      display: inline-block;
+      width: 300px; /* Adjust as needed to fix the input+dropdown width */
+
+      input {
+        width: 100%; /* Fill the .search-wrapper width */
+        padding: 10px 12px;
+        font-size: 1rem;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+
+      .clear-tooltip {
+        position: absolute;
+        top: 50%;
+        right: 12px;
+        transform: translateY(-50%);
+        z-index: 2;
+        font-size: 0.9rem;
+        color: #999;
+        background-color: #fff;
+        padding: 2px 6px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        cursor: pointer;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+
+        &:hover {
+          color: #666;
+          background-color: #f1f1f1;
+        }
+      }
+    }
+
+    .suggestions-list {
+      position: absolute;
+      top: calc(100% + 2px);
+      left: 0;
+      right: 0;  /* Ensures it matches .search-wrapper width */
+      z-index: 100;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      background: #fff;
+      border: 1px solid #ccc;
+      border-top: none;
+      border-radius: 0 0 4px 4px;
+      max-height: 200px;
+      overflow-y: auto;
+      width: 325.33px;
+      li {
+        padding: 10px 12px;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+
+        &.highlighted,
+        &:hover {
+          background-color: #f1f1f1;
+        }
+      }
+    }
+  }
+
+  .faq-category-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 10px;
+
+    button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      padding: 8px 16px;
+      font-size: 1rem;
+      line-height: 1.5;
+      cursor: pointer;
+      background-color: #fff;
+      color: #333;
+
+      .category-icon {
+        width: 24px;
+        height: 24px;
+        margin-right: 8px;
+      }
+
+      &:hover {
+        background-color: #f1f1f1;
+      }
+
+      &:active {
+        opacity: 0.8;
+      }
+
+      &.active {
+        background-color: #3f51b5;
+        color: #fff;
+        border-color: #3f51b5;
+      }
+
+      &:disabled {
+        background-color: #eee;
+        border-color: #ddd;
+        cursor: not-allowed;
+        opacity: 0.6;
+      }
+    }
+  }
+
+  mat-accordion {
+    mat-expansion-panel {
+      margin-bottom: 10px;
+      border-radius: 4px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+
+      .faq-title {
+        display: flex;
+        align-items: center;
+
+        .category-icon {
+          width: 24px;
+          height: 24px;
+          margin-right: 8px;
+        }
+      }
+    }
+  }
+}

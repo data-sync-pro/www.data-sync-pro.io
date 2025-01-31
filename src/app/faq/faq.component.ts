@@ -1,0 +1,213 @@
+/*********************************************************
+ * src/app/faq/faq.component.ts
+ *********************************************************/
+import { Component, OnInit } from '@angular/core';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import faqData from '../../assets/data/faqs.json';
+
+interface SourceFAQRecord {
+  Id: string;
+  Question__c: string;
+  Answer__c: string | null;
+  Category__c: string;
+  SubCategory__c: string | null;
+  SeqNo__c?: string;
+}
+
+interface FAQItem {
+  question: string;
+  answer: string;
+  safeAnswer: SafeHtml;
+  category: string;
+  subCategory: string;
+  isPopular?: boolean;
+}
+
+@Component({
+  selector: 'app-faq',
+  templateUrl: './faq.component.html',
+  styleUrls: ['./faq.component.scss']
+})
+export class FaqComponent implements OnInit {
+  searchQuery = '';
+  searchFocused = false;
+
+  currentCategory = '';
+  currentSubCategory = '';
+
+  categoryLogos: Record<string, string> = {
+    'General': 'assets/G.png',
+    'Batch': 'assets/A.png',
+    'Trigger': 'assets/B.png',
+    'Data List': 'assets/C.png',
+    'Data Loader': 'assets/D.png',
+    'Record Action': 'assets/E.png',
+    'Rules Engine': 'assets/E.png'
+  };
+
+  subCategories: Record<string, string[]> = {};
+  faqList: FAQItem[] = [];
+
+  suggestions: string[] = [];
+  showSuggestions = false;
+  selectedSuggestionIndex = -1;
+
+  constructor(private sanitizer: DomSanitizer) {}
+
+  ngOnInit(): void {
+    const data = faqData as SourceFAQRecord[];
+    data.forEach(record => {
+      const cat = record.Category__c;
+      const sub = record.SubCategory__c ?? '';
+      if (cat) {
+        if (!this.subCategories[cat]) {
+          this.subCategories[cat] = [];
+        }
+        if (sub && !this.subCategories[cat].includes(sub)) {
+          this.subCategories[cat].push(sub);
+        }
+      }
+    });
+    this.faqList = data.map(rec => this.toFAQItem(rec));
+  }
+
+  private toFAQItem(rec: SourceFAQRecord): FAQItem {
+    let escapedAnswer = rec.Answer__c ?? '';
+    escapedAnswer = this.removeParagraphs(escapedAnswer);
+    const unescaped = this.unescapeHtml(escapedAnswer);
+    const safe = this.sanitizer.bypassSecurityTrustHtml(unescaped);
+    return {
+      question: rec.Question__c ?? '',
+      answer: unescaped,
+      safeAnswer: safe,
+      category: rec.Category__c ?? '',
+      subCategory: rec.SubCategory__c ?? '',
+      isPopular: false
+    };
+  }
+
+  private removeParagraphs(str: string): string {
+    str = str.replace(/<p[^>]*>/g, '');
+    str = str.replace(/<\/p>/g, '');
+    return str;
+  }
+
+  private unescapeHtml(escapedStr: string): string {
+    return escapedStr
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;/g, '\'')
+      .replace(/&amp;/g, '&');
+  }
+
+  get categories(): string[] {
+    return Object.keys(this.subCategories);
+  }
+
+  get filteredFAQ(): FAQItem[] {
+    const q = this.searchQuery.toLowerCase().trim();
+    return this.faqList.filter(item => {
+      if (this.currentCategory && item.category !== this.currentCategory) return false;
+      if (this.currentSubCategory && item.subCategory !== this.currentSubCategory) return false;
+      if (q) {
+        return (
+          item.question.toLowerCase().includes(q) ||
+          item.answer.toLowerCase().includes(q)
+        );
+      }
+      return true;
+    });
+  }
+
+  pickCategory(cat: string): void {
+    this.currentCategory = cat;
+    this.currentSubCategory = '';
+  }
+
+  clearCategory(): void {
+    this.currentCategory = '';
+    this.currentSubCategory = '';
+  }
+
+  pickSubCategory(subCat: string): void {
+    this.currentSubCategory = subCat;
+  }
+
+  clearSubCategory(): void {
+    this.currentSubCategory = '';
+  }
+
+  onSearchInputChange(): void {
+    this.updateSuggestions();
+    const hasQuery = this.searchQuery.trim().length > 0;
+    this.showSuggestions = hasQuery && this.suggestions.length > 0;
+    this.selectedSuggestionIndex = -1;
+  }
+
+  private updateSuggestions(): void {
+    const q = this.searchQuery.toLowerCase().trim();
+    if (!q) {
+      this.suggestions = [];
+      return;
+    }
+    const matchedQuestions = this.faqList
+      .map(item => item.question)
+      .filter(question => question.toLowerCase().includes(q));
+    const unique = Array.from(new Set(matchedQuestions));
+    this.suggestions = unique.slice(0, 10);
+  }
+
+  onSearchKeyDown(event: KeyboardEvent): void {
+    if (!this.showSuggestions || this.suggestions.length === 0) return;
+    switch (event.key) {
+      case 'ArrowDown':
+        event.preventDefault();
+        if (this.selectedSuggestionIndex < this.suggestions.length - 1) {
+          this.selectedSuggestionIndex++;
+        }
+        break;
+      case 'ArrowUp':
+        event.preventDefault();
+        if (this.selectedSuggestionIndex > 0) {
+          this.selectedSuggestionIndex--;
+        }
+        break;
+      case 'Enter':
+        if (this.selectedSuggestionIndex >= 0) {
+          this.searchQuery = this.suggestions[this.selectedSuggestionIndex];
+          this.onSearchInputChange();
+        }
+        this.showSuggestions = false;
+        break;
+      case 'Escape':
+        this.showSuggestions = false;
+        break;
+      default:
+        break;
+    }
+  }
+
+  onSuggestionClick(suggestion: string): void {
+    this.searchQuery = suggestion;
+    this.onSearchInputChange();
+    this.showSuggestions = false;
+  }
+
+  onClearMouseDown(event: MouseEvent, inputEl: HTMLInputElement): void {
+    event.preventDefault();
+    this.clearSearch();
+    setTimeout(() => {
+      inputEl.focus();
+    }, 0);
+  }
+
+  onSearchBlur(): void {
+    this.searchFocused = false;
+  }
+
+  clearSearch(): void {
+    this.searchQuery = '';
+    this.onSearchInputChange();
+  }
+}
