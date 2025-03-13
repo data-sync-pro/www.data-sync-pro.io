@@ -1,9 +1,7 @@
-/*********************************************************
- * src/app/faq/faq.component.ts
- *********************************************************/
 import { Component, OnInit } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import faqData from '../../assets/data/faqs.json';
+import { AnalyticsService } from '../analytics.service';
 
 interface SourceFAQRecord {
   Id: string;
@@ -29,33 +27,34 @@ interface FAQItem {
   styleUrls: ['./faq.component.scss']
 })
 export class FaqComponent implements OnInit {
+  // SEARCH STATE
   searchQuery = '';
   searchFocused = false;
 
+  // CURRENT FILTERS
   currentCategory = '';
   currentSubCategory = '';
 
-  categoryLogos: Record<string, string> = {
-    'General': 'assets/G.png',
-    'Batch': 'assets/A.png',
-    'Trigger': 'assets/B.png',
-    'Data List': 'assets/C.png',
-    'Data Loader': 'assets/D.png',
-    'Record Action': 'assets/E.png',
-    'Rules Engine': 'assets/E.png'
-  };
-
-  subCategories: Record<string, string[]> = {};
+  // FAQ DATA
   faqList: FAQItem[] = [];
 
+  // Category->Subcategory structure
+  subCategories: Record<string, string[]> = {};
+
+  // SEARCH SUGGESTIONS
   suggestions: string[] = [];
   showSuggestions = false;
   selectedSuggestionIndex = -1;
 
-  constructor(private sanitizer: DomSanitizer) {}
+  constructor(
+    private sanitizer: DomSanitizer,
+    private analyticsService: AnalyticsService
+  ) {}
 
   ngOnInit(): void {
     const data = faqData as SourceFAQRecord[];
+
+    // Build subCategories map
     data.forEach(record => {
       const cat = record.Category__c;
       const sub = record.SubCategory__c ?? '';
@@ -68,6 +67,8 @@ export class FaqComponent implements OnInit {
         }
       }
     });
+
+    // Convert raw data to FAQ items
     this.faqList = data.map(rec => this.toFAQItem(rec));
   }
 
@@ -87,9 +88,9 @@ export class FaqComponent implements OnInit {
   }
 
   private removeParagraphs(str: string): string {
-    str = str.replace(/<p[^>]*>/g, '');
-    str = str.replace(/<\/p>/g, '');
-    return str;
+    return str
+      .replace(/<p[^>]*>/g, '')
+      .replace(/<\/p>/g, '');
   }
 
   private unescapeHtml(escapedStr: string): string {
@@ -97,19 +98,24 @@ export class FaqComponent implements OnInit {
       .replace(/&lt;/g, '<')
       .replace(/&gt;/g, '>')
       .replace(/&quot;/g, '"')
-      .replace(/&#39;/g, '\'')
+      .replace(/&#39;/g, "'")
       .replace(/&amp;/g, '&');
   }
 
+  // All main categories
   get categories(): string[] {
     return Object.keys(this.subCategories);
   }
 
+  // Filter logic based on current search, category, subcategory
   get filteredFAQ(): FAQItem[] {
     const q = this.searchQuery.toLowerCase().trim();
     return this.faqList.filter(item => {
+      // Match category
       if (this.currentCategory && item.category !== this.currentCategory) return false;
+      // Match subcategory
       if (this.currentSubCategory && item.subCategory !== this.currentSubCategory) return false;
+      // Match search text
       if (q) {
         return (
           item.question.toLowerCase().includes(q) ||
@@ -120,6 +126,7 @@ export class FaqComponent implements OnInit {
     });
   }
 
+  // Category / Subcategory selection
   pickCategory(cat: string): void {
     this.currentCategory = cat;
     this.currentSubCategory = '';
@@ -134,8 +141,22 @@ export class FaqComponent implements OnInit {
     this.currentSubCategory = subCat;
   }
 
-  clearSubCategory(): void {
-    this.currentSubCategory = '';
+  // Track expansions in analytics
+  onFaqOpened(item: FAQItem) {
+    if (this.analyticsService.userConsented) {
+      const payload = {
+        eventType: 'faq_open',
+        faqQuestion: item.question,
+        faqCategory: item.category,
+        timestamp: new Date().toISOString()
+      };
+      this.analyticsService.trackCustomEvent(payload);
+    }
+  }
+
+  // Search & Suggestions
+  onSearchBlur(): void {
+    this.searchFocused = false;
   }
 
   onSearchInputChange(): void {
@@ -154,6 +175,7 @@ export class FaqComponent implements OnInit {
     const matchedQuestions = this.faqList
       .map(item => item.question)
       .filter(question => question.toLowerCase().includes(q));
+
     const unique = Array.from(new Set(matchedQuestions));
     this.suggestions = unique.slice(0, 10);
   }
@@ -200,10 +222,6 @@ export class FaqComponent implements OnInit {
     setTimeout(() => {
       inputEl.focus();
     }, 0);
-  }
-
-  onSearchBlur(): void {
-    this.searchFocused = false;
   }
 
   clearSearch(): void {

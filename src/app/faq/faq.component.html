@@ -1,19 +1,10 @@
-<!--
-/*********************************************************
- * src/app/faq/faq.component.html
- *********************************************************
--->
+<!-- faq.component.html -->
 <div class="faq-container">
-
+  <!-- TOP SEARCH BAR -->
   <div class="faq-search">
     <label class="visually-hidden" for="faqSearchInput">
       Search FAQs
     </label>
-
-    <!-- 
-      This .search-wrapper has a fixed width (e.g. 300px),
-      and both the input and suggestions will match that width.
-    -->
     <div class="search-wrapper">
       <input
         #faqSearchBox
@@ -41,6 +32,7 @@
       </span>
     </div>
 
+    <!-- SUGGESTIONS -->
     <ul
       class="suggestions-list"
       *ngIf="showSuggestions"
@@ -59,47 +51,106 @@
     </ul>
   </div>
 
-  <div class="faq-category-buttons">
-    <button (click)="clearCategory()" [disabled]="!currentCategory">
-      All
-    </button>
-    <button
-      *ngFor="let cat of categories"
-      (click)="pickCategory(cat)"
-      [class.active]="cat === currentCategory"
-    >
-      <img
-        class="category-icon"
-        [src]="categoryLogos[cat] || 'assets/icons/default.png'"
-        alt="{{ cat }} logo"
-      />
-      {{ cat }}
-    </button>
-  </div>
+  <!-- LAYOUT WRAPPER: LEFT SIDEBAR + MAIN CONTENT -->
+  <div class="faq-layout">
+    
+    <!-- LEFT SIDEBAR -->
+    <aside class="faq-sidebar">
+      <h3 class="sidebar-title">Categories</h3>
+      <ul class="category-list">
+        <!-- "All" entry to clear categories -->
+        <li
+          class="category-item"
+          [class.active]="!currentCategory"
+          (click)="clearCategory()"
+        >
+          All
+        </li>
 
-  <div class="faq-category-buttons" *ngIf="currentCategory && subCategories[currentCategory]">
-    <button
-      *ngFor="let subCat of subCategories[currentCategory]"
-      (click)="pickSubCategory(subCat)"
-      [class.active]="subCat === currentSubCategory"
-    >
-      {{ subCat }}
-    </button>
-  </div>
+        <!-- Main categories -->
+        <li
+          *ngFor="let cat of categories"
+          class="category-item"
+          [class.active]="cat === currentCategory"
+          (click)="pickCategory(cat)"
+        >
+          {{ cat }}
+        </li>
+      </ul>
 
-  <mat-accordion>
-    <mat-expansion-panel *ngFor="let item of filteredFAQ">
-      <mat-expansion-panel-header>
-        <mat-panel-title class="faq-title">
-          <img
-            class="category-icon"
-            [src]="categoryLogos[item.category] || 'assets/icons/default.png'"
-            alt="{{ item.category }} logo"
-          />
-          {{ item.question }}
-        </mat-panel-title>
-      </mat-expansion-panel-header>
-      <div [innerHTML]="item.safeAnswer"></div>
-    </mat-expansion-panel>
-  </mat-accordion>
-</div>
+      <!-- Subcategory listing (only if a category is selected) -->
+      <div
+        class="subcategory-container"
+        *ngIf="currentCategory && subCategories[currentCategory]?.length"
+      >
+        <h4 class="sidebar-title">Subcategories</h4>
+        <ul class="subcategory-list">
+          <li
+            *ngFor="let subCat of subCategories[currentCategory]"
+            class="subcategory-item"
+            [class.active]="subCat === currentSubCategory"
+            (click)="pickSubCategory(subCat)"
+          >
+            {{ subCat }}
+          </li>
+        </ul>
+      </div>
+    </aside>
+
+    <!-- MAIN FAQ AREA -->
+    <main class="faq-main">
+      <!-- BREADCRUMB / FAST RETURN -->
+      <nav class="breadcrumb" *ngIf="currentCategory || currentSubCategory">
+        <!-- If user has chosen any category, show breadcrumb for that -->
+        <span
+          class="breadcrumb-link"
+          (click)="clearCategory()"
+          [class.clickable]="currentCategory || currentSubCategory"
+        >
+          All
+        </span>
+        <ng-container *ngIf="currentCategory">
+          <span class="breadcrumb-separator">/</span>
+          <span
+            class="breadcrumb-link"
+            (click)="pickCategory(currentCategory)"
+            [class.clickable]="true"
+          >
+            {{ currentCategory }}
+          </span>
+        </ng-container>
+        <ng-container *ngIf="currentSubCategory">
+          <span class="breadcrumb-separator">/</span>
+          <span
+            class="breadcrumb-link"
+            (click)="pickSubCategory(currentSubCategory)"
+            [class.clickable]="true"
+          >
+            {{ currentSubCategory }}
+          </span>
+        </ng-container>
+      </nav>
+
+      <!-- FAQ ACCORDION -->
+      <mat-accordion>
+        <mat-expansion-panel
+          *ngFor="let item of filteredFAQ"
+          (opened)="onFaqOpened(item)"
+        >
+          <mat-expansion-panel-header>
+            <mat-panel-title class="faq-title">
+              {{ item.question }}
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+          <div [innerHTML]="item.safeAnswer"></div>
+        </mat-expansion-panel>
+      </mat-accordion>
+      
+      <!-- Optionally, if no results found -->
+      <div class="no-results" *ngIf="filteredFAQ.length === 0">
+        No FAQs found. Try a different search or reset the filters.
+      </div>
+    </main>
+
+  </div> <!-- END .faq-layout -->
+</div> <!-- END .faq-container -->

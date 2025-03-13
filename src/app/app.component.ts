@@ -1,27 +1,44 @@
-import { Component, HostListener } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
+import { Router, NavigationEnd, Event as RouterEvent } from '@angular/router';
+import { filter } from 'rxjs/operators';
 import { AnalyticsService } from './analytics.service';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html'
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
 
-  constructor(private analyticsService: AnalyticsService) {}
+  constructor(
+    private analyticsService: AnalyticsService,
+    private router: Router
+  ) {}
 
+  ngOnInit() {
+    // Listen for route changes to track page views
+    this.router.events
+      .pipe(
+        // Type guard: ensures only NavigationEnd events pass through
+        filter((event: RouterEvent): event is NavigationEnd => event instanceof NavigationEnd)
+      )
+      .subscribe((event: NavigationEnd) => {
+        if (this.analyticsService.userConsented) {
+          this.analyticsService.trackPageView(event.urlAfterRedirects);
+        }
+      });
+  }
+
+  // Global document click listener (unchanged)
+  /*
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent) {
-    // The clicked element
     const targetElement = event.target as HTMLElement;
-
-    // Build an identifier: ID, class, or just the tag name
     const elementInfo = targetElement.id
       ? `#${targetElement.id}`
       : targetElement.className
       ? `.${targetElement.className}`
       : targetElement.tagName;
 
-    // Only track if user has accepted cookies
     if (this.analyticsService.userConsented) {
       const clickData = {
         element: elementInfo,
@@ -30,4 +47,5 @@ export class AppComponent {
       this.analyticsService.trackClickEvent(clickData);
     }
   }
+  */
 }

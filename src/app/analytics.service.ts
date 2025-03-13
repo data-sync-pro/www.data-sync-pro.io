@@ -13,36 +13,105 @@ export class AnalyticsService {
     this.userConsented = consent;
   }
 
-  // If you want a unique visitor ID, you can store/retrieve it from localStorage:
-  private getVisitorId(): string {
-    let vid = localStorage.getItem('visitorId');
-    if (!vid) {
-      vid = Math.random().toString(36).substring(2, 10);
-      localStorage.setItem('visitorId', vid);
+  /**
+   * Generate or retrieve the user ID from a cookie named 'visitorId'.
+   * If the cookie doesn't exist, create a new one.
+   */
+  private getOrSetVisitorIdFromCookie(): string {
+    const cookieName = 'visitorId';
+
+    // 1. Attempt to read existing cookie
+    const existingCookie = this.getCookieValue(cookieName);
+    if (existingCookie) {
+      return existingCookie;
     }
-    return vid;
+
+    // 2. If not found, generate a new ID and set it in a cookie
+    const newId = Math.random().toString(36).substring(2, 10);
+    const daysToExpire = 365; // Customize the expiration as needed
+    this.setCookie(cookieName, newId, daysToExpire);
+    return newId;
   }
 
-  // This method is called from the global click listener
+  private getCookieValue(name: string): string | null {
+    const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+    return match ? decodeURIComponent(match[2]) : null;
+  }
+
+  private setCookie(name: string, value: string, days?: number) {
+    let cookieString = `${name}=${encodeURIComponent(value)}; path=/;`;
+    if (days) {
+      const date = new Date();
+      date.setDate(date.getDate() + days);
+      cookieString += ` expires=${date.toUTCString()};`;
+    }
+    document.cookie = cookieString;
+  }
+
+  /**
+   * Retrieve the visitor ID (cookie-based).
+   */
+  private getVisitorId(): string {
+    return this.getOrSetVisitorIdFromCookie();
+  }
+
+  /**
+   * Globally track any click event from the document (as you already do).
+   */
   trackClickEvent(data: { element: string; timestamp: string }) {
-    // If the user hasn't accepted cookies, do nothing
     if (!this.userConsented) {
       return;
     }
-
-    // We can add the visitorId if we want
     const visitorId = this.getVisitorId();
+    const payload = {
+      visitorId,
+      eventType: 'click',
+      element: data.element,
+      timestamp: data.timestamp
+    };
+    this.http.post('http://localhost:3000/api/track', payload)
+      .subscribe({
+        next: (res) => console.log('Click tracked successfully:', res),
+        error: (err) => console.error('Tracking error:', err)
+      });
+  }
 
-    // Build the final payload
+  /**
+   * Track a page view (called after route navigation).
+   */
+  trackPageView(pageUrl: string) {
+    if (!this.userConsented) {
+      return;
+    }
+    const visitorId = this.getVisitorId();
+    const payload = {
+      visitorId,
+      eventType: 'page_view',
+      page: pageUrl,
+      timestamp: new Date().toISOString()
+    };
+    this.http.post('http://localhost:3000/api/track', payload)
+      .subscribe({
+        next: (res) => console.log('Page view tracked:', res),
+        error: (err) => console.error('Tracking error:', err)
+      });
+  }
+
+  /**
+   * A generic method for custom events, e.g., FAQ expansions.
+   */
+  trackCustomEvent(data: any) {
+    if (!this.userConsented) {
+      return;
+    }
+    const visitorId = this.getVisitorId();
     const payload = {
       visitorId,
       ...data
     };
-
-    // Send to your backend. Adjust the URL if your server is at a different port or domain
     this.http.post('http://localhost:3000/api/track', payload)
       .subscribe({
-        next: (res) => console.log('Click tracked successfully:', res),
+        next: (res) => console.log('Custom event tracked:', res),
         error: (err) => console.error('Tracking error:', err)
       });
   }
