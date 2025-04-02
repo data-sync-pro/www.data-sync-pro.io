@@ -1,26 +1,1199 @@
 [
   {
-    "Id": "a0oEc000004POegIAG",
-    "Question__c": "123",
-    "SeqNo__c": "1.0",
-    "Answer__c": null,
-    "Category__c": "Rules Engine",
-    "SubCategory__c": "Batch"
+    "Id": "a0oEc0000057w79IAA",
+    "Question__c": "How can I integrate the Q into Salesforce Lightning pages?",
+    "Answer__c": "You can integrate **Query Manager (Q)** into Lightning pages using either of the following approaches:\n\n1️⃣ **Query List** – Drag the **Query List** Lightning Web Component onto a Lightning page and configure its SOQL query and display settings via component attributes.\n\n2️⃣ **Executable/Pipeline Data Lists** – For more advanced scenarios (e.g., actions, transformations, filters), use **Data Lists** defined in **Executables**. Then, add the **Executable Data List** or **Pipeline Data Lists** component to your Lightning page and enter the API Name of the corresponding Executable or Pipeline.\n\n&#128204; See the **Data List** section for details on setting up action-enabled, rule-driven data lists within DSP.",
+    "Category__c": "Query Manager(Q)",
+    "SubCategory__c": null
   },
   {
-    "Id": "a0oEc000004PRfRIAW",
-    "Question__c": "665",
-    "SeqNo__c": "2.0",
-    "Answer__c": "<p>&lt;div class=&quot;responsive-video&quot;&gt;</p><p>        &lt;iframe class=&quot;absolute-position&quot; width=&quot;100%&quot; height=&quot;100%&quot; src=&quot;https://www.youtube.com/embed/DfYM-N5wCA4?rel=0&quot;</p><p>        frameborder=&quot;0&quot; allow=&quot;accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture&quot; allowfullscreen&gt;</p><p>        &lt;/iframe&gt;</p><p>      &lt;/div&gt;</p>",
+    "Id": "a0oEc0000057w76IAA",
+    "Question__c": "Is pagination handled on the server-side or client-side?",
+    "Answer__c": "Pagination in Query Manager (Q) is handled server-side for standard and custom objects, ensuring efficient querying by retrieving only the records needed for the current page. This optimizes performance, reduces memory usage, and speeds up data retrieval.\n\nFor Big Objects, pagination is handled client-side because Salesforce does not support the OFFSET clause in Big Object queries. Instead, the full result set is fetched, and pagination is applied client-side. Specify the LIMIT to reduce the number of records to be queried.",
+    "Category__c": "Query Manager(Q)",
+    "SubCategory__c": null
+  },
+  {
+    "Id": "a0oEc0000057w77IAA",
+    "Question__c": "Does Q support the Tooling API?",
+    "Answer__c": "Yes, Q supports querying via the Tooling API. Users can switch to Tooling API Mode to query metadata and system-related objects that are not accessible through standard SOQL. This enables retrieving insights on Apex classes, triggers, custom fields, debug logs, and other Salesforce development components directly from Q.",
+    "Category__c": "Query Manager(Q)",
+    "SubCategory__c": null
+  },
+  {
+    "Id": "a0oEc0000057w78IAA",
+    "Question__c": "How can I manage my queries?",
+    "Answer__c": "In **Query Manager (Q)**, you can efficiently save, organize, and reuse your queries with the following features:\n\n- **Save Queries** – Use the **&quot;Save Query&quot;** button to store your current query for future use.  \n- **View Saved Queries** – Click **&quot;Select Query&quot;** to browse saved queries, sorted by **Last Modified Date**.  \n- **Select a Query** – Load any saved query into Q, modify it as needed, and execute the query to view the results.  \n- **Sort &amp; Filter** – Sort by **Label** or **Object API Name**, and use **Column Filters** to find queries quickly.  \n- **Relabel or Delete** – Update query labels for clarity or remove unused queries.",
+    "Category__c": "Query Manager(Q)",
+    "SubCategory__c": null
+  },
+  {
+    "Id": "a0oEc0000057w4PIAQ",
+    "Question__c": "What is Data Sync Pro(DSP)?",
+    "Answer__c": "Data Sync Pro is a secure, comprehensive, and scalable enterprise data management solution built natively on Salesforce. It’s designed to streamline, automate, and optimize data operations—enabling effortless data transformation, execution, and automation at scale.\n\nDSP offers a suite of powerful, no-code, and modular rules engines—[Batch, Triggers, Data List, Action Button, and Data Loader]—that address a substantial range of Salesforce data management needs. By defining processes through modular, record-based rules, DSP significantly simplifies both development and business workflows, increases operational efficiency, reduces tech debt, and supports long-term scalability within the Salesforce platform.",
     "Category__c": "General",
     "SubCategory__c": null
   },
   {
-    "Id": "a0oEc000004PUILIA4",
-    "Question__c": "221",
-    "SeqNo__c": "3.0",
-    "Answer__c": "<p>2212</p>",
-    "Category__c": "Rules Engine",
-    "SubCategory__c": "Triggers"
+    "Id": "a0oEc0000057w4QIAQ",
+    "Question__c": "What are the five rules engines in DSP, and what is each used for?",
+    "Answer__c": "In **Data Sync Pro (DSP)**, the five **rules engines** are distinct data processing frameworks built on a **record-based configuration model**, each tailored for specific types of data operations—within or across Salesforce orgs.\n\n---\n\n1️⃣ **Batch** –  \nProcesses large volumes of data with unmatched performance enhancement. Ideal for replacing Apex batch jobs, performing data transformations at scale, data cleansing, and migrating records between Salesforce orgs.\n\n---\n\n2️⃣ **Data List** –  \nRenders query results as interactive, configurable tables. Enables business users to filter, explore, edit, and take action on records through list-level or row-level interactions.\n\n---\n\n3️⃣ **Triggers** –  \nExecutes rule-based automation in response to Salesforce DML events such as insert, update, delete, and undelete. Useful for real-time validations, transformations, and actions.\n\n---\n\n4️⃣ **Action Button** –  \nAdds configurable buttons to the Lightning UI to initiate record-level or global actions. Supports pre-populated transformations, validations, and updates through guided interaction.\n\n---\n\n5️⃣ **Data Loader** –  \nAutomates data uploads via CSV files using reusable configuration and transformation logic. Supports secure, trackable loading into any connected Salesforce org.\n\n---\n\n&#128204; **All five rules engines share a unified architecture:**\n\n- Configured through **Executable records**\n- Follow guided steps—**Input**, **Preview**, **Retrieve**, **Scoping**, **Match**, **Mapping**, **Action**, **Verify** *(as applicable)*\n- Fully support **cross-org operations** via Connections\n- Offer **granular permissions control** to manage visibility, access, and execution\n- Built with Salesforce-native technologies (Apex, Lightning Web Components), ensuring secure, performant, and fully integrated automation inside Salesforce\n\nTogether, these rules engines power DSP’s unified automation platform—enabling teams to design modular, flexible, and enterprise-grade data processes without the need for code.",
+    "Category__c": "General",
+    "SubCategory__c": null
+  },
+  {
+    "Id": "a0oEc0000057w4RIAQ",
+    "Question__c": "How do no-code, modular, record-based rules transform enterprise data management?",
+    "Answer__c": "No-code, modular, and record-based rules fundamentally transform enterprise data management by providing a structured approach that simplifies complex data processes, reduces technical debt, and ensures scalability and maintainability across the enterprise.\n\n**No-code:**  \nEmpowers non-technical users to implement, manage, and maintain data processes without writing or managing complex code, greatly accelerating development and reducing operational overhead.\n\n**Modularity:**  \nBreaks down data processes into clearly defined, self-contained components, simplifying collaboration, troubleshooting, and ongoing enhancements.\n\n**Record-based Rules:**  \nEncapsulate business logic within clearly structured records. Because each rule is bounded and self-contained, complexity is effectively isolated and controlled, ensuring easier reuse, consistent implementation, minimal dependency management, and streamlined deployment.\n\nMany existing no-code solutions primarily transform traditional code into visual UI components. However, like traditional coding, these solutions still leave modularity up to designers, forcing them to manually handle complex logic and bulkification, which inevitably leads to complexity and technical debt. In contrast, combining true no-code capabilities, inherent modularity, and structured record-based rules effectively resolves these challenges, establishing a sustainable foundation for the future of enterprise data management.",
+    "Category__c": "General",
+    "SubCategory__c": null
+  },
+  {
+    "Id": "a0oEc0000057w4SIAQ",
+    "Question__c": "Why Data Sync Pro?",
+    "Answer__c": "Data Sync Pro (DSP) transforms enterprise data management by uniquely combining powerful, unified rules engines, structured record-based rules, no-code configuration, inherent modularity, and automated bulkified transformations—all within Salesforce’s native environment. Here’s why DSP stands out:\n\n- **Unified, Powerful Rules Engines:** DSP’s five integrated rules engines (Batch, Data List, Triggers, Action Button, Data Loader) share a common architecture, enabling sophisticated data operations, precise permission controls, and effortless scalability across enterprise environments. Additionally, DSP treats Salesforce orgs as unified connections, empowering these rules engines to seamlessly perform CRUD (Create, Read, Update, Delete) operations across multiple connected orgs—facilitating efficient cross-org data synchronization, migration, and unified data management.\n\n- **Bulkified Transformations:** DSP fully automates bulk data operations, significantly simplifying logic and improving performance. Unlike traditional methods requiring manual management of bulk queries and collections, DSP supports direct referencing of relational fields (e.g., `Parent__r.Field_x__c`) and intelligently optimizes queries. Additionally, complex operations like VLOOKUP and aggregations (AGG) are automatically bulkified, greatly reducing database interactions and ensuring clear, maintainable logic.\n\n- **No-Code Empowerment:** DSP provides a guided, intuitive interface across all rules engines, allowing designers to define sophisticated data processes effortlessly. Its powerful bulkification capabilities enable designers to configure their rules using declarative, easy-to-use formulas and capability-based settings—making bulk operations feel as simple as working with a single record.\n\n- **Inherent Modularity:** DSP encourages modular design by guiding designers to build clearly defined, self-contained processes with explicitly defined inputs, outputs, and internal logic. DSP then automatically compiles and integrates these modules into cohesive, scalable solutions, facilitating easy collaboration, efficient troubleshooting, and continuous improvements.\n\n- **Record-Based Rules:** DSP encapsulates business logic into clearly structured rules stored directly as regular records. This approach ensures each module remains self-contained and bounded, isolates complexity, reduces dependencies, simplifies logic reuse, and streamlines deployment compared to traditional no-code solutions.\n\n- **Native Salesforce Technologies:** Built entirely with Salesforce-native technologies (Apex and Lightning Web Components), DSP ensures secure, compliant, and deeply integrated data operations within your Salesforce environment—without external data processing.\n\nData Sync Pro converts complex data management challenges into simple, maintainable, and efficient processes, enabling rapid development and providing enterprises a powerful, scalable, and future-proof solution within Salesforce.",
+    "Category__c": "General",
+    "SubCategory__c": null
+  },
+  {
+    "Id": "a0oEc0000057w4TIAQ",
+    "Question__c": "Does DSP process any data outside the subscriber’s Salesforce org?",
+    "Answer__c": "No, Data Sync Pro does not process any data outside the subscriber’s Salesforce org. All data operations run entirely within the subscriber’s environment—where DSP is installed—using native Salesforce Apex.",
+    "Category__c": "General",
+    "SubCategory__c": null
+  },
+  {
+    "Id": "a0oEc0000057w4UIAQ",
+    "Question__c": "How does DSP ensure security and privacy?",
+    "Answer__c": "**Data Sync Pro ensures security and privacy in two key ways:**\n\n### **1. Data Processing within the Subscriber’s Org**  \nAll data processing is performed entirely within the subscriber’s Salesforce org where DSP is installed, using native Apex. DSP operates fully within the subscriber’s environment and does not rely on any external data processing.\n\n### **2. Enforcement of Salesforce’s Standard Security Model**  \nDSP fully adheres to Salesforce’s object-, field-, and record-level security. Only users with the appropriate permissions can access or invoke DSP rules:\n\n- Users with the **&quot;DSP: Data Sync Pro Starter&quot;** permission set can access real-time (synchronous) rules—such as **Data Lists, Triggers, and Action Buttons**—**only** if they have **read access to the associated Executable records**.  \n- They **cannot execute asynchronous rules**, like **Batch jobs or Data Loaders**, as this permission set does **not include insert access** to **Pipeline Execution**, **Execution**, or **Batch Execution** objects required for logging.  \n- To run asynchronous rules, users must have the **&quot;DSP: Data Sync Pro App User&quot;** permission set and must be granted **explicit access to the relevant Executable records**.  \n- Full administrative control is reserved for users with the **&quot;DSP: Data Sync Pro Administrator&quot;** permission set, which includes access to all configuration records.\n\n---\n\n**These safeguards ensure that all DSP operations strictly follow the subscriber’s security settings while maintaining full control within the Salesforce platform.**",
+    "Category__c": "General",
+    "SubCategory__c": null
+  },
+  {
+    "Id": "a0oEc0000057w4VIAQ",
+    "Question__c": "How is Data Sync Pro licensed, and what factors determine pricing?",
+    "Answer__c": "Data Sync Pro uses a **site-wide license model**, meaning it can be assigned to **unlimited users** within your Salesforce org. This allows you to maximize value across teams without incurring per-user (per-seat) costs.\n\nPricing is based on three key factors:\n\n- **Number of Connections** – The number of external Salesforce orgs or environments connected through DSP.  \n- **Number of Executables** – The number of rules or logic units created in DSP to define data operations.  \n- **Daily Data Volume** – The total amount of data DSP processes each day.\n\nThis model ensures you&#39;re paying for the **value delivered**—based on the scale and complexity of your data management needs—not the number of users accessing the app.",
+    "Category__c": "General",
+    "SubCategory__c": null
+  },
+  {
+    "Id": "a0oEc0000057w4WIAQ",
+    "Question__c": "What are the three core user personas included in the Data Sync Pro package?",
+    "Answer__c": "Data Sync Pro supports three core user personas, each defined by a dedicated permission set that controls access to DSP features and actions:\n\n- **DSP: Data Sync Pro Starter**  \n  Provides minimal access to DSP package objects and components. Users with this permission set can execute **synchronous rules** like **Triggers**, **Record Actions**, and **Data Lists**—**only if Read access to the associated Executable records is shared with them**. They **cannot execute Batch Jobs or Data Loaders**, even if they have access to the related Executable records.\n\n- **DSP: Data Sync Pro App User**  \n  Builds on the Starter persona by granting access to the **Data Sync Pro** app, as well as the ability to **execute Batch Jobs and Data Loaders**, provided the user has at least **Read access to the relevant Executable records** through sharing.\n\n- **DSP: Data Sync Pro Administrator**  \n  Grants full administrative access, including **&quot;Modify All&quot;** on all DSP objects and access to **all custom permissions** within the package. This persona is intended for users responsible for configuring and managing DSP across the org.\n\nThese permission sets enable secure, scalable, and role-appropriate access control throughout your use of Data Sync Pro.",
+    "Category__c": "General",
+    "SubCategory__c": null
+  },
+  {
+    "Id": "a0oEc0000057w4XIAQ",
+    "Question__c": "How do the different DSP rules engines—Batch, Data List, Action Button, Data Loader, and Triggers—compare in terms of similarities and differences?",
+    "Answer__c": "The Batch, Data List, and Trigger rules engines in DSP are Direction-based, meaning they take input from a source object, apply transformations, and perform an action on a target object. The Data Loader is similar to Batch but is Connection-based, meaning its source data comes from a CSV upload rather than a source object. The Action Button can be either Direction-based or Connection-based:\n\nConnection-based Action Button – Acts as a global action with no input data.\nDirection-based Action Button – Functions as a record action, using the current record from a Lightning record page as input.\nWhile these rules engines share similar sub-processes, the key difference lies in how they receive input:\n\nBatch – Processes all records retrieved by the Retrieve query.\nData List – Displays query results to users, allowing manual record selection before execution.\nTriggers – Executes when Salesforce DML events occur, using the triggering records as input.\nAction Button –\nConnection-based: No input data.\nDirection-based: Uses the current record from the Lightning record page.\nData Loader – Uses uploaded CSV data as input instead of querying a source object.\n&#128204; Despite their differences in input handling, all DSP rules engines follow a structured process, enabling powerful automation and transformation capabilities.",
+    "Category__c": "General",
+    "SubCategory__c": null
+  },
+  {
+    "Id": "a0oEc0000057w4YIAQ",
+    "Question__c": "How much training is required to start building in Data Sync Pro?",
+    "Answer__c": "Getting started with Data Sync Pro requires minimal training. DSP is built entirely on **Salesforce-native technologies** (Apex and LWC) and introduces only **seven intuitive configuration objects**—**Connection, Direction, Pipeline, Executable, Field Mapping, Variable, and Schedule**—whose purposes are mostly self-explanatory by name.\n\nCreating data processes in DSP simply involves **creating records** from these configuration objects, along with a **one-time integration** via Apex Triggers or Lightning Pages. Each rules engine comes with **guided user interfaces**, **step-by-step configuration**, and **capability-based fields** that help users design rules easily within Executable records.\n\nDSP provides **autocomplete suggestions** for filters, field mappings, and variables to simplify building formulas.\n\nTo support new users, DSP also includes **comprehensive user manuals** and **starter recipes** to help teams ramp up quickly.\n\nThanks to its intuitive design and shared architecture across rules engines, **most users are able to start building rules within a few hours**.",
+    "Category__c": "General",
+    "SubCategory__c": null
+  },
+  {
+    "Id": "a0oEc0000057w4ZIAQ",
+    "Question__c": "Does DSP development adhere to the Software Development Life Cycle (SDLC)?",
+    "Answer__c": "**Data Sync Pro supports SDLC-aligned deployment through two flexible options, designed to accommodate teams of all sizes:**\n\n### 1️⃣ Manual JSON Export &amp; Import *(Ideal for SMBs with simple processes)*  \nDSP allows you to export Executables from a Pipeline as a JSON file, which can then be manually imported into a Pipeline in the target environment. This method is straightforward and effective for smaller teams with a limited number of Executables and minimal deployment complexity.\n\n### 2️⃣ Automated Deployment via DSP Migration *(Best for Medium to Large Enterprises)*  \nFor more systematic and scalable deployments, DSP provides a **standard migration template** to move configuration data across Salesforce environments.  \nDownload the template, upload it to your Pipeline, and use the **Template Direction** to define how data should flow. You can then execute Batches manually or schedule them for automated deployment.\n\n&#128073; Check out the [deployment recipe](link) for step-by-step guidance on migrating DSP configurations via Pipelines.\n\n---\n\n&#128640; **Using DSP for deployment provides a consistent, scalable, and SDLC-friendly approach to configuration migration—powered by DSP’s native Salesforce-to-Salesforce data management capabilities.**",
+    "Category__c": "General",
+    "SubCategory__c": null
+  },
+  {
+    "Id": "a0oEc0000057w4aIAA",
+    "Question__c": "Is DSP subject to Salesforce governor limits?",
+    "Answer__c": "Yes, DSP runs entirely within your Salesforce org and is therefore subject to Salesforce governor limits.",
+    "Category__c": "General",
+    "SubCategory__c": null
+  },
+  {
+    "Id": "a0oEc0000057w4bIAA",
+    "Question__c": "What is a Batch job in general?",
+    "Answer__c": "A **batch job** is a method of processing large volumes of data or tasks by breaking them into smaller, manageable units (or “batches”) that are executed asynchronously.\n\nBatch jobs are not limited to local data processing—they apply to any process that **retrieves data from a source**, applies **transformations**, and performs **actions on a target**, whether within a single system or across connected systems.\n\n---\n\n### &#128295; **Core Concepts:**\n\n- **Asynchronous Processing**  \n  Batch jobs run separately from the main application flow, allowing intensive operations to execute without impacting system responsiveness.\n\n- **Data Chunking**  \n  Large datasets are split into smaller batches, each processed independently. This improves efficiency, scalability, and fault tolerance.\n\n- **Invocation**  \n  Batch jobs can be triggered on-demand, scheduled, or initiated by other automated processes, depending on platform capabilities and business needs.\n\n---\n\n### &#128204; **Common Use Cases:**\n- Mass data updates, inserts, or deletions  \n- Data cleansing, enrichment, and deduplication  \n- Cross-org or cross-system data synchronization  \n- Backup and restore of historical records  \n- Lead conversion  \n- Sending emails or triggering custom notifications  \n\n---\n\nBatch jobs are widely used across enterprise platforms to enable **efficient, scalable, and reliable processing of high-volume data operations—locally or across systems.**",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Batch"
+  },
+  {
+    "Id": "a0oEc0000057w4cIAA",
+    "Question__c": "Why choose Data Sync Pro's Batch?",
+    "Answer__c": "Data Sync Pro’s Batch is a powerful, no-code, record-based engine designed to manage large-scale data operations entirely within Salesforce. Built for performance, flexibility, and operational control, it enables teams to define and automate complex data workflows in a scalable, modular way.\n---\n\n#### ✅ **Key Advantages:**\n\n- **Fully Native** – Built on Apex, Batch operates securely within the subscriber&#39;s Salesforce org, with no external data handling.  \n- **Record-Based &amp; Modular** – Configuration is stored as structured records, making processes transparent, reusable, and easy to maintain.  \n- **Guided Interface** – A step-by-step UI simplifies process design with clear phases: Retrieve, Scoping, Match, Mapping, Action, and Verify.  \n- **Bulkified &amp; High-Performance** – Optimized for large-scale operations using Bulk API, delta processing, and auto-scaling techniques.  \n- **Advanced Transformation** – Supports formulas, relational lookups, expressions, VLOOKUP, external ID mapping, and more—at scale.  \n- **Reliable Execution Controls** – Features like auto-retry, re-run failed batches, writeback, and batch-specific settings make error handling and recovery seamless.  \n- **Cross-Org Support via Unified Connections** – Batches can process and synchronize data across multiple Salesforce orgs through DSP’s unified connection architecture.  \n- **Compliance-Friendly** – All operations run inside Salesforce, respecting org-level security, sharing rules, and platform limits.  \n- **Action-Oriented** – Beyond DML, Batches can perform Lead Conversion, send Emails, publish Platform Events, and trigger Bell Notifications.  \n\n---\n\n&#128640; By combining **automation**, **integration**, **modularity**, **transformation**, **rapid development**, **low maintenance**, and **compliance tracking**, **DSP Batch** provides an **efficient, reliable, and future-proof solution** for processing high-volume data in Salesforce.",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Batch"
+  },
+  {
+    "Id": "a0oEc0000057w4dIAA",
+    "Question__c": "What technologies are used to build the Batch rules engine in DSP?",
+    "Answer__c": "Batch in Data Sync Pro (DSP) is built entirely with Apex (on the backend) and Lightning Web Components (LWC) (on the frontend), ensuring secure, Salesforce-native data processing that never leaves the subscriber’s org. Unlike traditional Apex batch classes, DSP’s no-code Batch uses an optimized execution framework to handle large-scale data operations faster and more efficiently.",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Batch"
+  },
+  {
+    "Id": "a0oEc0000057w4eIAA",
+    "Question__c": "What are the common use cases for DSP's Batch?",
+    "Answer__c": "Batch in Data Sync Pro (DSP) is a **no-code, scalable alternative to Apex batch jobs**, enabling automated, large-scale data processing entirely within Salesforce. By leveraging Salesforce-native execution and eliminating external data exports, DSP Batch delivers **enhanced performance, security, and efficiency**.\n\n---\n\n**1) Automated Data Processing (Apex Batch Job Replacement)**\n- Execute bulk Insert, Update, Upsert, Delete, Undelete, and Merge operations  \n- Automate Lead Conversion, Send Emails, and Trigger Bell Notifications  \n- Publish Platform Events for real-time workflows and integrations  \n\n**2) Complex Data Transformation &amp; Enrichment**\n- Apply formula-based transformations and field mappings  \n- Enrich records by retrieving, validating, and modifying related data  \n- Implement multi-step transformations using Pipelines  \n\n**3) Data Cleansing &amp; Deduplication**\n- Identify and merge duplicate records in bulk  \n- Normalize and transform data via rules-based processing  \n- Ensure data accuracy and integrity before final commits  \n\n**4) Org Data Migration**\n- Merge and synchronize data across multiple Salesforce orgs  \n- Retain data integrity without exporting outside Salesforce  \n- Achieve seamless cross-org consolidation and synchronization  \n\n**5) Data Backup &amp; Restore Using Salesforce Big Objects**\n- Archive large volumes of historical data without impacting performance  \n- Automate regular backups of critical records for security and retention  \n- Restore previous record versions on demand for business continuity  \n\n**6) Record History Tracking Using Salesforce Big Objects**\n- Track record changes over time using historical snapshots  \n- Maintain detailed audit logs in high-performance storage  \n- Retrieve and analyze long-term data trends without affecting standard objects  \n\n**7) Sandbox Seeding &amp; Data Masking**\n- Seed sandboxes with relational data for testing and development  \n- Mask sensitive data to meet security requirements  \n- Provide realistic but secure datasets for UAT and dev environments  \n\n**8) Deployment of Record-Based Configurations**\n- Deploy **record-based configurations** (e.g., CPQ, nCino, Data Sync Pro)  \n- Automate configuration migration across orgs—including Custom Settings and other config objects  \n- Preserve data integrity and business logic throughout deployments  \n\n**9) Bulk Data Performance Testing &amp; Governor Limit Tracking**\n- Simulate high-volume data scenarios to assess performance  \n- Track resource consumption (SOQL, CPU, DML, heap) in batch logs  \n- Identify and optimize bottlenecks for improved scalability  \n\n---\n\n**&#128640;** With robust **no-code automation** and **transformation** capabilities, **DSP Batch** replaces traditional Apex batch jobs—making large-scale data operations faster, more secure, and fully Salesforce-native.",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Batch"
+  },
+  {
+    "Id": "a0oEc0000057w4fIAA",
+    "Question__c": "How efficiently does Batch handle large data volumes?",
+    "Answer__c": "DSP Batch is highly optimized for performance, consistently outperforming standard Apex batch jobs. Actual processing speeds depend on factors like system resources and enabled automations. However, with Bulk API turned on, a batch size of 2,000, and automations off or bypassed, DSP can update one million records in under five minutes—demonstrating superior throughput for large-volume data.\n\nEnabling features such as &quot;Skip Record Update if No Changes&quot; can further boost performance in specific scenarios, highlighting DSP Batch’s ability to handle massive datasets with remarkable speed.",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Batch"
+  },
+  {
+    "Id": "a0oEc0000057w4gIAA",
+    "Question__c": "How do I create a Batch Executable?",
+    "Answer__c": "To define a Batch in Data Sync Pro (DSP), you begin by creating a **Batch Executable** that is associated with a **Direction**. This Executable can be created directly from a **Direction record** or from a **Pipeline record** with a **Template Direction** specified.\n\nOnce created, DSP provides a **guided, step-by-step interface** for defining the Batch process:\n\n1️⃣ **Retrieve** – Configure how source data is queried from the connected org. Designers can preview data, test transformations, and run selected records before executing the full batch.  \n2️⃣ **Scoping** – Refine the retrieved dataset using in-memory filters and optional joins with other datasets for multi-source enrichment.  \n3️⃣ **Match** – Identify target records using matching rules. Supports insert-only logic, multi-field matching via transformations, and merge-specific logic.  \n4️⃣ **Mapping** – Apply formulas and expressions to assign and transform target field values. Features auto-validation, relational field support, and a comprehensive function library.  \n5️⃣ **Action** – Define the operations to be performed, such as Insert, Update, Upsert, Delete, Merge, Lead Convert, Send Email, and more. Configure behavior options like “Skip Record Update if No Changes” and writeback.  \n6️⃣ **Verify** – Select target fields to review after execution. These fields appear in the Batch Execution record, allowing review of source and target data side-by-side.\n\nIn addition, the **Batch Settings** section allows configuration of execution parameters such as:\n\n- Enabling **Bulk API**  \n- Setting the **batch size**  \n- Enabling **auto-retry** for failed batches  \n- Running in **serial mode**  \n- Defining additional **execution behaviors**\n\n&#128204; This structured, guided process ensures each Batch is configurable, repeatable, and optimized for high-performance, large-scale data operations—all within Salesforce’s native environment.",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Batch"
+  },
+  {
+    "Id": "a0oEc0000057w4hIAA",
+    "Question__c": "Does Batch only support cross-org data migrations?",
+    "Answer__c": "No, Batch in Data Sync Pro (DSP) is not limited to cross-org data migrations. While it supports seamless cross-org data synchronization, it is also designed for high-performance data operations within the same Salesforce org.\n\nTo run batch jobs within the same org, use the Connection where &quot;Is Current Org&quot; is enabled, allowing the job to execute in the context of the running user.",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Batch"
+  },
+  {
+    "Id": "a0oEc0000057w4iIAA",
+    "Question__c": "What permissions are required to execute a Batch?",
+    "Answer__c": "All DSP processes are structured as custom objects, meaning execution permissions depend on object, field, and record access.\n\nTo execute a Batch Executable in DSP, users must have:\n✅ Read access to the Executable record.\n✅ Create permissions on execution-related objects, including:\n\nPipeline Execution (if executed from a Pipeline).\nExecution and Batch Execution objects.\nPlatform Events: Execution Result and Batch Execution Result.\nRecommended Permission Sets:\n&#128313; DSP: Data Sync Pro Administrator – Grants full access, including all Executable records, enabling users to execute any Batch Executable. This is ideal for super users or admins.\n\n&#128313; DSP: Data Sync Pro App User – Provides necessary object and field-level access without direct access to Batch Executables. To allow execution, manually share specific Batch Executables with users via Salesforce&#39;s standard record-sharing mechanisms.\n\n&#128640; Using the appropriate permission set ensures users have the necessary access while maintaining security and control over Batch Executions.",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Batch"
+  },
+  {
+    "Id": "a0oEc0000057w4jIAA",
+    "Question__c": "What is the maximum dataset size that a DSP batch job can process?",
+    "Answer__c": "DSP Batch follows the same limitations as Salesforce Apex Batch, meaning the maximum data size that can be retrieved in a single query is 50 million records.\n\nWhile DSP optimizes execution for high-volume processing, the actual dataset size that can be processed depends on Salesforce governor limits, system resources, and API constraints.",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Batch"
+  },
+  {
+    "Id": "a0oEc0000057w4kIAA",
+    "Question__c": "What is the maximum batch size that can be set?",
+    "Answer__c": "The maximum batch size in Data Sync Pro (DSP) is 2,000 records per batch. For Remote Connections – To set the batch size to 2,000, &quot;Action to Bulk API&quot; must be enabled, as Salesforce’s regular API does not support DML operations with more than 200 records per request.",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Batch"
+  },
+  {
+    "Id": "a0oEc0000057w4lIAA",
+    "Question__c": "How can I chain multiple batch Executables to run in a specific sequence?",
+    "Answer__c": "To execute multiple Batch Executables in a specific order, create a Pipeline and associate the Executables with it, assigning a Seq No based on their dependencies.\n\nWhen the Pipeline is executed, it executes Batch Executables sequentially, ensuring each one runs in the defined order.",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Batch"
+  },
+  {
+    "Id": "a0oEc0000057w4mIAA",
+    "Question__c": "How can I schedule Batch jobs?",
+    "Answer__c": "You can schedule Batch jobs by creating Schedule records associated with a Batch Executable, Pipeline, or a global Apex class implementing the Batchable or Schedulable interface.\n\nSince Salesforce imposes limits on scheduled jobs, using Pipelines to chain Batch Executables helps optimize scheduling resources and reduce job consumption.",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Batch"
+  },
+  {
+    "Id": "a0oEc0000057w4nIAA",
+    "Question__c": "Can a Pipeline execution be stopped if one of its Executables fails?",
+    "Answer__c": "Yes, by enabling the &quot;Stop Remaining When an Executable Fails&quot; field on the Pipeline.",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Batch"
+  },
+  {
+    "Id": "a0oEc0000057w4oIAA",
+    "Question__c": "Can I apply a common SOQL filter to all Executables in a Pipeline?",
+    "Answer__c": "Yes, by setting the common filter in the &quot;Additional Retrieve Criteria&quot; field on the Pipeline. This applies the filter alongside each Executable&#39;s individual filters.",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Batch"
+  },
+  {
+    "Id": "a0oEc0000057w4pIAA",
+    "Question__c": "How can I efficiently set up Batch Executables to sync multiple objects with parent-child relationships?",
+    "Answer__c": "You can use the Migration Builder within the Pipeline to set up Batch Executables for syncing multiple objects. Start by creating a Pipeline record with a template direction, then navigate to the Migration Builder tab. Add root objects, expand each root object down to the leaf node you want to sync, and select the leaf node. In the modal popup, choose the source and target fields for matching, define the action, and click Create Executables to generate the necessary batch processes.",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Batch"
+  },
+  {
+    "Id": "a0oEc0000057w4qIAA",
+    "Question__c": "How are logs tracked for a Batch execution?",
+    "Answer__c": "Data Sync Pro tracks Batch execution logs using structured records and optional file-based logging:\n\n- **Execution Records** – For each batch job run, an **Execution** record is created and linked to the original **Executable** record.  \n- **Batch Execution Records** – Each individual batch within the job generates a **Batch Execution** record, linked to the parent Execution record.  \n- **Log to File (Optional)** – If **&quot;Log to File&quot;** is enabled, additional execution details are saved in **JSON format** as a **ContentDocument**, linked to the corresponding Batch Execution record.  \n- **Pipeline Execution (if applicable)** – When the batch job runs as part of a **Pipeline**, a **Pipeline Execution** record is created. The related Execution records within the pipeline are automatically assigned **sequence numbers** to indicate their order.\n\n&#128204; This logging structure enables detailed tracking, auditing, and troubleshooting for every step of the batch process.",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Batch"
+  },
+  {
+    "Id": "a0oEc0000057w4rIAA",
+    "Question__c": "Does DSP allow re-execution of failed batches?",
+    "Answer__c": "Yes, you can manually re-execute a specific failed batch from the **Batch Execution** record or re-execute all failed batches at once from the **Execution** record. Additionally, DSP supports **Auto Retry for Failed Batches**, enabling automated recovery without manual intervention.",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Batch"
+  },
+  {
+    "Id": "a0oEc0000057w4sIAA",
+    "Question__c": "Is it possible to revert the changes made a batch execution?",
+    "Answer__c": "Yes, changes made by a Batch execution can be reverted depending on the action type and configuration. DSP provides flexible rollback options when needed:\n\n---\n\n#### &#128260; **For Update Actions**  \n- If **&quot;Log to File&quot;** is enabled, the original target data is saved as a **JSON log file** before the update.  \n- To revert updates:\n  - Use **&quot;Restore Updated From Log File&quot;** on the **Batch Execution** or **Execution** record.\n\n---\n\n#### ➕ **For Insert Actions**  \n- To remove inserted records:\n  - Click **&quot;Delete Inserted Records&quot;** from the **Execution** record to delete all records inserted by the job.\n  - To delete records from a specific batch, go to the **Batch Execution** record, open the **Verify** tab, and delete directly from the data list.\n\n---\n\n#### &#128465;️ **For Delete Actions**  \n- Use **&quot;Restore From Recycle Bin&quot;** if the records are still available there.  \n- If **&quot;Log to File&quot;** is enabled:\n  - Use **&quot;Re-Create Deleted From Log File&quot;** on the Batch Execution to restore deleted data from the saved log.\n\n---\n\n&gt; **Note:** Reversion is **not supported** when **&quot;Action to Bulk API&quot;** is enabled.\n\n---\n\nThese rollback features help ensure reliable recovery from unintended changes—whether from updates, inserts, or deletions—supporting safer data operations in DSP.",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Batch"
+  },
+  {
+    "Id": "a0oEc0000057w4tIAA",
+    "Question__c": "How can I implement delta retrieval?",
+    "Answer__c": "To implement delta retrieval, enable one of the following options:\n\n- **Retrieve Modified Since Last Start Time** – Adds the condition `SystemModstamp &gt; (Last Start Time)` to the Retrieve Parameters during execution. The **Last Start Time** refers to the Start Time of the most recent **SUCCEEDED** Execution.\n\n- **Retrieve Modified Since Last End Time** – Adds the condition `SystemModstamp &gt; (Last End Time)` to the Retrieve Parameters during execution. The **Last End Time** refers to the End Time of the most recent **SUCCEEDED** Execution.\n\n&gt; **Note:** When updating the **source query**, be sure to **disable delta retrieval** first. Re-enable it after the query has been updated to ensure proper evaluation of changes.",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Batch"
+  },
+  {
+    "Id": "a0oEc0000057w4uIAA",
+    "Question__c": "What are the key considerations for enabling the Bulk API?",
+    "Answer__c": "Enabling Bulk API in Data Sync Pro (DSP) offers significant performance improvements, but it comes with certain trade-offs.\n\n✅ Benefits\nExtraordinary Performance Gains – With the right batch size (up to 2,000 records per batch), Bulk API can process large data volumes much faster than the standard API.\n⚠ Drawbacks\nAsynchronous Processing – Since Salesforce processes Bulk API jobs asynchronously, users must monitor the execution status directly in Salesforce.\nNo Data Reversion – Actions performed via Bulk API cannot be reverted, meaning features like &quot;Restore Updated From Log File&quot; or &quot;Re-Create Deleted From Log File&quot; are not supported.\n&#128640; Bulk API is ideal for high-volume processing but requires careful setup and monitoring for optimal use.",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Batch"
+  },
+  {
+    "Id": "a0oEc0000057w4vIAA",
+    "Question__c": "How can I set up notifications for completed batch executions?",
+    "Answer__c": "Set the &quot;Notify When Execution Completes&quot; field to &quot;Always&quot; or &quot;Only If Failed&quot; to specify when notifications should be sent. Then, choose recipients by enabling &quot;Notify Owner&quot; to notify the record owner, entering comma-separated email addresses in the &quot;Notify Email Addresses&quot; field, or configuring both options together.",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Batch"
+  },
+  {
+    "Id": "a0oEc0000057w4wIAA",
+    "Question__c": "What is the best approach to test a Batch Executable with a small data sample before running it on the full dataset?",
+    "Answer__c": "In the Batch tab, under the Retrieve section, you can select a small number of records from the previewed data list. Then, click Execute to run the batch logic only for the selected records. This test run also generates detailed execution logs to help with verification and troubleshooting before processing the full dataset.",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Batch"
+  },
+  {
+    "Id": "a0oEc0000057w4xIAA",
+    "Question__c": "How can I break down a complex batch job with multiple actions into manageable parts?",
+    "Answer__c": "You can simplify a complex batch job by breaking it into smaller, modular components using one of the following approaches:\n\n- **Use Multiple Executables within a Pipeline**  \n  Split the batch logic across multiple **Executables**, each handling a specific part of the process, and group them within a **Pipeline**. Since **batching in DSP is fast** and most of the **performance cost occurs at the DML operations**, this approach ensures **efficiency without significant overhead**, even when breaking a large job into smaller, modular batches.\n\n- **Leverage Triggers for Sequential Actions**  \n  If multiple actions can be initiated by a single DML on a primary object, consider using **DSP Triggers** to orchestrate the sequence.  \n  For example: **update the primary object to kick off a chain of automations sequentially.**\n\nThis modular strategy improves clarity, supports reusability, simplifies testing, and makes ongoing maintenance more scalable.",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Batch"
+  },
+  {
+    "Id": "a0oEc0000057w4yIAA",
+    "Question__c": "What are the advantages of combining a blank update batch with a self-adaptive trigger?",
+    "Answer__c": "A self-adaptive trigger evaluates fields in a before insert or before update trigger using DSP formulas. A blank update batch retrieves records that need updating and performs an update operation without modifying any fields. During this update, the self-adaptive trigger re-evaluates all fields based on the defined transformation logic.\n\nBenefits of Combining a Blank Update Batch with a Self-Adaptive Trigger:\n1️⃣ Reusable &amp; Universal Automation – The self-adaptive trigger runs automatically regardless of whether the update is triggered by a batch job, web service, Apex, or manual update, ensuring consistency.\n\n2️⃣ Performance Optimization – When the blank update batch is executed with Bulk API enabled (batch size: 2,000), the calculations run significantly faster than traditional Apex batch jobs.\n\n3️⃣ Modular &amp; Decoupled System – Keeping batch execution and automation separate ensures a simplified, modular, and maintainable system, making debugging and scaling easier.\n\nFor example, this method is particularly useful for calculating roll-up summaries or aggregated values across child records. If a parent record needs to maintain a sum, count, or average of related child records, a blank update batch can trigger the recalculation automatically via the self-adaptive trigger, eliminating the need for additional processing logic.\n\n&#128640; This approach enhances efficiency, reusability, and performance while ensuring dynamic, automated recalculations.",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Batch"
+  },
+  {
+    "Id": "a0oEc0000057w4zIAA",
+    "Question__c": "What is a Data List in Data Sync Pro?",
+    "Answer__c": "A **Data List** in Data Sync Pro (DSP) is a **no-code, interactive data table** designed to let users **retrieve, transform, and act on Salesforce records** in real time. Built with just a single SOQL query and guided configuration, each Data List is stored as an **Executable**, making it reusable, modular, and easy to manage.\n\nIntegrated with **Lightning pages**, Data Lists provide a seamless user experience and are suitable for **business users, system admins, developers, and architects alike**—empowering anyone to manage and interact with data efficiently, all within Salesforce.",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Data List"
+  },
+  {
+    "Id": "a0oEc0000057w50IAA",
+    "Question__c": "Why DSP Data List?",
+    "Answer__c": "The DSP Data List is a powerful, no-code, record-based rules engine built to let Salesforce users retrieve, transform, and take action on Salesforce data in real time—all through a guided, configurable interface. With support for inline editing, dynamic filters, row and list actions, and seamless Lightning integration, it provides a highly interactive and user-friendly experience. Its modular design, declarative setup, and low-code maintenance model empower teams to deliver flexible, context-aware data solutions—while minimizing development effort and reducing tech debt.\n\n---\n\n### &#128640; **Key Advantages of DSP Data Lists**\n\n✅ **Fast &amp; Flexible Setup** – Define a single SOQL query using the **Query Builder (Q)** and instantly turn it into a live, interactive data table.  \n\n✅ **Robust User Interactions** – Empower users with:\n- **Inline editing**, **mass editing**, **record creation**, **cloning**, and **deletion**\n- **CSV upload** and **CSV export**  \n- **Customizable related lists** to show contextually linked records  \n- **Column filters** for quick, user-friendly field-level filtering  \n- **Automatic pagination** for seamless navigation across large datasets\n\n✅ **Powerful Data Transformations** – Apply **formula-based logic** to dynamically manipulate and display data, enhancing clarity and enforcing consistency.\n\n✅ **Custom Row &amp; List Actions** – Trigger record updates, lead conversions, email sends, notifications, or multi-step logic from within the list.\n\n✅ **Advanced Filtering Options** – Use **dynamic filters** driven by user context or record parameters for intelligent, personalized data access.\n\n✅ **Streamlined Visual Customization** – Configure layout, visibility, and behavior through an intuitive, declarative interface—without writing code.\n\n✅ **Modular &amp; Scalable Design** – Group multiple Data Lists into **Pipelines** to create guided, multi-step workflows that remain maintainable and reusable.\n\n✅ **Cross-Org Data Interaction** – Retrieve and act on data across **connected Salesforce orgs** using **Connection-based Executables**, all within DSP.\n\n✅ **Seamless Lightning Integration** – Embed in **Lightning Pages** using tabs, stacks, or list-style views for a unified, interactive experience.\n\n✅ **Enterprise-Grade Access Control** – Control who can **see and interact with each Data List** and its **defined actions** based on:\n- **Permission sets**\n- **Custom permissions**\n- **Executable sharing**\n- **Target object access**  \nThis ensures only the right users can view, edit, or take actions—honoring both DSP-specific and Salesforce-native security.\n\n---\n\nAs an intuitive, no-code engine built for admins, developers, and business users alike, **DSP Data Lists** provide unmatched control and automation for interacting with Salesforce data—**at scale, across orgs.**",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Data List"
+  },
+  {
+    "Id": "a0oEc0000057w51IAA",
+    "Question__c": "How do I create an Actionable Data List?",
+    "Answer__c": "To create an Actionable Data List in Data Sync Pro (DSP), start by creating an **Executable** associated with a **Direction**. Once created, DSP provides a **guided interface** to configure each step of the data list process:\n\n### **Guided Steps for Defining an Actionable Data List**\n1️⃣ **Retrieve** – Configure how source data is queried from the connected org. Designers can preview data, test transformations, and execute selected records synchronously.  \n2️⃣ **Scoping** – Refine the retrieved dataset using in-memory filters and optional joins with other datasets for multi-source enrichment.  \n3️⃣ **Match** – Identify target records using matching rules. Supports insert-only logic, multi-field matching via transformations, and merge-specific logic.  \n4️⃣ **Mapping** – Apply formulas and expressions to assign and transform target field values. Features auto-validation, relational field support, and a comprehensive function library.  \n5️⃣ **Action** – Define the operations to be performed, such as Insert, Update, Upsert, Delete, Merge, Lead Convert, Send Email, and more. Configure behavior options like “Skip Record Update if No Changes” and writeback.  \n6️⃣ **Verify** – Select target fields to review after execution. These fields appear in the Batch Execution record, allowing review of source and target data side-by-side.\n\n### **Additional Data List(Q) Settings:**\n\n- **Action on Target** – Configures how the action behaves, including button label and style, visibility on list or row level (or both), alert messages, and whether users can edit fields before executing the action.\n- **Permissions (Query Results)** – Manages access to the data list based on user permissions.  \n- **Appearance &amp; More** – Allows customization of layout, display settings, and UI behaviors.\n\n&#128204; This structured, intuitive interface ensures your Data List is interactive, reusable, and fully aligned with your business logic—without writing any code. &#128640;",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Data List"
+  },
+  {
+    "Id": "a0oEc0000057w52IAA",
+    "Question__c": "What are the two essential components of a Actionable Data List?",
+    "Answer__c": "An **Actionable Data List** in Data Sync Pro is defined within a **Direction-based Executable** and consists of two key components:\n\n1️⃣ **Query Manager (Q)**  \nA powerful Lightning Web Component (LWC) that defines the source data using a SOQL query. It provides a no-code, intuitive interface for building and managing queries, with features like autocomplete, dynamic filters, pagination, inline editing, mass actions, record creation, and CSV export—offering full control over data retrieval and interaction.\n\n2️⃣ **Custom Actions with Transformations**  \nDefines the **Row Actions** and **List Actions** users can perform on selected records—such as applying formula-based transformations, updating records, sending notifications or emails, converting leads, and triggering downstream logic.\n\nTogether, these components make the Data List a dynamic, interactive tool for real-time engagement with Salesforce data—without writing code.",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Data List"
+  },
+  {
+    "Id": "a0oEc0000057w53IAA",
+    "Question__c": "What are the minimum requirements to create a Data List?",
+    "Answer__c": "Creating a Data List requires only an **Executable record** and a **SOQL query** for the source object, which can be defined using DSP&#39;s **Query Manager (Q)** in the **Retrieve** section. \n\n&#128204; **Query Manager (Q)** provides an intuitive UI for building and refining SOQL queries, enabling the creation of powerful Data Lists with minimal effort. Check out the **Query Manager (Q)** section for more details on how a single query can drive a fully interactive Data List.",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Data List"
+  },
+  {
+    "Id": "a0oEc0000057w54IAA",
+    "Question__c": "What is the difference between an actionable Data List and a non-actionable Data List?",
+    "Answer__c": "- **Actionable Data List**  \n  - Created using a **Direction-based Executable**  \n  - Supports **Row Actions** and **List Actions** (e.g., update, transform, notify)  \n  - Defines both **source** and **target** logic with configurable rules  \n\n- **Non-Actionable Data List**  \n  - Created using a **Connection-based Executable**  \n  - Used for **data retrieval only**  \n  - Still supports **inline editing**, but no custom actions\n\n➡️ Use **Direction-based** for interactive lists with actions  \n➡️ Use **Connection-based** for simple, read/edit-only lists",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Data List"
+  },
+  {
+    "Id": "a0oEc0000057w55IAA",
+    "Question__c": "What permissions are required to access a Data List, view its data, and execute its actions?",
+    "Answer__c": "To access and use a **Data List** (including **Actionable Data Lists**), users need the following:\n\n1️⃣ **DSP Permission Set**  \n- Minimum required: **DSP: Data Sync Pro Starter**\n\n2️⃣ **Executable Record Access**  \n- Must have at least **Read access** to the **Executable record** that defines the Data List.\n\n3️⃣ **Custom Permission (View Access)**  \n- If **“Q: Required Custom Permissions To View”** is set, users must have the specified **custom permission(s)**.\n\n4️⃣ **Custom Permission (Action Access)**  \n- For **Actionable Data Lists**, if **“Required Custom Permissions To Execute”** is configured, users must have those permission(s) to see and use action buttons.\n\n5️⃣ **Object &amp; Field-Level Access**  \n- Users must have **Read access** to the source object and fields used in the query.",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Data List"
+  },
+  {
+    "Id": "a0oEc0000057w56IAA",
+    "Question__c": "How do I embed Data Lists into a Lightning page?",
+    "Answer__c": "To embed a Data List in the Lightning UI:\n\n1. Open **Lightning App Builder** for a **Record Page**, **Home Page**, or **App Page**.  \n2. Drag and drop either:  \n   - **“Executable Data List”** to embed a single Data List  \n   - **“Pipeline Data Lists”** to embed a group of Data Lists from a Pipeline  \n3. Enter the **API Name** of the corresponding **Executable** or **Pipeline**.\n\n&#128204; This allows you to display interactive, no-code Data Lists directly within the Lightning experience—tailored to your users’ workflows.",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Data List"
+  },
+  {
+    "Id": "a0oEc0000057w57IAA",
+    "Question__c": "How can I customize the Label, Variant, and Icon of an action?",
+    "Answer__c": "In the **&quot;Action on Target&quot;** section of the Executable, you can customize the action&#39;s appearance by setting the following fields:\n\n- **Action Button Label** – Defines the text shown on the button  \n- **Action Button Variant** – Sets the button style (e.g., brand, neutral, destructive)  \n- **Action Icon Name** – Specifies the Salesforce Lightning icon to display on the button  \n\nThese settings control how the action button appears in the Data List UI.",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Data List"
+  },
+  {
+    "Id": "a0oEc0000057w58IAA",
+    "Question__c": "Can I prompt users for confirmation before executing an action after they click the action button?",
+    "Answer__c": "Yes. To prompt users for confirmation before executing an action:\n\n- Enable the **&quot;Confirm Before Action?&quot;** field to show a confirmation dialog.  \n- Use the **&quot;Action Confirm Message&quot;** field to customize the message that appears in the prompt.\n\nThis helps ensure users review their action before proceeding.",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Data List"
+  },
+  {
+    "Id": "a0oEc0000057w59IAA",
+    "Question__c": "Can I specify whether an Action should be a List Action, a Row Action, or both?",
+    "Answer__c": "Yes. In the **&quot;Action on Target&quot;** section:\n\n- Enable **“Q: List Action?”** to make the action available as a **List Action** (for multiple selected records).  \n- Enable **“Q: Row Action?”** to make it available as a **Row Action** (for individual records).\n\nYou can enable one or both depending on how you want users to trigger the action.",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Data List"
+  },
+  {
+    "Id": "a0oEc0000057w5AIAQ",
+    "Question__c": "Can users review and edit transformed values before executing an action?",
+    "Answer__c": "Yes. To allow users to review and edit transformed values before executing the action:\n\n- Go to the **&quot;Action on Target&quot;** section.  \n- Use the **&quot;Edit Target Fields Before Action&quot;** field to list the **target field API names**, separated by commas.\n\nThis will display the specified fields with their transformed values in an editable form—giving users a chance to review or adjust them before confirming the action.",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Data List"
+  },
+  {
+    "Id": "a0oEc0000057w5BIAQ",
+    "Question__c": "Why group multiple Executable Data Lists into a Pipeline?",
+    "Answer__c": "Grouping Executable Data Lists into a **Pipeline** offers several key benefits:\n\n1️⃣ **Organized UI with Variant Options**  \nThe **Pipeline Data Lists** component can be placed on a Lightning page to display multiple Data Lists using different **variants**—including **stack**, **tabs**, and **list-views**—giving designers control over how data is presented and navigated.\n\n2️⃣ **Flexible Configuration &amp; Maintenance**  \nYou can **add, remove, reorder, or modify** Executable Data Lists directly within the Pipeline—without changing the Lightning page—making updates easier to manage.\n\n3️⃣ **Merged Actions for Shared Queries**  \nIf multiple Data Lists in the Pipeline use the same **source query**, their actions are automatically **merged into a single list**, providing users with a unified interface.\n\n---\n\n&#128204; **Pipelines bring structure, flexibility, and modularity—making it easier to manage and present multiple related Data Lists in one place.**",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Data List"
+  },
+  {
+    "Id": "a0oEc0000057w5CIAQ",
+    "Question__c": "How can I consolidate multiple Executable actions into a single Data List?",
+    "Answer__c": "When multiple **Executable Data Lists** within a **Pipeline** share the same **source query**, their actions are automatically **merged into a single Data List**. This allows users to interact with one unified list while accessing all actions defined across those Executables.\n\nTo enable this:\n\n- Ensure the Executables in the Pipeline use the **same source query**  \n- Add the **&quot;Pipeline Data Lists&quot;** component to a **Lightning page**  \n- Configure the Data Lists within the **Pipeline** to control order and visibility  \n\n&#128204; This setup streamlines the user experience by reducing duplication and consolidating actions in a single, interactive view.",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Data List"
+  },
+  {
+    "Id": "a0oEc0000057w5DIAQ",
+    "Question__c": "How can I specify the related lists for each row in a data list?",
+    "Answer__c": "To display related lists for each row in a **Data List**, follow these steps:\n\n1. **Create a Pipeline** that contains one or more **Data Lists** configured with **dynamic filters** based on a **context record ID**.\n\n2. In the **parent Data List Executable**, set the field **&quot;Q: Row&#39;s Related Lists Pipeline API Name&quot;** to the **API Name of the Pipeline** created in Step 1.\n\nOnce configured, a standard **&quot;Related Lists&quot;** row action will automatically appear for each row. Clicking this action will display the related lists defined in the Pipeline.\n\n&#128204; By default, related lists open in a **modal popup**, but you can set **&quot;Q: Show Row&#39;s Related Lists Below?&quot;** to **true** to display them inline, directly beneath the main Data List.",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Data List"
+  },
+  {
+    "Id": "a0oEc0000057w5EIAQ",
+    "Question__c": "What are the benefits of replacing the default \"New Record\" function in a Data List with a custom action?",
+    "Answer__c": "The default **New Record** action in a Data List uses Salesforce’s standard **LWC API** to create a new record, which opens a blank form based on the page layout. After saving, users must manually refresh the Data List to view the new record.\n\nBy replacing this with a **global Executable Action Button**—configured via the **&quot;Q: New Record Executable API Name&quot;** field—Data Sync Pro offers a more streamlined and customizable experience:\n\n- ✅ **Pre-filled Forms** – Use DSP transformations to populate fields with relevant values.  \n- ✅ **Editable Before Save** – Users can adjust the pre-filled values before submitting.  \n- ✅ **Automatic Refresh** – The Data List refreshes automatically after record creation.\n\n&#128204; This approach provides a more **convenient**, **transformation-powered** alternative to standard record creation, supporting streamlined customization and better user flow.",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Data List"
+  },
+  {
+    "Id": "a0oEc0000057w5FIAQ",
+    "Question__c": "Can I set up a Data Loader as a List Action in my Data List?",
+    "Answer__c": "Yes. To enable this, set the **&quot;Q: Data Load Executable API Name&quot;** field on the **Data List Executable** to the API Name of the **Executable** that defines your **Data Loader**.\n\n&#128204; This allows users to launch the Data Loader directly from the Data List—making it easy to process a data load, optionally tied to the **record in context**.",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Data List"
+  },
+  {
+    "Id": "a0oEc0000057w5GIAQ",
+    "Question__c": "What permissions can be set for accessing and interacting with query results in a Data List?",
+    "Answer__c": "The **Permissions (Query Results)** section in a Data List Executable defines how users can access and interact with the query results:\n\n1️⃣ **Q: Createable?** – Allows users to create new records directly from the Data List.  \n2️⃣ **Q: Editable?** – Enables inline and mass editing of records.  \n3️⃣ **Q: Editable Fields** – Specifies which fields are editable when editing is enabled.  \n4️⃣ **Q: Deletable?** – Allows users to delete **single** records or **multiple selected records** in the Data List.  \n5️⃣ **Q: Downloadable?** – Grants users permission to download the **entire query results** or **only selected records**. Requires the custom permission **&quot;DSP: Download Data in Q&quot;**.  \n6️⃣ **Q: Show Row Action &#39;Edit&#39;?** – Displays an **Edit** option for each row.  \n7️⃣ **Q: Show Row Action &#39;Clone&#39;?** – Enables a **Clone** action for each row.  \n8️⃣ **Q: Show Row Action &#39;Delete&#39;?** – Adds a **Delete** option for individual records.  \n9️⃣ **Q: Required Custom Permissions To View** – Restricts visibility of the Data List to users with specific custom permissions.\n\n&#128204; These permission settings provide precise control over how users interact with data—ensuring secure and tailored experiences within Data Lists.",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Data List"
+  },
+  {
+    "Id": "a0oEc0000057w5HIAQ",
+    "Question__c": "How can I configure records to open in the Lightning record page when clicked in a Data List?",
+    "Answer__c": "Enable the **&quot;Q: Open Links in Record Page?&quot;** setting on the Data List Executable. When checked, clicking a record in the Data List opens it in the standard **Lightning record page**.\n\n&#128204; If this option is **unchecked**, records open in DSP’s **raw record view**—a plain interface that displays all fields from the source record.  \nIf the Data List is based on a **Direction-based Executable** with a defined target action, users will also see a **preview of the transformed values** before the action is executed, providing visibility into how the data will be processed.",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Data List"
+  },
+  {
+    "Id": "a0oEc0000057w5IIAQ",
+    "Question__c": "How can end users customize the query in a Data List—such as selecting fields, filtering, or sorting?",
+    "Answer__c": "Check **&quot;Q: Query Manager Toggleable?&quot;** to allow users to toggle the Query Manager and modify the query using an intuitive UI for adjusting filters, sorting, and selecting fields. Additionally, enable **&quot;Q: Hide Others in Query Manager?&quot;** to hide the **Other** section in the Query Manager for a more focused user experience.",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Data List"
+  },
+  {
+    "Id": "a0oEc0000057w5JIAQ",
+    "Question__c": "Can Data Lists be extended and customized within custom LWC components?",
+    "Answer__c": "Enable **&quot;Q: Query Manager Toggleable?&quot;** on the Data List Executable to give users access to the **Query Manager (Q)**—an intuitive UI that allows them to **select fields, adjust filters, and apply sorting** as needed.\n\nDSP’s Query Manager lists all **selectable and orderable fields**, including fields from **parent relationships**, and provides **autocomplete hints** for filter operators and values—tailored to the field type (e.g., picklists, date/datetime, reference fields, etc.).\n\n&#128204; To simplify the interface, enable **&quot;Q: Hide Others in Query Manager?&quot;** to hide the **Other** section for a more focused user experience.",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Data List"
+  },
+  {
+    "Id": "a0oEc0000057w5KIAQ",
+    "Question__c": "How can I enable horizontal scrolling for a data list?",
+    "Answer__c": "DSP Data List is built on Salesforce’s **Lightning Datatable**, which defaults to **&quot;fixed&quot; column width mode**—meaning all columns share equal width within the available viewport.\n\n- **On Windows:** Simply **drag a column edge** to increase its width. Once the total width exceeds the viewport, horizontal scrolling is enabled automatically.  \n- **On macOS:** A user must **set &quot;Show scroll bars&quot; to &quot;Always&quot;** in **System Preferences** in order to enable horizontal scrolling when columns are resized.\n\n&#128204; For more predictable scroll behavior, you can also set **&quot;Q: Column Widths Mode&quot;** to **&quot;Auto&quot;** and define a **&quot;Q: Min Column Width&quot;**. This allows columns to size naturally based on their content and enables horizontal scrolling when needed.",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Data List"
+  },
+  {
+    "Id": "a0oEc0000057w5LIAQ",
+    "Question__c": "How can I configure a Data List to retrieve data from a remote Salesforce org?",
+    "Answer__c": "Setting up a Data List for a **remote Salesforce org** is the same as for a **local org**—simply ensure that the **source Connection** points to the desired remote Salesforce org.\n\nThis simplicity is made possible by **DSP’s unified Connections**, which treat all Salesforce orgs consistently, enabling seamless cross-org data retrieval and actions with no extra setup.",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Data List"
+  },
+  {
+    "Id": "a0oEc0000057w5MIAQ",
+    "Question__c": "What is an Action Button in Data Sync Pro?",
+    "Answer__c": "An **Action Button** in Data Sync Pro (DSP) is a **no-code, record-based rules engine** that enables business users to **trigger data transformations and actions** instantly with a single click—directly from the **Salesforce Lightning UI**.\n\nEach Action Button is defined in an **Executable record**, with a **guided user interface** that makes configuration intuitive and maintainable. It supports **powerful transformations** using DSP’s formula engine and allows users to **review and edit transformed field values before execution**.\n\nSupported actions include **Insert, Update, Delete, Merge, Lead Conversion, Send Emails, Publish Platform Events, Bell Notifications**, and more.\n\nAction Buttons can be added to Lightning pages as **Quick Actions** or surfaced as a **customizable group of buttons using a Lightning Web Component**—empowering business users with real-time, rules-driven automation inside Salesforce.",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Action Button"
+  },
+  {
+    "Id": "a0oEc0000057w5NIAQ",
+    "Question__c": "Why Data Sync Pro Action Button?",
+    "Answer__c": "The **DSP Action Button** is a powerful, no-code, record-based rules engine purpose-built to let **business users** perform real-time data transformations and actions—directly within the Salesforce UI with a single click. Designed for **scalability, flexibility, and ease of use**, it combines **rich transformation logic**, **customizable user experience**, and a **modular configuration model** that ensures **low development effort**, **easy maintenance**, and **reduced tech debt**—making it the **go-to solution for enterprise-grade data execution.**\n\n### &#128640; **Key Advantages of DSP Action Buttons**\n\n✅ **No-Code, Guided Setup** – Business users can configure and manage actions through an intuitive, step-by-step interface.  \n\n✅ **Powerful Data Transformations** – Apply formula-based logic to calculate, enrich, and adjust values before execution.  \n\n✅ **Flexible Action Logic** – Execute Insert, Update, Delete, Merge, Lead Conversion, Send Emails, Publish Events, Bell Notifications, and more.  \n\n✅ **Editable Previews** – Let users review and modify transformed values before executing the action.  \n\n✅ **Simple Visual Customization** – Easily tailor button labels, icons, confirmation prompts, and appearance—without developer assistance.  \n\n✅ **Modular &amp; Reusable** – Actions are stored as Executables, making them easy to adapt, clone, and maintain.  \n\n✅ **Seamless Lightning Integration** – Embed single or grouped Action Buttons directly into Lightning pages.  \n\n✅ **Built-In Access Control** – Honors existing Salesforce permissions and sharing rules to control access to actions.\n\n---\n\nDSP Action Buttons empower business users with real-time, rules-driven interactions inside Salesforce—delivering high-impact outcomes with low development effort and reduced tech debt.",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Action Button"
+  },
+  {
+    "Id": "a0oEc0000057w5OIAQ",
+    "Question__c": "How can I create an Action Button?",
+    "Answer__c": "To create an **Action Button** in Data Sync Pro (DSP), start by creating an **Executable**—either **Direction-based** for record actions or **Connection-based** for global actions. Once created, DSP provides a **guided interface** to configure each step of the action logic:\n\n---\n\n### **Guided Steps for Defining an Action Button**\n\n1️⃣ **Scoping** – Refine the retrieved dataset using in-memory filters and optional joins with other datasets for multi-source enrichment.  \n2️⃣ **Match** – Identify target records using matching rules. Supports insert-only logic, multi-field matching via transformations, and merge-specific logic.  \n3️⃣ **Mapping** – Apply formulas and expressions to assign and transform target field values. Features auto-validation, relational field support, and a comprehensive function library.  \n4️⃣ **Action** – Define the operations to be performed, such as Insert, Update, Upsert, Delete, Merge, Lead Convert, Send Email, and more. Configure behavior options like “Skip Record Update if No Changes” and writeback.\n\n---\n\n### **Additional Action on Target Settings:**\n\n- **Action on Target** – Configures how the action behaves, including button label and style, visibility as list or row action (or both), confirmation prompt, and editable fields before execution.  \n- **Lightning Placement Options** – Action Buttons can be embedded as a **Quick Action**, a standalone **Executable Action Button**, or grouped using **Pipeline Action Buttons**.\n\n&#128204; This structured, intuitive interface ensures your Action Buttons are modular, reusable, and fully aligned with your business logic—without writing any code. &#128640;",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Action Button"
+  },
+  {
+    "Id": "a0oEc0000057w5PIAQ",
+    "Question__c": "How can I customize the Label, Variant, and Icon of an action?",
+    "Answer__c": "In the **&quot;Action on Target&quot;** section of the Executable, you can customize the action&#39;s appearance by setting the following fields:\n\n- **Action Button Label** – Defines the text shown on the button  \n- **Action Button Variant** – Sets the button style (e.g., brand, neutral, destructive)  \n- **Action Icon Name** – Specifies the Salesforce Lightning icon to display on the button  \n\nThese settings control how the action button appears in the Data List UI.",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Action Button"
+  },
+  {
+    "Id": "a0oEc0000057w5QIAQ",
+    "Question__c": "Can I prompt users for confirmation before executing an action after they click the action button?",
+    "Answer__c": "Yes. To prompt users for confirmation before executing an action:\n\n- Enable the **&quot;Confirm Before Action?&quot;** field to show a confirmation dialog.  \n- Use the **&quot;Action Confirm Message&quot;** field to customize the message that appears in the prompt.\n\nThis helps ensure users review their action before proceeding.",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Action Button"
+  },
+  {
+    "Id": "a0oEc0000057w5RIAQ",
+    "Question__c": "Can I display transformed field values on screen and allow users to edit them before execution?",
+    "Answer__c": "Yes, specify the target fields that should be editable before execution by listing them as comma-separated values in the &quot;Edit Target Fields Before Action&quot; field under the &quot;Action on Target&quot; section.",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Action Button"
+  },
+  {
+    "Id": "a0oEc0000057w5SIAQ",
+    "Question__c": "Why group multiple Executable Action Buttons into a Pipeline?",
+    "Answer__c": "Grouping **Executable Action Buttons** into a **Pipeline** offers several key benefits:\n\n1️⃣ **Centralized &amp; Organized UI**  \nThe **Pipeline Action Buttons** component can be placed on a Lightning page to present multiple buttons in a unified, streamlined layout—making it easier for users to access related actions from one place.\n\n2️⃣ **Flexible Configuration &amp; Maintenance**  \nYou can **add, remove, reorder, or modify** Executable Action Buttons directly within the Pipeline—without changing the Lightning page—making updates easier to manage.\n\n3️⃣ **Streamlined User Experience**  \nDisplaying related actions together reduces UI clutter and improves usability by aligning buttons with business processes in a clean, consistent interface.\n\n---\n\n&#128204; **Pipelines bring structure, flexibility, and modularity—making it easier to manage and present multiple related Action Buttons in one place.**",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Action Button"
+  },
+  {
+    "Id": "a0oEc0000057w5TIAQ",
+    "Question__c": "Can I make a series of actions with a single button click?",
+    "Answer__c": "**Yes.** You can implement **DSP trigger actions** that execute multiple actions from a single record update. When the Action Button updates a record that meets the **triggering scope**, DSP Triggers can automatically fire a series of downstream actions based on that update.\n\n&#128204; *Check out the example for how to set up DSP trigger actions.*",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Action Button"
+  },
+  {
+    "Id": "a0oEc0000057w5UIAQ",
+    "Question__c": "How can I grant users access to an Action Button?",
+    "Answer__c": "To grant users access to an Action Button:\n\n- Assign the **&quot;DSP: Data Sync Pro Starter&quot;** permission set, which provides essential access to DSP package objects and components, including Action Buttons.  \n- Ensure the **Executable record** defining the Action Button is shared with the user via record sharing or sharing rules.  \n- If **&quot;Required Custom Permissions To Execute&quot;** is configured, the user must have at least one of the specified custom permissions to view and execute the Action Button.",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Action Button"
+  },
+  {
+    "Id": "a0oEc0000057w5VIAQ",
+    "Question__c": "How does the Data Loader work in DSP?",
+    "Answer__c": "### **What is Data Loader in DSP?**  \n\n**Data Loader in DSP** is a **record-based rules engine** designed for processing **CSV file uploads**, applying transformations, and executing actions in Salesforce. Unlike other DSP rules engines that retrieve data from a Salesforce object, Data Loader processes records directly from a CSV file and performs operations like **Insert, Update, Upsert, Delete, and more** based on predefined logic.  \n\n### **How Does Data Loader Work?**  \n\n1️⃣ **Input Data Configuration** – Users define the structure of the CSV file by specifying column names and mapping them to Salesforce fields.  \n\n2️⃣ **Scoping** – Applies **in-memory** filtering and joins to refine the uploaded data before processing.  \n\n3️⃣ **Match** – Matches records in the target Salesforce object using a **Target Matching Field**, supporting transformations like VLOOKUP for multi-field matching.  \n\n4️⃣ **Mapping** – Maps CSV data to target fields using DSP formulas and expressions, enabling **dynamic transformations**.  \n\n5️⃣ **Action** – Executes operations such as Insert, Update, Upsert, Delete, or other configured actions.  \n\n### **Key Benefits of DSP Data Loader:**  \n✅ **No-Code, Record-Based Configuration** – Set up complex data transformations and automation with an intuitive, no-code approach.  \n\n✅ **Reusable Executables** – Configure once and reuse multiple times for efficient and consistent data processing.  \n\n✅ **Comprehensive Execution Logs** – Tracks execution details as **data records**, simplifying troubleshooting and ensuring compliance.  \n\n✅ **Secure Access Control** – Uses Salesforce **record sharing** to define access, ensuring security and governance.  \n\n&#128640; **DSP Data Loader enables scalable, flexible, and secure data processing with advanced transformation capabilities, reducing manual effort and increasing efficiency.**",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Data Loader"
+  },
+  {
+    "Id": "a0oEc0000057w5WIAQ",
+    "Question__c": "How can I create a Data Loader?",
+    "Answer__c": "To create a **Data Loader** in Data Sync Pro (DSP), follow these steps:\n\n---\n\n1️⃣ **Go to the Connection Record**  \nNavigate to the **Connection** where you want to upload data. If loading into your current Salesforce org, use the **Current Org** connection.\n\n2️⃣ **Create a New Executable**  \n- Click **“New Executable (Action)”**  \n- Set the **Type** to **Data Loader**  \n- Specify the **Target Object**, choose an **Action** (Insert, Update, Upsert, Delete), and define a **Target Matching Field** if needed\n\n3️⃣ **Upload a Template CSV File**  \n- Upload a **CSV file** with headers—DSP uses this to generate the data profile  \n- Make sure column names follow DSP naming conventions: use only letters, numbers, and underscores, and start with a letter\n\n4️⃣ **Configure the Data Loader Steps**  \nOnce created, the Executable will guide you through the following steps:\n \n **Input** – Define the structure of the uploaded CSV so its fields can be used in filters and field mappings.\n **Scoping** – Refine the retrieved dataset using in-memory filters and optional joins with other datasets for multi-source enrichment.  \n **Match** – Identify target records using matching rules. Supports insert-only logic, multi-field matching via transformations, and merge-specific logic.  \n **Mapping** – Apply formulas and expressions to assign and transform target field values. Features auto-validation, relational field support, and a comprehensive function library.  \n **Action** – Define the operations to be performed, such as Insert, Update, Upsert, Delete, Merge, Lead Convert, Send Email, and more. Configure behavior options like “Skip Record Update if No Changes”\n&#128640; **Once configured, your Data Loader can be reused to process similar datasets—ensuring fast, accurate, and consistent uploads across your org.**",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Data Loader"
+  },
+  {
+    "Id": "a0oEc0000057w5XIAQ",
+    "Question__c": "Can I load data to a different org?",
+    "Answer__c": "DSP has unified Connections, so creating a Data Loader for a remote Salesforce org is the same as for a local one. Simply select the **remote Connection** when creating the **Executable**, then follow the standard steps to configure the **Data Loader**.",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Data Loader"
+  },
+  {
+    "Id": "a0oEc0000057w5YIAQ",
+    "Question__c": "How are execution logs recorded in a Data Loader process?",
+    "Answer__c": "Execution logs in a Data Loader process are recorded as related records in DSP for detailed tracking, troubleshooting, and compliance.  \n\nEach **Execution** record is associated with the Data Loader Executable and captures key details such as execution status, processed records, errors, and timestamps. Within each execution, **Batch Execution** records are created as related records, providing granular visibility into individual batch runs.  \n\nThis structured logging approach ensures transparency, making it easy to review, analyze, and troubleshoot data loads efficiently.",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Data Loader"
+  },
+  {
+    "Id": "a0oEc0000057w5ZIAQ",
+    "Question__c": "Since CSV columns are stored as strings, how does Data Loader handle data type conversion?",
+    "Answer__c": "When creating a Data Loader Executable, the **&quot;Relax Field Mapping’s Type Check?&quot;** option is enabled by default, allowing DSP to bypass strict type checks for string columns in the mappings. DSP then attempts to automatically convert string values into the appropriate data types for the assigned fields.",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Data Loader"
+  },
+  {
+    "Id": "a0oEc0000057w5aIAA",
+    "Question__c": "How can I grant users access to a Data Loader?",
+    "Answer__c": "To grant users access to a **Data Loader**:  \n\n- Assign the **&quot;DSP: Data Sync Pro App User&quot;** permission set, which provides the necessary access to execute a **Batch** or **Data Loader**, including create access to Execution-related objects. Additionally, ensure the **Executable record** defining the Data Loader is shared with the user through record sharing or sharing rules.  \n- Alternatively, assign the **&quot;DSP: Data Sync Pro Administrator&quot;** permission set, which grants full access to all DSP functionalities, including Data Loaders.",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Data Loader"
+  },
+  {
+    "Id": "a0oEc0000057w5bIAA",
+    "Question__c": "Does Data Loader only support CSV files upload?",
+    "Answer__c": "Yes, currently, Data Loader only supports CSV file uploads.",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Data Loader"
+  },
+  {
+    "Id": "a0oEc0000057w5cIAA",
+    "Question__c": "When should the serial mode be used?",
+    "Answer__c": "Serial mode should be used when processing records sequentially is necessary to prevent record locking issues, ensure data integrity, or maintain the correct execution order. It is particularly useful in scenarios where multiple records update the same parent record or when actions depend on the completion of previous records.\n\n### Key Considerations:\n- **Prevents Record Locking** – Reduces the likelihood of lock contention, especially when updating or inserting related records.\n- **Ensures Order of Execution** – Processes records one at a time rather than in parallel, which is beneficial for workflows that require strict sequencing.\n- **Potential Performance Impact** – Since records are processed sequentially, execution time may increase compared to parallel processing.\n- **Use for Dependent Transactions** – Ideal when data dependencies exist between records that must be processed in a specific order.\n\nEnabling **serial mode** ensures safer execution in these cases, but it should be used selectively based on the needs of the batch process. &#128640;",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Data Loader"
+  },
+  {
+    "Id": "a0oEc0000057w5dIAA",
+    "Question__c": "Can I re-execute only the failed batches without reloading the entire dataset?",
+    "Answer__c": "Yes, if &quot;Log to File?&quot; is enabled, the input data is logged in ContentDocument. Navigate to the Execution record and click &quot;Re-Execute Failed Batches&quot; to retry only the failed batches.",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Data Loader"
+  },
+  {
+    "Id": "a0oEc0000057w5eIAA",
+    "Question__c": "Is it possible to revert the changes made a data load?",
+    "Answer__c": "Yes, if &quot;Log To File?&quot; is enabled, DSP captures the original data in a ContentDocument before processing the Data Load. You can use the &quot;Restore Updated From Log File&quot; or &quot;Re-Create Deleted From Log File&quot; quick actions from the Execution record to revert changes for Update and Delete actions, respectively.\n\nFor Insert actions, use the &quot;Delete Inserted Records&quot; quick action to remove the inserted records.",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Data Loader"
+  },
+  {
+    "Id": "a0oEc0000057w5fIAA",
+    "Question__c": "Can I make a Data Load fail if a column is missing from the source file?",
+    "Answer__c": "Yes, enable **&quot;Error Out if Source Attributes Missing?&quot;** to make the Data Load fail if a required column is missing from the source file.",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Data Loader"
+  },
+  {
+    "Id": "a0oEc0000057w5gIAA",
+    "Question__c": "Can I set up my Data Loader as a List Action in a Data List?",
+    "Answer__c": "Yes, set the &quot;Q: Data Load Executable API Name&quot; on the Data List Executable to associate it with the Executable that defines your Data Loader.",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Data Loader"
+  },
+  {
+    "Id": "a0oEc0000057w5hIAA",
+    "Question__c": "How does the DSP Trigger Rules Engine work?",
+    "Answer__c": "The DSP Trigger Rules Engine is a record-based, no-code automation framework that executes actions based on Salesforce trigger events (Before Insert, After Update, etc.). Instead of writing complex Apex logic, users configure trigger-based logic as Executable records, ensuring automation is modular, maintainable, and bulkified.\n\nDSP Triggers operate in two ways:\n\nSelf-Adaptive Triggers – Transform and validate fields within the same records before they are committed.\nTrigger Actions – Use the triggering records as a source to perform separate actions, such as updating related records, sending notifications, or publishing platform events.\nWhen a trigger event occurs, DSP evaluates the scoping criteria to determine which records should be processed. It then applies field transformations, validations, or actions in a bulkified manner for optimal performance.\n\nTo enable the Trigger Rules Engine, include the required events in your Apex Trigger and call:\n\npushtopics.TriggerServices.execute();\nThis allows DSP to manage execution dynamically, ensuring flexibility, scalability, and efficient automation without requiring custom Apex development.",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Triggers"
+  },
+  {
+    "Id": "a0oEc0000057w5iIAA",
+    "Question__c": "Why Data Sync Pro Trigger?",
+    "Answer__c": "### Why Data Sync Pro Trigger?\n\nData Sync Pro (DSP) Triggers offer a simplified yet powerful approach to Salesforce automation through a **record-based rules engine**. DSP leverages intuitive, record-based configurations and bulkified transformation, making automation significantly easier to manage and scale compared to traditional metadata-driven approaches.\n\n**Key Benefits:**\n\n1. **No-Code, Record-Based Trigger Rules**:  \n   DSP empowers users to define trigger logic via a user-friendly, intuitive interface using declarative formulas and expressions. This modular, no-code approach eliminates complex coding, substantially reduces development time, and ensures flexibility.  \n   *(Note: While trigger logic itself is no-code, a minimal one-time setup with Salesforce Apex Triggers is required.)*\n\n2. **Bulkified Transformation (Simplified Trigger Design)**:  \n   DSP automatically manages bulk data operations, enabling users to define trigger logic as if working with just one record—significantly simplifying trigger development. For example, relational fields like `Parent__r.Field_x__c` can be referenced directly within DSP formulas and expressions, without manually writing queries or managing complex Apex collections. DSP intelligently handles related queries and Apex collections across trigger Executables, executing them collectively only when necessary (lazy loading).  \n   This approach dramatically reduces database interactions, improves performance, and greatly simplifies traditional Salesforce trigger complexity. Automation designers can thus focus entirely on business rules without worrying about technical bulkification or potential technical debt.\n\n3. **Dynamic Scoping and Criteria**:  \n   DSP processes only those records matching defined criteria for specified trigger events, efficiently handling the scoped data.\n\n4. **Flexible Actions**:  \n   DSP offers comprehensive automation capabilities—including validations, field recalculations, cross-object DML operations, email notifications, and more—providing robust and flexible business process automation.\n\n5. **Execution Order and Granular Control**:  \n   DSP provides precise control over trigger execution order, user permissions, selective bypass options, and recursion handling, allowing fine-tuned alignment with specific business requirements.\n\nBy combining a **no-code, record-based rules engine** (with minimal one-time Apex Trigger integration), efficient **bulkified transformations**, and a highly **modular design**, DSP Triggers dramatically simplify Salesforce automation—delivering exceptional scalability, flexibility, ease of maintenance, and minimizing long-term tech debt.",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Triggers"
+  },
+  {
+    "Id": "a0oEc0000057w5jIAA",
+    "Question__c": "Which trigger events are supported?",
+    "Answer__c": "DSP supports all standard Salesforce trigger events: Before Insert, After Insert, Before Update, After Update, Before Delete, After Delete, and After Undelete.\n\nHow to Implement DSP Triggers?\nInclude all necessary events in your Apex Trigger and call pushtopics.TriggerServices.execute();. This allows you to control each trigger event within the Executable record.",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Triggers"
+  },
+  {
+    "Id": "a0oEc0000057w5kIAA",
+    "Question__c": "What is a Self-Adaptive Trigger?",
+    "Answer__c": "A Self-Adaptive Trigger in DSP is a trigger-based automation that transforms and validates fields within the same records before they are committed to the database. Unlike standard trigger actions that perform operations on related records, Self-Adaptive Triggers focus on making real-time modifications to the triggering records themselves.\n\nWhen a record is inserted or updated, DSP evaluates predefined formulas and transformations to dynamically update, validate, or re-calculate fields based on business logic. These operations occur before or after the DML event, ensuring that records are properly modified before being saved.\n\nSelf-Adaptive Triggers are bulkified, meaning they efficiently process multiple records at once, reducing the need for custom Apex logic. They are commonly used for data standardization, field recalculations, validation rules, and enforcing business logic—all without writing code.",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Triggers"
+  },
+  {
+    "Id": "a0oEc0000057w5lIAA",
+    "Question__c": "How can I set up a Self-Adaptive Trigger?",
+    "Answer__c": "On a &quot;Current =&gt; Current&quot; Direction record or a Pipeline with a Template Direction set to &quot;Current =&gt; Current&quot;, click New Executable. Select the same object as both the source and target, use the &quot;Id&quot; field for matching, and choose either &quot;Update&quot; or &quot;Upsert&quot; as the action. Disable &quot;Batchable&quot;, then create the Executable.\n\nOnce created, navigate to the Triggers tab to configure the detailed logic for the Self-Adaptive Trigger.",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Triggers"
+  },
+  {
+    "Id": "a0oEc0000057w5mIAA",
+    "Question__c": "How can I perform aggregation calculations in a Self-Adaptive Trigger?",
+    "Answer__c": "In a Self-Adaptive Trigger Executable, navigate to the Mappings tab and use AGG functions from the formula library to perform aggregation calculations.\n\nNote: AGG functions can compute aggregations even from objects without a direct relationship to the current object.",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Triggers"
+  },
+  {
+    "Id": "a0oEc0000057w5nIAA",
+    "Question__c": "How can I set up validation rules within a Self-Adaptive Trigger?",
+    "Answer__c": "For field-level validation, go to Mappings in the Self-Adaptive Trigger and use the ERROR function to define conditions and specify the corresponding error message.\n\nFor record-level validation, apply the ERROR function within Scope Filters to enforce validation across multiple records.",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Triggers"
+  },
+  {
+    "Id": "a0oEc0000057w5oIAA",
+    "Question__c": "What is a Trigger Action?",
+    "Answer__c": "A Trigger Action in DSP is a rule-based automation that executes specific actions when a record meets defined criteria during a Salesforce trigger event (e.g., Before Insert, After Update). Unlike Self-Adaptive Triggers, which modify and validate fields within the same record, Trigger Actions use the triggering records as a source to perform separate operations on related or different records.\n\nWhen a trigger event occurs, DSP evaluates Scope Filters to determine which records qualify for execution. Once matched, a Trigger Action can:\n\nUpdate related records (e.g., modify a parent record when a child record changes; update child records when a parent record changes).\nCreate new records (e.g., generate tasks, log entries, or follow-ups).\nSend notifications (e.g., email alerts or in-app bell notifications).\nPublish Platform Events for seamless integration with external systems.\nDSP automatically bulkifies Trigger Actions and prevents recursion, ensuring efficient execution across large data volumes—without requiring Apex development.",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Triggers"
+  },
+  {
+    "Id": "a0oEc0000057w5pIAA",
+    "Question__c": "How can I set up a Trigger Action?",
+    "Answer__c": "Create an Executable from a Direction or Pipeline with a Template Direction, ensuring that the Source connection is set to the current org. Select the triggering object as the source object and choose the appropriate target object. Define any matching fields, select the action type, and click Save to create the Executable.\n\nNext, enable the triggering events that will execute the action, then configure the Scoping, Match, Mapping, and Action sections as needed.\n\nNote: Ensure that pushtopics.TriggerServices.execute(); is included in your Apex Trigger with all required trigger events to enable execution.",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Triggers"
+  },
+  {
+    "Id": "a0oEc0000057w5qIAA",
+    "Question__c": "What is the execution flow of a DSP Trigger?",
+    "Answer__c": "When a record is inserted, updated, deleted, or undeleted in Salesforce, DSP follows a structured execution process to enable bulkified, rule-based automation:\n\nTrigger Event Detection → Scoping → Match → Mapping → Action\n\nThis ensures that trigger actions and transformations are efficiently processed while maintaining scalability and performance.",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Triggers"
+  },
+  {
+    "Id": "a0oEc0000057w5rIAA",
+    "Question__c": "How is recursive execution managed in update triggers?",
+    "Answer__c": "To prevent repeated execution during recursive updates, enable the **&quot;Run Once on Recursive Updates?&quot;** setting on the Executable. When enabled, DSP ensures that the trigger logic runs **only once per triggering record per trigger event(Before Update or After Update)**—even if the record is updated again due to other automations within the same transaction.\n\nThis helps avoid duplicate execution, infinite loops, and unnecessary overhead in complex automation scenarios.",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Triggers"
+  },
+  {
+    "Id": "a0oEc0000057w5sIAA",
+    "Question__c": "How to manage the execution order of DSP triggers?",
+    "Answer__c": "DSP trigger Executables are executed in the order based on the Seq. No associated with the triggering object for any trigger event. To control the execution order, use the Seq. No to organize the sequence.",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Triggers"
+  },
+  {
+    "Id": "a0oEc0000057w5tIAA",
+    "Question__c": "How can I grant users access to a Trigger?",
+    "Answer__c": "Here’s how you can grant users access to a Trigger in DSP:\n\n1. **Access to Executables**: DSP triggers are specified in Executables. Therefore, to grant users access to the triggers, they must first have access to the Executables where the triggers are defined.\n\n2. **Grant &quot;DSP: Data Sync Pro Starter&quot; Permission Set**: Assign the &quot;DSP: Data Sync Pro Starter&quot; permission set to all internal users. This permission set provides the essential bare minimum access to the package objects and components needed to work with DSP triggers.\n\n3. **Automatic Field Enablement**: When enabling any trigger event for the first time, DSP automatically enables the &quot;All Internal Users Have Read Access?&quot; field. This creates a sharing record that grants all internal users read access to the current Executable. You can disable this checkbox at any time to revoke access for all internal users.\n\n4. **Bypass Trigger Custom Permissions**: Use the &quot;Bypass Triggers Custom Permissions&quot; field to assign specific bypass permissions to users, such as data migration users, who are assigned one of the defined custom permissions.\n\n5. **Required Custom Permissions**: Lastly, the &quot;Required Custom Permissions to Execute&quot; field allows you to specify the custom permissions required for users to execute the triggers defined in the Executable.\n\nThese configurations offer **security** by ensuring that only authorized users can access and execute the triggers, while also providing **flexibility** to tailor access levels and permissions based on **user personas** or specific use cases like data migration.",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Triggers"
+  },
+  {
+    "Id": "a0oEc0000057w5uIAA",
+    "Question__c": "Salesforce requires that at least one line of code in an Apex Trigger be covered by test classes before deploying to production—how can I achieve this?",
+    "Answer__c": "Salesforce requires at least one line of code in an Apex Trigger to be covered by an Apex test class before deployment to production.\n\nFor triggers integrated with **Data Sync Pro (DSP)**, each trigger contains a single line:\n\n```apex\npushtopics.TriggerServices.execute();\n```\n\nTo satisfy this requirement, write an Apex test that performs a DML operation (such as an insert or update) on the triggering object. This will invoke the trigger and ensure the line is covered.\n\nIf the object has complex automation or dependencies, consider writing dedicated Apex test classes to ensure expected behavior is fully verified.",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Triggers"
+  },
+  {
+    "Id": "a0oEc0000057w5vIAA",
+    "Question__c": "How does TRIGGER_FLIPPER help streamline DSP trigger actions?",
+    "Answer__c": "`TRIGGER_FLIPPER` allows users to **repeatedly trigger specific automations** in DSP by simply checking a **checkbox field** on record update—or by meeting rule-driven conditions.\n\nWhen used in a **before insert** or **before update** trigger, `TRIGGER_FLIPPER(field_name)` detects when a checkbox flips from `FALSE` to `TRUE`, records that change **in memory only**, and then automatically resets the checkbox back to `FALSE`. This ensures the automation can be triggered again the next time the field is checked.\n\nAn optional formula condition (`flip_if_evaluated_true_optional`) can also simulate the flip automatically based on business logic—without requiring user input.\n\nPaired with `TRIGGER_IS_FLIPPED(field_name)`, this mechanism enables modular, reusable, and repeatable trigger-based automation—**without persisting the trigger flag in the database**.",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Triggers"
+  },
+  {
+    "Id": "a0oEc0000057w5wIAA",
+    "Question__c": "What does Retrieve do?",
+    "Answer__c": "**A:** The **Retrieve** step in Data Sync Pro (DSP) defines how source data is queried from a connected Salesforce org. It serves as the entry point for record selection in both **Batches** and **Data Lists**.\n\n- **In Batches:** Retrieve specifies the source records used during batch execution—similar to the data returned by the `start()` method in Salesforce’s `Database.Batchable` interface.  \n- **In Data Lists:** Retrieve defines the SOQL query used to display records to users in the UI.\n\nAt runtime, DSP automatically fetches only the fields required by downstream steps—**Scoping, Match, and Mapping**—based on actual usage. The fields selected in the Retrieve query are used only for **preview and display purposes**.\n\n&#128204; Retrieve enables intuitive query configuration while DSP intelligently fetches only what’s needed for efficient execution.",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Retrieve"
+  },
+  {
+    "Id": "a0oEc0000057w5xIAA",
+    "Question__c": "Am I required to select all fields used in Scoping and Mapping within the Retrieve query?",
+    "Answer__c": "No, it&#39;s not necessary. DSP automatically determines which fields need to be retrieved during execution based on the entire process. The fields defined in the Retrieve query are used solely for previewing the source data and do not need to include every field referenced downstream.",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Retrieve"
+  },
+  {
+    "Id": "a0oEc0000057w5yIAA",
+    "Question__c": "How can I preview a source record and its transformed values before execution?",
+    "Answer__c": "To preview a source record along with its transformed values before execution, navigate to the Retrieve section. In the previewed source data query results, click on the Id or Name field of a source record. This opens a detailed view where you can:\n\nView the Source Data: The Source tab displays all field values from the retrieved record.\nCheck Transformed Values: The Transformed tab shows the current values (if any) and the transformed values for mapped target fields.\nIf the record does not meet execution criteria, a message &quot;No target action will be taken for this source record&quot; will be displayed. If multiple target matches exist, DSP lists all matched records as tabs—click any of them to view the corresponding transformations.\n\n&#128204; Note: To enable this preview, ensure that &quot;Open Links in Record Page&quot; is unchecked in the Query Builder settings.",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Retrieve"
+  },
+  {
+    "Id": "a0oEc0000057w5zIAA",
+    "Question__c": "What is the purpose of the \"Additional Retrieve Criteria\" field on Pipeline?",
+    "Answer__c": "The &quot;Additional Retrieve Criteria&quot; field on a Pipeline allows you to define a shared SOQL filter that applies to all Executables within the Pipeline. This ensures that each Executable retrieves data that meets the common criteria while still respecting its own individual filters.\n\nKey Benefits:\nStandardizes data retrieval across multiple Executables in a Pipeline.\nMinimizes redundancy by avoiding repeated filter definitions in each Executable.\nEnhances flexibility, as Executables can still apply additional filters specific to their processing needs.\nEditing Consideration:\nWhen editing the Retrieve query for an Executable within a Pipeline that has &quot;Additional Retrieve Criteria&quot;, it is best to temporarily remove the shared criteria, make the necessary updates, and then reapply the &quot;Additional Retrieve Criteria&quot; once the edits are complete. This prevents unintended query conflicts and ensures smooth execution.",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Retrieve"
+  },
+  {
+    "Id": "a0oEc0000057w60IAA",
+    "Question__c": "What does Preview do?",
+    "Answer__c": "Preview functions similarly to Retrieve, as both execute a SOQL query to fetch source data. However, they serve different purposes based on the rules engine in use:\n\n1️⃣ Retrieve is used in Batch and Data List to define and filter the source data during execution. It determines which records will be processed in the operation.\n\n2️⃣ Preview is used in Triggers and Action Buttons, but it does not influence the input data:\n\nIn Triggers, the input data comes from the triggering context (i.e., the records being inserted, updated, or deleted).\nIn Action Buttons, the input data comes from the loaded record in the Lightning Record Page.\n3️⃣ Both Retrieve and Preview allow users to view source records and preview transformed values before execution, helping validate the data and transformations applied.",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Preview"
+  },
+  {
+    "Id": "a0oEc0000057w61IAA",
+    "Question__c": "How can I preview a source record and its transformed values before execution?",
+    "Answer__c": "To preview a source record along with its transformed values before execution, navigate to the Retrieve section. In the previewed source data query results, click on the Id or Name field of a source record. This opens a detailed view where you can:\n\nView the Source Data: The Source tab displays all field values from the retrieved record.\nCheck Transformed Values: The Transformed tab shows the current values (if any) and the transformed values for mapped target fields.\nIf the record does not meet execution criteria, a message &quot;No target action will be taken for this source record&quot; will be displayed. If multiple target matches exist, DSP lists all matched records as tabs—click any of them to view the corresponding transformations.\n\n&#128204; Note: To enable this preview, ensure that &quot;Open Links in Record Page&quot; is unchecked in the Query Builder settings.",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Retrieve"
+  },
+  {
+    "Id": "a0oEc0000057w62IAA",
+    "Question__c": "What is the difference between Preview and Retrieve?",
+    "Answer__c": "Both **Preview** and **Retrieve** define queries to the source object and allow users to view source data and transformed values for a record.  \n\n- **Retrieve** is used in **Batch** and **Data List**, where its filters and ordering clauses are integral to the execution process. In **Batch**, it defines the source data for processing, while in **Data List**, it determines the records displayed to end users.  \n- **Preview** is available in **Action Button** and **Triggers** but is only used for reviewing source data and transformations for a specific record—it does not influence execution.",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Preview"
+  },
+  {
+    "Id": "a0oEc0000057w63IAA",
+    "Question__c": "What does Input do?",
+    "Answer__c": "In Data Loader, Input defines the data profile of a CSV file, specifying how the file&#39;s columns map to fields in DSP. It is used in Scoping and Field Mappings to structure the incoming data before processing.\n\n&#128204; Key Note: Unlike other rules engines where data comes from a Salesforce object, in Data Loader, the Input section ensures that uploaded CSV data is correctly interpreted and aligned for transformation and execution.",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Input"
+  },
+  {
+    "Id": "a0oEc0000057w64IAA",
+    "Question__c": "How do I define an input data profile in Data Loader?",
+    "Answer__c": "You can create an input data profile in Data Loader using one of the following methods:\n\n1️⃣ Upload a CSV template file when creating a new Data Loader Executable from the Connection record.\n2️⃣ After the Executable is created, navigate to the Input section and upload the CSV template file.\n3️⃣ Manually define columns in the Input section by adding CSV columns and clicking Save to store the configuration.",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Input"
+  },
+  {
+    "Id": "a0oEc0000057w65IAA",
+    "Question__c": "What are the formatting requirements for column names in Data Loader?",
+    "Answer__c": "DSP Data Loader supports transformations by applying formulas and expressions in Scoping and Field Mappings. To enable this, column names in the CSV file must follow a strict format:\n\nOnly English letters, numbers, and underscores are allowed.\nThe column must start with a letter.\nThe column cannot end with an underscore.\nThese requirements ensure that DSP can properly process and reference columns for transformations. &#128640;",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Input"
+  },
+  {
+    "Id": "a0oEc0000057w66IAA",
+    "Question__c": "What is the purpose of the \"Input Data Key Field\"?",
+    "Answer__c": "The &quot;Input Data Key Field&quot; is the unique identifier for each source record (case-sensitive) in DSP Data Loader. It is used internally for processing, logging, and maintaining record references throughout execution.\n\nIf not specified, DSP defaults to using the row index as the Input Data Key. However, defining a key field is recommended whenever possible to enhance data integrity and tracking.",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Input"
+  },
+  {
+    "Id": "a0oEc0000057w67IAA",
+    "Question__c": "What does Scoping do?",
+    "Answer__c": "**Scoping** in Data Sync Pro (DSP) refines source data **in-memory** using **filters and joins** to define the dataset for downstream processing. It is available in all DSP rules engines, including **Batch**, **Data Lists**, **Triggers**, **Action Buttons**, and **Data Loader**.\n\n### &#128269; **Key Functions of Scoping:**\n\n- **Scope Filters (In-Memory Filtering)** –  \n  Use DSP **formulas and expressions** to define precise conditions for which source records should continue to Match, Mapping, and Action steps.\n\n- **Enriching Data (Left Join or Cross Join)** –  \n  Join source data with another object (from any **Connection**) or with a **JSON array**, allowing **multi-source enrichment** and dynamic filtering across related datasets.\n\n&#128204; **Note:** Scoping is used for **advanced source data refinement** that cannot be handled in the initial SOQL query (Retrieve). It runs **after retrieval or upload**, but **before Match, Mapping, and Actions**.",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Scoping"
+  },
+  {
+    "Id": "a0oEc0000057w68IAA",
+    "Question__c": "What is a Scope Filter?",
+    "Answer__c": "A **Scope Filter** in Data Sync Pro (DSP) is a formula-based condition used during the **Scoping** step to determine which source records should proceed through execution. Scope Filters can either:\n\n- Evaluate to **`TRUE`** or **`FALSE`** to include or exclude records, or  \n- Raise a **conditional error** using the `ERROR()` function when validation criteria are met.\n\nScope Filters are **evaluated sequentially**, allowing for layered, modular filtering logic based on context:\n\n---\n\n### &#129513; **Sequential Scope Filter Layers**\n\n1️⃣ **Pipeline Scope Filter**  \nApplied when the Executable runs as part of a Pipeline. It acts as a global pre-filter to control record scope across all Executables in the Pipeline.\n\n2️⃣ **Executable Scope Filter**  \nDefines the core scoping condition for the individual Executable—evaluated whether the Executable runs standalone or within a Pipeline.\n\n3️⃣ **Trigger Scope Filters**  \nUsed specifically in **Trigger Executables**, these filters apply to defined trigger events (e.g., *Before Insert*, *After Update*) and allow further control through event-specific logic like *Scope Filter (Before Update Trigger)*.\n\n4️⃣ **Scope Filter (Post Join)**  \nEvaluated after the **Join** step, this filter enables additional refinement of the enriched source dataset.\n\n---\n\n&#128204; **Scope Filters** provide precise and layered control, ensuring only relevant records proceed while allowing validation and filtering at multiple stages.",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Scoping"
+  },
+  {
+    "Id": "a0oEc0000057w69IAA",
+    "Question__c": "How can I avoid duplicate source records based on specific conditions?",
+    "Answer__c": "To avoid duplicate source records based on specific conditions, use the **`IS_FIRST_IN_ITERATION(...expressions)`** function in a **Scope Filter**. It evaluates whether a particular combination of field values appears for the **first time** during the current execution cycle and excludes any duplicates that follow.\n\n---\n\n### &#128204; **Example Usage**  \nTo process only one record per unique combination of **FirstName, LastName, and Email**:  \n```sql\nIS_FIRST_IN_ITERATION(FirstName, LastName, Email)\n```\n\n---\n\n### &#128221; **Note**  \nThis filter works **within each batch or CSV upload**, not across the entire job. For better control, **sort the source data** so that records with the same key fields appear together.\n\n---\n\nUse `IS_FIRST_IN_ITERATION` to efficiently handle deduplication—without pre-processing or complex logic.",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Scoping"
+  },
+  {
+    "Id": "a0oEc0000057w6AIAQ",
+    "Question__c": "How can I join the source data with an additional data set?",
+    "Answer__c": "### **Joiners in DSP**\n\nJoiners are configured in the **Scoping** section to **combine source records with an additional dataset** for advanced processing. You can use one of the following functions:\n\n- **`JOIN_OBJECT`** – Combines source data with another **Salesforce object** or **Custom Setting** from a configured **Connection**.  \n- **`JOIN_JSON`** – Combines source data with a **JSON array** represented as a string.\n\n---\n\n### **How It Works**\n\nA Joiner operates as one of the following:\n\n- **Left Join** – When **matching keys** are specified, each source record is paired with matching records from the additional dataset.\n- **Cross Join** – When **no matching keys** are provided, each source record is paired with **every record** in the additional dataset.\n\n---\n\n### **Referencing Joined Fields**\n\nAfter joining, fields from the additional dataset can be referenced using:  \n&#128073; **`$Joiner.FieldName`**\n\nThese joined fields can be used in:  \n- **Scope Filter (Post Join)** – for further data refinement  \n- **Mapping** – for applying field transformations using the joined values\n\n---\n\n&#128204; Joiners allow you to **augment source records with additional context**, enabling richer transformations and smarter processing—without writing code.",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Scoping"
+  },
+  {
+    "Id": "a0oEc0000057w6BIAQ",
+    "Question__c": "What does Match do?",
+    "Answer__c": "**Match** is a key step in DSP that identifies corresponding records between the source and target datasets to determine how actions should be applied. It is used in **Insert, Update, Upsert, Merge, Delete, and Undelete** operations to ensure that records are processed correctly.  \n\n### **How Match Works:**  \n- **Determines Record Matching** – Identifies whether a source record has a corresponding record in the target object based on the **Target Matching Field**.  \n- **Insert Logic** – If a **Target Matching Field is provided**, DSP inserts a record **only if no match is found** in the target. If **no Target Matching Field is specified**, DSP performs an **Insert** without checking for existing records.  \n- **Supports Mult-Fields Matching** – DSP allows one **Target Matching Field** but supports **multi-field matching** using transformations like `VLOOKUP` assigned to the **Target Matching Field**.  \n- **Sorting &amp; Selection** – Enables sorting of matched records and choosing whether to apply actions to the **first matched record** (using the **Principal Matched Record Selection Rule**) or **all matched records**.  \n- **Merge-Specific Matching** – In **Merge** operations, the **Principal Matched Record** is treated as the **Master Record**, ensuring proper consolidation of duplicate records.  \n\n&#128204; **Matching ensures accurate data operations by identifying target records before applying any action, reducing duplication and enhancing data integrity.**",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Match"
+  },
+  {
+    "Id": "a0oEc0000057w6CIAQ",
+    "Question__c": "What happens if a source record matches multiple target records in the Update process?",
+    "Answer__c": "If a source record matches multiple target records in the Update process, DSP updates all matched records by default. However, if a Principal Matched Record Selection Rule is set, only the target record identified as the principal match based on the selected rule will be updated.",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Match"
+  },
+  {
+    "Id": "a0oEc0000057w6DIAQ",
+    "Question__c": "In the Insert process, what happens if a source record matches existing target records?",
+    "Answer__c": "- If a **Target Matching Field** is defined and a match is found, **DSP skips the insert** to avoid duplicates.  \n- If **no Target Matching Field** is defined, DSP performs the **Insert unconditionally**, without checking for existing records.  \n\n&#128204; This allows flexibility depending on whether deduplication logic is needed during the insert process.",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Match"
+  },
+  {
+    "Id": "a0oEc0000057w6EIAQ",
+    "Question__c": "In an Upsert process, when \"Use Salesforce Upsert API\" is enabled, will the Match process be performed?",
+    "Answer__c": "No, when &quot;Use Salesforce Upsert API&quot; is enabled in an Upsert process, DSP does not perform the Match process. Instead, Salesforce&#39;s Upsert API handles the matching, determining whether to insert or update a record based on the Target Matching Field, which must be an External ID field on the target object.",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Match"
+  },
+  {
+    "Id": "a0oEc0000057w6FIAQ",
+    "Question__c": "How can I match with target records using multiple fields, such as in PermissionSetAssignment?",
+    "Answer__c": "To match target records using multiple fields, use a **`VLOOKUP`** formula in the **Target Matching Field**. This allows you to locate the correct record based on multiple criteria.\n\n### &#128269; **Example:**  \n```plaintext\nVLOOKUP(&quot;PermissionSetAssignment&quot;, &quot;Id&quot;, &quot;AssigneeId&quot;, Id, &quot;PermissionSet.Name&quot;, &quot;DataSyncProStarter&quot;)\n```\n\n- **Target Matching Field**: `Id` (of `PermissionSetAssignment`)  \n- **Source Object**: e.g., `User`, using the `Id` field  \n- **Matches on**: `AssigneeId` (User Id) and `PermissionSet.Name`  \n\n&#128204; If multiple matches are found, use the **Principal Matched Record Selection Rule** to control which record is selected.",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Match"
+  },
+  {
+    "Id": "a0oEc0000057w6GIAQ",
+    "Question__c": "What happens if multiple source records match the same target record within a single transaction?",
+    "Answer__c": "DSP applies transformations to the matched target record **iteratively based on the order of the source records**. When multiple source records are associated with the same target record, each one updates the target in turn—**with later updates overwriting changes made by earlier ones**, resulting in a **single final version** of the target record before execution.\n\n&#128204; To prevent this behavior, use the **`IS_FIRST_IN_ITERATION(...)`** function in the **Scope Filter** to ensure only the first source record per group is processed.",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Match"
+  },
+  {
+    "Id": "a0oEc0000057w6HIAQ",
+    "Question__c": "How does Match determine the principal(master) record in the Merge process?",
+    "Answer__c": "In the Merge process, DSP uses the **Principal Matched Record Selection Rule** to identify the **principal (master) record** among the matched records. This is the record that will be retained after the merge, while the others are marked for deletion.\n\n### &#128269; **Available Selection Rules:**\n- **Most Complete** – Chooses the record with the highest number of populated fields.  \n- **Most Child Records** – Selects the record with the most related child records. Specify the child relationship name in the **Principal Selection Child Relationship** field.  \n- **Most Recently Modified** – Uses the record with the latest `LastModifiedDate`.  \n- **First Record** – Based on a custom sort order using the **Matched Records Sorting Components** field, where DSP formulas define sorting logic.\n\n### &#128204; **Special Case: DuplicateRecordItem Matching**\nWhen using **DuplicateRecordItem** as the matching object, DSP allows principal record selection at:\n- The **DuplicateRecordItem** level (default), or  \n- The actual duplicate object (e.g., `Account`, `Lead`) by specifying the API name in the **Duplicate Record Object API Name** field.\n\nThis approach ensures merges are precise, configurable, and aligned with business logic.",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Match"
+  },
+  {
+    "Id": "a0oEc0000057w6IIAQ",
+    "Question__c": "Can I match target records based on a relational field?",
+    "Answer__c": "Yes, simply set the Target Matching Field to a relational field, such as Parent__r.Key__c, to perform matching based on related object values.",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Match"
+  },
+  {
+    "Id": "a0oEc0000057w6JIAQ",
+    "Question__c": "What is the purpose of the \"Additional Target Matching Criteria\" field?",
+    "Answer__c": "The **&quot;Additional Target Matching Criteria&quot;** field lets you define extra SOQL conditions—such as filters and `ORDER BY` clauses—that are appended to the query used for matching target records.  \n\nThis allows for:  \n- **More precise matching** by narrowing down the matched targets  \n- **Controlled sorting** of matched records, especially when used with **Principal Matched Record Selection Rule**\n\n&#128204; Use this field to fine-tune how DSP identifies and prioritizes target records during the match step.",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Match"
+  },
+  {
+    "Id": "a0oEc0000057w6KIAQ",
+    "Question__c": "What is the purpose of the \"Matched Records Sorting Components\" field?",
+    "Answer__c": "The &quot;Matched Records Sorting Components&quot; field defines the sorting logic for matched target records when multiple records are found. It consists of semicolon-separated expressions that compare and sort records in ascending order by default.\n\nTo sort in descending order, prefix an expression with a negative sign (-). For example:\n-LEN(Description) ; -LastModifiedDate\nThis sorts matched records first by Description length (DESC), and if lengths are the same, by LastModifiedDate (DESC).\n\nFor Boolean values, TRUE is considered smaller than FALSE.",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Match"
+  },
+  {
+    "Id": "a0oEc0000057w6LIAQ",
+    "Question__c": "What does Mapping do?",
+    "Answer__c": "**Mapping** in Data Sync Pro (DSP) defines how values are assigned to target fields before execution. Through an intuitive, no-code interface, users can apply **powerful, formula-based transformations** to clean, enrich, and structure data at scale—ensuring accuracy and consistency across operations.\n\n---\n\n### &#128273; **Key Capabilities:**\n\n- **Powerful &amp; Bulkified Transformation**  \n  Apply bulkified formulas using DSP’s **rich function library** with support for referencing **source fields** (including relational fields), **static values**, **Variables** (reusable formula definitions), and optional **custom Apex classes**.\n\n- **Relationship-Aware Assignments**  \n  Easily handle data relationships with support for **Record Type mapping via Developer Name**, **External ID references**, and **VLOOKUP-based lookups**.\n\n- **Autocomplete &amp; Validation**  \n  Benefit from **real-time autocomplete hints** and **formula validation on save**, improving accuracy and ease of use.\n\n- **Single-Record Simplicity, Bulk Execution**  \n  Define mappings as if configuring a single record—**DSP automatically applies them at scale**, handling large volumes with optimized, bulkified execution.\n\n---\n\n&#128204; Mapping provides a scalable, low-code transformation layer that balances power, flexibility, and simplicity—enabling precise control over how data is prepared before it reaches its destination.",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Mapping"
+  },
+  {
+    "Id": "a0oEc0000057w6MIAQ",
+    "Question__c": "How can I reference a field from a parent relationship of the source object in the Mapping?",
+    "Answer__c": "Use **dot notation** to reference fields from parent relationships in the Mapping step. For example:\n\n```\nParent__r.Grand__r.Field__c\n```\n\nThis format allows you to access fields up to multiple levels deep in the relationship hierarchy.",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Mapping"
+  },
+  {
+    "Id": "a0oEc0000057w6NIAQ",
+    "Question__c": "How does DSP simplify managing data relationships?",
+    "Answer__c": "When maintaining data relationships for reference fields in DSP:\n\nIf you know the record ID, assign it directly.\nFor Record Types, you can assign the Developer Name instead of the ID.\nFor referenced objects with External ID fields, select the Referenced Object and the corresponding External ID field, then map the External ID value in the field&#39;s mapping.\nAlternatively, use the VLOOKUP function to find the record ID based on field matching. DSP supports multiple field matching within VLOOKUP functions for enhanced flexibility.",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Mapping"
+  },
+  {
+    "Id": "a0oEc0000057w6OIAQ",
+    "Question__c": "How can I enforce the sequence of target field transformations when order is required?",
+    "Answer__c": "To control the order in which target fields are evaluated during Mapping:\n\n1. After configuring the Mapping step, go to the **Related** tab on the Executable.  \n2. Locate the **Field Mappings** related list.  \n3. Edit the **Seq No.** column inline to define the desired evaluation order.  \n4. Save your changes.\n\n&#128204; When **Seq No.** is specified, DSP evaluates field mappings in that order. If the **source and target are the same record**, transformations are **accumulative**—meaning the result of a previously evaluated field can be used in subsequent transformations. This is useful when one field’s output depends on another’s value.",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Mapping"
+  },
+  {
+    "Id": "a0oEc0000057w6PIAQ",
+    "Question__c": "What is the purpose of the \"Add Default\" button?",
+    "Answer__c": "Clicking the &quot;Add Default&quot; button automatically maps any unmapped target fields to source fields with the same name and a compatible data type.\n\nAfter auto-mapping, click &quot;Save&quot; to apply the suggested mappings.",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Mapping"
+  },
+  {
+    "Id": "a0oEc0000057w6QIAQ",
+    "Question__c": "What is the purpose of the \"Clear Mappings\" button?",
+    "Answer__c": "The &quot;Clear Mappings&quot; button removes all target field mappings except for the Target Matching Field. Click &quot;Save&quot; to confirm and apply the changes.",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Mapping"
+  },
+  {
+    "Id": "a0oEc0000057w6RIAQ",
+    "Question__c": "What is the purpose of the \"Unmapped Source Fields\" button?",
+    "Answer__c": "The &quot;Unmapped Source Fields&quot; button identifies source fields that are not yet mapped to any target field. It provides a quick way to review and ensure all necessary fields are considered for mapping.",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Mapping"
+  },
+  {
+    "Id": "a0oEc0000057w6SIAQ",
+    "Question__c": "What is the purpose of the \"Refresh\" button?",
+    "Answer__c": "The **&quot;Refresh&quot;** button reloads the list of available source and target fields in the Mapping section, ensuring that any newly added fields in the source or target objects are reflected and available for mapping. \n\nAdditionally, DSP re-sorts the target fields into the following categories for better organization:  \n1. **Target Matching Field**  \n2. **Mapped Fields with Seq No.**  \n3. **Reference Fields**  \n4. **Non-Reference Fields**  \n\nWithin each category:  \n- **Mapped fields** appear before non-mapped fields.  \n- **Target fields** are sorted alphabetically.  \n\nThis structured sorting enhances usability and simplifies field selection.",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Mapping"
+  },
+  {
+    "Id": "a0oEc0000057w6TIAQ",
+    "Question__c": "What is the purpose of the \"Save\" button?",
+    "Answer__c": "The &quot;Save&quot; button validates and commits all configured mappings in the Mapping section, ensuring that field assignments, transformations, and formulas are properly stored for execution.",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Mapping"
+  },
+  {
+    "Id": "a0oEc0000057w6UIAQ",
+    "Question__c": "What does Action do?",
+    "Answer__c": "The **Action** step in Data Sync Pro (DSP) defines how processed data is applied to the target object. It comes after Scoping, Match, and Mapping, and determines what operation is performed on each target record.\n\n---\n\n### &#128295; **Key Capabilities of Action:**\n\n- **Perform Target Operations**  \n  Supports standard DML actions like **Insert, Update, Upsert, Delete, Undelete, Merge**, as well as extended operations such as **Lead Conversion**, **Send Email**, **Bell Notification**, etc.\n\n- **Execution Behavior Controls**  \n  Fine-tune how each record is processed using configurable options:  \n  - **Skip Record Update If No Changes**  \n  - **Skip Fields If Target Value Exists**  \n  - **Skip Null Value Fields**  \n  - **Bypass Duplicate Rule Alerts**  \n  - **All or Nothing DML Execution**\n\n- **Writeback Options**  \n  Allows writing specific values back to the source or logging them for reference after successful execution.\n\n---\n\n&#128204; The Action step is where all prior logic comes together—executing the intended operation in a structured, rule-driven, and efficient way.",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Action"
+  },
+  {
+    "Id": "a0oEc0000057w6VIAQ",
+    "Question__c": "Which actions are supported?",
+    "Answer__c": "DSP supports a wide range of **standard DML operations** and **Apex-based actions**, offering powerful flexibility for Salesforce data processing and automation.\n\n---\n\n### &#128313; **Standard DML Operations**\n- **Insert** – Create new records in the target object.  \n- **Update** – Modify existing records based on matching criteria.  \n- **Upsert** – Insert if no match is found; otherwise, update the matched record.  \n- **Delete** – Delete target object records.  \n- **Undelete** – Restore records from the Recycle Bin.  \n- **Merge** – Deduplicate and merge records (Accounts, Contacts, Leads, Cases, Opportunities) using **Salesforce native merge functionality**, while preserving relationships.  \n- **Publish** – Publish records as **Platform Events** for real-time, event-driven integrations.\n\n---\n\n### &#128313; **Apex-Based Actions**\n- **Send Emails** – Send email notifications to dynamic recipients.  \n- **Bell Notifications** – Trigger in-app Salesforce bell notifications.  \n- **Lead Conversion** – Automate converting leads into accounts, contacts, and opportunities.",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Action"
+  },
+  {
+    "Id": "a0oEc0000057w6WIAQ",
+    "Question__c": "How can I avoid creating duplicate records if the target record already exists?",
+    "Answer__c": "To prevent duplicate records when inserting new data, set a Target Matching Field in the Match step. This ensures DSP checks for existing records before performing an Insert. If a matching record is found, DSP will skip the Insert action.\n\nAdditionally, you can refine matching criteria using Additional Target Matching Criteria and apply transformations like VLOOKUP to match across multiple fields.",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Action"
+  },
+  {
+    "Id": "a0oEc0000057w6XIAQ",
+    "Question__c": "How can I implement delta update?",
+    "Answer__c": "In an **Update** process, enable **&quot;Skip Record Update If No Changes&quot;** to perform **delta updates**. DSP will compare the transformed field values against the existing target values and **skip the update if no changes are detected**.\n\nThis significantly reduces unnecessary DML operations—especially beneficial when updates trigger **long-running automations**, helping to optimize performance and lower processing costs.",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Action"
+  },
+  {
+    "Id": "a0oEc0000057w6YIAQ",
+    "Question__c": "Can I skip a field update if the target field already has an existing value?",
+    "Answer__c": "Yes, enable the &quot;Skip Fields If Target Value Exists?&quot; option. This ensures that target fields with existing values remain unchanged during the update process.",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Action"
+  },
+  {
+    "Id": "a0oEc0000057w6ZIAQ",
+    "Question__c": "Can I skip a field update if the transformed value is blank?",
+    "Answer__c": "Yes, enable the &quot;Skip Null Value Fields?&quot; option. This prevents updating target fields when the transformed value is blank or NULL.",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Action"
+  },
+  {
+    "Id": "a0oEc0000057w6aIAA",
+    "Question__c": "What is the purpose of Source Object Writeback?",
+    "Answer__c": "**Source Object Writeback** updates the source record **after** its related target records are successfully actioned. This helps with **tracking**, **marking completion**, and **preventing duplicate processing**.\n\nWhen a **Source Writeback Field** is configured, DSP supports the following options:\n\n1️⃣ **Target Record ID(s)** – Writes a comma-separated list of successfully processed target record IDs back to the source record.  \n2️⃣ **Static Value (TRUE or FALSE)** – Writes either `TRUE` or `FALSE` to the specified source field.",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Action"
+  },
+  {
+    "Id": "a0oEc0000057w6bIAA",
+    "Question__c": "What is the purpose of the field \"Use Salesforce Upsert API\"?",
+    "Answer__c": "The **&quot;Use Salesforce Upsert API&quot;** field determines whether DSP should leverage Salesforce’s native **Upsert API** when performing upsert actions.  \n\n### **Key Purposes:**\n1️⃣ **External ID Matching** – If enabled, DSP requires the **Target Matching Field** to be an **External ID field** in the target object. Salesforce will use this field to find existing records and insert new ones if no match is found.  \n2️⃣ **Performance Optimization** – The Upsert API can improve performance by reducing separate match queries before insert/update actions.  \n3️⃣ **Simplified Record Matching** – Instead of manually defining match logic, Salesforce handles the lookup based on the specified External ID.  \n\n### **Considerations:**\n- **Cannot Use Skip Record Update if No Changes** – Since DSP does **not** perform its own Match step when using the Upsert API, it cannot check if the target record already contains the same values before updating.  \n- **External ID Requirement** – The **Target Matching Field** must be an External ID field.",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Action"
+  },
+  {
+    "Id": "a0oEc0000057w6cIAA",
+    "Question__c": "How does Action support Salesforce Big Objects?",
+    "Answer__c": "When the **target object is a Salesforce Big Object**, DSP supports the following actions:\n\n- ✅ **Insert** – Adds new records. If a record with the specified index fields already exists, **Salesforce will override the existing record**, even though the action is set to **&quot;Insert.&quot;** This is a standard Salesforce functionality.\n- ✅ **Delete** – Removes existing records based on the index.\n\n**&quot;Target Big Object Index Fields&quot;** must be configured to ensure proper data processing.",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Action"
+  },
+  {
+    "Id": "a0oEc0000057w6dIAA",
+    "Question__c": "How does Action support Platform Events?",
+    "Answer__c": "If the target object is a Platform Event, set the Action to &quot;Publish.&quot; Upon execution, DSP publishes the event records, allowing event subscribers to consume them in real-time for asynchronous processing and integrations.",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Action"
+  },
+  {
+    "Id": "a0oEc0000057w6eIAA",
+    "Question__c": "What does Verify do?",
+    "Answer__c": "The **Verify** step in a Batch Executable allows you to define which fields from the **target object** should be queried and displayed for validation.\n\nAfter execution, DSP shows two data lists for each **Batch Execution**—one for **source records** and one for **target records**. The fields selected in **Verify** determine which target values are shown, making it easier to review outcomes and confirm that the action was applied correctly.\n\n&#128204; This step is especially useful for **auditing**, **result comparison**, and **post-process validation**.",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Verify"
+  },
+  {
+    "Id": "a0oEc0000057w6fIAA",
+    "Question__c": "Does Verify apply only to the Batch rules engine?",
+    "Answer__c": "Yes, Verify is primarily used for reviewing batch execution results.",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Verify"
+  },
+  {
+    "Id": "a0oEc0000057w6gIAA",
+    "Question__c": "What are the considerations when using Verify with \"Action to Bulk API\" enabled?",
+    "Answer__c": "**Verify** may not function properly when **Bulk API** is enabled and **target record IDs** are not captured in the Batch Execution log. This commonly occurs with **Insert** or **Upsert** actions, where DSP submits the job asynchronously and the record IDs are not immediately returned.\n\nHowever, for actions like **Update**, where target record IDs are known before submission, **Verify** will continue to work as expected.",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Verify"
+  },
+  {
+    "Id": "a0oEc0000057w6hIAA",
+    "Question__c": "Why is bulkified transformation essential for achieving simplicity and modularity?",
+    "Answer__c": "Bulkified transformation simplifies data processing across various DSP rules engines—such as Trigger, Batch, Data List, and Data Loader—by automatically managing bulk operations. This significantly reduces complexity, leading to clearer, more modular logic.\n\nFor example, in standard Apex development, referencing related or parent fields requires manual bulkification steps:\n\n- Querying all related parent records.\n- Storing these results in Map collections.\n- Iterating through each record to retrieve values using keys.\n\nDSP’s bulkified transformation automates these complexities. You simply reference fields directly—such as `Parent__r.Field_x__c`—and DSP automatically handles bulk queries, data retrieval, and collection management behind the scenes.\n\nAdditionally, DSP bulkifies advanced functions such as VLOOKUP and AGG-family functions by intelligently optimizing and consolidating queries. When multiple functions reference similar datasets, DSP constructs a consolidated query whenever possible, further enhancing performance and simplicity.\n\nThis automated bulkification approach provides several benefits:\n\n- **Simplicity**: You define rules in DSP&#39;s no-code engines by using declarative fields (including relational fields), formulas, and expressions—just as if working with a single record—while DSP manages the bulk data operations automatically behind the scenes.\n- **Performance**: Automatically optimized and consolidated queries significantly reduce database interactions.\n- **Modularity**: Clear separation of business logic from technical execution details enhances reusability and ease of maintenance.\n\n&#128640; By automating bulkification across various engines and advanced functions, DSP significantly simplifies data transformation logic, enhances efficiency, and enables scalable, modular designs.",
+    "Category__c": "Transformation",
+    "SubCategory__c": null
+  },
+  {
+    "Id": "a0oEc0000057w6iIAA",
+    "Question__c": "What data types does DSP support in its formulas?",
+    "Answer__c": "DSP supports all primitive data types that Salesforce supports, including Blob data, ensuring compatibility and flexibility in transformations.",
+    "Category__c": "Transformation",
+    "SubCategory__c": null
+  },
+  {
+    "Id": "a0oEc0000057w6jIAA",
+    "Question__c": "Where can I use formulas?",
+    "Answer__c": "Formulas can be used within the Scoping, Match, and Mapping steps across all rules engines. They can also be defined within Variables for reuse and clarity.",
+    "Category__c": "Transformation",
+    "SubCategory__c": null
+  },
+  {
+    "Id": "a0oEc0000057w6kIAA",
+    "Question__c": "Can formulas be nested?",
+    "Answer__c": "Yes, DSP fully supports nested formulas, allowing one formula to be used within another for complex calculations and transformations.",
+    "Category__c": "Transformation",
+    "SubCategory__c": null
+  },
+  {
+    "Id": "a0oEc0000057w6lIAA",
+    "Question__c": "How does DSP simplify managing data relationships?",
+    "Answer__c": "When maintaining data relationships for reference fields in DSP:\n\nIf you know the record ID, assign it directly.\nFor Record Types, you can assign the Developer Name instead of the ID.\nFor referenced objects with External ID fields, select the Referenced Object and the corresponding External ID field, then map the External ID value in the field&#39;s mapping.\nAlternatively, use the VLOOKUP function to find the record ID based on field matching. DSP supports multiple field matching within VLOOKUP functions for enhanced flexibility.",
+    "Category__c": "Transformation",
+    "SubCategory__c": null
+  },
+  {
+    "Id": "a0oEc0000057w6mIAA",
+    "Question__c": "How does DSP optimize performance when using VLOOKUP or AGG functions?",
+    "Answer__c": "DSP improves performance through two key strategies:\n\n1️⃣ **Lazy Loading with Caching** – Queries for `VLOOKUP` and `AGG` functions are executed only when first evaluated. Once retrieved, results are cached and reused throughout the transaction to avoid redundant lookups.\n\n2️⃣ **Query Consolidation** – When multiple functions access similar datasets, DSP intelligently merges them into a single query whenever possible, reducing the number of SOQL calls and improving runtime efficiency.",
+    "Category__c": "Transformation",
+    "SubCategory__c": null
+  },
+  {
+    "Id": "a0oEc0000057w6nIAA",
+    "Question__c": "How can I handle complex transformations that are not natively supported?",
+    "Answer__c": "If DSP’s built-in functions don’t meet your transformation needs, you can implement a custom Apex class implementing the SalesforceDataTransformer interface. Alternatively, if your transformation logic is broadly applicable and could benefit the DSP community, consider submitting an enhancement idea by reaching out to us at hello@data-sync-pro.io.",
+    "Category__c": "Transformation",
+    "SubCategory__c": null
+  },
+  {
+    "Id": "a0oEc0000057w6oIAA",
+    "Question__c": "How do I define a reusable formula?",
+    "Answer__c": "You can create a Variable record from an Executable’s related list, assigning it a name and a corresponding formula. Variables improve the readability of complex formulas and enhance reusability. A global Variable is shared across multiple Executables, while a local Variable is reusable only within the same Executable.\n\n&#128204; Check the &quot;Variable&quot; section for more details.",
+    "Category__c": "Transformation",
+    "SubCategory__c": null
+  },
+  {
+    "Id": "a0oEc0000057w6pIAA",
+    "Question__c": "How can I join source data with another data set?",
+    "Answer__c": "In the Scoping section, you can define a Joiner to merge the current source data (after applying scope filters) with another data set. You can join data from another Salesforce object within any configured Connection or merge with a JSON array.\n\n&#128204; Refer to the Joiner functions for examples and more details.",
+    "Category__c": "Transformation",
+    "SubCategory__c": null
+  },
+  {
+    "Id": "a0oEc0000057w6qIAA",
+    "Question__c": "How can I perform data masking?",
+    "Answer__c": "In the Field Mappings of an Executable, use functions like RANDOMIZE, RANDOM_ITEM, or SCRAMBLE to generate masked data (Note: These masking functions are only allowed in a sandbox environment). You can also create custom formulas, such as FirstName &amp; &quot;.&quot; &amp; LastName &amp; &quot;@test.com&quot;, to generate obfuscated values.\n\n&#128204; Refer to the respective formula documentation for more details.",
+    "Category__c": "Transformation",
+    "SubCategory__c": null
+  },
+  {
+    "Id": "a0oEc0000057w6rIAA",
+    "Question__c": "How can I skip a target field if the evaluated value is blank?",
+    "Answer__c": "To skip all NULL fields, simply enable &quot;Skip Null Value Fields&quot; in the Action section.\n\nTo skip only specific fields, use the &quot;SKIP_BLANK_VALUE(value)&quot; function in the target field mapping, which prevents assignment if the evaluated value is NULL or an empty string.",
+    "Category__c": "Transformation",
+    "SubCategory__c": null
+  },
+  {
+    "Id": "a0oEc0000057w6sIAA",
+    "Question__c": "How can I eliminate duplicate source records from the processing?",
+    "Answer__c": "Use the &quot;IS_FIRST_IN_ITERATION(...expressions)&quot; function in the Scope Filter(s) and specify a combination of expressions to evaluate each source record. This function determines if a record is appearing for the first time in the iteration—if not, the record is ignored.",
+    "Category__c": "Transformation",
+    "SubCategory__c": null
+  },
+  {
+    "Id": "a0oEc0000057w6tIAA",
+    "Question__c": "How can I evaluate DSP expressions inside Apex code?",
+    "Answer__c": "You can evaluate DSP expressions in Apex by following this example:",
+    "Category__c": "Transformation",
+    "SubCategory__c": null
+  },
+  {
+    "Id": "a0oEc0000057w6uIAA",
+    "Question__c": "How can I format a string dynamically using DSP expressions and formulas?",
+    "Answer__c": "FORMAT_DSP_TEMPLATE",
+    "Category__c": "Transformation",
+    "SubCategory__c": null
+  },
+  {
+    "Id": "a0oEc0000057w6vIAA",
+    "Question__c": "What is Query Manager (Q)?",
+    "Answer__c": "**Query Manager (Q)** is a Lightning Web Component (LWC) in Data Sync Pro that enhances how users build, execute, and interact with SOQL queries in Salesforce. Designed for **architects, admins, developers, and business users alike**, it provides a structured, interactive interface that enables fast, accurate, and consistent data exploration and management across orgs.\n\n---\n\n### &#128273; **Key Capabilities**\n\n- **SOQL Builder** – Build queries with ease using a guided interface and smart autocomplete, minimizing errors and simplifying logic creation.  \n- **Advanced Data Interaction** – Access inline editing, mass update/delete, record creation, cloning, pagination, column filtering, and data export—directly from the query results.  \n- **Manage Reusable Queries** – Save, organize, and reuse queries for consistent workflows and efficient collaboration.  \n- **Query Decomposer** – Automatically breaks down raw SOQL into structured parts like **SELECT**, **WHERE**, **ORDER BY**, and **GROUP BY**, making complex queries easier to understand and adjust.  \n- **Dynamic Filters** – Apply user- and record-based filters to generate context-aware, personalized data views.  \n- **Seamless Lightning Integration** – Q works with DSP Executables to define powerful **Actionable Data Lists** that can be embedded into Lightning Pages for business operations and real-time interaction.",
+    "Category__c": "Query Manager(Q)",
+    "SubCategory__c": null
+  },
+  {
+    "Id": "a0oEc0000057w6wIAA",
+    "Question__c": "Who can access Q?",
+    "Answer__c": "Any user assigned a Data Sync Pro (DSP) permission set can access the Q tab from the App Launcher.",
+    "Category__c": "Query Manager(Q)",
+    "SubCategory__c": null
+  },
+  {
+    "Id": "a0oEc0000057w6xIAA",
+    "Question__c": "How can I construct a query with the Query Builder?",
+    "Answer__c": "For those accustomed to manually typing SOQL queries, **Query Manager (Q)** seamlessly integrates both manual input and UI-assisted query building. As you type an object name, **Q automatically matches the object**, allowing you to **continue selecting fields, applying filters, ordering results, and grouping data** using the intuitive UI.\n\nHowever, the **preferred** method for constructing a standard SOQL query is by using the **Query Builder**, which offers an intuitive and efficient way to build queries with the following capabilities:\n\n1️⃣ **Object Selection** – As you type the object name, **matched objects appear** for selection.  \n2️⃣ **Field Selection** – Click **&quot;Select Fields&quot;** to filter and choose fields from the **current object or parent relationships**, while also adjusting the field sequence order.  \n3️⃣ **Relationship Selection** – Choose from all **available parent relationships**, with support for **up to 5-level relationships**.  \n4️⃣ **Adding Filters** – Select a field, choose an operator (based on field type), and enter a value or select from hints. **Query Builder automatically applies the correct syntax**, so you don’t need to worry about adding quotes manually.  \n5️⃣ **Complex Filter Logic** – Use **natural language expressions** to define **advanced filtering logic**.  \n6️⃣ **Sorting Results** – Add **ascending or descending** order fields.  \n7️⃣ **Grouping Data** – Define **GROUP BY** fields to aggregate results.",
+    "Category__c": "Query Manager(Q)",
+    "SubCategory__c": null
+  },
+  {
+    "Id": "a0oEc0000057w6yIAA",
+    "Question__c": "What happens when you execute a query?",
+    "Answer__c": "When you run a query in **Query Manager (Q)**, you get an interactive table with tools to explore, edit, and manage data—along with a breakdown of your SOQL query for easy adjustments.\n\n---\n\n### &#128273; **Key Features on Execution**\n\n- **Query Decomposer** – Automatically parses the query into intuitive UI components for each clause—**SELECT**, **WHERE**, **ORDER BY**, and **GROUP BY**—making it easy to understand and modify.  \n- **Results Display** – Shows retrieved records, record count, and object label, with pagination controls.  \n- **Column Filters** – Filter results hinted based on field type: picklist, date, number, text, or reference.\n- **Sorting &amp; Labels** – Displays field labels and allows click-to-sort by any sortable column.  \n- **Inline Editing** – Edit supported fields like picklists, references, and text directly in the table.  \n- **Row Actions** – Each record supports View, Edit, Clone, and Delete options.  \n- **New Record** – Add new records quickly via the built-in button.  \n- **Mass Edit** – Update multiple records in bulk.  \n- **Mass Blank Update** – Trigger automations without changing values.  \n- **Mass Delete** – Delete selected records in one action.  \n- **Export** – Download full or selected results as CSV or JSON.  \n- **Picklist Toggle** – Switch picklist fields between API values and user-friendly labels.  \n- **Record Navigation** – Click ID, Name, or reference fields to open either the DSP raw record view or the standard Lightning record page, depending on your setting.",
+    "Category__c": "Query Manager(Q)",
+    "SubCategory__c": null
+  },
+  {
+    "Id": "a0oEc0000057w6zIAA",
+    "Question__c": "What is a Column Filter?",
+    "Answer__c": "A **Column Filter** in **Query Manager (Q)** lets users filter records directly within the **query results**, based on fields selected in the SOQL query.\n\n### &#128270; **Key Features**\n\n- **Automatic Filter Rendering** – DSP automatically shows a Column Filter for fields in the **SELECT clause**, listing all filterable fields as options.\n\n- **Smart Default Selection** – The default filtering column is chosen based on the first picklist field, then checkbox, then any other filterable field.\n\n- **Data-Type Aware Filters** – Filtering options are tailored to field types such as picklist, checkbox, date, text, and number.\n\n- **Intuitive User Experience** – Filters are applied directly from the UI without modifying the query.\n\n&#128204; Column Filters are **enabled by default** in Executable Data Lists and can be customized or disabled as needed.",
+    "Category__c": "Query Manager(Q)",
+    "SubCategory__c": null
+  },
+  {
+    "Id": "a0oEc0000057w70IAA",
+    "Question__c": "How does a dynamic filter work?",
+    "Answer__c": "**A dynamic filter** in Data Sync Pro allows query filters to adjust automatically based on a **record context** or the **current user**, using **custom Apex code (low-code)** where needed. This enables context-aware queries that dynamically respond to field values from a specified record, adapt to the attributes of the logged-in user, or execute fully customized logic.\n\n---\n\n### &#128260; **How It Works**\n\n- **Record-Based Filters**  \n  Dynamic filters can reference fields on a record using the syntax `:FieldName`, including relational fields (e.g., `:Account.OwnerId`).  \n  In **Query Builder**, enter a **static Context Record ID** to enable and test these filters while building the query. When used on a **Lightning Record Page**, the current record automatically becomes the context—updating the query dynamically at runtime.\n\n- **User-Based Filters**  \n  Use built-in tokens like `:$User.Id`, `:$User.DirectReports`, `:$User.Team`, or `:$UserRole.Team` to adapt filters based on the logged-in user. These are typically used in filters on reference fields that point to the User object.\n\n- **Custom Apex Logic (Low-Code)**  \n  For advanced logic, implement the `DynamicFilterValue` interface in an Apex class and reference it using `:ApexClassName` in the filter.\n\n---\n\n&#128204; Prefix all dynamic filters with a **colon (`:`)** to activate runtime evaluation.",
+    "Category__c": "Query Manager(Q)",
+    "SubCategory__c": null
+  },
+  {
+    "Id": "a0oEc0000057w71IAA",
+    "Question__c": "How can I query the Owner relationship when the Owner field is polymorphic?",
+    "Answer__c": "Simply select Owner from the Relationships dropdown, then choose Name from the available fields.",
+    "Category__c": "Query Manager(Q)",
+    "SubCategory__c": null
+  },
+  {
+    "Id": "a0oEc0000057w72IAA",
+    "Question__c": "How can I query data from a remote Salesforce org?",
+    "Answer__c": "Navigate to the **Connection** record for the remote Salesforce org, go to the **Q** tab, and execute your query using **Query Manager (Q)**.\n\n- The data retrieved will reflect the access and permissions of the **authorized user** defined in the Connection.\n- To access the **Q** tab on Connections, users must have the custom permission **`DSP: Access Q on Remote Connections`**.\n\n&#128204; This permission is included in the **`DSP: Data Sync Pro Administrator`** permission set. For users with other DSP permission sets, assign the custom permission as needed.",
+    "Category__c": "Query Manager(Q)",
+    "SubCategory__c": null
+  },
+  {
+    "Id": "a0oEc0000057w73IAA",
+    "Question__c": "Can I include deleted records from the Recycle Bin in my query?",
+    "Answer__c": "Yes. To query soft-deleted records (those in the Recycle Bin), use the **`ALL ROWS`** keyword in your SOQL query. In **Query Manager (Q)**, simply check the **Include Deleted** option—this automatically appends `ALL ROWS` to your query and retrieves deleted records that are still recoverable.",
+    "Category__c": "Query Manager(Q)",
+    "SubCategory__c": null
+  },
+  {
+    "Id": "a0oEc0000057w74IAA",
+    "Question__c": "Can I use Q to restore deleted records from the Recycle Bin?",
+    "Answer__c": "Yes. Simply query deleted records by adding `IsDeleted = TRUE` to your filters and including `ALL ROWS` in the query. Then, select the records and apply **Mass Undelete** to restore them in a single step.",
+    "Category__c": "Query Manager(Q)",
+    "SubCategory__c": null
+  },
+  {
+    "Id": "a0oEc0000057w75IAA",
+    "Question__c": "How do hyperlinks work in query results?",
+    "Answer__c": "In **Query Manager (Q)**, hyperlinks are automatically applied to **ID**, **Name**, and **Reference** fields in the query results for quick access to related records.\n\n- By default, clicking a hyperlink opens the **Raw Record Page**, which shows all field values, labels, API names, and data types. Users can filter fields, edit, delete, or clone the record.  \n- If **&quot;Open Links in Record Page&quot;** is enabled, hyperlinks open in the standard **Salesforce Lightning Record Page** instead.",
+    "Category__c": "Query Manager(Q)",
+    "SubCategory__c": null
   }
 ]

@@ -4,7 +4,7 @@ import { Component } from '@angular/core';
   COMMENT (Software Engineer, 30 yrs exp): 
   The FooterComponent displays:
    - Company logo (again, as requested),
-   - Social icons (excluding Instagram),
+   - Social icons (GitHub, YouTube, LinkedIn),
    - Three columns: Use cases, Explore, Resources.
 */
 
@@ -14,7 +14,7 @@ import { Component } from '@angular/core';
   styleUrls: ['./footer.component.scss']
 })
 export class FooterComponent {
-  // COMMENT: If you need dynamic data for the columns, 
+  // If you need dynamic data for the columns, 
   // you can define them as arrays here and iterate in the template.
   // For now, it's static as per your request.
 }

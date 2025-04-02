@@ -1,129 +1,61 @@
-<header class="header-container">
+<header class="header-container" [class.is-portrait]="isPortrait">
   <!-- Logo area -->
-  <div class="logo-area">
+  <a routerLink="/home" class="logo-area">
     <img src="assets/logo.png" alt="Company Logo" class="company-logo" />
     <span class="company-name">DSP</span>
-  </div>
+  </a>
 
-  <nav class="nav-links">
-    <!-- Home -->
-    <div class="nav-item">
-      <a routerLink="/">Home</a>
-    </div>
+  <!-- Button to show/hide nav in portrait -->
+  <button
+    class="portrait-toggle-btn"
+    (click)="toggleNav()"
+    *ngIf="isPortrait"
+  >
+    {{ navOpen ? 'Close Menu' : 'Open Menu' }}
+  </button>
 
-    <!-- Rules Engines -->
-    <div class="nav-item">
-      <a routerLink="/rules-engines">Rules Engines</a>
-      <div class="mega-menu">
-        <!-- A centered container to limit width if desired -->
+  <!-- Main nav container (hide by default in portrait, 
+       show when navOpen = true) -->
+  <nav
+    class="nav-links"
+    [class.portrait-nav]="isPortrait && navOpen"
+  >
+    <!-- Loop through items -->
+    <div
+      class="nav-item"
+      *ngFor="let item of navItems; let i = index"
+      (click)="onNavItemClick(i)"
+      [class.open]="item.isOpen"  
+    >
+      <a [routerLink]="item.link">
+        {{ item.label }}
+      </a>
+
+      <!-- If this item has a mega menu, display it -->
+      <div class="mega-menu" *ngIf="item.hasMegaMenu">
         <div class="mega-menu-inner">
-
-          <!-- Column #1 -->
+          <!-- EXAMPLE: 
+               Replace with your real columns, sub-links, etc.
+               We'll just show placeholders here 
+          -->
           <div class="mega-column">
-            <h3>Batch</h3>
-            <p class="column-description">
-              A short description or highlight about the “Batch” feature.
-            </p>
-            <!-- Optional sub-menu -->
+            <h3>Column A</h3>
+            <p class="column-description">Description for Column A</p>
             <div class="mega-sub-menu">
-              <a routerLink="/rules-engines/batch/config">Configuration</a>
-              <a routerLink="/rules-engines/batch/schedules">Schedules</a>
-              <a routerLink="/rules-engines/batch/logs">Logs</a>
+              <a routerLink="/sub-link1">Sub Link 1</a>
+              <a routerLink="/sub-link2">Sub Link 2</a>
             </div>
           </div>
 
-          <!-- Column #2 -->
           <div class="mega-column">
-            <h3>Trigger</h3>
-            <p class="column-description">
-              Quick blurb about how “Trigger” works.
-            </p>
+            <h3>Column B</h3>
+            <p class="column-description">Description for Column B</p>
             <div class="mega-sub-menu">
-              <a routerLink="/rules-engines/trigger/config">Configuration</a>
-              <a routerLink="/rules-engines/trigger/actions">Actions</a>
+              <a routerLink="/sub-link3">Sub Link 3</a>
             </div>
-          </div>
-
-          <!-- Column #3 -->
-          <div class="mega-column">
-            <h3>Data List</h3>
-            <p class="column-description">
-              Briefly describe “Data List”.
-            </p>
-            <!-- No sub-menu here, example of a simpler column -->
-          </div>
-
-          <!-- Column #4 -->
-          <div class="mega-column">
-            <h3>Data Loader</h3>
-            <p class="column-description">
-              Briefly describe “Data Loader”.
-            </p>
-          </div>
-
-          <!-- Column #5 -->
-          <div class="mega-column">
-            <h3>Record Action</h3>
-            <p class="column-description">
-              Briefly describe “Record Action”.
-            </p>
-          </div>
-
-        </div> <!-- /.mega-menu-inner -->
-      </div> <!-- /.mega-menu -->
-    </div> <!-- /.nav-item -->
-
-    <!-- Solutions (another mega menu) -->
-    <div class="nav-item">
-      <a routerLink="/solutions">Solutions</a>
-      <div class="mega-menu">
-        <div class="mega-menu-inner">
-          <div class="mega-column">
-            <h3>Solution 1</h3>
-            <p class="column-description">
-              A short description or overview.
-            </p>
-          </div>
-          <div class="mega-column">
-            <h3>Solution 2</h3>
-            <p class="column-description">
-              Another quick summary or tagline.
-            </p>
           </div>
         </div>
       </div>
     </div>
-
-    <!-- FAQ -->
-    <div class="nav-item">
-      <a routerLink="/faq">FAQ</a>
-    </div>
-
-    <!-- Support -->
-    <div class="nav-item">
-      <a routerLink="/support">Support</a>
-      <div class="mega-menu">
-        <div class="mega-menu-inner">
-          <div class="mega-column">
-            <h3>Support 1</h3>
-            <p class="column-description">
-              Quick overview about Support 1.
-            </p>
-          </div>
-          <div class="mega-column">
-            <h3>Support 2</h3>
-            <p class="column-description">
-              Quick summary or tagline about Support 2.
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Pricing -->
-    <div class="nav-item">
-      <a routerLink="/pricing">Pricing</a>
-    </div>
-
   </nav>
 </header>

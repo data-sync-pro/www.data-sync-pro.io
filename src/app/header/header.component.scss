@@ -2,25 +2,17 @@
    HEADER CONTAINER
 ------------------------------ */
 .header-container {
-  /* --- Positioning & Dimensions --- */
-  // You can keep it absolute if you want it over other elements,
-  // or switch to relative if needed. 
-  position: absolute; 
+  position: absolute;
   top: 0;
   left: 0;
   width: 99vw;
   height: 60px;
   z-index: 1000;
-
-  /* --- Visual --- */
   background-color: #fff;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 
-  /* ----------------------------------
-     LOGO AREA
-  ---------------------------------- */
+  /* -- Logo area -- */
   .logo-area {
-    /* --- Positioning & Display --- */
     position: absolute;
     padding-left: 10%;
     top: 50%;
@@ -28,6 +20,8 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    text-decoration: none;
+    z-index: 2000;
 
     .company-logo {
       width: 40px;
@@ -42,37 +36,49 @@
     }
   }
 
-  /* ----------------------------------
-     NAVIGATION LINKS
-  ---------------------------------- */
+  /* -- Toggle Button (only for portrait) -- */
+  .portrait-toggle-btn {
+    position: absolute;
+    top: 50%;
+    right: 2rem;
+    transform: translateY(-50%);
+    z-index: 2000;
+    background: #007bff;
+    color: #fff;
+    border: none;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    font-weight: 500;
+    border-radius: 4px;
+
+    &:hover {
+      background-color: #0056b3;
+    }
+  }
+
+  /* =========================================
+     NAVIGATION (Default Horizontal)
+  ========================================= */
   .nav-links {
-    /* Centers the nav items horizontally within the header */
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
     display: flex;
-    gap: 2rem;
     left: 0;
     right: 0;
-    max-width: 100vw;
-    padding-left: 30%;
-    /* Each nav item */
+    max-width: 99vw;
+    padding-left: 33%;
+    gap: 1rem;
+
     .nav-item {
-      /* 
-         "left: 130%;" is unusual but retained if 
-         you're offsetting the items for a specific layout. 
-         Feel free to remove or adjust as needed.
-      */
       position: relative;
 
       > a {
-        /* Bigger hover area so hovering "below" the text
-           still counts as hovering on the link. */
         display: inline-block;
-        width: max-content; /* let the link size shrink-wrap the text */
-        height: 60px;       /* same as header height */
-        line-height: 60px;  /* vertically center the text */
-        padding: 0 1rem;    /* horizontal padding */
+        width: max-content;
+        height: 60px;
+        line-height: 60px;
+        padding: 0 1rem;
         text-decoration: none;
         color: #333;
         font-weight: 500;
@@ -82,30 +88,23 @@
         }
       }
 
-      /* ----------------------------------
-         MEGA MENU
-      ---------------------------------- */
+      /* --- Mega Menu for Horizontal: hidden by default --- */
       .mega-menu {
-        /* Use opacity/visibility/transform for transitions, not display:none. */
         opacity: 0;
         visibility: hidden;
-        transform: translateY(-20px);
-        transition: opacity 0.4s ease, transform 0.4s ease;
+        transition: opacity 0.4s ease, visibility 0s linear 0.4s;
 
-        /* If the header is 60px tall, place the mega menu right below it. */
+        /* Using position: fixed for full-width dropdown */
         position: fixed;
-        top: 60px;       /* no gap between header bottom and mega menu top */
+        top: 60px;
         left: 0;
         right: 0;
         width: 99vw;
-
-        /* --- Visual --- */
         background-color: #fff;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         border-top: 1px solid #ddd;
         z-index: 9999;
 
-        /* Wraps content with a max width and centers it */
         .mega-menu-inner {
           max-width: 1200px;
           margin: 0 auto;
@@ -114,7 +113,6 @@
           flex-wrap: wrap;
           gap: 2rem;
 
-          /* Each column in the mega menu */
           .mega-column {
             flex: 1 1 200px;
             min-width: 200px;
@@ -150,11 +148,103 @@
         }
       }
 
-      /* Show the mega-menu on hover with an animated transition */
+      /* Hover to show mega menu in horizontal mode */
       &:hover .mega-menu {
         opacity: 1;
         visibility: visible;
-        transform: translateY(0);
+        transition-delay: 0s;
+      }
+    }
+  }
+
+  /* =====================================================
+     PORTRAIT MODE OVERRIDES
+     (When .header-container has .is-portrait)
+  ===================================================== */
+  &.is-portrait {
+    /* The header remains 60px tall. */
+
+    /* .nav-links hidden by default in portrait.
+       Shown when we add .portrait-nav.
+    */
+    .nav-links {
+      position: relative;
+      top: 60px;
+      transform: none;
+      display: none;
+      width: 99vw;
+      max-width: 99vw;
+      padding-left: 0;
+      gap: 0;
+    }
+
+    /* .portrait-nav: nav is shown, stacked vertically */
+    .nav-links.portrait-nav {
+      display: flex;
+      flex-direction: column;
+      background-color: #fff;
+
+      .nav-item {
+        width: 100%;
+
+        > a {
+          display: block;
+          width: 100%;
+          padding: 0.75rem 1rem;
+          border-bottom: 1px solid #eee;
+          line-height: 1.5rem;
+        }
+
+        /* 
+          We remove the hover-based approach for sub-menus in portrait
+          so the user must click to open them.
+        */
+        &:hover .mega-menu {
+          /* Do nothing here: override any horizontal rule */
+          opacity: 1;   /* or you can keep it but won't matter if we do max-height below */
+          visibility: visible;
+        }
+
+        /* 
+          Instead of hiding sub-menus with opacity/visibility, 
+          we use a collapsible "max-height" approach
+          so the item expands in height when .open is applied.
+        */
+
+        .mega-menu {
+          /* Remove position: fixed. We want them inline in portrait */
+          position: static;
+          width: 100%;
+          left: auto;
+          right: auto;
+          top: auto;
+          box-shadow: none;
+          border-top: none;
+          margin-bottom: 1rem; /* optional spacing */
+
+          /* Collapsed by default (no space) */
+          max-height: 0;
+          overflow: hidden;
+          transition: max-height 0.3s ease;
+
+          /* Optionally add some horizontal padding if you want a nice look */
+          padding: 0;
+        }
+
+        &.open .mega-menu {
+          /* Expanded state: large max-height to show all content */
+          max-height: 500px; /* or a large number that fits your sub-menu */
+          padding: 1rem;     /* expand the padding as well */
+        }
+
+        .mega-menu-inner {
+          flex-direction: column;
+          max-width: 100%;
+
+          .mega-column {
+            /* If you want extra styling for columns in portrait, do it here */
+          }
+        }
       }
     }
   }
