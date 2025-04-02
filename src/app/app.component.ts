@@ -15,10 +15,8 @@ export class AppComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    // Listen for route changes to track page views
     this.router.events
       .pipe(
-        // Type guard: ensures only NavigationEnd events pass through
         filter((event: RouterEvent): event is NavigationEnd => event instanceof NavigationEnd)
       )
       .subscribe((event: NavigationEnd) => {

@@ -2,14 +2,11 @@
   width: 80%;
   margin: 0 auto;
 
-  /* Two-column flex layout */
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-between; 
-  /* or space-around / flex-start / center, depending on your preference */
 
-  /* Spacing around the hero section */
   padding: 2rem 0;  
   gap: 2rem;     
   margin-top: 80px;

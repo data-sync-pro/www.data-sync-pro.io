@@ -1,15 +1,5 @@
 import { Component } from '@angular/core';
 
-/*
-  COMMENT (Software Engineer, 30 yrs exp):
-  This component has a 'tabs' array, each representing one tab's data:
-    - 'name': the tab label
-    - 'secondHeroTitle'/'secondHeroSubtitle': content for the "second-hero" section
-    - 'cardOneTitle'/'cardOneContent' + 'cardTwoTitle'/'cardTwoContent': 
-      text for the two-column cards.
-
-  'selectedTab' references the currently active tab's data.
-*/
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
@@ -17,7 +7,6 @@ import { Component } from '@angular/core';
 })
 export class HomeComponent {
 
-  // COMMENT: Each object in 'tabs' corresponds to one tab, with custom content.
   tabs = [
     {
       name: 'Batch',
@@ -66,11 +55,8 @@ export class HomeComponent {
     }
   ];
 
-  // COMMENT: We default to the first tab in the array (Batch), 
-  // or pick whichever you prefer.
   selectedTab = this.tabs[0];
 
-  // COMMENT: Switches 'selectedTab' to whichever tab user clicked
   selectTab(tab: any) {
     this.selectedTab = tab;
   }

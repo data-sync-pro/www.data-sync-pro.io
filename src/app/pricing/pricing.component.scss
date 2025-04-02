@@ -19,7 +19,6 @@
       color: #666;
     }
   
-    /* ===== Top Plan Cards ===== */
     .plans-container {
       display: flex;
       flex-wrap: wrap;
@@ -130,16 +129,15 @@
         }
       }
     }
-  
-    /* ===== ACCORDION SECTION ===== */
+
     .category-accordion {
-      text-align: left; /* so the table lines up well */
+      text-align: left; 
   
       .category-section {
         margin-bottom: 0.5rem;
         border: 1px solid #eee;
         border-radius: 4px;
-        overflow: hidden; /* helps contain the panel */
+        overflow: hidden;
   
         .category-header {
           background-color: #faf8f6;
@@ -153,7 +151,7 @@
           position: relative;
   
           &.open {
-            background-color: #f2e9e4; /* highlight if open */
+            background-color: #f2e9e4;
           }
   
           .arrow {

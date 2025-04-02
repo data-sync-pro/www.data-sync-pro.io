@@ -13,20 +13,15 @@ export class AnalyticsService {
     this.userConsented = consent;
   }
 
-  /**
-   * Generate or retrieve the user ID from a cookie named 'visitorId'.
-   * If the cookie doesn't exist, create a new one.
-   */
+
   private getOrSetVisitorIdFromCookie(): string {
     const cookieName = 'visitorId';
 
-    // 1. Attempt to read existing cookie
     const existingCookie = this.getCookieValue(cookieName);
     if (existingCookie) {
       return existingCookie;
     }
 
-    // 2. If not found, generate a new ID and set it in a cookie
     const newId = Math.random().toString(36).substring(2, 10);
     const daysToExpire = 365; // Customize the expiration as needed
     this.setCookie(cookieName, newId, daysToExpire);
@@ -48,16 +43,10 @@ export class AnalyticsService {
     document.cookie = cookieString;
   }
 
-  /**
-   * Retrieve the visitor ID (cookie-based).
-   */
   private getVisitorId(): string {
     return this.getOrSetVisitorIdFromCookie();
   }
 
-  /**
-   * Globally track any click event from the document (as you already do).
-   */
   trackClickEvent(data: { element: string; timestamp: string }) {
     if (!this.userConsented) {
       return;
@@ -76,9 +65,6 @@ export class AnalyticsService {
       });
   }
 
-  /**
-   * Track a page view (called after route navigation).
-   */
   trackPageView(pageUrl: string) {
     if (!this.userConsented) {
       return;
@@ -96,10 +82,6 @@ export class AnalyticsService {
         error: (err) => console.error('Tracking error:', err)
       });
   }
-
-  /**
-   * A generic method for custom events, e.g., FAQ expansions.
-   */
   trackCustomEvent(data: any) {
     if (!this.userConsented) {
       return;

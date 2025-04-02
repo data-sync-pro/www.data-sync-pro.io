@@ -27,21 +27,17 @@ interface FAQItem {
   styleUrls: ['./faq.component.scss']
 })
 export class FaqComponent implements OnInit {
-  // SEARCH STATE
   searchQuery = '';
   searchFocused = false;
 
-  // CURRENT FILTERS
   currentCategory = '';
   currentSubCategory = '';
 
-  // FAQ DATA
   faqList: FAQItem[] = [];
 
-  // Category->Subcategory structure
   subCategories: Record<string, string[]> = {};
 
-  // SEARCH SUGGESTIONS
+
   suggestions: string[] = [];
   showSuggestions = false;
   selectedSuggestionIndex = -1;
@@ -54,7 +50,6 @@ export class FaqComponent implements OnInit {
   ngOnInit(): void {
     const data = faqData as SourceFAQRecord[];
 
-    // Build subCategories map
     data.forEach(record => {
       const cat = record.Category__c;
       const sub = record.SubCategory__c ?? '';
@@ -68,7 +63,6 @@ export class FaqComponent implements OnInit {
       }
     });
 
-    // Convert raw data to FAQ items
     this.faqList = data.map(rec => this.toFAQItem(rec));
   }
 
@@ -102,20 +96,18 @@ export class FaqComponent implements OnInit {
       .replace(/&amp;/g, '&');
   }
 
-  // All main categories
   get categories(): string[] {
     return Object.keys(this.subCategories);
   }
 
-  // Filter logic based on current search, category, subcategory
   get filteredFAQ(): FAQItem[] {
     const q = this.searchQuery.toLowerCase().trim();
     return this.faqList.filter(item => {
-      // Match category
+
       if (this.currentCategory && item.category !== this.currentCategory) return false;
-      // Match subcategory
+
       if (this.currentSubCategory && item.subCategory !== this.currentSubCategory) return false;
-      // Match search text
+
       if (q) {
         return (
           item.question.toLowerCase().includes(q) ||
@@ -126,7 +118,6 @@ export class FaqComponent implements OnInit {
     });
   }
 
-  // Category / Subcategory selection
   pickCategory(cat: string): void {
     this.currentCategory = cat;
     this.currentSubCategory = '';
@@ -141,7 +132,6 @@ export class FaqComponent implements OnInit {
     this.currentSubCategory = subCat;
   }
 
-  // Track expansions in analytics
   onFaqOpened(item: FAQItem) {
     if (this.analyticsService.userConsented) {
       const payload = {
@@ -154,7 +144,6 @@ export class FaqComponent implements OnInit {
     }
   }
 
-  // Search & Suggestions
   onSearchBlur(): void {
     this.searchFocused = false;
   }

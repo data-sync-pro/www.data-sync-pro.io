@@ -1,24 +1,22 @@
 import { Component } from '@angular/core';
 
-/** Each top plan card. */
 interface Plan {
   name?: string;
-  oldPrice?: string;      // optional strikethrough
+  oldPrice?: string;      
   currentPrice?: string;
   perPerson?: string;
   buttonLabel?: string;
-  badge?: string;         // e.g., "BEST VALUE"
-  subtitle?: string;       // short plan description
-  features?: string[];     // bullet list inside the plan card
-  addOns?: string[];      // optional bullet list of add-ons
+  badge?: string;        
+  subtitle?: string;      
+  features?: string[];    
+  addOns?: string[];     
 }
 
-/** For the accordion: each category has a title and multiple feature rows. */
 interface FeatureCategory {
   title: string; 
   features: {
-    name: string;                     // "Health insurance administration", etc.
-    simple: boolean | string;         // true => checkmark, false => blank, "Add-on" => label
+    name: string;                
+    simple: boolean | string;        
     plus: boolean | string;
     premium: boolean | string;
   }[];
@@ -31,7 +29,6 @@ interface FeatureCategory {
 })
 export class PricingComponent {
   
-  // ====== TOP 3 CARDS ======
   plans: Plan[] = [
     {
       name: 'Starter',
@@ -41,7 +38,6 @@ export class PricingComponent {
         'Basic support',
         'Employee profiles and self-service',
         'Basic hiring and onboarding tools',
-        // ...other bullet points...
       ]
     },
     {
@@ -54,7 +50,6 @@ export class PricingComponent {
   
   ];
 
-  // ====== ACCORDION FEATURE CATEGORIES ======
   categories: FeatureCategory[] = [
     {
       title: 'Batch Engine',
@@ -96,21 +91,18 @@ export class PricingComponent {
         // ...
       ]
     },
-    // Add more categories as needed...
+    
   ];
 
-  // Track which accordion panel is currently open. Null => all closed.
-  openIndex: number | null = null;
+ openIndex: number | null = null;
 
-  // Toggle open/close for a given category index
   toggleCategory(index: number) {
     this.openIndex = this.openIndex === index ? null : index;
   }
 
-  // Helper function to interpret boolean/string values in the table
   getDisplay(val: boolean | string): string {
-    if (val === true) return '✔';   // included
-    if (val === false) return '';   // blank if not included
-    return val;                     // e.g. "Add-on"
+    if (val === true) return '✔';   
+    if (val === false) return '';   
+    return val;                     
   }
 }

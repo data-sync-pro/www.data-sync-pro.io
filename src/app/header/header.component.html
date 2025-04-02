@@ -4,8 +4,6 @@
     <img src="assets/logo.png" alt="Company Logo" class="company-logo" />
     <span class="company-name">DSP</span>
   </a>
-
-  <!-- Button to show/hide nav in portrait -->
   <button
     class="portrait-toggle-btn"
     (click)="toggleNav()"
@@ -13,14 +11,10 @@
   >
     {{ navOpen ? 'Close Menu' : 'Open Menu' }}
   </button>
-
-  <!-- Main nav container (hide by default in portrait, 
-       show when navOpen = true) -->
   <nav
     class="nav-links"
     [class.portrait-nav]="isPortrait && navOpen"
   >
-    <!-- Loop through items -->
     <div
       class="nav-item"
       *ngFor="let item of navItems; let i = index"
@@ -31,13 +25,8 @@
         {{ item.label }}
       </a>
 
-      <!-- If this item has a mega menu, display it -->
       <div class="mega-menu" *ngIf="item.hasMegaMenu">
         <div class="mega-menu-inner">
-          <!-- EXAMPLE: 
-               Replace with your real columns, sub-links, etc.
-               We'll just show placeholders here 
-          -->
           <div class="mega-column">
             <h3>Column A</h3>
             <p class="column-description">Description for Column A</p>

@@ -1,6 +1,4 @@
-<!-- faq.component.html -->
 <div class="faq-container">
-  <!-- TOP SEARCH BAR -->
   <div class="faq-search">
     <label class="visually-hidden" for="faqSearchInput">
       Search FAQs
@@ -31,8 +29,6 @@
         Clear
       </span>
     </div>
-
-    <!-- SUGGESTIONS -->
     <ul
       class="suggestions-list"
       *ngIf="showSuggestions"
@@ -51,14 +47,11 @@
     </ul>
   </div>
 
-  <!-- LAYOUT WRAPPER: LEFT SIDEBAR + MAIN CONTENT -->
   <div class="faq-layout">
     
-    <!-- LEFT SIDEBAR -->
     <aside class="faq-sidebar">
       <h3 class="sidebar-title">Categories</h3>
       <ul class="category-list">
-        <!-- "All" entry to clear categories -->
         <li
           class="category-item"
           [class.active]="!currentCategory"
@@ -67,7 +60,6 @@
           All
         </li>
 
-        <!-- Main categories -->
         <li
           *ngFor="let cat of categories"
           class="category-item"
@@ -78,7 +70,6 @@
         </li>
       </ul>
 
-      <!-- Subcategory listing (only if a category is selected) -->
       <div
         class="subcategory-container"
         *ngIf="currentCategory && subCategories[currentCategory]?.length"
@@ -97,11 +88,8 @@
       </div>
     </aside>
 
-    <!-- MAIN FAQ AREA -->
     <main class="faq-main">
-      <!-- BREADCRUMB / FAST RETURN -->
       <nav class="breadcrumb" *ngIf="currentCategory || currentSubCategory">
-        <!-- If user has chosen any category, show breadcrumb for that -->
         <span
           class="breadcrumb-link"
           (click)="clearCategory()"
@@ -131,7 +119,6 @@
         </ng-container>
       </nav>
 
-      <!-- FAQ ACCORDION -->
       <mat-accordion>
         <mat-expansion-panel
           *ngFor="let item of filteredFAQ"
@@ -146,11 +133,10 @@
         </mat-expansion-panel>
       </mat-accordion>
       
-      <!-- Optionally, if no results found -->
       <div class="no-results" *ngIf="filteredFAQ.length === 0">
         No FAQs found. Try a different search or reset the filters.
       </div>
     </main>
 
-  </div> <!-- END .faq-layout -->
-</div> <!-- END .faq-container -->
+  </div>
+</div> 

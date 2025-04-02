@@ -1,9 +1,3 @@
-/*
-  COMMENT (Software Engineer, 30 yrs exp):
-  We use CSS Grid, but now limit the footer's width
-  to 70% of the screen width, aligned left.
-*/
-
 .footer-container {
     display: grid;
     grid-auto-flow: column;
@@ -13,20 +7,8 @@
     border-top: 1px solid #ddd;
   
 
-  
-    /*
-      If you want it *centered* within the screen,
-      you could use:
-        margin: 0 auto;
-      But since you asked specifically to end at 70%,
-      margin-left: 0 + width: 70% keeps it left-aligned.
-    */
   }
-  
-  /* 
-    .footer-brand: Logo + Social Icons block
-    No change needed here unless you want further adjustments.
-  */
+
   .footer-brand {
     display: flex;
     flex-direction: column;
@@ -50,11 +32,7 @@
     }
   }
   
-  /*
-    .footer-column: Each column of links
-    Also unchanged, as the grid container's width 
-    dictates the overall layout constraint.
-  */
+
   .footer-column {
     display: flex;
     flex-direction: column;
@@ -82,13 +60,5 @@
       }
     }
   }
-  
-  /* 
-    COMMENT: For small screens, you might need to stack columns vertically:
-    @media (max-width: 768px) {
-      .footer-container {
-        grid-auto-flow: row;
-      }
-    }
-  */
+
   
