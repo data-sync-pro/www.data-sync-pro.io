@@ -8,7 +8,6 @@ import { SupportComponent } from './support/support.component';
 import { FaqComponent } from './faq/faq.component';
 import { AppComponent } from './app.component';
 
-// COMMENT (Software Engineer, 30 yrs exp): Minimal routing for 2 pages
 const routes: Routes = [
   { path: '', component: HomeComponent },       // Home page
   { path: 'rules-engines', component: RulesEnginesComponent },
