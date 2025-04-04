@@ -129,7 +129,12 @@
               {{ item.question }}
             </mat-panel-title>
           </mat-expansion-panel-header>
-          <div [innerHTML]="item.Answer__c"></div>
+          <ng-container
+            *ngComponentOutlet="
+              FaqComponentRegistry[toRegistryKey(item.answer)]
+            "
+          ></ng-container>
+
         </mat-expansion-panel>
       </mat-accordion>
       

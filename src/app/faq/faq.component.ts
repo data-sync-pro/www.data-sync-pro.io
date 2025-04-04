@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import faqData from '../../assets/data/faqs.json';
 import { AnalyticsService } from '../analytics.service';
-
+import { FaqComponentRegistry } from './faq-registry';
 interface SourceFAQRecord {
   Id: string;
   Question__c: string;
@@ -216,5 +216,10 @@ export class FaqComponent implements OnInit {
   clearSearch(): void {
     this.searchQuery = '';
     this.onSearchInputChange();
+  }
+
+  public FaqComponentRegistry = FaqComponentRegistry;
+  toRegistryKey(answer: string): string {
+    return answer.replace(/\.html$/, '').toLowerCase();
   }
 }
