@@ -1,61 +1,52 @@
 <article>
-    <p>
-      The <strong>Batch, Data List</strong>, and <strong>Trigger</strong> rules engines in DSP 
-      are <strong>Direction-based</strong>, meaning they take input from a source object, apply 
-      transformations, and perform an action on a target object. The <strong>Data Loader</strong> 
-      is similar to Batch but is <strong>Connection-based</strong>, meaning its source data comes 
-      from a CSV upload rather than a source object. The <strong>Action Button</strong> can be either 
-      Direction-based or Connection-based:
-    </p>
-  
-    <ul>
-      <li>
-        <strong>Connection-based Action Button</strong> &ndash; Acts as a global action 
-        with no input data.
-      </li>
-      <li>
-        <strong>Direction-based Action Button</strong> &ndash; Functions as a record action, 
-        using the current record from a Lightning record page as input.
-      </li>
-    </ul>
-  
-    <p>
-      While these rules engines share similar sub-processes, the key difference lies 
-      in how they receive input:
-    </p>
-  
-    <ul>
-      <li>
-        <strong>Batch</strong> &ndash; Processes all records retrieved by the <em>Retrieve</em> query.
-      </li>
-      <li>
-        <strong>Data List</strong> &ndash; Displays query results to users, allowing manual record 
-        selection before execution.
-      </li>
-      <li>
-        <strong>Triggers</strong> &ndash; Executes when Salesforce DML events occur, using the 
-        triggering records as input.
-      </li>
-      <li>
-        <strong>Action Button</strong>:
-        <ul>
-          <li>
-            <strong>Connection-based:</strong> No input data.
-          </li>
-          <li>
-            <strong>Direction-based:</strong> Uses the current record from the Lightning record page.
-          </li>
-        </ul>
-      </li>
-      <li>
-        <strong>Data Loader</strong> &ndash; Uses uploaded CSV data as input instead of querying a 
-        source object.
-      </li>
-    </ul>
-  
-    <p>
-      <strong>📌 Note:</strong> Despite their differences in input handling, all DSP rules engines follow a 
-      structured process, enabling powerful automation and transformation capabilities.
-    </p>
-  </article>
-  
+  <p>
+    The Batch, Data List, and Trigger rules engines in DSP are Direction-based, meaning they take input 
+    from a source object, apply transformations, and perform an action on a target object. The Data Loader 
+    is similar to Batch but is Connection-based, meaning its source data comes from a CSV upload rather 
+    than a source object. The Action Button can be either Direction-based or Connection-based:
+  </p>
+
+  <ul>
+    <li>
+      <strong>Connection-based Action Button</strong> – Acts as a global action with no input data.
+    </li>
+    <li>
+      <strong>Direction-based Action Button</strong> – Functions as a record action, using the current 
+      record from a Lightning record page as input.
+    </li>
+  </ul>
+
+  <p>
+    While these rules engines share similar sub-processes, the key difference lies in how they receive 
+    input:
+  </p>
+
+  <ul>
+    <li>
+      <strong>Batch</strong> – Processes all records retrieved by the Retrieve query.
+    </li>
+    <li>
+      <strong>Data List</strong> – Displays query results to users, allowing manual record selection 
+      before execution.
+    </li>
+    <li>
+      <strong>Triggers</strong> – Executes when Salesforce DML events occur, using the triggering 
+      records as input.
+    </li>
+    <li>
+      <strong>Action Button</strong>
+      <ul>
+        <li><strong>Connection-based:</strong> No input data.</li>
+        <li><strong>Direction-based:</strong> Uses the current record from the Lightning record page.</li>
+      </ul>
+    </li>
+    <li>
+      <strong>Data Loader</strong> – Uses uploaded CSV data as input instead of querying a source object.
+    </li>
+  </ul>
+
+  <p>
+    📌 Despite their differences in input handling, all DSP rules engines follow a structured process, 
+    enabling powerful automation and transformation capabilities.
+  </p>
+</article>
