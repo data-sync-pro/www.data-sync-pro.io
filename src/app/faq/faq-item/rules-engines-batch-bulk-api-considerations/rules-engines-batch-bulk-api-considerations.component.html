@@ -1,7 +1,34 @@
-<!-- Auto-generated for FAQ: a0oEc0000058bG8IAI -->
-    <h1>What are the key considerations for enabling the Bulk API?</h1>
-    <p><strong>Category:</strong> Rules Engines</p>
-    <p><strong>SubCategory:</strong> </p>
-    <p><strong>Original Filename:</strong> rules-engines-batch-bulk-api-considerations.html</p>
-    <hr/>
-    <p>Replace this placeholder with real FAQ content.</p>
+<article>
+    <p>
+      Enabling Bulk API in Data Sync Pro (DSP) offers significant performance improvements, 
+      but it comes with certain trade-offs:
+    </p>
+  
+    <h4>✅ Benefits</h4>
+    <ul>
+      <li>
+        <strong>Extraordinary Performance Gains</strong> &ndash; With the right batch size (up 
+        to 2,000 records per batch), Bulk API can process large data volumes much faster 
+        than the standard API.
+      </li>
+    </ul>
+  
+    <h4>⚠ Drawbacks</h4>
+    <ul>
+      <li>
+        <strong>Asynchronous Processing</strong> &ndash; Since Salesforce processes Bulk API jobs 
+        asynchronously, users must monitor the execution status directly in Salesforce.
+      </li>
+      <li>
+        <strong>No Data Reversion</strong> &ndash; Actions performed via Bulk API cannot be reverted, 
+        meaning features like <em>"Restore Updated From Log File"</em> or 
+        <em>"Re-Create Deleted From Log File"</em> are not supported.
+      </li>
+    </ul>
+  
+    <p>
+      🚀 Bulk API is ideal for high-volume processing but requires careful setup and monitoring 
+      for optimal use.
+    </p>
+  </article>
+  

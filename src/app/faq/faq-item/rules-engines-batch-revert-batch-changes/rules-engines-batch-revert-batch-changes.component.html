@@ -1,7 +1,72 @@
-<!-- Auto-generated for FAQ: a0oEc0000058bG6IAI -->
-    <h1>Is it possible to revert the changes made a batch execution?</h1>
-    <p><strong>Category:</strong> Rules Engines</p>
-    <p><strong>SubCategory:</strong> </p>
-    <p><strong>Original Filename:</strong> rules-engines-batch-revert-batch-changes.html</p>
-    <hr/>
-    <p>Replace this placeholder with real FAQ content.</p>
+<article>
+    <p>
+      Yes, changes made by a Batch execution can be reverted depending on the action type 
+      and configuration. DSP provides flexible rollback options when needed:
+    </p>
+  
+    <hr />
+  
+    <h4>🔄 <strong>For Update Actions</strong></h4>
+    <ul>
+      <li>
+        If <strong>"Log to File"</strong> is enabled, the original target data is saved 
+        as a <strong>JSON log file</strong> before the update.
+      </li>
+      <li>
+        To revert updates:
+        <ul>
+          <li>
+            Use <strong>"Restore Updated From Log File"</strong> on the <strong>Batch Execution</strong> 
+            or <strong>Execution</strong> record.
+          </li>
+        </ul>
+      </li>
+    </ul>
+  
+    <h4>➕ <strong>For Insert Actions</strong></h4>
+    <ul>
+      <li>
+        To remove inserted records:
+        <ul>
+          <li>
+            Click <strong>"Delete Inserted Records"</strong> from the <strong>Execution</strong> record 
+            to delete all records inserted by the job.
+          </li>
+          <li>
+            To delete records from a specific batch, go to the 
+            <strong>Batch Execution</strong> record, open the <strong>Verify</strong> tab, and delete 
+            directly from the data list.
+          </li>
+        </ul>
+      </li>
+    </ul>
+  
+    <h4>🗑️ <strong>For Delete Actions</strong></h4>
+    <ul>
+      <li>
+        Use <strong>"Restore From Recycle Bin"</strong> if the records are still available there.
+      </li>
+      <li>
+        If <strong>"Log to File"</strong> is enabled:
+        <ul>
+          <li>
+            Use <strong>"Re-Create Deleted From Log File"</strong> on the 
+            <strong>Batch Execution</strong> to restore deleted data from the saved log.
+          </li>
+        </ul>
+      </li>
+    </ul>
+  
+    <hr />
+  
+    <p>
+      <strong>Note:</strong> Reversion is <strong>not supported</strong> when 
+      <strong>"Action to Bulk API"</strong> is enabled.
+    </p>
+  
+    <p>
+      These rollback features help ensure reliable recovery from unintended changes—whether 
+      from updates, inserts, or deletions—supporting safer data operations in DSP.
+    </p>
+  </article>
+  

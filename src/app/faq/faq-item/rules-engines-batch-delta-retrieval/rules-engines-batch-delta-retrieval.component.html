@@ -1,7 +1,29 @@
-<!-- Auto-generated for FAQ: a0oEc0000058bG7IAI -->
-    <h1>How can I implement delta retrieval?</h1>
-    <p><strong>Category:</strong> Rules Engines</p>
-    <p><strong>SubCategory:</strong> </p>
-    <p><strong>Original Filename:</strong> rules-engines-batch-delta-retrieval.html</p>
-    <hr/>
-    <p>Replace this placeholder with real FAQ content.</p>
+<article>
+    <p>
+      To implement delta retrieval, enable one of the following options:
+    </p>
+  
+    <ul>
+      <li>
+        <strong>Retrieve Modified Since Last Start Time</strong> – Adds the condition 
+        <code>SystemModstamp &gt; (Last Start Time)</code> to the Retrieve Parameters during execution. 
+        The <strong>Last Start Time</strong> refers to the Start Time of the most recent 
+        <strong>SUCCEEDED</strong> Execution.
+      </li>
+      <li>
+        <strong>Retrieve Modified Since Last End Time</strong> – Adds the condition 
+        <code>SystemModstamp &gt; (Last End Time)</code> to the Retrieve Parameters during execution. 
+        The <strong>Last End Time</strong> refers to the End Time of the most recent 
+        <strong>SUCCEEDED</strong> Execution.
+      </li>
+    </ul>
+  
+    <blockquote>
+      <p>
+        <strong>Note:</strong> When updating the <strong>source query</strong>, be sure to 
+        <strong>disable delta retrieval</strong> first. Re-enable it after the query has been 
+        updated to ensure proper evaluation of changes.
+      </p>
+    </blockquote>
+  </article>
+  

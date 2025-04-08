@@ -1,7 +1,63 @@
-<!-- Auto-generated for FAQ: a0oEc0000058bFuIAI -->
-    <h1>How do I create a Batch Executable?</h1>
-    <p><strong>Category:</strong> Rules Engines</p>
-    <p><strong>SubCategory:</strong> </p>
-    <p><strong>Original Filename:</strong> rules-engines-batch-create-batch-executable.html</p>
-    <hr/>
-    <p>Replace this placeholder with real FAQ content.</p>
+<article>
+    <p>
+      To define a Batch in Data Sync Pro (DSP), you begin by creating a 
+      <strong>Batch Executable</strong> that is associated with a <strong>Direction</strong>. 
+      This Executable can be created directly from a <strong>Direction record</strong> or from a 
+      <strong>Pipeline record</strong> with a <strong>Template Direction</strong> specified.
+    </p>
+  
+    <p>
+      Once created, DSP provides a <strong>guided, step-by-step interface</strong> for defining 
+      the Batch process:
+    </p>
+  
+    <ol>
+      <li>
+        <strong>1️⃣ Retrieve</strong> &ndash; Configure how source data is queried from the 
+        connected org. Designers can preview data, test transformations, and run selected records 
+        before executing the full batch.
+      </li>
+      <li>
+        <strong>2️⃣ Scoping</strong> &ndash; Refine the retrieved dataset using in-memory filters 
+        and optional joins with other datasets for multi-source enrichment.
+      </li>
+      <li>
+        <strong>3️⃣ Match</strong> &ndash; Identify target records using matching rules. Supports 
+        insert-only logic, multi-field matching via transformations, and merge-specific logic.
+      </li>
+      <li>
+        <strong>4️⃣ Mapping</strong> &ndash; Apply formulas and expressions to assign and transform 
+        target field values. Features auto-validation, relational field support, and a comprehensive 
+        function library.
+      </li>
+      <li>
+        <strong>5️⃣ Action</strong> &ndash; Define the operations to be performed, such as Insert, 
+        Update, Upsert, Delete, Merge, Lead Convert, Send Email, and more. Configure behavior options 
+        like &ldquo;Skip Record Update if No Changes&rdquo; and writeback.
+      </li>
+      <li>
+        <strong>6️⃣ Verify</strong> &ndash; Select target fields to review after execution. These 
+        fields appear in the Batch Execution record, allowing review of source and target data 
+        side-by-side.
+      </li>
+    </ol>
+  
+    <p>
+      In addition, the <strong>Batch Settings</strong> section allows configuration of execution 
+      parameters such as:
+    </p>
+  
+    <ul>
+      <li>Enabling <strong>Bulk API</strong></li>
+      <li>Setting the <strong>batch size</strong></li>
+      <li>Enabling <strong>auto-retry</strong> for failed batches</li>
+      <li>Running in <strong>serial mode</strong></li>
+      <li>Defining additional <strong>execution behaviors</strong></li>
+    </ul>
+  
+    <p>
+      📌 This structured, guided process ensures each Batch is configurable, repeatable, and optimized 
+      for high-performance, large-scale data operations&mdash;all within Salesforce’s native environment.
+    </p>
+  </article>
+  
