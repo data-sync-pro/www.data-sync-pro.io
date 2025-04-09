@@ -1,7 +1,64 @@
-<!-- Auto-generated for FAQ: a0oEc0000058bGFIAY -->
-    <h1>How do I create an Actionable Data List?</h1>
-    <p><strong>Category:</strong> Rules Engines</p>
-    <p><strong>SubCategory:</strong> </p>
-    <p><strong>Original Filename:</strong> rules-engines-data-list-create-actionable-data-list.html</p>
-    <hr/>
-    <p>Replace this placeholder with real FAQ content.</p>
+<section>
+  <p>
+    "To create an Actionable Data List in Data Sync Pro (DSP), start by creating 
+    an <strong>Executable</strong> associated with a <strong>Direction</strong>. 
+    Once created, DSP provides a <strong>guided interface</strong> to configure 
+    each step of the data list process:
+  </p>
+
+  <h3><strong>Guided Steps for Defining an Actionable Data List</strong></h3>
+  <ol>
+    <li>
+      1️⃣ <strong>Retrieve</strong> – Configure how source data is queried 
+      from the connected org. Designers can preview data, test transformations, 
+      and execute selected records synchronously.
+    </li>
+    <li>
+      2️⃣ <strong>Scoping</strong> – Refine the retrieved dataset using 
+      in-memory filters and optional joins with other datasets for 
+      multi-source enrichment.
+    </li>
+    <li>
+      3️⃣ <strong>Match</strong> – Identify target records using matching 
+      rules. Supports insert-only logic, multi-field matching via transformations, 
+      and merge-specific logic.
+    </li>
+    <li>
+      4️⃣ <strong>Mapping</strong> – Apply formulas and expressions to assign 
+      and transform target field values. Features auto-validation, relational 
+      field support, and a comprehensive function library.
+    </li>
+    <li>
+      5️⃣ <strong>Action</strong> – Define the operations to be performed, 
+      such as Insert, Update, Upsert, Delete, Merge, Lead Convert, Send Email, 
+      and more. Configure behavior options like “Skip Record Update if No Changes” 
+      and writeback.
+    </li>
+    <li>
+      6️⃣ <strong>Verify</strong> – Select target fields to review after 
+      execution. These fields appear in the Batch Execution record, allowing 
+      review of source and target data side-by-side.
+    </li>
+  </ol>
+
+  <h3><strong>Additional Data List(Q) Settings:</strong></h3>
+  <ul>
+    <li>
+      <strong>Action on Target</strong> – Configures how the action behaves, 
+      including button label and style, visibility on list or row level (or both), 
+      alert messages, and whether users can edit fields before executing the action.
+    </li>
+    <li>
+      <strong>Permissions (Query Results)</strong> – Manages access to the 
+      data list based on user permissions.
+    </li>
+    <li>
+      <strong>Appearance &amp; More</strong> – Allows customization of layout, 
+      display settings, and UI behaviors.
+    </li>
+  </ul>
+  <p>
+    📌 This structured, intuitive interface ensures your Data List is interactive, 
+    reusable, and fully aligned with your business logic—without writing any code. 🚀
+  </p>
+</section>
