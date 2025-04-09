@@ -1,7 +1,37 @@
-<!-- Auto-generated for FAQ: a0oEc0000058bHEIAY -->
-    <h1>What does Preview do?</h1>
-    <p><strong>Category:</strong> Process Steps</p>
-    <p><strong>SubCategory:</strong> </p>
-    <p><strong>Original Filename:</strong> process-steps-preview-preview-overview.html</p>
-    <hr/>
-    <p>Replace this placeholder with real FAQ content.</p>
+<section>
+    <p>
+      Preview functions similarly to Retrieve, as both execute a SOQL query 
+      to fetch source data. However, they serve different purposes based on 
+      the rules engine in use:
+    </p>
+    <ol>
+      <li>
+        1️⃣ <strong>Retrieve</strong> is used in <strong>Batch</strong> and 
+        <strong>Data List</strong> to define and filter the source data 
+        during execution. It determines which records will be processed 
+        in the operation.
+      </li>
+      <li>
+        2️⃣ <strong>Preview</strong> is used in <strong>Triggers</strong> 
+        and <strong>Action Buttons</strong>, but it does not influence 
+        the input data:
+        <ul>
+          <li>
+            In <strong>Triggers</strong>, the input data comes from the 
+            triggering context (i.e., the records being inserted, updated, 
+            or deleted).
+          </li>
+          <li>
+            In <strong>Action Buttons</strong>, the input data comes from 
+            the loaded record in the Lightning Record Page.
+          </li>
+        </ul>
+      </li>
+      <li>
+        3️⃣ Both Retrieve and Preview allow users to view source records 
+        and preview transformed values before execution, helping validate 
+        the data and transformations applied.
+      </li>
+    </ol>
+  </section>
+  

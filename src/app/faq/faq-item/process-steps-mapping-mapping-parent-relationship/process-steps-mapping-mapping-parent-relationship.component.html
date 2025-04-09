@@ -1,7 +1,13 @@
-<!-- Auto-generated for FAQ: a0oEc0000058bHaIAI -->
-    <h1>How can I reference a field from a parent relationship of the source object in the Mapping?</h1>
-    <p><strong>Category:</strong> Process Steps</p>
-    <p><strong>SubCategory:</strong> </p>
-    <p><strong>Original Filename:</strong> process-steps-mapping-mapping-parent-relationship.html</p>
-    <hr/>
-    <p>Replace this placeholder with real FAQ content.</p>
+<section>
+    <p>
+      Use <strong>dot notation</strong> to reference fields from parent 
+      relationships in the Mapping step. For example:
+    </p>
+    <pre><code>Parent__r.Grand__r.Field__c
+  </code></pre>
+    <p>
+      This format allows you to access fields up to multiple levels deep 
+      in the relationship hierarchy.
+    </p>
+  </section>
+  

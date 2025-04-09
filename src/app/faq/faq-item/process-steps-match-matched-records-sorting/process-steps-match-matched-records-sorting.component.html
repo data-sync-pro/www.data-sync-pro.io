@@ -1,7 +1,19 @@
-<!-- Auto-generated for FAQ: a0oEc0000058bHYIAY -->
-    <h1>What is the purpose of the 'Matched Records Sorting Components' field?</h1>
-    <p><strong>Category:</strong> Process Steps</p>
-    <p><strong>SubCategory:</strong> </p>
-    <p><strong>Original Filename:</strong> process-steps-match-matched-records-sorting.html</p>
-    <hr/>
-    <p>Replace this placeholder with real FAQ content.</p>
+<section>
+    <p>
+      The "Matched Records Sorting Components" field defines the 
+      sorting logic for matched target records when multiple records are found. 
+      It consists of semicolon-separated expressions that compare and sort 
+      records in ascending order by default.
+    </p>
+    <p>
+      To sort in descending order, prefix an expression with a negative sign 
+      (<code>-</code>). For example:<br />
+      <code>-LEN(Description) ; -LastModifiedDate</code><br />
+      This sorts matched records first by <code>Description</code> length (DESC), 
+      and if lengths are the same, by <code>LastModifiedDate</code> (DESC).
+    </p>
+    <p>
+      For Boolean values, TRUE is considered smaller than FALSE.
+    </p>
+  </section>
+  

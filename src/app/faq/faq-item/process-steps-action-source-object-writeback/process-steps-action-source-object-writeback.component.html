@@ -1,7 +1,24 @@
-<!-- Auto-generated for FAQ: a0oEc0000058bHoIAI -->
-    <h1>What is the purpose of Source Object Writeback?</h1>
-    <p><strong>Category:</strong> Process Steps</p>
-    <p><strong>SubCategory:</strong> </p>
-    <p><strong>Original Filename:</strong> process-steps-action-source-object-writeback.html</p>
-    <hr/>
-    <p>Replace this placeholder with real FAQ content.</p>
+<section>
+    <p>
+      <strong>Source Object Writeback</strong> updates the source record 
+      <strong>after</strong> its related target records are successfully 
+      actioned. This helps with <strong>tracking</strong>, 
+      <strong>marking completion</strong>, and 
+      <strong>preventing duplicate processing</strong>.
+    </p>
+    <p>
+      When a <strong>Source Writeback Field</strong> is configured, DSP supports 
+      the following options:
+    </p>
+    <ol>
+      <li>
+        1️⃣ <strong>Target Record ID(s)</strong> – Writes a comma-separated list 
+        of successfully processed target record IDs back to the source record.
+      </li>
+      <li>
+        2️⃣ <strong>Static Value (TRUE or FALSE)</strong> – Writes either 
+        <code>TRUE</code> or <code>FALSE</code> to the specified source field.
+      </li>
+    </ol>
+  </section>
+  

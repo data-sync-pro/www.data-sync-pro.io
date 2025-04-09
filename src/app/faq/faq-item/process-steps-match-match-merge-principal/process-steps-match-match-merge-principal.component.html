@@ -1,7 +1,46 @@
-<!-- Auto-generated for FAQ: a0oEc0000058bHVIAY -->
-    <h1>How does Match determine the principal(master) record in the Merge process?</h1>
-    <p><strong>Category:</strong> Process Steps</p>
-    <p><strong>SubCategory:</strong> </p>
-    <p><strong>Original Filename:</strong> process-steps-match-match-merge-principal.html</p>
-    <hr/>
-    <p>Replace this placeholder with real FAQ content.</p>
+<section>
+    <p>
+      In the Merge process, DSP uses the 
+      <strong>Principal Matched Record Selection Rule</strong> to identify 
+      the <strong>principal (master) record</strong> among the matched records. 
+      This is the record that will be retained after the merge, while the 
+      others are marked for deletion.
+    </p>
+    <h3>### 🔍 <strong>Available Selection Rules:</strong></h3>
+    <ul>
+      <li>
+        <strong>Most Complete</strong> – Chooses the record with the highest 
+        number of populated fields.
+      </li>
+      <li>
+        <strong>Most Child Records</strong> – Selects the record with the most 
+        related child records. Specify the child relationship name in the 
+        <strong>Principal Selection Child Relationship</strong> field.
+      </li>
+      <li>
+        <strong>Most Recently Modified</strong> – Uses the record with the 
+        latest <code>LastModifiedDate</code>.
+      </li>
+      <li>
+        <strong>First Record</strong> – Based on a custom sort order using the 
+        <strong>Matched Records Sorting Components</strong> field, where DSP 
+        formulas define sorting logic.
+      </li>
+    </ul>
+    <p>
+      <strong>### 📌 Special Case: DuplicateRecordItem Matching</strong><br />
+      When using <strong>DuplicateRecordItem</strong> as the matching object, 
+      DSP allows principal record selection at:
+    </p>
+    <ul>
+      <li>The <strong>DuplicateRecordItem</strong> level (default)</li>
+      <li>The actual duplicate object (e.g., <code>Account</code>, <code>Lead</code>) 
+      by specifying the API name in the 
+      <strong>Duplicate Record Object API Name</strong> field.</li>
+    </ul>
+    <p>
+      This approach ensures merges are precise, configurable, and aligned 
+      with business logic.
+    </p>
+  </section>
+  

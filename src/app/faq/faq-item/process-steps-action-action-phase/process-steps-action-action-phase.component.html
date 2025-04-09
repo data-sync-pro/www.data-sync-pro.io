@@ -1,7 +1,38 @@
-<!-- Auto-generated for FAQ: a0oEc0000058bHiIAI -->
-    <h1>What does Action do?</h1>
-    <p><strong>Category:</strong> Process Steps</p>
-    <p><strong>SubCategory:</strong> </p>
-    <p><strong>Original Filename:</strong> process-steps-action-action-phase.html</p>
-    <hr/>
-    <p>Replace this placeholder with real FAQ content.</p>
+<section>
+    <p>
+      The <strong>Action</strong> step in Data Sync Pro (DSP) defines how 
+      processed data is applied to the target object. It comes after Scoping, 
+      Match, and Mapping, and determines what operation is performed on each 
+      target record.
+    </p>
+    <hr />
+    <h3>### 🔧 <strong>Key Capabilities of Action:</strong></h3>
+    <ul>
+      <li>
+        <strong>Perform Target Operations</strong><br />
+        Supports standard DML actions like <strong>Insert, Update, Upsert, 
+        Delete, Undelete, Merge</strong>, as well as extended operations 
+        such as <strong>Lead Conversion</strong>, <strong>Send Email</strong>, 
+        <strong>Bell Notification</strong>, etc.
+      </li>
+      <li>
+        <strong>Execution Behavior Controls</strong><br />
+        Fine-tune how each record is processed using configurable options:<br />
+        &bull; <em>Skip Record Update If No Changes</em><br />
+        &bull; <em>Skip Fields If Target Value Exists</em><br />
+        &bull; <em>Skip Null Value Fields</em><br />
+        &bull; <em>Bypass Duplicate Rule Alerts</em><br />
+        &bull; <em>All or Nothing DML Execution</em>
+      </li>
+      <li>
+        <strong>Writeback Options</strong><br />
+        Allows writing specific values back to the source or logging them for 
+        reference after successful execution.
+      </li>
+    </ul>
+    <p>
+      📌 The Action step is where all prior logic comes together—executing the 
+      intended operation in a structured, rule-driven, and efficient way.
+    </p>
+  </section>
+  

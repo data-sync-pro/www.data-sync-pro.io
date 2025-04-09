@@ -1,7 +1,29 @@
-<!-- Auto-generated for FAQ: a0oEc0000058bHcIAI -->
-    <h1>How can I enforce the sequence of target field transformations when order is required?</h1>
-    <p><strong>Category:</strong> Process Steps</p>
-    <p><strong>SubCategory:</strong> </p>
-    <p><strong>Original Filename:</strong> process-steps-mapping-sequence-of-transformations.html</p>
-    <hr/>
-    <p>Replace this placeholder with real FAQ content.</p>
+<section>
+    <p>
+      To control the order in which target fields are evaluated during Mapping:
+    </p>
+    <ol>
+      <li>
+        After configuring the Mapping step, go to the <strong>Related</strong> 
+        tab on the Executable.
+      </li>
+      <li>
+        Locate the <strong>Field Mappings</strong> related list.
+      </li>
+      <li>
+        Edit the <strong>Seq No.</strong> column inline to define the desired 
+        evaluation order.
+      </li>
+      <li>
+        Save your changes.
+      </li>
+    </ol>
+    <p>
+      📌 When <strong>Seq No.</strong> is specified, DSP evaluates field mappings 
+      in that order. If the <strong>source and target are the same record</strong>, 
+      transformations are <strong>accumulative</strong>—meaning the result of 
+      a previously evaluated field can be used in subsequent transformations. 
+      This is useful when one field’s output depends on another’s value.
+    </p>
+  </section>
+  

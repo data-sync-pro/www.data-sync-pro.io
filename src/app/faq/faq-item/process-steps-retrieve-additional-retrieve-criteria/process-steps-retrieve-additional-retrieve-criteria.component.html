@@ -1,7 +1,25 @@
-<!-- Auto-generated for FAQ: a0oEc0000058bHDIAY -->
-    <h1>What is the purpose of the 'Additional Retrieve Criteria' field on Pipeline?</h1>
-    <p><strong>Category:</strong> Process Steps</p>
-    <p><strong>SubCategory:</strong> </p>
-    <p><strong>Original Filename:</strong> process-steps-retrieve-additional-retrieve-criteria.html</p>
-    <hr/>
-    <p>Replace this placeholder with real FAQ content.</p>
+<section>
+    <p>
+      The "Additional Retrieve Criteria" field on a Pipeline allows you to 
+      define a shared SOQL filter that applies to all Executables within the 
+      Pipeline. This ensures that each Executable retrieves data that meets 
+      the common criteria while still respecting its own individual filters.
+    </p>
+    <p>
+      <strong>Key Benefits:</strong><br />
+      &bull; Standardizes data retrieval across multiple Executables in a Pipeline.<br />
+      &bull; Minimizes redundancy by avoiding repeated filter definitions in 
+      each Executable.<br />
+      &bull; Enhances flexibility, as Executables can still apply additional 
+      filters specific to their processing needs.
+    </p>
+    <p>
+      <strong>Editing Consideration:</strong><br />
+      When editing the Retrieve query for an Executable within a Pipeline that 
+      has "Additional Retrieve Criteria", it is best to temporarily remove 
+      the shared criteria, make the necessary updates, and then reapply the 
+      "Additional Retrieve Criteria" once the edits are complete. This 
+      prevents unintended query conflicts and ensures smooth execution.
+    </p>
+  </section>
+  

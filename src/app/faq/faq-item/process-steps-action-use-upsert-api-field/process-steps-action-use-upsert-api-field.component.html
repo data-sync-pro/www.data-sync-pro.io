@@ -1,7 +1,37 @@
-<!-- Auto-generated for FAQ: a0oEc0000058bHpIAI -->
-    <h1>What is the purpose of the field 'Use Salesforce Upsert API'?</h1>
-    <p><strong>Category:</strong> Process Steps</p>
-    <p><strong>SubCategory:</strong> </p>
-    <p><strong>Original Filename:</strong> process-steps-action-use-upsert-api-field.html</p>
-    <hr/>
-    <p>Replace this placeholder with real FAQ content.</p>
+<section>
+    <p>
+      The <strong>"Use Salesforce Upsert API"</strong> field determines 
+      whether DSP should leverage Salesforce’s native <strong>Upsert API</strong> 
+      when performing upsert actions.
+    </p>
+    <h3>### <strong>Key Purposes:</strong></h3>
+    <ol>
+      <li>
+        1️⃣ <strong>External ID Matching</strong> – If enabled, DSP requires the 
+        <strong>Target Matching Field</strong> to be an 
+        <strong>External ID field</strong> in the target object. Salesforce 
+        will use this field to find existing records and insert new ones if 
+        no match is found.
+      </li>
+      <li>
+        2️⃣ <strong>Performance Optimization</strong> – The Upsert API can 
+        improve performance by reducing separate match queries before insert/update 
+        actions.
+      </li>
+      <li>
+        3️⃣ <strong>Simplified Record Matching</strong> – Instead of manually 
+        defining match logic, Salesforce handles the lookup based on the 
+        specified External ID.
+      </li>
+    </ol>
+    <p>
+      <strong>### Considerations:</strong><br />
+      &bull; <em>Cannot Use Skip Record Update if No Changes</em> – Since DSP does 
+      <strong>not</strong> perform its own Match step when using the Upsert API, 
+      it cannot check if the target record already contains the same values before 
+      updating.<br />
+      &bull; <em>External ID Requirement</em> – The 
+      <strong>Target Matching Field</strong> must be an External ID field.
+    </p>
+  </section>
+  

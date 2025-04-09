@@ -1,7 +1,15 @@
-<!-- Auto-generated for FAQ: a0oEc0000058bHuIAI -->
-    <h1>What are the considerations when using Verify with 'Action to Bulk API' enabled?</h1>
-    <p><strong>Category:</strong> Process Steps</p>
-    <p><strong>SubCategory:</strong> </p>
-    <p><strong>Original Filename:</strong> process-steps-verify-verify-with-bulk-api.html</p>
-    <hr/>
-    <p>Replace this placeholder with real FAQ content.</p>
+<section>
+    <p>
+      <strong>Verify</strong> may not function properly when 
+      <strong>Bulk API</strong> is enabled and <strong>target record IDs</strong> 
+      are not captured in the Batch Execution log. This commonly occurs with 
+      <strong>Insert</strong> or <strong>Upsert</strong> actions, where DSP 
+      submits the job asynchronously and the record IDs are not immediately returned.
+    </p>
+    <p>
+      However, for actions like <strong>Update</strong>, where target record 
+      IDs are known before submission, <strong>Verify</strong> will continue 
+      to work as expected.
+    </p>
+  </section>
+  

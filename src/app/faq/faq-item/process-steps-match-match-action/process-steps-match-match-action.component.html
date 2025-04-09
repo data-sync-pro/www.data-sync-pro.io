@@ -1,7 +1,36 @@
-<!-- Auto-generated for FAQ: a0oEc0000058bHPIAY -->
-    <h1>What does Match do?</h1>
-    <p><strong>Category:</strong> Process Steps</p>
-    <p><strong>SubCategory:</strong> </p>
-    <p><strong>Original Filename:</strong> process-steps-match-match-action.html</p>
-    <hr/>
-    <p>Replace this placeholder with real FAQ content.</p>
+<section>
+    <p>
+      <strong>Match</strong> is a key step in DSP that identifies corresponding 
+      records between the source and target datasets to determine how actions 
+      should be applied. It is used in <strong>Insert, Update, Upsert, Merge, 
+      Delete, and Undelete</strong> operations to ensure that records are 
+      processed correctly.
+    </p>
+    <p>
+      <strong>### How Match Works:</strong><br /><br />
+      &bull; <strong>Determines Record Matching</strong> – Identifies whether a 
+      source record has a corresponding record in the target object based on the 
+      <strong>Target Matching Field</strong>.<br />
+      &bull; <strong>Insert Logic</strong> – If a <strong>Target Matching Field</strong> 
+      is provided, DSP inserts a record <em>only if no match is found</em> in the target. 
+      If <em>no Target Matching Field is specified</em>, DSP performs an 
+      <strong>Insert</strong> without checking for existing records.<br />
+      &bull; <strong>Supports Mult-Fields Matching</strong> – DSP allows one 
+      <strong>Target Matching Field</strong> but supports <strong>multi-field matching</strong> 
+      using transformations like <code>VLOOKUP</code> assigned to the 
+      <strong>Target Matching Field</strong>.<br />
+      &bull; <strong>Sorting &amp; Selection</strong> – Enables sorting of matched 
+      records and choosing whether to apply actions to the <em>first matched record</em> 
+      (using the <strong>Principal Matched Record Selection Rule</strong>) or 
+      <em>all matched records</em>.<br />
+      &bull; <strong>Merge-Specific Matching</strong> – In <strong>Merge</strong> operations, 
+      the <strong>Principal Matched Record</strong> is treated as the 
+      <strong>Master Record</strong>, ensuring proper consolidation of duplicate records.
+    </p>
+    <p>
+      📌 <strong>Matching</strong> ensures accurate data operations by identifying 
+      target records before applying any action, reducing duplication and 
+      enhancing data integrity.
+    </p>
+  </section>
+  

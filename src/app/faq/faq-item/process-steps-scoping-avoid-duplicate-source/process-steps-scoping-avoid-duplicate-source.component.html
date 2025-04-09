@@ -1,7 +1,29 @@
-<!-- Auto-generated for FAQ: a0oEc0000058bHNIAY -->
-    <h1>How can I avoid duplicate source records based on specific conditions?</h1>
-    <p><strong>Category:</strong> Process Steps</p>
-    <p><strong>SubCategory:</strong> </p>
-    <p><strong>Original Filename:</strong> process-steps-scoping-avoid-duplicate-source.html</p>
-    <hr/>
-    <p>Replace this placeholder with real FAQ content.</p>
+<section>
+    <p>
+      To avoid duplicate source records based on specific conditions, 
+      use the <code>IS_FIRST_IN_ITERATION(...expressions)</code> function 
+      in a <strong>Scope Filter</strong>. It evaluates whether a particular 
+      combination of field values appears for the <strong>first time</strong> 
+      during the current execution cycle and excludes any duplicates that follow.
+    </p>
+    <hr />
+    <h3>### 📌 <strong>Example Usage</strong></h3>
+    <p>
+      To process only one record per unique combination of 
+      <strong>FirstName, LastName, and Email</strong>:<br />
+      <code>IS_FIRST_IN_ITERATION(FirstName, LastName, Email)</code>
+    </p>
+    <hr />
+    <h3>### 📝 <strong>Note</strong></h3>
+    <p>
+      This filter works <strong>within each batch or CSV upload</strong>, 
+      not across the entire job. For better control, 
+      <strong>sort the source data</strong> so that records with the same key 
+      fields appear together.
+    </p>
+    <p>
+      Use <code>IS_FIRST_IN_ITERATION</code> to efficiently handle 
+      deduplication—without pre-processing or complex logic.
+    </p>
+  </section>
+  
