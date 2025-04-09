@@ -1,9 +1,6 @@
 <p>
-  DSP Batch follows the same limitations as Salesforce Apex Batch, meaning the maximum data size 
-  that can be retrieved in a single query is 50 million records.
-</p>
-
-<p>
-  While DSP optimizes execution for high-volume processing, the actual dataset size that can be processed 
-  depends on Salesforce governor limits, system resources, and API constraints.
+  The maximum batch size in Data Sync Pro (DSP) is 2,000 records per batch. For
+  Remote Connections – To set the batch size to 2,000, "Action to Bulk API" must
+  be enabled, as Salesforce’s regular API does not support DML operations with
+  more than 200 records per request.
 </p>
