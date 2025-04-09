@@ -1,7 +1,26 @@
-<!-- Auto-generated for FAQ: a0oEc0000058bGqIAI -->
-    <h1>When should the serial mode be used?</h1>
-    <p><strong>Category:</strong> Rules Engines</p>
-    <p><strong>SubCategory:</strong> </p>
-    <p><strong>Original Filename:</strong> rules-engines-data-loader-serial-mode-usage.html</p>
-    <hr/>
-    <p>Replace this placeholder with real FAQ content.</p>
+<section>
+    <p>
+      "Serial mode should be used when processing records sequentially is necessary 
+      to prevent record locking issues, ensure data integrity, or maintain the 
+      correct execution order. It is particularly useful in scenarios where multiple 
+      records update the same parent record or when actions depend on the completion 
+      of previous records.
+    </p>
+    <p>
+      <strong>### Key Considerations:</strong><br />
+      - <strong>Prevents Record Locking</strong> – Reduces the likelihood of lock 
+        contention, especially when updating or inserting related records.<br />
+      - <strong>Ensures Order of Execution</strong> – Processes records one at a 
+        time rather than in parallel, which is beneficial for workflows that require 
+        strict sequencing.<br />
+      - <strong>Potential Performance Impact</strong> – Since records are processed 
+        sequentially, execution time may increase compared to parallel processing.<br />
+      - <strong>Use for Dependent Transactions</strong> – Ideal when data dependencies 
+        exist between records that must be processed in a specific order.
+    </p>
+    <p>
+      Enabling <strong>serial mode</strong> ensures safer execution in these cases, 
+      but it should be used selectively based on the needs of the batch process. 🚀"
+    </p>
+  </section>
+  
