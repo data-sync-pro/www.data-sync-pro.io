@@ -1,7 +1,20 @@
-<!-- Auto-generated for FAQ: a0oEc0000058bI0IAI -->
-    <h1>How does DSP optimize performance when using VLOOKUP or AGG functions?</h1>
-    <p><strong>Category:</strong> Transformation</p>
-    <p><strong>SubCategory:</strong> </p>
-    <p><strong>Original Filename:</strong> transformation-optimize-vlookup-agg.html</p>
-    <hr/>
-    <p>Replace this placeholder with real FAQ content.</p>
+<section>
+    <p>
+      DSP improves performance through two key strategies:
+    </p>
+    <ol>
+      <li>
+        <strong>Lazy Loading with Caching</strong> – Queries for 
+        <code>VLOOKUP</code> and <code>AGG</code> functions are executed 
+        only when first evaluated. Once retrieved, results are cached and reused 
+        throughout the transaction to avoid redundant lookups.
+      </li>
+      <li>
+        <strong>Query Consolidation</strong> – When multiple functions access 
+        similar datasets, DSP intelligently merges them into a single query 
+        whenever possible, reducing the number of SOQL calls and improving runtime 
+        efficiency.
+      </li>
+    </ol>
+  </section>
+  

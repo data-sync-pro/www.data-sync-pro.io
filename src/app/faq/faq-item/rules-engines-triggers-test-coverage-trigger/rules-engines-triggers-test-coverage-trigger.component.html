@@ -1,7 +1,22 @@
-<!-- Auto-generated for FAQ: a0oEc0000058bH8IAI -->
-    <h1>Salesforce requires that at least one line of code in an Apex Trigger be covered by test classes before deploying to production—how can I achieve this?</h1>
-    <p><strong>Category:</strong> Rules Engines</p>
-    <p><strong>SubCategory:</strong> </p>
-    <p><strong>Original Filename:</strong> rules-engines-triggers-test-coverage-trigger.html</p>
-    <hr/>
-    <p>Replace this placeholder with real FAQ content.</p>
+<section>
+    <p>
+      Salesforce requires at least one line of code in an Apex Trigger be 
+      covered by an Apex test class before deployment to production.
+    </p>
+    <p>
+      For triggers integrated with <strong>Data Sync Pro (DSP)</strong>, each 
+      trigger contains a single line:
+    </p>
+    <pre><code>pushtopics.TriggerServices.execute();
+  </code></pre>
+    <p>
+      To satisfy this requirement, write an Apex test that performs a DML operation 
+      (such as an insert or update) on the triggering object. This will invoke the 
+      trigger and ensure the line is covered.
+    </p>
+    <p>
+      If the object has complex automation or dependencies, consider writing 
+      dedicated Apex test classes to ensure expected behavior is fully verified.
+    </p>
+  </section>
+  

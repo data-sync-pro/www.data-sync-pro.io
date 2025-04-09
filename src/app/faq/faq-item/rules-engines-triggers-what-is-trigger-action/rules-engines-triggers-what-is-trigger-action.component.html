@@ -1,7 +1,25 @@
-<!-- Auto-generated for FAQ: a0oEc0000058bH2IAI -->
-    <h1>What is a Trigger Action?</h1>
-    <p><strong>Category:</strong> Rules Engines</p>
-    <p><strong>SubCategory:</strong> </p>
-    <p><strong>Original Filename:</strong> rules-engines-triggers-what-is-trigger-action.html</p>
-    <hr/>
-    <p>Replace this placeholder with real FAQ content.</p>
+<section>
+    <p>
+      A <strong>Trigger Action</strong> in DSP is a rule-based automation that 
+      executes specific actions when a record meets defined criteria during a 
+      Salesforce trigger event (e.g., Before Insert, After Update). Unlike 
+      Self-Adaptive Triggers, which modify and validate fields within the 
+      same record, Trigger Actions use the triggering records as a source 
+      to perform separate operations on related or different records.
+    </p>
+    <p>
+      When a trigger event occurs, DSP evaluates Scope Filters to determine 
+      which records qualify for execution. Once matched, a Trigger Action can:
+    </p>
+    <ul>
+      <li>Update related records</li>
+      <li>Create new records</li>
+      <li>Send notifications (email or in-app bell notifications)</li>
+      <li>Publish Platform Events</li>
+    </ul>
+    <p>
+      DSP automatically bulkifies Trigger Actions and prevents recursion, ensuring 
+      efficient execution across large data volumes—without requiring Apex development.
+    </p>
+  </section>
+  

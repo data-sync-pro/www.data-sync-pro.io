@@ -1,7 +1,38 @@
-<!-- Auto-generated for FAQ: a0oEc0000058bH7IAI -->
-    <h1>How can I grant users access to a Trigger?</h1>
-    <p><strong>Category:</strong> Rules Engines</p>
-    <p><strong>SubCategory:</strong> </p>
-    <p><strong>Original Filename:</strong> rules-engines-triggers-trigger-access.html</p>
-    <hr/>
-    <p>Replace this placeholder with real FAQ content.</p>
+<section>
+    <p>
+      Here’s how you can grant users access to a Trigger in DSP:
+    </p>
+    <ol>
+      <li>
+        <strong>Access to Executables</strong> – DSP triggers are specified in 
+        Executables. Users need <strong>Read access</strong> to these Executables.
+      </li>
+      <li>
+        <strong>Grant "DSP: Data Sync Pro Starter" Permission Set</strong> – 
+        This provides the essential bare minimum access to DSP package objects 
+        and components for working with triggers.
+      </li>
+      <li>
+        <strong>Automatic Field Enablement</strong> – When enabling any trigger 
+        event for the first time, DSP auto-enables 
+        <em>"All Internal Users Have Read Access?"</em> to create a sharing 
+        record for all internal users.
+      </li>
+      <li>
+        <strong>Bypass Trigger Custom Permissions</strong> – Use 
+        <em>"Bypass Triggers Custom Permissions"</em> to assign specific bypass 
+        permissions to data migration or special users.
+      </li>
+      <li>
+        <strong>Required Custom Permissions</strong> – Specify custom permissions 
+        in <em>"Required Custom Permissions to Execute"</em> so only users with 
+        those permissions can run the triggers.
+      </li>
+    </ol>
+    <p>
+      These configurations ensure <strong>security</strong> by authorizing the right 
+      users, while offering <strong>flexibility</strong> to tailor access based on 
+      user personas or specific scenarios like data migration.
+    </p>
+  </section>
+  

@@ -1,7 +1,12 @@
-<!-- Auto-generated for FAQ: a0oEc0000058bI5IAI -->
-    <h1>How can I skip a target field if the evaluated value is blank?</h1>
-    <p><strong>Category:</strong> Transformation</p>
-    <p><strong>SubCategory:</strong> </p>
-    <p><strong>Original Filename:</strong> transformation-skip-field-if-blank.html</p>
-    <hr/>
-    <p>Replace this placeholder with real FAQ content.</p>
+<section>
+    <p>
+      To skip all NULL fields, simply enable "Skip Null Value Fields"
+      in the Action section.
+    </p>
+    <p>
+      To skip only specific fields, use the 
+      <code>SKIP_BLANK_VALUE(value)</code> function in the target field mapping, 
+      which prevents assignment if the evaluated value is NULL or an empty string.
+    </p>
+  </section>
+  

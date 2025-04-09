@@ -1,7 +1,24 @@
-<!-- Auto-generated for FAQ: a0oEc0000058bH9IAI -->
-    <h1>How does TRIGGER_FLIPPER help streamline DSP trigger actions?</h1>
-    <p><strong>Category:</strong> Rules Engines</p>
-    <p><strong>SubCategory:</strong> </p>
-    <p><strong>Original Filename:</strong> rules-engines-triggers-trigger-flipper.html</p>
-    <hr/>
-    <p>Replace this placeholder with real FAQ content.</p>
+<section>
+    <p>
+      <code>TRIGGER_FLIPPER</code> allows users to <strong>repeatedly trigger specific automations</strong> 
+      in DSP by checking a <strong>checkbox field</strong> on record update—or by 
+      meeting rule-driven conditions.
+    </p>
+    <p>
+      When used in a <strong>before insert</strong> or <strong>before update</strong> 
+      trigger, <code>TRIGGER_FLIPPER(field_name)</code> detects when a checkbox 
+      flips from FALSE to TRUE, records that change <em>in memory only</em>, and 
+      then automatically resets the checkbox back to FALSE—so it can be flipped again 
+      later. 
+    </p>
+    <p>
+      An optional formula condition (<code>flip_if_evaluated_true_optional</code>) can 
+      simulate the flip automatically based on business logic—without requiring user input.
+    </p>
+    <p>
+      Paired with <code>TRIGGER_IS_FLIPPED(field_name)</code>, this mechanism enables 
+      modular, reusable, and repeatable trigger-based automation—<strong>without</strong> 
+      persisting the trigger flag in the database.
+    </p>
+  </section>
+  

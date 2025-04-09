@@ -1,7 +1,12 @@
-<!-- Auto-generated for FAQ: a0oEc0000058bI8IAI -->
-    <h1>How can I format a string dynamically using DSP expressions and formulas?</h1>
-    <p><strong>Category:</strong> Transformation</p>
-    <p><strong>SubCategory:</strong> </p>
-    <p><strong>Original Filename:</strong> transformation-dynamic-string-format.html</p>
-    <hr/>
-    <p>Replace this placeholder with real FAQ content.</p>
+<section>
+  <p>
+    You can use <code>FORMAT_DSP_TEMPLATE</code> or other DSP formatting functions to dynamically
+    construct strings within your formulas. For instance:
+  </p>
+  <pre><code>FORMAT_DSP_TEMPLATE("Hello &#123;0&#125;, your account balance is &#123;1&#125;", FirstName, Account.Balance__c)
+</code></pre>
+  <p>
+    This approach allows you to insert field values or expressions into a string template,
+    providing flexible and readable dynamic formatting.
+  </p>
+</section>

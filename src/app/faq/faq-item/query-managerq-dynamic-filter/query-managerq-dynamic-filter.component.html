@@ -1,7 +1,33 @@
-<!-- Auto-generated for FAQ: a0oEc0000058bIEIAY -->
-    <h1>How does a dynamic filter work?</h1>
-    <p><strong>Category:</strong> Query Manager(Q)</p>
-    <p><strong>SubCategory:</strong> </p>
-    <p><strong>Original Filename:</strong> query-managerq-dynamic-filter.html</p>
-    <hr/>
-    <p>Replace this placeholder with real FAQ content.</p>
+<section>
+    <h2>How does a dynamic filter work?</h2>
+    <p>
+      <strong>A dynamic filter</strong> in Data Sync Pro allows query filters to 
+      adjust automatically based on a <strong>record context</strong> or the 
+      <strong>current user</strong>, using custom Apex code (low-code) where needed. 
+      This enables context-aware queries that dynamically respond to field values 
+      from a specified record, adapt to the attributes of the logged-in user, or 
+      execute fully customized logic.
+    </p>
+    <hr />
+    <h3>### 🔄 <strong>How It Works</strong></h3>
+    <ul>
+      <li>
+        <strong>Record-Based Filters</strong> – Reference fields on a record 
+        using <code>:FieldName</code>. If used on a Lightning Record Page, the 
+        current record ID is automatically used at runtime.
+      </li>
+      <li>
+        <strong>User-Based Filters</strong> – Use tokens like <code>:$User.Id</code> 
+        or <code>:$UserRole.Team</code> to adapt queries based on the logged-in user.
+      </li>
+      <li>
+        <strong>Custom Apex Logic (Low-Code)</strong> – Implement the 
+        <code>DynamicFilterValue</code> interface in an Apex class and reference 
+        it with <code>:ApexClassName</code>.
+      </li>
+    </ul>
+    <p>
+      📌 Prefix all dynamic filters with a <code>:</code> to activate runtime evaluation.
+    </p>
+  </section>
+  
