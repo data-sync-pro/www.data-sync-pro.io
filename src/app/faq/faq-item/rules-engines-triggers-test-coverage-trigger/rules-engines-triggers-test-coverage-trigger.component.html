@@ -7,8 +7,9 @@
       For triggers integrated with <strong>Data Sync Pro (DSP)</strong>, each 
       trigger contains a single line:
     </p>
-    <pre><code>pushtopics.TriggerServices.execute();
-  </code></pre>
+    ```apex
+    pushtopics.TriggerServices.execute();
+    ```
     <p>
       To satisfy this requirement, write an Apex test that performs a DML operation 
       (such as an insert or update) on the triggering object. This will invoke the 
