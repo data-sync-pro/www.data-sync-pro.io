@@ -1,14 +1,15 @@
 <section>
-    <p>
-      Pagination in <strong>Query Manager (Q)</strong> is handled server-side 
-      for standard and custom objects, ensuring efficient querying by retrieving 
-      only the records needed for the current page.
-    </p>
-    <p>
-      For <strong>Big Objects</strong>, pagination is client-side because 
-      Salesforce does not support the <code>OFFSET</code> clause for Big Object 
-      queries. Specify a <code>LIMIT</code> to reduce the number of records 
-      returned in a single query.
-    </p>
-  </section>
-  
+  <p>
+    Pagination in <strong>Query Manager (Q)</strong> is handled server-side for
+    standard and custom objects, ensuring efficient querying by retrieving only
+    the records needed for the current page. This optimizes performance, reduces
+    memory usage, and speeds up data retrieval.
+  </p>
+  <p>
+    For <strong>Big Objects</strong>, pagination is handled client-side because
+    Salesforce does not support the <code>OFFSET</code> clause in Big Object
+    queries. Instead, the full result set is fetched, and pagination is applied
+    client-side. Specify the <code>LIMIT</code> to reduce the number of records
+    to be queried.
+  </p>
+</section>
