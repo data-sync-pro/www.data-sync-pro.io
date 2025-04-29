@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ViewChild, ElementRef, HostListener, OnInit } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import faqData from '../../assets/data/faqs.json';
 import { AnalyticsService } from '../analytics.service';
@@ -41,6 +41,7 @@ export class FaqComponent implements OnInit {
   suggestions: string[] = [];
   showSuggestions = false;
   selectedSuggestionIndex = -1;
+  isSearchOpen = false; 
 
   constructor(
     private sanitizer: DomSanitizer,
@@ -221,5 +222,33 @@ export class FaqComponent implements OnInit {
   public FaqComponentRegistry = FaqComponentRegistry;
   toRegistryKey(answer: string): string {
     return answer.replace(/\.html$/, '').toLowerCase();
+  }
+  openSearchOverlay() {
+    this.isSearchOpen = true;
+    console.log('openSearchOverlay');
+  }
+  
+
+  closeSearchOverlay() {
+    this.isSearchOpen = false;
+  }
+  @ViewChild('faqSearchBox') faqSearchBox!: ElementRef<HTMLInputElement>;      
+
+  @HostListener('document:keydown', ['$event']) handleSlash(event: KeyboardEvent) {      
+    if (event.key === '/' && !event.ctrlKey && !event.metaKey && !event.altKey && this.isTypingField(event.target)) {      
+      event.preventDefault();      
+      this.openSearch();      
+    }
+  }
+  private isTypingField(t: EventTarget | null): boolean {      
+    if (!t || !(t as HTMLElement)) return true;      
+    const tag = (t as HTMLElement).tagName.toLowerCase();      
+    return tag !== 'input' && tag !== 'textarea' && !(t as HTMLElement).isContentEditable;      
+  }
+
+  private openSearch() {      
+    this.faqSearchBox.nativeElement.focus();      
+    this.searchFocused = true;      
+    this.showSuggestions = !!this.searchQuery.trim();      
   }
 }

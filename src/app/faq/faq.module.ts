@@ -182,7 +182,7 @@ import { QueryManagerqPaginationHandlingComponent } from './faq-item/query-manag
 import { QueryManagerqQToolingApiComponent } from './faq-item/query-managerq-q-tooling-api/query-managerq-q-tooling-api.component';
 import { QueryManagerqManageQueriesComponent } from './faq-item/query-managerq-manage-queries/query-managerq-manage-queries.component';
 import { QueryManagerqIntegrateQLightningComponent } from './faq-item/query-managerq-integrate-q-lightning/query-managerq-integrate-q-lightning.component';
-
+import { SearchOverlayComponent } from '../search-overlay/search-overlay.component';
 @NgModule({
   declarations: [
     FaqComponent,
@@ -357,6 +357,7 @@ import { QueryManagerqIntegrateQLightningComponent } from './faq-item/query-mana
     QueryManagerqQToolingApiComponent,
     QueryManagerqManageQueriesComponent,
     QueryManagerqIntegrateQLightningComponent,
+    SearchOverlayComponent
   ],
   imports: [
     CommonModule,

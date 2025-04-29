@@ -1,8 +1,10 @@
 <div class="faq-container">
   <div class="faq-search">
-    <label class="visually-hidden" for="faqSearchInput">
-      Search FAQs
-    </label>
+    <div class="search-shortcut-wrapper">
+
+    <label class="visually-hidden" for="faqSearchInput"> Search FAQs </label>
+    
+    </div>
     <div class="search-wrapper">
       <input
         #faqSearchBox
@@ -10,7 +12,7 @@
         type="text"
         placeholder="Search FAQs..."
         [(ngModel)]="searchQuery"
-        (focus)="searchFocused = true"
+        (focus)="openSearchOverlay()"
         (blur)="onSearchBlur()"
         (input)="onSearchInputChange()"
         (keydown)="onSearchKeyDown($event)"
@@ -21,13 +23,9 @@
       />
 
       <span
-        class="clear-tooltip"
-        *ngIf="searchQuery && searchFocused"
-        (mousedown)="onClearMouseDown($event, faqSearchBox)"
-        aria-label="Clear search"
-      >
-        Clear
-      </span>
+        class="shortcut-hint shortcut-clickable"
+        (click)="isSearchOpen = true"
+        >/</span>
     </div>
     <ul
       class="suggestions-list"
@@ -48,7 +46,6 @@
   </div>
 
   <div class="faq-layout">
-    
     <aside class="faq-sidebar">
       <h3 class="sidebar-title">Categories</h3>
       <ul class="category-list">
@@ -134,14 +131,17 @@
               FaqComponentRegistry[toRegistryKey(item.answer)]
             "
           ></ng-container>
-
         </mat-expansion-panel>
       </mat-accordion>
-      
+
       <div class="no-results" *ngIf="filteredFAQ.length === 0">
         No FAQs found. Try a different search or reset the filters.
       </div>
     </main>
-
+    <app-search-overlay
+      *ngIf="isSearchOpen"
+      [isOpen]="isSearchOpen"
+      (closed)="isSearchOpen = false"
+    ></app-search-overlay>
   </div>
-</div> 
+</div>
