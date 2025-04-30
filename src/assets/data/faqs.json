@@ -1,1199 +1,1541 @@
 [
   {
-    "Id": "a0oEc0000058bFdIAI",
+    "Id": "a0oEc000005JohNIAS",
+    "Name": "DSPFAQ-1315",
+    "Category__c": "General",
+    "SubCategory__c": null,
+    "SeqNo__c": null,
     "Question__c": "What is Data Sync Pro(DSP)?",
-    "Answer__c": "general-what-is-dsp.html",
-    "Category__c": "General",
-    "SubCategory__c": null
+    "Answer__c": "general-what-is-dsp.html"
   },
   {
-    "Id": "a0oEc0000058bFeIAI",
+    "Id": "a0oEc000005JohOIAS",
+    "Name": "DSPFAQ-1316",
+    "Category__c": "General",
+    "SubCategory__c": null,
+    "SeqNo__c": null,
     "Question__c": "What are the five rules engines in DSP, and what is each used for?",
-    "Answer__c": "general-five-dsp-engines.html",
-    "Category__c": "General",
-    "SubCategory__c": null
+    "Answer__c": "general-five-dsp-engines.html"
   },
   {
-    "Id": "a0oEc0000058bFfIAI",
+    "Id": "a0oEc000005JohPIAS",
+    "Name": "DSPFAQ-1317",
+    "Category__c": "General",
+    "SubCategory__c": null,
+    "SeqNo__c": null,
     "Question__c": "How do no-code, modular, record-based rules transform enterprise data management?",
-    "Answer__c": "general-no-code-rules-transform.html",
-    "Category__c": "General",
-    "SubCategory__c": null
+    "Answer__c": "general-no-code-rules-transform.html"
   },
   {
-    "Id": "a0oEc0000058bFgIAI",
+    "Id": "a0oEc000005JohQIAS",
+    "Name": "DSPFAQ-1318",
+    "Category__c": "General",
+    "SubCategory__c": null,
+    "SeqNo__c": null,
     "Question__c": "Why Data Sync Pro?",
-    "Answer__c": "general-why-dsp.html",
-    "Category__c": "General",
-    "SubCategory__c": null
+    "Answer__c": "general-why-dsp.html"
   },
   {
-    "Id": "a0oEc0000058bFhIAI",
+    "Id": "a0oEc000005JohRIAS",
+    "Name": "DSPFAQ-1319",
+    "Category__c": "General",
+    "SubCategory__c": null,
+    "SeqNo__c": null,
     "Question__c": "Does DSP process any data outside the subscriber’s Salesforce org?",
-    "Answer__c": "general-dsp-external-data.html",
-    "Category__c": "General",
-    "SubCategory__c": null
+    "Answer__c": "general-dsp-external-data.html"
   },
   {
-    "Id": "a0oEc0000058bFiIAI",
+    "Id": "a0oEc000005JohSIAS",
+    "Name": "DSPFAQ-1320",
+    "Category__c": "General",
+    "SubCategory__c": null,
+    "SeqNo__c": null,
     "Question__c": "How does DSP ensure security and privacy?",
-    "Answer__c": "general-dsp-security-privacy.html",
-    "Category__c": "General",
-    "SubCategory__c": null
+    "Answer__c": "general-dsp-security-privacy.html"
   },
   {
-    "Id": "a0oEc0000058bFjIAI",
+    "Id": "a0oEc000005JohTIAS",
+    "Name": "DSPFAQ-1321",
+    "Category__c": "General",
+    "SubCategory__c": null,
+    "SeqNo__c": null,
     "Question__c": "How is Data Sync Pro licensed, and what factors determine pricing?",
-    "Answer__c": "general-dsp-licensing-pricing.html",
-    "Category__c": "General",
-    "SubCategory__c": null
+    "Answer__c": "general-dsp-licensing-pricing.html"
   },
   {
-    "Id": "a0oEc0000058bFkIAI",
+    "Id": "a0oEc000005JohUIAS",
+    "Name": "DSPFAQ-1322",
+    "Category__c": "General",
+    "SubCategory__c": null,
+    "SeqNo__c": null,
     "Question__c": "What are the three core user personas included in the Data Sync Pro package?",
-    "Answer__c": "general-three-user-personas.html",
-    "Category__c": "General",
-    "SubCategory__c": null
+    "Answer__c": "general-three-user-personas.html"
   },
   {
-    "Id": "a0oEc0000058bFlIAI",
+    "Id": "a0oEc000005JohVIAS",
+    "Name": "DSPFAQ-1323",
+    "Category__c": "General",
+    "SubCategory__c": null,
+    "SeqNo__c": null,
     "Question__c": "How do the different DSP rules engines—Batch, Data List, Action Button, Data Loader, and Triggers—compare in terms of similarities and differences?",
-    "Answer__c": "general-dsp-rules-engines-compare.html",
-    "Category__c": "General",
-    "SubCategory__c": null
+    "Answer__c": "general-dsp-rules-engines-compare.html"
   },
   {
-    "Id": "a0oEc0000058bFmIAI",
+    "Id": "a0oEc000005JohWIAS",
+    "Name": "DSPFAQ-1324",
+    "Category__c": "General",
+    "SubCategory__c": null,
+    "SeqNo__c": null,
     "Question__c": "How much training is required to start building in Data Sync Pro?",
-    "Answer__c": "general-dsp-training-needed.html",
-    "Category__c": "General",
-    "SubCategory__c": null
+    "Answer__c": "general-dsp-training-needed.html"
   },
   {
-    "Id": "a0oEc0000058bFnIAI",
+    "Id": "a0oEc000005JohXIAS",
+    "Name": "DSPFAQ-1325",
+    "Category__c": "General",
+    "SubCategory__c": null,
+    "SeqNo__c": null,
     "Question__c": "Does DSP development adhere to the Software Development Life Cycle (SDLC)?",
-    "Answer__c": "general-dsp-adheres-sdlc.html",
-    "Category__c": "General",
-    "SubCategory__c": null
+    "Answer__c": "general-dsp-adheres-sdlc.html"
   },
   {
-    "Id": "a0oEc0000058bFoIAI",
+    "Id": "a0oEc000005JohYIAS",
+    "Name": "DSPFAQ-1326",
+    "Category__c": "General",
+    "SubCategory__c": null,
+    "SeqNo__c": null,
     "Question__c": "Is DSP subject to Salesforce governor limits?",
-    "Answer__c": "general-dsp-governor-limits.html",
-    "Category__c": "General",
-    "SubCategory__c": null
+    "Answer__c": "general-dsp-governor-limits.html"
   },
   {
-    "Id": "a0oEc0000058bFpIAI",
+    "Id": "a0oEc000005JohZIAS",
+    "Name": "DSPFAQ-1327",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Batch",
+    "SeqNo__c": null,
     "Question__c": "What is a Batch job in general?",
-    "Answer__c": "rules-engines-batch-what-is-batch-job.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-batch-what-is-batch-job.html"
   },
   {
-    "Id": "a0oEc0000058bFqIAI",
+    "Id": "a0oEc000005JohaIAC",
+    "Name": "DSPFAQ-1328",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Batch",
+    "SeqNo__c": null,
     "Question__c": "Why choose Data Sync Pro's Batch?",
-    "Answer__c": "rules-engines-batch-why-dsp-batch.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-batch-why-dsp-batch.html"
   },
   {
-    "Id": "a0oEc0000058bFrIAI",
+    "Id": "a0oEc000005JohbIAC",
+    "Name": "DSPFAQ-1329",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Batch",
+    "SeqNo__c": null,
     "Question__c": "What technologies are used to build the Batch rules engine in DSP?",
-    "Answer__c": "rules-engines-batch-batch-technologies-used.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-batch-batch-technologies-used.html"
   },
   {
-    "Id": "a0oEc0000058bFsIAI",
+    "Id": "a0oEc000005JohcIAC",
+    "Name": "DSPFAQ-1330",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Batch",
+    "SeqNo__c": null,
     "Question__c": "What are the common use cases for DSP's Batch?",
-    "Answer__c": "rules-engines-batch-batch-use-cases.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-batch-batch-use-cases.html"
   },
   {
-    "Id": "a0oEc0000058bFtIAI",
+    "Id": "a0oEc000005JohdIAC",
+    "Name": "DSPFAQ-1331",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Batch",
+    "SeqNo__c": null,
     "Question__c": "How efficiently does Batch handle large data volumes?",
-    "Answer__c": "rules-engines-batch-batch-large-volumes.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-batch-batch-large-volumes.html"
   },
   {
-    "Id": "a0oEc0000058bFuIAI",
+    "Id": "a0oEc000005JoheIAC",
+    "Name": "DSPFAQ-1332",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Batch",
+    "SeqNo__c": null,
     "Question__c": "How do I create a Batch Executable?",
-    "Answer__c": "rules-engines-batch-create-batch-executable.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-batch-create-batch-executable.html"
   },
   {
-    "Id": "a0oEc0000058bFvIAI",
+    "Id": "a0oEc000005JohfIAC",
+    "Name": "DSPFAQ-1333",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Batch",
+    "SeqNo__c": null,
     "Question__c": "Does Batch only support cross-org data migrations?",
-    "Answer__c": "rules-engines-batch-batch-cross-org.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-batch-batch-cross-org.html"
   },
   {
-    "Id": "a0oEc0000058bFwIAI",
+    "Id": "a0oEc000005JohgIAC",
+    "Name": "DSPFAQ-1334",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Batch",
+    "SeqNo__c": null,
     "Question__c": "What permissions are required to execute a Batch?",
-    "Answer__c": "rules-engines-batch-batch-permissions-needed.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-batch-batch-permissions-needed.html"
   },
   {
-    "Id": "a0oEc0000058bFxIAI",
+    "Id": "a0oEc000005JohhIAC",
+    "Name": "DSPFAQ-1335",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Batch",
+    "SeqNo__c": null,
     "Question__c": "What is the maximum dataset size that a DSP batch job can process?",
-    "Answer__c": "rules-engines-batch-batch-max-dataset.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-batch-batch-max-dataset.html"
   },
   {
-    "Id": "a0oEc0000058bFyIAI",
+    "Id": "a0oEc000005JohiIAC",
+    "Name": "DSPFAQ-1336",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Batch",
+    "SeqNo__c": null,
     "Question__c": "What is the maximum batch size that can be set?",
-    "Answer__c": "rules-engines-batch-batch-max-size.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-batch-batch-max-size.html"
   },
   {
-    "Id": "a0oEc0000058bFzIAI",
+    "Id": "a0oEc000005JohjIAC",
+    "Name": "DSPFAQ-1337",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Batch",
+    "SeqNo__c": null,
     "Question__c": "How can I chain multiple batch Executables to run in a specific sequence?",
-    "Answer__c": "rules-engines-batch-chain-batch-executables.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-batch-chain-batch-executables.html"
   },
   {
-    "Id": "a0oEc0000058bG0IAI",
+    "Id": "a0oEc000005JohkIAC",
+    "Name": "DSPFAQ-1338",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Batch",
+    "SeqNo__c": null,
     "Question__c": "How can I schedule Batch jobs?",
-    "Answer__c": "rules-engines-batch-schedule-batch-jobs.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-batch-schedule-batch-jobs.html"
   },
   {
-    "Id": "a0oEc0000058bG1IAI",
+    "Id": "a0oEc000005JohlIAC",
+    "Name": "DSPFAQ-1339",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Batch",
+    "SeqNo__c": null,
     "Question__c": "Can a Pipeline execution be stopped if one of its Executables fails?",
-    "Answer__c": "rules-engines-batch-stop-pipeline-on-fail.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-batch-stop-pipeline-on-fail.html"
   },
   {
-    "Id": "a0oEc0000058bG2IAI",
+    "Id": "a0oEc000005JohmIAC",
+    "Name": "DSPFAQ-1340",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Batch",
+    "SeqNo__c": null,
     "Question__c": "Can I apply a common SOQL filter to all Executables in a Pipeline?",
-    "Answer__c": "rules-engines-batch-common-soql-pipeline.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-batch-common-soql-pipeline.html"
   },
   {
-    "Id": "a0oEc0000058bG3IAI",
+    "Id": "a0oEc000005JohnIAC",
+    "Name": "DSPFAQ-1341",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Batch",
+    "SeqNo__c": null,
     "Question__c": "How can I efficiently set up Batch Executables to sync multiple objects with parent-child relationships?",
-    "Answer__c": "rules-engines-batch-batch-parent-child.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-batch-batch-parent-child.html"
   },
   {
-    "Id": "a0oEc0000058bG4IAI",
+    "Id": "a0oEc000005JohoIAC",
+    "Name": "DSPFAQ-1342",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Batch",
+    "SeqNo__c": null,
     "Question__c": "How are logs tracked for a Batch execution?",
-    "Answer__c": "rules-engines-batch-batch-logs-tracked.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-batch-batch-logs-tracked.html"
   },
   {
-    "Id": "a0oEc0000058bG5IAI",
+    "Id": "a0oEc000005JohpIAC",
+    "Name": "DSPFAQ-1343",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Batch",
+    "SeqNo__c": null,
     "Question__c": "Does DSP allow re-execution of failed batches?",
-    "Answer__c": "rules-engines-batch-re-execute-failed-batches.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-batch-re-execute-failed-batches.html"
   },
   {
-    "Id": "a0oEc0000058bG6IAI",
+    "Id": "a0oEc000005JohqIAC",
+    "Name": "DSPFAQ-1344",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Batch",
+    "SeqNo__c": null,
     "Question__c": "Is it possible to revert the changes made a batch execution?",
-    "Answer__c": "rules-engines-batch-revert-batch-changes.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-batch-revert-batch-changes.html"
   },
   {
-    "Id": "a0oEc0000058bG7IAI",
+    "Id": "a0oEc000005JohrIAC",
+    "Name": "DSPFAQ-1345",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Batch",
+    "SeqNo__c": null,
     "Question__c": "How can I implement delta retrieval?",
-    "Answer__c": "rules-engines-batch-delta-retrieval.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-batch-delta-retrieval.html"
   },
   {
-    "Id": "a0oEc0000058bG8IAI",
+    "Id": "a0oEc000005JohsIAC",
+    "Name": "DSPFAQ-1346",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Batch",
+    "SeqNo__c": null,
     "Question__c": "What are the key considerations for enabling the Bulk API?",
-    "Answer__c": "rules-engines-batch-bulk-api-considerations.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-batch-bulk-api-considerations.html"
   },
   {
-    "Id": "a0oEc0000058bG9IAI",
+    "Id": "a0oEc000005JohtIAC",
+    "Name": "DSPFAQ-1347",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Batch",
+    "SeqNo__c": null,
     "Question__c": "How can I set up notifications for completed batch executions?",
-    "Answer__c": "rules-engines-batch-batch-notifications.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-batch-batch-notifications.html"
   },
   {
-    "Id": "a0oEc0000058bGAIAY",
+    "Id": "a0oEc000005JohuIAC",
+    "Name": "DSPFAQ-1348",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Batch",
+    "SeqNo__c": null,
     "Question__c": "What is the best approach to test a Batch Executable with a small data sample before running it on the full dataset?",
-    "Answer__c": "rules-engines-batch-test-batch-with-sample.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-batch-test-batch-with-sample.html"
   },
   {
-    "Id": "a0oEc0000058bGBIAY",
+    "Id": "a0oEc000005JohvIAC",
+    "Name": "DSPFAQ-1349",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Batch",
+    "SeqNo__c": null,
     "Question__c": "How can I break down a complex batch job with multiple actions into manageable parts?",
-    "Answer__c": "rules-engines-batch-break-down-complex-batch.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-batch-break-down-complex-batch.html"
   },
   {
-    "Id": "a0oEc0000058bGCIAY",
+    "Id": "a0oEc000005JohwIAC",
+    "Name": "DSPFAQ-1350",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Batch",
+    "SeqNo__c": null,
     "Question__c": "What are the advantages of combining a blank update batch with a self-adaptive trigger?",
-    "Answer__c": "rules-engines-batch-blank-update-batch-advantages.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-batch-blank-update-batch-advantages.html"
   },
   {
-    "Id": "a0oEc0000058bGDIAY",
+    "Id": "a0oEc000005JohxIAC",
+    "Name": "DSPFAQ-1351",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Data List",
+    "SeqNo__c": null,
     "Question__c": "What is a Data List in Data Sync Pro?",
-    "Answer__c": "rules-engines-data-list-what-is-data-list.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-data-list-what-is-data-list.html"
   },
   {
-    "Id": "a0oEc0000058bGEIAY",
+    "Id": "a0oEc000005JohyIAC",
+    "Name": "DSPFAQ-1352",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Data List",
+    "SeqNo__c": null,
     "Question__c": "Why DSP Data List?",
-    "Answer__c": "rules-engines-data-list-why-dsp-data-list.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-data-list-why-dsp-data-list.html"
   },
   {
-    "Id": "a0oEc0000058bGFIAY",
+    "Id": "a0oEc000005JohzIAC",
+    "Name": "DSPFAQ-1353",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Data List",
+    "SeqNo__c": null,
     "Question__c": "How do I create an Actionable Data List?",
-    "Answer__c": "rules-engines-data-list-create-actionable-data-list.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-data-list-create-actionable-data-list.html"
   },
   {
-    "Id": "a0oEc0000058bGGIAY",
+    "Id": "a0oEc000005Joi0IAC",
+    "Name": "DSPFAQ-1354",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Data List",
+    "SeqNo__c": null,
     "Question__c": "What are the two essential components of a Actionable Data List?",
-    "Answer__c": "rules-engines-data-list-two-components-data-list.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-data-list-two-components-data-list.html"
   },
   {
-    "Id": "a0oEc0000058bGHIAY",
+    "Id": "a0oEc000005Joi1IAC",
+    "Name": "DSPFAQ-1355",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Data List",
+    "SeqNo__c": null,
     "Question__c": "What are the minimum requirements to create a Data List?",
-    "Answer__c": "rules-engines-data-list-data-list-min-reqs.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-data-list-data-list-min-reqs.html"
   },
   {
-    "Id": "a0oEc0000058bGIIAY",
+    "Id": "a0oEc000005Joi2IAC",
+    "Name": "DSPFAQ-1356",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Data List",
+    "SeqNo__c": null,
     "Question__c": "What is the difference between an actionable Data List and a non-actionable Data List?",
-    "Answer__c": "rules-engines-data-list-actionable-vs-nonactionable.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-data-list-actionable-vs-nonactionable.html"
   },
   {
-    "Id": "a0oEc0000058bGJIAY",
+    "Id": "a0oEc000005Joi3IAC",
+    "Name": "DSPFAQ-1357",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Data List",
+    "SeqNo__c": null,
     "Question__c": "What permissions are required to access a Data List, view its data, and execute its actions?",
-    "Answer__c": "rules-engines-data-list-data-list-permissions.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-data-list-data-list-permissions.html"
   },
   {
-    "Id": "a0oEc0000058bGKIAY",
+    "Id": "a0oEc000005Joi4IAC",
+    "Name": "DSPFAQ-1358",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Data List",
+    "SeqNo__c": null,
     "Question__c": "How do I embed Data Lists into a Lightning page?",
-    "Answer__c": "rules-engines-data-list-embed-data-lists-lightning.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-data-list-embed-data-lists-lightning.html"
   },
   {
-    "Id": "a0oEc0000058bGLIAY",
+    "Id": "a0oEc000005Joi5IAC",
+    "Name": "DSPFAQ-1359",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Data List",
+    "SeqNo__c": null,
     "Question__c": "How can I customize the Label, Variant, and Icon of an action?",
-    "Answer__c": "rules-engines-data-list-customize-action-ui.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-data-list-customize-action-ui.html"
   },
   {
-    "Id": "a0oEc0000058bGMIAY",
+    "Id": "a0oEc000005Joi6IAC",
+    "Name": "DSPFAQ-1360",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Data List",
+    "SeqNo__c": null,
     "Question__c": "Can I prompt users for confirmation before executing an action after they click the action button?",
-    "Answer__c": "rules-engines-data-list-action-confirmation-prompt.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-data-list-action-confirmation-prompt.html"
   },
   {
-    "Id": "a0oEc0000058bGNIAY",
+    "Id": "a0oEc000005Joi7IAC",
+    "Name": "DSPFAQ-1361",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Data List",
+    "SeqNo__c": null,
     "Question__c": "Can I specify whether an Action should be a List Action, a Row Action, or both?",
-    "Answer__c": "rules-engines-data-list-specify-action-scope.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-data-list-specify-action-scope.html"
   },
   {
-    "Id": "a0oEc0000058bGOIAY",
+    "Id": "a0oEc000005Joi8IAC",
+    "Name": "DSPFAQ-1362",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Data List",
+    "SeqNo__c": null,
     "Question__c": "Can users review and edit transformed values before executing an action?",
-    "Answer__c": "rules-engines-data-list-review-edit-transformed.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-data-list-review-edit-transformed.html"
   },
   {
-    "Id": "a0oEc0000058bGPIAY",
+    "Id": "a0oEc000005Joi9IAC",
+    "Name": "DSPFAQ-1363",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Data List",
+    "SeqNo__c": null,
     "Question__c": "Why group multiple Executable Data Lists into a Pipeline?",
-    "Answer__c": "rules-engines-data-list-group-data-lists.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-data-list-group-data-lists.html"
   },
   {
-    "Id": "a0oEc0000058bGQIAY",
+    "Id": "a0oEc000005JoiAIAS",
+    "Name": "DSPFAQ-1364",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Data List",
+    "SeqNo__c": null,
     "Question__c": "How can I consolidate multiple Executable actions into a single Data List?",
-    "Answer__c": "rules-engines-data-list-consolidate-data-list-actions.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-data-list-consolidate-data-list-actions.html"
   },
   {
-    "Id": "a0oEc0000058bGRIAY",
+    "Id": "a0oEc000005JoiBIAS",
+    "Name": "DSPFAQ-1365",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Data List",
+    "SeqNo__c": null,
     "Question__c": "How can I specify the related lists for each row in a data list?",
-    "Answer__c": "rules-engines-data-list-specify-related-lists.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-data-list-specify-related-lists.html"
   },
   {
-    "Id": "a0oEc0000058bGSIAY",
+    "Id": "a0oEc000005JoiCIAS",
+    "Name": "DSPFAQ-1366",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Data List",
+    "SeqNo__c": null,
     "Question__c": "What are the benefits of replacing the default 'New Record' function in a Data List with a custom action?",
-    "Answer__c": "rules-engines-data-list-replace-new-record.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-data-list-replace-new-record.html"
   },
   {
-    "Id": "a0oEc0000058bGTIAY",
+    "Id": "a0oEc000005JoiDIAS",
+    "Name": "DSPFAQ-1367",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Data List",
+    "SeqNo__c": null,
     "Question__c": "Can I set up a Data Loader as a List Action in my Data List?",
-    "Answer__c": "rules-engines-data-list-data-loader-list-action.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-data-list-data-loader-list-action.html"
   },
   {
-    "Id": "a0oEc0000058bGUIAY",
+    "Id": "a0oEc000005JoiEIAS",
+    "Name": "DSPFAQ-1368",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Data List",
+    "SeqNo__c": null,
     "Question__c": "What permissions can be set for accessing and interacting with query results in a Data List?",
-    "Answer__c": "rules-engines-data-list-data-list-query-permissions.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-data-list-data-list-query-permissions.html"
   },
   {
-    "Id": "a0oEc0000058bGVIAY",
+    "Id": "a0oEc000005JoiFIAS",
+    "Name": "DSPFAQ-1369",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Data List",
+    "SeqNo__c": null,
     "Question__c": "How can I configure records to open in the Lightning record page when clicked in a Data List?",
-    "Answer__c": "rules-engines-data-list-open-record-in-lightning.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-data-list-open-record-in-lightning.html"
   },
   {
-    "Id": "a0oEc0000058bGWIAY",
+    "Id": "a0oEc000005JoiGIAS",
+    "Name": "DSPFAQ-1370",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Data List",
+    "SeqNo__c": null,
     "Question__c": "How can end users customize the query in a Data List—such as selecting fields, filtering, or sorting?",
-    "Answer__c": "rules-engines-data-list-end-user-query-customization.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-data-list-end-user-query-customization.html"
   },
   {
-    "Id": "a0oEc0000058bGXIAY",
+    "Id": "a0oEc000005JoiHIAS",
+    "Name": "DSPFAQ-1371",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Data List",
+    "SeqNo__c": null,
     "Question__c": "Can Data Lists be extended and customized within custom LWC components?",
-    "Answer__c": "rules-engines-data-list-extend-data-lists-lwc.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-data-list-extend-data-lists-lwc.html"
   },
   {
-    "Id": "a0oEc0000058bGYIAY",
+    "Id": "a0oEc000005JoiIIAS",
+    "Name": "DSPFAQ-1372",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Data List",
+    "SeqNo__c": null,
     "Question__c": "How can I enable horizontal scrolling for a data list?",
-    "Answer__c": "rules-engines-data-list-horizontal-scrolling-data-list.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-data-list-horizontal-scrolling-data-list.html"
   },
   {
-    "Id": "a0oEc0000058bGZIAY",
+    "Id": "a0oEc000005JoiJIAS",
+    "Name": "DSPFAQ-1373",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Data List",
+    "SeqNo__c": null,
     "Question__c": "How can I configure a Data List to retrieve data from a remote Salesforce org?",
-    "Answer__c": "rules-engines-data-list-remote-org-data-list.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-data-list-remote-org-data-list.html"
   },
   {
-    "Id": "a0oEc0000058bGaIAI",
+    "Id": "a0oEc000005JoiKIAS",
+    "Name": "DSPFAQ-1374",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Action Button",
+    "SeqNo__c": null,
     "Question__c": "What is an Action Button in Data Sync Pro?",
-    "Answer__c": "rules-engines-action-button-what-is-action-button.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-action-button-what-is-action-button.html"
   },
   {
-    "Id": "a0oEc0000058bGbIAI",
+    "Id": "a0oEc000005JoiLIAS",
+    "Name": "DSPFAQ-1375",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Action Button",
+    "SeqNo__c": null,
     "Question__c": "Why Data Sync Pro Action Button?",
-    "Answer__c": "rules-engines-action-button-why-dsp-action-button.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-action-button-why-dsp-action-button.html"
   },
   {
-    "Id": "a0oEc0000058bGcIAI",
+    "Id": "a0oEc000005JoiMIAS",
+    "Name": "DSPFAQ-1376",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Action Button",
+    "SeqNo__c": null,
     "Question__c": "How can I create an Action Button?",
-    "Answer__c": "rules-engines-action-button-create-action-button.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-action-button-create-action-button.html"
   },
   {
-    "Id": "a0oEc0000058bGdIAI",
+    "Id": "a0oEc000005JoiNIAS",
+    "Name": "DSPFAQ-1377",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Action Button",
+    "SeqNo__c": null,
     "Question__c": "How can I customize the Label, Variant, and Icon of an action?",
-    "Answer__c": "rules-engines-action-button-customize-action-ui.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-action-button-customize-action-ui.html"
   },
   {
-    "Id": "a0oEc0000058bGeIAI",
+    "Id": "a0oEc000005JoiOIAS",
+    "Name": "DSPFAQ-1378",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Action Button",
+    "SeqNo__c": null,
     "Question__c": "Can I prompt users for confirmation before executing an action after they click the action button?",
-    "Answer__c": "rules-engines-action-button-action-confirmation-prompt.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-action-button-action-confirmation-prompt.html"
   },
   {
-    "Id": "a0oEc0000058bGfIAI",
+    "Id": "a0oEc000005JoiPIAS",
+    "Name": "DSPFAQ-1379",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Action Button",
+    "SeqNo__c": null,
     "Question__c": "Can I display transformed field values on screen and allow users to edit them before execution?",
-    "Answer__c": "rules-engines-action-button-display-transformed-values.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-action-button-display-transformed-values.html"
   },
   {
-    "Id": "a0oEc0000058bGgIAI",
+    "Id": "a0oEc000005JoiQIAS",
+    "Name": "DSPFAQ-1380",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Action Button",
+    "SeqNo__c": null,
     "Question__c": "Why group multiple Executable Action Buttons into a Pipeline?",
-    "Answer__c": "rules-engines-action-button-group-action-buttons.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-action-button-group-action-buttons.html"
   },
   {
-    "Id": "a0oEc0000058bGhIAI",
+    "Id": "a0oEc000005JoiRIAS",
+    "Name": "DSPFAQ-1381",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Action Button",
+    "SeqNo__c": null,
     "Question__c": "Can I make a series of actions with a single button click?",
-    "Answer__c": "rules-engines-action-button-series-actions-one-click.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-action-button-series-actions-one-click.html"
   },
   {
-    "Id": "a0oEc0000058bGiIAI",
+    "Id": "a0oEc000005JoiSIAS",
+    "Name": "DSPFAQ-1382",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Action Button",
+    "SeqNo__c": null,
     "Question__c": "How can I grant users access to an Action Button?",
-    "Answer__c": "rules-engines-action-button-action-button-access.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-action-button-action-button-access.html"
   },
   {
-    "Id": "a0oEc0000058bGjIAI",
+    "Id": "a0oEc000005JoiTIAS",
+    "Name": "DSPFAQ-1383",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Data Loader",
+    "SeqNo__c": null,
     "Question__c": "How does the Data Loader work in DSP?",
-    "Answer__c": "rules-engines-data-loader-data-loader-overview.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-data-loader-data-loader-overview.html"
   },
   {
-    "Id": "a0oEc0000058bGkIAI",
+    "Id": "a0oEc000005JoiUIAS",
+    "Name": "DSPFAQ-1384",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Data Loader",
+    "SeqNo__c": null,
     "Question__c": "How can I create a Data Loader?",
-    "Answer__c": "rules-engines-data-loader-create-data-loader.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-data-loader-create-data-loader.html"
   },
   {
-    "Id": "a0oEc0000058bGlIAI",
+    "Id": "a0oEc000005JoiVIAS",
+    "Name": "DSPFAQ-1385",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Data Loader",
+    "SeqNo__c": null,
     "Question__c": "Can I load data to a different org?",
-    "Answer__c": "rules-engines-data-loader-load-data-different-org.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-data-loader-load-data-different-org.html"
   },
   {
-    "Id": "a0oEc0000058bGmIAI",
+    "Id": "a0oEc000005JoiWIAS",
+    "Name": "DSPFAQ-1386",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Data Loader",
+    "SeqNo__c": null,
     "Question__c": "How are execution logs recorded in a Data Loader process?",
-    "Answer__c": "rules-engines-data-loader-data-loader-logs.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-data-loader-data-loader-logs.html"
   },
   {
-    "Id": "a0oEc0000058bGnIAI",
+    "Id": "a0oEc000005JoiXIAS",
+    "Name": "DSPFAQ-1387",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Data Loader",
+    "SeqNo__c": null,
     "Question__c": "Since CSV columns are stored as strings, how does Data Loader handle data type conversion?",
-    "Answer__c": "rules-engines-data-loader-data-loader-type-conversion.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-data-loader-data-loader-type-conversion.html"
   },
   {
-    "Id": "a0oEc0000058bGoIAI",
+    "Id": "a0oEc000005JoiYIAS",
+    "Name": "DSPFAQ-1388",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Data Loader",
+    "SeqNo__c": null,
     "Question__c": "How can I grant users access to a Data Loader?",
-    "Answer__c": "rules-engines-data-loader-data-loader-access.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-data-loader-data-loader-access.html"
   },
   {
-    "Id": "a0oEc0000058bGpIAI",
+    "Id": "a0oEc000005JoiZIAS",
+    "Name": "DSPFAQ-1389",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Data Loader",
+    "SeqNo__c": null,
     "Question__c": "Does Data Loader only support CSV files upload?",
-    "Answer__c": "rules-engines-data-loader-data-loader-csv-only.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-data-loader-data-loader-csv-only.html"
   },
   {
-    "Id": "a0oEc0000058bGqIAI",
+    "Id": "a0oEc000005JoiaIAC",
+    "Name": "DSPFAQ-1390",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Data Loader",
+    "SeqNo__c": null,
     "Question__c": "When should the serial mode be used?",
-    "Answer__c": "rules-engines-data-loader-serial-mode-usage.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-data-loader-serial-mode-usage.html"
   },
   {
-    "Id": "a0oEc0000058bGrIAI",
+    "Id": "a0oEc000005JoibIAC",
+    "Name": "DSPFAQ-1391",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Data Loader",
+    "SeqNo__c": null,
     "Question__c": "Can I re-execute only the failed batches without reloading the entire dataset?",
-    "Answer__c": "rules-engines-data-loader-re-execute-failed-load.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-data-loader-re-execute-failed-load.html"
   },
   {
-    "Id": "a0oEc0000058bGsIAI",
+    "Id": "a0oEc000005JoicIAC",
+    "Name": "DSPFAQ-1392",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Data Loader",
+    "SeqNo__c": null,
     "Question__c": "Is it possible to revert the changes made a data load?",
-    "Answer__c": "rules-engines-data-loader-revert-data-load.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-data-loader-revert-data-load.html"
   },
   {
-    "Id": "a0oEc0000058bGtIAI",
+    "Id": "a0oEc000005JoidIAC",
+    "Name": "DSPFAQ-1393",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Data Loader",
+    "SeqNo__c": null,
     "Question__c": "Can I make a Data Load fail if a column is missing from the source file?",
-    "Answer__c": "rules-engines-data-loader-fail-on-missing-column.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-data-loader-fail-on-missing-column.html"
   },
   {
-    "Id": "a0oEc0000058bGuIAI",
+    "Id": "a0oEc000005JoieIAC",
+    "Name": "DSPFAQ-1394",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Data Loader",
+    "SeqNo__c": null,
     "Question__c": "Can I set up my Data Loader as a List Action in a Data List?",
-    "Answer__c": "rules-engines-data-loader-loader-as-list-action.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-data-loader-loader-as-list-action.html"
   },
   {
-    "Id": "a0oEc0000058bGvIAI",
+    "Id": "a0oEc000005JoifIAC",
+    "Name": "DSPFAQ-1395",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Triggers",
+    "SeqNo__c": null,
     "Question__c": "How does the DSP Trigger Rules Engine work?",
-    "Answer__c": "rules-engines-triggers-trigger-rules-engine.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-triggers-trigger-rules-engine.html"
   },
   {
-    "Id": "a0oEc0000058bGwIAI",
+    "Id": "a0oEc000005JoigIAC",
+    "Name": "DSPFAQ-1396",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Triggers",
+    "SeqNo__c": null,
     "Question__c": "Why Data Sync Pro Trigger?",
-    "Answer__c": "rules-engines-triggers-why-dsp-trigger.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-triggers-why-dsp-trigger.html"
   },
   {
-    "Id": "a0oEc0000058bGxIAI",
+    "Id": "a0oEc000005JoihIAC",
+    "Name": "DSPFAQ-1397",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Triggers",
+    "SeqNo__c": null,
     "Question__c": "Which trigger events are supported?",
-    "Answer__c": "rules-engines-triggers-trigger-events-supported.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-triggers-trigger-events-supported.html"
   },
   {
-    "Id": "a0oEc0000058bGyIAI",
+    "Id": "a0oEc000005JoiiIAC",
+    "Name": "DSPFAQ-1398",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Triggers",
+    "SeqNo__c": null,
     "Question__c": "What is a Self-Adaptive Trigger?",
-    "Answer__c": "rules-engines-triggers-self-adaptive-trigger.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-triggers-self-adaptive-trigger.html"
   },
   {
-    "Id": "a0oEc0000058bGzIAI",
+    "Id": "a0oEc000005JoijIAC",
+    "Name": "DSPFAQ-1399",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Triggers",
+    "SeqNo__c": null,
     "Question__c": "How can I set up a Self-Adaptive Trigger?",
-    "Answer__c": "rules-engines-triggers-setup-self-adaptive-trigger.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-triggers-setup-self-adaptive-trigger.html"
   },
   {
-    "Id": "a0oEc0000058bH0IAI",
+    "Id": "a0oEc000005JoikIAC",
+    "Name": "DSPFAQ-1400",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Triggers",
+    "SeqNo__c": null,
     "Question__c": "How can I perform aggregation calculations in a Self-Adaptive Trigger?",
-    "Answer__c": "rules-engines-triggers-aggregation-self-adaptive.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-triggers-aggregation-self-adaptive.html"
   },
   {
-    "Id": "a0oEc0000058bH1IAI",
+    "Id": "a0oEc000005JoilIAC",
+    "Name": "DSPFAQ-1401",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Triggers",
+    "SeqNo__c": null,
     "Question__c": "How can I set up validation rules within a Self-Adaptive Trigger?",
-    "Answer__c": "rules-engines-triggers-validation-self-adaptive.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-triggers-validation-self-adaptive.html"
   },
   {
-    "Id": "a0oEc0000058bH2IAI",
+    "Id": "a0oEc000005JoimIAC",
+    "Name": "DSPFAQ-1402",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Triggers",
+    "SeqNo__c": null,
     "Question__c": "What is a Trigger Action?",
-    "Answer__c": "rules-engines-triggers-what-is-trigger-action.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-triggers-what-is-trigger-action.html"
   },
   {
-    "Id": "a0oEc0000058bH3IAI",
+    "Id": "a0oEc000005JoinIAC",
+    "Name": "DSPFAQ-1403",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Triggers",
+    "SeqNo__c": null,
     "Question__c": "How can I set up a Trigger Action?",
-    "Answer__c": "rules-engines-triggers-setup-trigger-action.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-triggers-setup-trigger-action.html"
   },
   {
-    "Id": "a0oEc0000058bH4IAI",
+    "Id": "a0oEc000005JoioIAC",
+    "Name": "DSPFAQ-1404",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Triggers",
+    "SeqNo__c": null,
     "Question__c": "What is the execution flow of a DSP Trigger?",
-    "Answer__c": "rules-engines-triggers-dsp-trigger-flow.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-triggers-dsp-trigger-flow.html"
   },
   {
-    "Id": "a0oEc0000058bH5IAI",
+    "Id": "a0oEc000005JoipIAC",
+    "Name": "DSPFAQ-1405",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Triggers",
+    "SeqNo__c": null,
     "Question__c": "How is recursive execution managed in update triggers?",
-    "Answer__c": "rules-engines-triggers-recursive-update-triggers.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-triggers-recursive-update-triggers.html"
   },
   {
-    "Id": "a0oEc0000058bH6IAI",
+    "Id": "a0oEc000005JoiqIAC",
+    "Name": "DSPFAQ-1406",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Triggers",
+    "SeqNo__c": null,
     "Question__c": "How to manage the execution order of DSP triggers?",
-    "Answer__c": "rules-engines-triggers-trigger-execution-order.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-triggers-trigger-execution-order.html"
   },
   {
-    "Id": "a0oEc0000058bH7IAI",
+    "Id": "a0oEc000005JoirIAC",
+    "Name": "DSPFAQ-1407",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Triggers",
+    "SeqNo__c": null,
     "Question__c": "How can I grant users access to a Trigger?",
-    "Answer__c": "rules-engines-triggers-trigger-access.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-triggers-trigger-access.html"
   },
   {
-    "Id": "a0oEc0000058bH8IAI",
+    "Id": "a0oEc000005JoisIAC",
+    "Name": "DSPFAQ-1408",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Triggers",
+    "SeqNo__c": null,
     "Question__c": "Salesforce requires that at least one line of code in an Apex Trigger be covered by test classes before deploying to production—how can I achieve this?",
-    "Answer__c": "rules-engines-triggers-test-coverage-trigger.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-triggers-test-coverage-trigger.html"
   },
   {
-    "Id": "a0oEc0000058bH9IAI",
+    "Id": "a0oEc000005JoitIAC",
+    "Name": "DSPFAQ-1409",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "# Triggers",
+    "SeqNo__c": null,
     "Question__c": "How does TRIGGER_FLIPPER help streamline DSP trigger actions?",
-    "Answer__c": "rules-engines-triggers-trigger-flipper.html",
-    "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "Answer__c": "rules-engines-triggers-trigger-flipper.html"
   },
   {
-    "Id": "a0oEc0000058bHAIAY",
+    "Id": "a0oEc000005JoiuIAC",
+    "Name": "DSPFAQ-1410",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Retrieve",
+    "SeqNo__c": null,
     "Question__c": "What does Retrieve do?",
-    "Answer__c": "process-steps-retrieve-retrieve-action.html",
-    "Category__c": "Process Steps",
-    "SubCategory__c": null
+    "Answer__c": "process-steps-retrieve-retrieve-action.html"
   },
   {
-    "Id": "a0oEc0000058bHBIAY",
+    "Id": "a0oEc000005JoivIAC",
+    "Name": "DSPFAQ-1411",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Retrieve",
+    "SeqNo__c": null,
     "Question__c": "Am I required to select all fields used in Scoping and Mapping within the Retrieve query?",
-    "Answer__c": "process-steps-retrieve-retrieve-query-field-requirements.html",
-    "Category__c": "Process Steps",
-    "SubCategory__c": null
+    "Answer__c": "process-steps-retrieve-retrieve-query-field-requirements.html"
   },
   {
-    "Id": "a0oEc0000058bHCIAY",
+    "Id": "a0oEc000005JoiwIAC",
+    "Name": "DSPFAQ-1412",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Retrieve",
+    "SeqNo__c": null,
     "Question__c": "How can I preview a source record and its transformed values before execution?",
-    "Answer__c": "process-steps-retrieve-preview-source-record.html",
-    "Category__c": "Process Steps",
-    "SubCategory__c": null
+    "Answer__c": "process-steps-retrieve-preview-source-record.html"
   },
   {
-    "Id": "a0oEc0000058bHDIAY",
+    "Id": "a0oEc000005JoixIAC",
+    "Name": "DSPFAQ-1413",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Retrieve",
+    "SeqNo__c": null,
     "Question__c": "What is the purpose of the 'Additional Retrieve Criteria' field on Pipeline?",
-    "Answer__c": "process-steps-retrieve-additional-retrieve-criteria.html",
-    "Category__c": "Process Steps",
-    "SubCategory__c": null
+    "Answer__c": "process-steps-retrieve-additional-retrieve-criteria.html"
   },
   {
-    "Id": "a0oEc0000058bHEIAY",
+    "Id": "a0oEc000005JoiyIAC",
+    "Name": "DSPFAQ-1414",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Preview",
+    "SeqNo__c": null,
     "Question__c": "What does Preview do?",
-    "Answer__c": "process-steps-preview-preview-overview.html",
-    "Category__c": "Process Steps",
-    "SubCategory__c": null
+    "Answer__c": "process-steps-preview-preview-overview.html"
   },
   {
-    "Id": "a0oEc0000058bHFIAY",
+    "Id": "a0oEc000005JoizIAC",
+    "Name": "DSPFAQ-1415",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Preview",
+    "SeqNo__c": null,
     "Question__c": "How can I preview a source record and its transformed values before execution?",
-    "Answer__c": "process-steps-preview-preview-source-record.html",
-    "Category__c": "Process Steps",
-    "SubCategory__c": null
+    "Answer__c": "process-steps-preview-preview-source-record.html"
   },
   {
-    "Id": "a0oEc0000058bHGIAY",
+    "Id": "a0oEc000005Joj0IAC",
+    "Name": "DSPFAQ-1416",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Preview",
+    "SeqNo__c": null,
     "Question__c": "What is the difference between Preview and Retrieve?",
-    "Answer__c": "process-steps-preview-preview-vs-retrieve.html",
-    "Category__c": "Process Steps",
-    "SubCategory__c": null
+    "Answer__c": "process-steps-preview-preview-vs-retrieve.html"
   },
   {
-    "Id": "a0oEc0000058bHHIAY",
+    "Id": "a0oEc000005Joj1IAC",
+    "Name": "DSPFAQ-1417",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Input",
+    "SeqNo__c": null,
     "Question__c": "What does Input do?",
-    "Answer__c": "process-steps-input-input-action.html",
-    "Category__c": "Process Steps",
-    "SubCategory__c": null
+    "Answer__c": "process-steps-input-input-action.html"
   },
   {
-    "Id": "a0oEc0000058bHIIAY",
+    "Id": "a0oEc000005Joj2IAC",
+    "Name": "DSPFAQ-1418",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Input",
+    "SeqNo__c": null,
     "Question__c": "How do I define an input data profile in Data Loader?",
-    "Answer__c": "process-steps-input-define-input-data-profile.html",
-    "Category__c": "Process Steps",
-    "SubCategory__c": null
+    "Answer__c": "process-steps-input-define-input-data-profile.html"
   },
   {
-    "Id": "a0oEc0000058bHJIAY",
+    "Id": "a0oEc000005Joj3IAC",
+    "Name": "DSPFAQ-1419",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Input",
+    "SeqNo__c": null,
     "Question__c": "What are the formatting requirements for column names in Data Loader?",
-    "Answer__c": "process-steps-input-data-loader-column-format.html",
-    "Category__c": "Process Steps",
-    "SubCategory__c": null
+    "Answer__c": "process-steps-input-data-loader-column-format.html"
   },
   {
-    "Id": "a0oEc0000058bHKIAY",
+    "Id": "a0oEc000005Joj4IAC",
+    "Name": "DSPFAQ-1420",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Input",
+    "SeqNo__c": null,
     "Question__c": "What is the purpose of the 'Input Data Key Field'?",
-    "Answer__c": "process-steps-input-input-data-key-field.html",
-    "Category__c": "Process Steps",
-    "SubCategory__c": null
+    "Answer__c": "process-steps-input-input-data-key-field.html"
   },
   {
-    "Id": "a0oEc0000058bHLIAY",
+    "Id": "a0oEc000005Joj5IAC",
+    "Name": "DSPFAQ-1421",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Scoping",
+    "SeqNo__c": null,
     "Question__c": "What does Scoping do?",
-    "Answer__c": "process-steps-scoping-scoping-action.html",
-    "Category__c": "Process Steps",
-    "SubCategory__c": null
+    "Answer__c": "process-steps-scoping-scoping-action.html"
   },
   {
-    "Id": "a0oEc0000058bHMIAY",
+    "Id": "a0oEc000005Joj6IAC",
+    "Name": "DSPFAQ-1422",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Scoping",
+    "SeqNo__c": null,
     "Question__c": "What is a Scope Filter?",
-    "Answer__c": "process-steps-scoping-scope-filter.html",
-    "Category__c": "Process Steps",
-    "SubCategory__c": null
+    "Answer__c": "process-steps-scoping-scope-filter.html"
   },
   {
-    "Id": "a0oEc0000058bHNIAY",
+    "Id": "a0oEc000005Joj7IAC",
+    "Name": "DSPFAQ-1423",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Scoping",
+    "SeqNo__c": null,
     "Question__c": "How can I avoid duplicate source records based on specific conditions?",
-    "Answer__c": "process-steps-scoping-avoid-duplicate-source.html",
-    "Category__c": "Process Steps",
-    "SubCategory__c": null
+    "Answer__c": "process-steps-scoping-avoid-duplicate-source.html"
   },
   {
-    "Id": "a0oEc0000058bHOIAY",
+    "Id": "a0oEc000005Joj8IAC",
+    "Name": "DSPFAQ-1424",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Scoping",
+    "SeqNo__c": null,
     "Question__c": "How can I join the source data with an additional data set?",
-    "Answer__c": "process-steps-scoping-join-source-data.html",
-    "Category__c": "Process Steps",
-    "SubCategory__c": null
+    "Answer__c": "process-steps-scoping-join-source-data.html"
   },
   {
-    "Id": "a0oEc0000058bHPIAY",
+    "Id": "a0oEc000005Joj9IAC",
+    "Name": "DSPFAQ-1425",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Match",
+    "SeqNo__c": null,
     "Question__c": "What does Match do?",
-    "Answer__c": "process-steps-match-match-action.html",
-    "Category__c": "Process Steps",
-    "SubCategory__c": null
+    "Answer__c": "process-steps-match-match-action.html"
   },
   {
-    "Id": "a0oEc0000058bHQIAY",
+    "Id": "a0oEc000005JojAIAS",
+    "Name": "DSPFAQ-1426",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Match",
+    "SeqNo__c": null,
     "Question__c": "What happens if a source record matches multiple target records in the Update process?",
-    "Answer__c": "process-steps-match-multiple-target-records.html",
-    "Category__c": "Process Steps",
-    "SubCategory__c": null
+    "Answer__c": "process-steps-match-multiple-target-records.html"
   },
   {
-    "Id": "a0oEc0000058bHRIAY",
+    "Id": "a0oEc000005JojBIAS",
+    "Name": "DSPFAQ-1427",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Match",
+    "SeqNo__c": null,
     "Question__c": "In the Insert process, what happens if a source record matches existing target records?",
-    "Answer__c": "process-steps-match-insert-duplicate-check.html",
-    "Category__c": "Process Steps",
-    "SubCategory__c": null
+    "Answer__c": "process-steps-match-insert-duplicate-check.html"
   },
   {
-    "Id": "a0oEc0000058bHSIAY",
+    "Id": "a0oEc000005JojCIAS",
+    "Name": "DSPFAQ-1428",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Match",
+    "SeqNo__c": null,
     "Question__c": "In an Upsert process, when \"Use Salesforce Upsert API\" is enabled, will the Match process be performed?",
-    "Answer__c": "process-steps-match-upsert-match-process.html",
-    "Category__c": "Process Steps",
-    "SubCategory__c": null
+    "Answer__c": "process-steps-match-upsert-match-process.html"
   },
   {
-    "Id": "a0oEc0000058bHTIAY",
+    "Id": "a0oEc000005JojDIAS",
+    "Name": "DSPFAQ-1429",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Match",
+    "SeqNo__c": null,
     "Question__c": "How can I match with target records using multiple fields, such as in PermissionSetAssignment?",
-    "Answer__c": "process-steps-match-multi-field-match.html",
-    "Category__c": "Process Steps",
-    "SubCategory__c": null
+    "Answer__c": "process-steps-match-multi-field-match.html"
   },
   {
-    "Id": "a0oEc0000058bHUIAY",
+    "Id": "a0oEc000005JojEIAS",
+    "Name": "DSPFAQ-1430",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Match",
+    "SeqNo__c": null,
     "Question__c": "What happens if multiple source records match the same target record within a single transaction?",
-    "Answer__c": "process-steps-match-multiple-source-same-target.html",
-    "Category__c": "Process Steps",
-    "SubCategory__c": null
+    "Answer__c": "process-steps-match-multiple-source-same-target.html"
   },
   {
-    "Id": "a0oEc0000058bHVIAY",
+    "Id": "a0oEc000005JojFIAS",
+    "Name": "DSPFAQ-1431",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Match",
+    "SeqNo__c": null,
     "Question__c": "How does Match determine the principal(master) record in the Merge process?",
-    "Answer__c": "process-steps-match-match-merge-principal.html",
-    "Category__c": "Process Steps",
-    "SubCategory__c": null
+    "Answer__c": "process-steps-match-match-merge-principal.html"
   },
   {
-    "Id": "a0oEc0000058bHWIAY",
+    "Id": "a0oEc000005JojGIAS",
+    "Name": "DSPFAQ-1432",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Match",
+    "SeqNo__c": null,
     "Question__c": "Can I match target records based on a relational field?",
-    "Answer__c": "process-steps-match-relational-field-match.html",
-    "Category__c": "Process Steps",
-    "SubCategory__c": null
+    "Answer__c": "process-steps-match-relational-field-match.html"
   },
   {
-    "Id": "a0oEc0000058bHXIAY",
+    "Id": "a0oEc000005JojHIAS",
+    "Name": "DSPFAQ-1433",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Match",
+    "SeqNo__c": null,
     "Question__c": "What is the purpose of the 'Additional Target Matching Criteria' field?",
-    "Answer__c": "process-steps-match-additional-target-matching.html",
-    "Category__c": "Process Steps",
-    "SubCategory__c": null
+    "Answer__c": "process-steps-match-additional-target-matching.html"
   },
   {
-    "Id": "a0oEc0000058bHYIAY",
+    "Id": "a0oEc000005JojIIAS",
+    "Name": "DSPFAQ-1434",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Match",
+    "SeqNo__c": null,
     "Question__c": "What is the purpose of the 'Matched Records Sorting Components' field?",
-    "Answer__c": "process-steps-match-matched-records-sorting.html",
-    "Category__c": "Process Steps",
-    "SubCategory__c": null
+    "Answer__c": "process-steps-match-matched-records-sorting.html"
   },
   {
-    "Id": "a0oEc0000058bHZIAY",
+    "Id": "a0oEc000005JojJIAS",
+    "Name": "DSPFAQ-1435",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Mapping",
+    "SeqNo__c": null,
     "Question__c": "What does Mapping do?",
-    "Answer__c": "process-steps-mapping-mapping-action.html",
-    "Category__c": "Process Steps",
-    "SubCategory__c": null
+    "Answer__c": "process-steps-mapping-mapping-action.html"
   },
   {
-    "Id": "a0oEc0000058bHaIAI",
+    "Id": "a0oEc000005JojKIAS",
+    "Name": "DSPFAQ-1436",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Mapping",
+    "SeqNo__c": null,
     "Question__c": "How can I reference a field from a parent relationship of the source object in the Mapping?",
-    "Answer__c": "process-steps-mapping-mapping-parent-relationship.html",
-    "Category__c": "Process Steps",
-    "SubCategory__c": null
+    "Answer__c": "process-steps-mapping-mapping-parent-relationship.html"
   },
   {
-    "Id": "a0oEc0000058bHbIAI",
+    "Id": "a0oEc000005JojLIAS",
+    "Name": "DSPFAQ-1437",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Mapping",
+    "SeqNo__c": null,
     "Question__c": "How does DSP simplify managing data relationships?",
-    "Answer__c": "process-steps-mapping-dsp-relationship-management.html",
-    "Category__c": "Process Steps",
-    "SubCategory__c": null
+    "Answer__c": "process-steps-mapping-dsp-relationship-management.html"
   },
   {
-    "Id": "a0oEc0000058bHcIAI",
+    "Id": "a0oEc000005JojMIAS",
+    "Name": "DSPFAQ-1438",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Mapping",
+    "SeqNo__c": null,
     "Question__c": "How can I enforce the sequence of target field transformations when order is required?",
-    "Answer__c": "process-steps-mapping-sequence-of-transformations.html",
-    "Category__c": "Process Steps",
-    "SubCategory__c": null
+    "Answer__c": "process-steps-mapping-sequence-of-transformations.html"
   },
   {
-    "Id": "a0oEc0000058bHdIAI",
+    "Id": "a0oEc000005JojNIAS",
+    "Name": "DSPFAQ-1439",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Mapping",
+    "SeqNo__c": null,
     "Question__c": "What is the purpose of the 'Add Default' button?",
-    "Answer__c": "process-steps-mapping-add-default-button.html",
-    "Category__c": "Process Steps",
-    "SubCategory__c": null
+    "Answer__c": "process-steps-mapping-add-default-button.html"
   },
   {
-    "Id": "a0oEc0000058bHeIAI",
+    "Id": "a0oEc000005JojOIAS",
+    "Name": "DSPFAQ-1440",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Mapping",
+    "SeqNo__c": null,
     "Question__c": "What is the purpose of the 'Clear Mappings' button?",
-    "Answer__c": "process-steps-mapping-clear-mappings-button.html",
-    "Category__c": "Process Steps",
-    "SubCategory__c": null
+    "Answer__c": "process-steps-mapping-clear-mappings-button.html"
   },
   {
-    "Id": "a0oEc0000058bHfIAI",
+    "Id": "a0oEc000005JojPIAS",
+    "Name": "DSPFAQ-1441",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Mapping",
+    "SeqNo__c": null,
     "Question__c": "What is the purpose of the 'Unmapped Source Fields' button?",
-    "Answer__c": "process-steps-mapping-unmapped-source-fields-button.html",
-    "Category__c": "Process Steps",
-    "SubCategory__c": null
+    "Answer__c": "process-steps-mapping-unmapped-source-fields-button.html"
   },
   {
-    "Id": "a0oEc0000058bHgIAI",
+    "Id": "a0oEc000005JojQIAS",
+    "Name": "DSPFAQ-1442",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Mapping",
+    "SeqNo__c": null,
     "Question__c": "What is the purpose of the 'Refresh' button?",
-    "Answer__c": "process-steps-mapping-refresh-button.html",
-    "Category__c": "Process Steps",
-    "SubCategory__c": null
+    "Answer__c": "process-steps-mapping-refresh-button.html"
   },
   {
-    "Id": "a0oEc0000058bHhIAI",
+    "Id": "a0oEc000005JojRIAS",
+    "Name": "DSPFAQ-1443",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Mapping",
+    "SeqNo__c": null,
     "Question__c": "What is the purpose of the 'Save' button?",
-    "Answer__c": "process-steps-mapping-save-button.html",
-    "Category__c": "Process Steps",
-    "SubCategory__c": null
+    "Answer__c": "process-steps-mapping-save-button.html"
   },
   {
-    "Id": "a0oEc0000058bHiIAI",
+    "Id": "a0oEc000005JojSIAS",
+    "Name": "DSPFAQ-1444",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Action",
+    "SeqNo__c": null,
     "Question__c": "What does Action do?",
-    "Answer__c": "process-steps-action-action-phase.html",
-    "Category__c": "Process Steps",
-    "SubCategory__c": null
+    "Answer__c": "process-steps-action-action-phase.html"
   },
   {
-    "Id": "a0oEc0000058bHjIAI",
+    "Id": "a0oEc000005JojTIAS",
+    "Name": "DSPFAQ-1445",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Action",
+    "SeqNo__c": null,
     "Question__c": "Which actions are supported?",
-    "Answer__c": "process-steps-action-which-actions-supported.html",
-    "Category__c": "Process Steps",
-    "SubCategory__c": null
+    "Answer__c": "process-steps-action-which-actions-supported.html"
   },
   {
-    "Id": "a0oEc0000058bHkIAI",
+    "Id": "a0oEc000005JojUIAS",
+    "Name": "DSPFAQ-1446",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Action",
+    "SeqNo__c": null,
     "Question__c": "How can I avoid creating duplicate records if the target record already exists?",
-    "Answer__c": "process-steps-action-avoid-duplicates.html",
-    "Category__c": "Process Steps",
-    "SubCategory__c": null
+    "Answer__c": "process-steps-action-avoid-duplicates.html"
   },
   {
-    "Id": "a0oEc0000058bHlIAI",
+    "Id": "a0oEc000005JojVIAS",
+    "Name": "DSPFAQ-1447",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Action",
+    "SeqNo__c": null,
     "Question__c": "How can I implement delta update?",
-    "Answer__c": "process-steps-action-implement-delta-update.html",
-    "Category__c": "Process Steps",
-    "SubCategory__c": null
+    "Answer__c": "process-steps-action-implement-delta-update.html"
   },
   {
-    "Id": "a0oEc0000058bHmIAI",
+    "Id": "a0oEc000005JojWIAS",
+    "Name": "DSPFAQ-1448",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Action",
+    "SeqNo__c": null,
     "Question__c": "Can I skip a field update if the target field already has an existing value?",
-    "Answer__c": "process-steps-action-skip-update-if-exists.html",
-    "Category__c": "Process Steps",
-    "SubCategory__c": null
+    "Answer__c": "process-steps-action-skip-update-if-exists.html"
   },
   {
-    "Id": "a0oEc0000058bHnIAI",
+    "Id": "a0oEc000005JojXIAS",
+    "Name": "DSPFAQ-1449",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Action",
+    "SeqNo__c": null,
     "Question__c": "Can I skip a field update if the transformed value is blank?",
-    "Answer__c": "process-steps-action-skip-update-if-blank.html",
-    "Category__c": "Process Steps",
-    "SubCategory__c": null
+    "Answer__c": "process-steps-action-skip-update-if-blank.html"
   },
   {
-    "Id": "a0oEc0000058bHoIAI",
+    "Id": "a0oEc000005JojYIAS",
+    "Name": "DSPFAQ-1450",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Action",
+    "SeqNo__c": null,
     "Question__c": "What is the purpose of Source Object Writeback?",
-    "Answer__c": "process-steps-action-source-object-writeback.html",
-    "Category__c": "Process Steps",
-    "SubCategory__c": null
+    "Answer__c": "process-steps-action-source-object-writeback.html"
   },
   {
-    "Id": "a0oEc0000058bHpIAI",
+    "Id": "a0oEc000005JojZIAS",
+    "Name": "DSPFAQ-1451",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Action",
+    "SeqNo__c": null,
     "Question__c": "What is the purpose of the field 'Use Salesforce Upsert API'?",
-    "Answer__c": "process-steps-action-use-upsert-api-field.html",
-    "Category__c": "Process Steps",
-    "SubCategory__c": null
+    "Answer__c": "process-steps-action-use-upsert-api-field.html"
   },
   {
-    "Id": "a0oEc0000058bHqIAI",
+    "Id": "a0oEc000005JojaIAC",
+    "Name": "DSPFAQ-1452",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Action",
+    "SeqNo__c": null,
     "Question__c": "How does Action support Salesforce Big Objects?",
-    "Answer__c": "process-steps-action-action-big-objects.html",
-    "Category__c": "Process Steps",
-    "SubCategory__c": null
+    "Answer__c": "process-steps-action-action-big-objects.html"
   },
   {
-    "Id": "a0oEc0000058bHrIAI",
+    "Id": "a0oEc000005JojbIAC",
+    "Name": "DSPFAQ-1453",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Action",
+    "SeqNo__c": null,
     "Question__c": "How does Action support Platform Events?",
-    "Answer__c": "process-steps-action-action-platform-events.html",
-    "Category__c": "Process Steps",
-    "SubCategory__c": null
+    "Answer__c": "process-steps-action-action-platform-events.html"
   },
   {
-    "Id": "a0oEc0000058bHsIAI",
+    "Id": "a0oEc000005JojcIAC",
+    "Name": "DSPFAQ-1454",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Verify",
+    "SeqNo__c": null,
     "Question__c": "What does Verify do?",
-    "Answer__c": "process-steps-verify-verify-phase.html",
-    "Category__c": "Process Steps",
-    "SubCategory__c": null
+    "Answer__c": "process-steps-verify-verify-phase.html"
   },
   {
-    "Id": "a0oEc0000058bHtIAI",
+    "Id": "a0oEc000005JojdIAC",
+    "Name": "DSPFAQ-1455",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Verify",
+    "SeqNo__c": null,
     "Question__c": "Does Verify apply only to the Batch rules engine?",
-    "Answer__c": "process-steps-verify-verify-batch-only.html",
-    "Category__c": "Process Steps",
-    "SubCategory__c": null
+    "Answer__c": "process-steps-verify-verify-batch-only.html"
   },
   {
-    "Id": "a0oEc0000058bHuIAI",
+    "Id": "a0oEc000005JojeIAC",
+    "Name": "DSPFAQ-1456",
+    "Category__c": "Process Steps",
+    "SubCategory__c": "Verify",
+    "SeqNo__c": null,
     "Question__c": "What are the considerations when using Verify with 'Action to Bulk API' enabled?",
-    "Answer__c": "process-steps-verify-verify-with-bulk-api.html",
-    "Category__c": "Process Steps",
-    "SubCategory__c": null
+    "Answer__c": "process-steps-verify-verify-with-bulk-api.html"
   },
   {
-    "Id": "a0oEc0000058bHvIAI",
+    "Id": "a0oEc000005JojfIAC",
+    "Name": "DSPFAQ-1457",
+    "Category__c": "Transformation",
+    "SubCategory__c": null,
+    "SeqNo__c": null,
     "Question__c": "Why is bulkified transformation essential for achieving simplicity and modularity?",
-    "Answer__c": "transformation-bulkified-transformation-essential.html",
-    "Category__c": "Transformation",
-    "SubCategory__c": null
+    "Answer__c": "transformation-bulkified-transformation-essential.html"
   },
   {
-    "Id": "a0oEc0000058bHwIAI",
+    "Id": "a0oEc000005JojgIAC",
+    "Name": "DSPFAQ-1458",
+    "Category__c": "Transformation",
+    "SubCategory__c": null,
+    "SeqNo__c": null,
     "Question__c": "What data types does DSP support in its formulas?",
-    "Answer__c": "transformation-formula-data-types.html",
-    "Category__c": "Transformation",
-    "SubCategory__c": null
+    "Answer__c": "transformation-formula-data-types.html"
   },
   {
-    "Id": "a0oEc0000058bHxIAI",
+    "Id": "a0oEc000005JojhIAC",
+    "Name": "DSPFAQ-1459",
+    "Category__c": "Transformation",
+    "SubCategory__c": null,
+    "SeqNo__c": null,
     "Question__c": "Where can I use formulas?",
-    "Answer__c": "transformation-formula-usage.html",
-    "Category__c": "Transformation",
-    "SubCategory__c": null
+    "Answer__c": "transformation-formula-usage.html"
   },
   {
-    "Id": "a0oEc0000058bHyIAI",
+    "Id": "a0oEc000005JojiIAC",
+    "Name": "DSPFAQ-1460",
+    "Category__c": "Transformation",
+    "SubCategory__c": null,
+    "SeqNo__c": null,
     "Question__c": "Can formulas be nested?",
-    "Answer__c": "transformation-nested-formulas.html",
-    "Category__c": "Transformation",
-    "SubCategory__c": null
+    "Answer__c": "transformation-nested-formulas.html"
   },
   {
-    "Id": "a0oEc0000058bHzIAI",
+    "Id": "a0oEc000005JojjIAC",
+    "Name": "DSPFAQ-1461",
+    "Category__c": "Transformation",
+    "SubCategory__c": null,
+    "SeqNo__c": null,
     "Question__c": "How does DSP simplify managing data relationships?",
-    "Answer__c": "transformation-dsp-relationship-management.html",
-    "Category__c": "Transformation",
-    "SubCategory__c": null
+    "Answer__c": "transformation-dsp-relationship-management.html"
   },
   {
-    "Id": "a0oEc0000058bI0IAI",
+    "Id": "a0oEc000005JojkIAC",
+    "Name": "DSPFAQ-1462",
+    "Category__c": "Transformation",
+    "SubCategory__c": null,
+    "SeqNo__c": null,
     "Question__c": "How does DSP optimize performance when using VLOOKUP or AGG functions?",
-    "Answer__c": "transformation-optimize-vlookup-agg.html",
-    "Category__c": "Transformation",
-    "SubCategory__c": null
+    "Answer__c": "transformation-optimize-vlookup-agg.html"
   },
   {
-    "Id": "a0oEc0000058bI1IAI",
+    "Id": "a0oEc000005JojlIAC",
+    "Name": "DSPFAQ-1463",
+    "Category__c": "Transformation",
+    "SubCategory__c": null,
+    "SeqNo__c": null,
     "Question__c": "How can I handle complex transformations that are not natively supported?",
-    "Answer__c": "transformation-handle-complex-transformations.html",
-    "Category__c": "Transformation",
-    "SubCategory__c": null
+    "Answer__c": "transformation-handle-complex-transformations.html"
   },
   {
-    "Id": "a0oEc0000058bI2IAI",
+    "Id": "a0oEc000005JojmIAC",
+    "Name": "DSPFAQ-1464",
+    "Category__c": "Transformation",
+    "SubCategory__c": null,
+    "SeqNo__c": null,
     "Question__c": "How do I define a reusable formula?",
-    "Answer__c": "transformation-define-reusable-formula.html",
-    "Category__c": "Transformation",
-    "SubCategory__c": null
+    "Answer__c": "transformation-define-reusable-formula.html"
   },
   {
-    "Id": "a0oEc0000058bI3IAI",
+    "Id": "a0oEc000005JojnIAC",
+    "Name": "DSPFAQ-1465",
+    "Category__c": "Transformation",
+    "SubCategory__c": null,
+    "SeqNo__c": null,
     "Question__c": "How can I join source data with another data set?",
-    "Answer__c": "transformation-join-source-data.html",
-    "Category__c": "Transformation",
-    "SubCategory__c": null
+    "Answer__c": "transformation-join-source-data.html"
   },
   {
-    "Id": "a0oEc0000058bI4IAI",
+    "Id": "a0oEc000005JojoIAC",
+    "Name": "DSPFAQ-1466",
+    "Category__c": "Transformation",
+    "SubCategory__c": null,
+    "SeqNo__c": null,
     "Question__c": "How can I perform data masking?",
-    "Answer__c": "transformation-perform-data-masking.html",
-    "Category__c": "Transformation",
-    "SubCategory__c": null
+    "Answer__c": "transformation-perform-data-masking.html"
   },
   {
-    "Id": "a0oEc0000058bI5IAI",
+    "Id": "a0oEc000005JojpIAC",
+    "Name": "DSPFAQ-1467",
+    "Category__c": "Transformation",
+    "SubCategory__c": null,
+    "SeqNo__c": null,
     "Question__c": "How can I skip a target field if the evaluated value is blank?",
-    "Answer__c": "transformation-skip-field-if-blank.html",
-    "Category__c": "Transformation",
-    "SubCategory__c": null
+    "Answer__c": "transformation-skip-field-if-blank.html"
   },
   {
-    "Id": "a0oEc0000058bI6IAI",
+    "Id": "a0oEc000005JojqIAC",
+    "Name": "DSPFAQ-1468",
+    "Category__c": "Transformation",
+    "SubCategory__c": null,
+    "SeqNo__c": null,
     "Question__c": "How can I eliminate duplicate source records from the processing?",
-    "Answer__c": "transformation-eliminate-duplicate-source.html",
-    "Category__c": "Transformation",
-    "SubCategory__c": null
+    "Answer__c": "transformation-eliminate-duplicate-source.html"
   },
   {
-    "Id": "a0oEc0000058bI7IAI",
+    "Id": "a0oEc000005JojrIAC",
+    "Name": "DSPFAQ-1469",
+    "Category__c": "Transformation",
+    "SubCategory__c": null,
+    "SeqNo__c": null,
     "Question__c": "How can I evaluate DSP expressions inside Apex code?",
-    "Answer__c": "transformation-evaluate-expressions-apex.html",
-    "Category__c": "Transformation",
-    "SubCategory__c": null
+    "Answer__c": "transformation-evaluate-expressions-apex.html"
   },
   {
-    "Id": "a0oEc0000058bI8IAI",
+    "Id": "a0oEc000005JojsIAC",
+    "Name": "DSPFAQ-1470",
+    "Category__c": "Transformation",
+    "SubCategory__c": null,
+    "SeqNo__c": null,
     "Question__c": "How can I format a string dynamically using DSP expressions and formulas?",
-    "Answer__c": "transformation-dynamic-string-format.html",
-    "Category__c": "Transformation",
-    "SubCategory__c": null
+    "Answer__c": "transformation-dynamic-string-format.html"
   },
   {
-    "Id": "a0oEc0000058bI9IAI",
+    "Id": "a0oEc000005JojtIAC",
+    "Name": "DSPFAQ-1471",
+    "Category__c": "Query Manager(Q)",
+    "SubCategory__c": null,
+    "SeqNo__c": null,
     "Question__c": "What is Query Manager (Q)?",
-    "Answer__c": "query-managerq-what-is-query-manager.html",
-    "Category__c": "Query Manager(Q)",
-    "SubCategory__c": null
+    "Answer__c": "query-managerq-what-is-query-manager.html"
   },
   {
-    "Id": "a0oEc0000058bIAIAY",
+    "Id": "a0oEc000005JojuIAC",
+    "Name": "DSPFAQ-1472",
+    "Category__c": "Query Manager(Q)",
+    "SubCategory__c": null,
+    "SeqNo__c": null,
     "Question__c": "Who can access Q?",
-    "Answer__c": "query-managerq-who-can-access-q.html",
-    "Category__c": "Query Manager(Q)",
-    "SubCategory__c": null
+    "Answer__c": "query-managerq-who-can-access-q.html"
   },
   {
-    "Id": "a0oEc0000058bIBIAY",
+    "Id": "a0oEc000005JojvIAC",
+    "Name": "DSPFAQ-1473",
+    "Category__c": "Query Manager(Q)",
+    "SubCategory__c": null,
+    "SeqNo__c": null,
     "Question__c": "How can I construct a query with the Query Builder?",
-    "Answer__c": "query-managerq-query-builder-construction.html",
-    "Category__c": "Query Manager(Q)",
-    "SubCategory__c": null
+    "Answer__c": "query-managerq-query-builder-construction.html"
   },
   {
-    "Id": "a0oEc0000058bICIAY",
+    "Id": "a0oEc000005JojwIAC",
+    "Name": "DSPFAQ-1474",
+    "Category__c": "Query Manager(Q)",
+    "SubCategory__c": null,
+    "SeqNo__c": null,
     "Question__c": "What happens when you execute a query?",
-    "Answer__c": "query-managerq-query-execution-result.html",
-    "Category__c": "Query Manager(Q)",
-    "SubCategory__c": null
+    "Answer__c": "query-managerq-query-execution-result.html"
   },
   {
-    "Id": "a0oEc0000058bIDIAY",
+    "Id": "a0oEc000005JojxIAC",
+    "Name": "DSPFAQ-1475",
+    "Category__c": "Query Manager(Q)",
+    "SubCategory__c": null,
+    "SeqNo__c": null,
     "Question__c": "What is a Column Filter?",
-    "Answer__c": "query-managerq-column-filter.html",
-    "Category__c": "Query Manager(Q)",
-    "SubCategory__c": null
+    "Answer__c": "query-managerq-column-filter.html"
   },
   {
-    "Id": "a0oEc0000058bIEIAY",
+    "Id": "a0oEc000005JojyIAC",
+    "Name": "DSPFAQ-1476",
+    "Category__c": "Query Manager(Q)",
+    "SubCategory__c": null,
+    "SeqNo__c": null,
     "Question__c": "How does a dynamic filter work?",
-    "Answer__c": "query-managerq-dynamic-filter.html",
-    "Category__c": "Query Manager(Q)",
-    "SubCategory__c": null
+    "Answer__c": "query-managerq-dynamic-filter.html"
   },
   {
-    "Id": "a0oEc0000058bIFIAY",
+    "Id": "a0oEc000005JojzIAC",
+    "Name": "DSPFAQ-1477",
+    "Category__c": "Query Manager(Q)",
+    "SubCategory__c": null,
+    "SeqNo__c": null,
     "Question__c": "How can I query the Owner relationship when the Owner field is polymorphic?",
-    "Answer__c": "query-managerq-query-owner-polymorphic.html",
-    "Category__c": "Query Manager(Q)",
-    "SubCategory__c": null
+    "Answer__c": "query-managerq-query-owner-polymorphic.html"
   },
   {
-    "Id": "a0oEc0000058bIGIAY",
+    "Id": "a0oEc000005Jok0IAC",
+    "Name": "DSPFAQ-1478",
+    "Category__c": "Query Manager(Q)",
+    "SubCategory__c": null,
+    "SeqNo__c": null,
     "Question__c": "How can I query data from a remote Salesforce org?",
-    "Answer__c": "query-managerq-query-remote-org.html",
-    "Category__c": "Query Manager(Q)",
-    "SubCategory__c": null
+    "Answer__c": "query-managerq-query-remote-org.html"
   },
   {
-    "Id": "a0oEc0000058bIHIAY",
+    "Id": "a0oEc000005Jok1IAC",
+    "Name": "DSPFAQ-1479",
+    "Category__c": "Query Manager(Q)",
+    "SubCategory__c": null,
+    "SeqNo__c": null,
     "Question__c": "Can I include deleted records from the Recycle Bin in my query?",
-    "Answer__c": "query-managerq-include-deleted-records.html",
-    "Category__c": "Query Manager(Q)",
-    "SubCategory__c": null
+    "Answer__c": "query-managerq-include-deleted-records.html"
   },
   {
-    "Id": "a0oEc0000058bIIIAY",
+    "Id": "a0oEc000005Jok2IAC",
+    "Name": "DSPFAQ-1480",
+    "Category__c": "Query Manager(Q)",
+    "SubCategory__c": null,
+    "SeqNo__c": null,
     "Question__c": "Can I use Q to restore deleted records from the Recycle Bin?",
-    "Answer__c": "query-managerq-restore-deleted-records.html",
-    "Category__c": "Query Manager(Q)",
-    "SubCategory__c": null
+    "Answer__c": "query-managerq-restore-deleted-records.html"
   },
   {
-    "Id": "a0oEc0000058bIJIAY",
+    "Id": "a0oEc000005Jok3IAC",
+    "Name": "DSPFAQ-1481",
+    "Category__c": "Query Manager(Q)",
+    "SubCategory__c": null,
+    "SeqNo__c": null,
     "Question__c": "How do hyperlinks work in query results?",
-    "Answer__c": "query-managerq-hyperlinks-query-results.html",
-    "Category__c": "Query Manager(Q)",
-    "SubCategory__c": null
+    "Answer__c": "query-managerq-hyperlinks-query-results.html"
   },
   {
-    "Id": "a0oEc0000058bIKIAY",
+    "Id": "a0oEc000005Jok4IAC",
+    "Name": "DSPFAQ-1482",
+    "Category__c": "Query Manager(Q)",
+    "SubCategory__c": null,
+    "SeqNo__c": null,
     "Question__c": "Is pagination handled on the server-side or client-side?",
-    "Answer__c": "query-managerq-pagination-handling.html",
-    "Category__c": "Query Manager(Q)",
-    "SubCategory__c": null
+    "Answer__c": "query-managerq-pagination-handling.html"
   },
   {
-    "Id": "a0oEc0000058bILIAY",
+    "Id": "a0oEc000005Jok5IAC",
+    "Name": "DSPFAQ-1483",
+    "Category__c": "Query Manager(Q)",
+    "SubCategory__c": null,
+    "SeqNo__c": null,
     "Question__c": "Does Q support the Tooling API?",
-    "Answer__c": "query-managerq-q-tooling-api.html",
-    "Category__c": "Query Manager(Q)",
-    "SubCategory__c": null
+    "Answer__c": "query-managerq-q-tooling-api.html"
   },
   {
-    "Id": "a0oEc0000058bIMIAY",
+    "Id": "a0oEc000005Jok6IAC",
+    "Name": "DSPFAQ-1484",
+    "Category__c": "Query Manager(Q)",
+    "SubCategory__c": null,
+    "SeqNo__c": null,
     "Question__c": "How can I manage my queries?",
-    "Answer__c": "query-managerq-manage-queries.html",
-    "Category__c": "Query Manager(Q)",
-    "SubCategory__c": null
+    "Answer__c": "query-managerq-manage-queries.html"
   },
   {
-    "Id": "a0oEc0000058bINIAY",
-    "Question__c": "How can I integrate the Q into Salesforce Lightning pages?",
-    "Answer__c": "query-managerq-integrate-q-lightning.html",
+    "Id": "a0oEc000005Jok7IAC",
+    "Name": "DSPFAQ-1485",
     "Category__c": "Query Manager(Q)",
-    "SubCategory__c": null
+    "SubCategory__c": null,
+    "SeqNo__c": null,
+    "Question__c": "How can I integrate the Q into Salesforce Lightning pages?",
+    "Answer__c": "query-managerq-integrate-q-lightning.html"
   }
 ]
