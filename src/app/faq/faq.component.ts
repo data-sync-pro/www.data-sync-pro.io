@@ -11,7 +11,7 @@ interface SourceFAQRecord {
   Answer__c: string | null;
   Category__c: string;
   SubCategory__c: string | null;
-  SeqNo__c?: string;
+  SeqNo__c?: string | null;
 }
 
 interface FAQItem {
