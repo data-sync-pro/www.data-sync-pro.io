@@ -38,6 +38,7 @@ interface FaqItem {
 export class SearchOverlayComponent implements OnInit, OnChanges {
   @Input() isOpen = false;
   @Output() closed = new EventEmitter<void>();
+  @Output() selectedResult = new EventEmitter<FaqItem>(); 
   @ViewChild('searchInput') searchInputRef!: ElementRef<HTMLInputElement>;
 
   searchQuery = '';
@@ -75,7 +76,7 @@ export class SearchOverlayComponent implements OnInit, OnChanges {
   }
 
   onSelectSuggestion(item: FaqItem) {
-    this.router.navigate(['/docs', item.route]);
+    this.selectedResult.emit(item); 
     this.close();
   }
 

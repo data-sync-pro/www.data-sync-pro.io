@@ -137,21 +137,21 @@
     "Question__c": "What permissions are required to execute a Batch?",
     "Answer__c": "rules-engines-batch-batch-permissions-needed.html",
     "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "SubCategory__c": "test1"
   },
   {
     "Id": "a0oEc0000058bFxIAI",
     "Question__c": "What is the maximum dataset size that a DSP batch job can process?",
     "Answer__c": "rules-engines-batch-batch-max-dataset.html",
     "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "SubCategory__c": "test2"
   },
   {
     "Id": "a0oEc0000058bFyIAI",
     "Question__c": "What is the maximum batch size that can be set?",
     "Answer__c": "rules-engines-batch-batch-max-size.html",
     "Category__c": "Rules Engines",
-    "SubCategory__c": null
+    "SubCategory__c": "test3"
   },
   {
     "Id": "a0oEc0000058bFzIAI",

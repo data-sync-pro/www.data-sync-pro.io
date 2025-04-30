@@ -11,14 +11,7 @@
         id="faqSearchInput"
         type="text"
         placeholder="Search FAQs..."
-        [(ngModel)]="searchQuery"
         (focus)="openSearchOverlay()"
-        (blur)="onSearchBlur()"
-        (input)="onSearchInputChange()"
-        (keydown)="onSearchKeyDown($event)"
-        aria-autocomplete="list"
-        aria-controls="faq-suggestions"
-        [attr.aria-expanded]="showSuggestions"
         role="combobox"
       />
 
@@ -27,26 +20,10 @@
         (click)="isSearchOpen = true"
         >/</span>
     </div>
-    <ul
-      class="suggestions-list"
-      *ngIf="showSuggestions"
-      role="listbox"
-      id="faq-suggestions"
-    >
-      <li
-        *ngFor="let suggestion of suggestions; let i = index"
-        (click)="onSuggestionClick(suggestion)"
-        [class.highlighted]="i === selectedSuggestionIndex"
-        [attr.aria-selected]="i === selectedSuggestionIndex"
-        role="option"
-      >
-        {{ suggestion }}
-      </li>
-    </ul>
   </div>
 
   <div class="faq-layout">
-    <aside class="faq-sidebar">
+    <!-- <aside class="faq-sidebar">
       <h3 class="sidebar-title">Categories</h3>
       <ul class="category-list">
         <li
@@ -83,7 +60,7 @@
           </li>
         </ul>
       </div>
-    </aside>
+    </aside> -->
 
     <main class="faq-main">
       <nav class="breadcrumb" *ngIf="currentCategory || currentSubCategory">
@@ -138,10 +115,12 @@
         No FAQs found. Try a different search or reset the filters.
       </div>
     </main>
-    <app-search-overlay
+    
+  </div>
+  <app-search-overlay
       *ngIf="isSearchOpen"
       [isOpen]="isSearchOpen"
       (closed)="isSearchOpen = false"
+      (selectedResult)="handleSearchSelect($event)" 
     ></app-search-overlay>
-  </div>
 </div>

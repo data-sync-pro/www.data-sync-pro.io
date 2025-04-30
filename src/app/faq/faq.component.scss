@@ -1,5 +1,5 @@
 .faq-container {
-  width: 90%;
+  width: 70vw;
   margin: 0 auto;
   padding: 20px;
   margin-top: 80px;
@@ -18,7 +18,8 @@
     position: relative;
     .search-wrapper {
       position: relative;
-      width: 19.7vw;
+      width: 45vw;
+      justify-self: center;
 
       input {
         width: 100%;

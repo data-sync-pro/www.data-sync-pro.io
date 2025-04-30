@@ -1,4 +1,6 @@
 import { Component, ViewChild, ElementRef, HostListener, OnInit } from '@angular/core';
+import { MatExpansionPanel } from '@angular/material/expansion';
+import { ViewChildren, QueryList } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import faqData from '../../assets/data/faqs.json';
 import { AnalyticsService } from '../analytics.service';
@@ -149,83 +151,12 @@ export class FaqComponent implements OnInit {
     this.searchFocused = false;
   }
 
-  onSearchInputChange(): void {
-    this.updateSuggestions();
-    const hasQuery = this.searchQuery.trim().length > 0;
-    this.showSuggestions = hasQuery && this.suggestions.length > 0;
-    this.selectedSuggestionIndex = -1;
-  }
-
-  private updateSuggestions(): void {
-    const q = this.searchQuery.toLowerCase().trim();
-    if (!q) {
-      this.suggestions = [];
-      return;
-    }
-    const matchedQuestions = this.faqList
-      .map(item => item.question)
-      .filter(question => question.toLowerCase().includes(q));
-
-    const unique = Array.from(new Set(matchedQuestions));
-    this.suggestions = unique.slice(0, 10);
-  }
-
-  onSearchKeyDown(event: KeyboardEvent): void {
-    if (!this.showSuggestions || this.suggestions.length === 0) return;
-    switch (event.key) {
-      case 'ArrowDown':
-        event.preventDefault();
-        if (this.selectedSuggestionIndex < this.suggestions.length - 1) {
-          this.selectedSuggestionIndex++;
-        }
-        break;
-      case 'ArrowUp':
-        event.preventDefault();
-        if (this.selectedSuggestionIndex > 0) {
-          this.selectedSuggestionIndex--;
-        }
-        break;
-      case 'Enter':
-        if (this.selectedSuggestionIndex >= 0) {
-          this.searchQuery = this.suggestions[this.selectedSuggestionIndex];
-          this.onSearchInputChange();
-        }
-        this.showSuggestions = false;
-        break;
-      case 'Escape':
-        this.showSuggestions = false;
-        break;
-      default:
-        break;
-    }
-  }
-
-  onSuggestionClick(suggestion: string): void {
-    this.searchQuery = suggestion;
-    this.onSearchInputChange();
-    this.showSuggestions = false;
-  }
-
-  onClearMouseDown(event: MouseEvent, inputEl: HTMLInputElement): void {
-    event.preventDefault();
-    this.clearSearch();
-    setTimeout(() => {
-      inputEl.focus();
-    }, 0);
-  }
-
-  clearSearch(): void {
-    this.searchQuery = '';
-    this.onSearchInputChange();
-  }
-
   public FaqComponentRegistry = FaqComponentRegistry;
   toRegistryKey(answer: string): string {
     return answer.replace(/\.html$/, '').toLowerCase();
   }
   openSearchOverlay() {
     this.isSearchOpen = true;
-    console.log('openSearchOverlay');
   }
   
 
@@ -250,5 +181,24 @@ export class FaqComponent implements OnInit {
     this.faqSearchBox.nativeElement.focus();      
     this.searchFocused = true;      
     this.showSuggestions = !!this.searchQuery.trim();      
+  }
+
+  @ViewChildren(MatExpansionPanel) panels!: QueryList<MatExpansionPanel>;
+  @ViewChildren(MatExpansionPanel, { read: ElementRef })
+  panelEls!: QueryList<ElementRef<HTMLElement>>;
+
+  handleSearchSelect(item: { question: string; category: string; subCategory: string | null }) {
+    this.currentCategory    = item.category;
+    this.currentSubCategory = item.subCategory ?? '';
+    this.isSearchOpen = false;
+
+    setTimeout(() => {
+      const idx = this.filteredFAQ.findIndex(f => f.question === item.question);
+      if (idx >= 0) {
+        this.panels.toArray()[idx].open();
+        this.panelEls.toArray()[idx].nativeElement
+            .scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
   }
 }
