@@ -1,55 +1,29 @@
 <div class="faq-container">
   <div class="faq-search">
-    <label class="visually-hidden" for="faqSearchInput">
-      Search FAQs
-    </label>
+    <div class="search-shortcut-wrapper">
+
+    <label class="visually-hidden" for="faqSearchInput"> Search FAQs </label>
+    
+    </div>
     <div class="search-wrapper">
       <input
         #faqSearchBox
         id="faqSearchInput"
         type="text"
         placeholder="Search FAQs..."
-        [(ngModel)]="searchQuery"
-        (focus)="searchFocused = true"
-        (blur)="onSearchBlur()"
-        (input)="onSearchInputChange()"
-        (keydown)="onSearchKeyDown($event)"
-        aria-autocomplete="list"
-        aria-controls="faq-suggestions"
-        [attr.aria-expanded]="showSuggestions"
+        (focus)="openSearchOverlay()"
         role="combobox"
       />
 
       <span
-        class="clear-tooltip"
-        *ngIf="searchQuery && searchFocused"
-        (mousedown)="onClearMouseDown($event, faqSearchBox)"
-        aria-label="Clear search"
-      >
-        Clear
-      </span>
+        class="shortcut-hint shortcut-clickable"
+        (click)="isSearchOpen = true"
+        >/</span>
     </div>
-    <ul
-      class="suggestions-list"
-      *ngIf="showSuggestions"
-      role="listbox"
-      id="faq-suggestions"
-    >
-      <li
-        *ngFor="let suggestion of suggestions; let i = index"
-        (click)="onSuggestionClick(suggestion)"
-        [class.highlighted]="i === selectedSuggestionIndex"
-        [attr.aria-selected]="i === selectedSuggestionIndex"
-        role="option"
-      >
-        {{ suggestion }}
-      </li>
-    </ul>
   </div>
 
   <div class="faq-layout">
-    
-    <aside class="faq-sidebar">
+    <!-- <aside class="faq-sidebar">
       <h3 class="sidebar-title">Categories</h3>
       <ul class="category-list">
         <li
@@ -86,7 +60,7 @@
           </li>
         </ul>
       </div>
-    </aside>
+    </aside> -->
 
     <main class="faq-main">
       <nav class="breadcrumb" *ngIf="currentCategory || currentSubCategory">
@@ -134,14 +108,19 @@
               FaqComponentRegistry[toRegistryKey(item.answer)]
             "
           ></ng-container>
-
         </mat-expansion-panel>
       </mat-accordion>
-      
+
       <div class="no-results" *ngIf="filteredFAQ.length === 0">
         No FAQs found. Try a different search or reset the filters.
       </div>
     </main>
-
+    
   </div>
-</div> 
+  <app-search-overlay
+      *ngIf="isSearchOpen"
+      [isOpen]="isSearchOpen"
+      (closed)="isSearchOpen = false"
+      (selectedResult)="handleSearchSelect($event)" 
+    ></app-search-overlay>
+</div>

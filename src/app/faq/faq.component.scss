@@ -1,5 +1,5 @@
 .faq-container {
-  width: 90%;
+  width: 70vw;
   margin: 0 auto;
   padding: 20px;
   margin-top: 80px;
@@ -9,7 +9,7 @@
     height: 1px;
     width: 1px;
     overflow: hidden;
-    clip: rect(1px,1px,1px,1px);
+    clip: rect(1px, 1px, 1px, 1px);
     white-space: nowrap;
   }
 
@@ -18,35 +18,30 @@
     position: relative;
     .search-wrapper {
       position: relative;
-      display: inline-block;
-      width: 19.7vw;
+      width: 45vw;
+      justify-self: center;
 
       input {
         width: 100%;
-        padding: 10px 12px;
+        padding-left: 12px;
+        padding-right: 0px;
+        padding-top: 10px;
+        padding-bottom: 10px;
         font-size: 1rem;
         border: 1px solid #ccc;
         border-radius: 4px;
       }
 
-      .clear-tooltip {
+      .shortcut-hint {
         position: absolute;
+        right: 0px;
         top: 50%;
-        right: 12px;
         transform: translateY(-50%);
+        background-color: #eee;
         font-size: 0.9rem;
-        color: #999;
-        background-color: #fff;
         padding: 2px 6px;
-        border: 1px solid #ccc;
         border-radius: 4px;
-        cursor: pointer;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-
-        &:hover {
-          color: #666;
-          background-color: #f1f1f1;
-        }
+        color: #555;
       }
     }
 
@@ -65,7 +60,7 @@
       border-radius: 0 0 4px 4px;
       max-height: 200px;
       overflow-y: auto;
-      width: calc(30vw + 22px); 
+      width: calc(30vw + 22px);
       li {
         padding: 10px 12px;
         cursor: pointer;
@@ -82,7 +77,7 @@
   /* ------------------ LAYOUT ------------------ */
   .faq-layout {
     display: flex;
-    gap: 20px; 
+    gap: 20px;
 
     .faq-sidebar {
       width: 20vw;
@@ -96,7 +91,8 @@
         margin-bottom: 8px;
       }
 
-      .category-list, .subcategory-list {
+      .category-list,
+      .subcategory-list {
         list-style: none;
         padding: 0;
         margin: 0;
@@ -153,11 +149,11 @@
         mat-expansion-panel {
           margin-bottom: 10px;
           border-radius: 4px;
-          box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 
           .faq-title {
             font-weight: 500;
-            font-size:larger;
+            font-size: larger;
           }
         }
       }
