@@ -51,7 +51,7 @@ export class FaqComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    const data = faqData as SourceFAQRecord[];
+    const data = faqData as unknown as SourceFAQRecord[];
 
     data.forEach(record => {
       const cat = record.Category__c;
