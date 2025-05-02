@@ -1,1 +1,13 @@
-@use '../../../../styles/faq-common.scss'
+@use "../../../../styles/faq-common.scss";
+
+h3 {
+  padding-left: 15px;
+  padding-right: 15px;
+  font-size: 16px;
+}
+h3 + p {
+  padding-left: 35px;
+  padding-right: 35px;
+  padding-bottom: 35px;
+}
+

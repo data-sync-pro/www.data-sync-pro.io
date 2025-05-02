@@ -4,15 +4,24 @@ body {
 }
 
 article {
-    background-color: #fff;
+    background-color:#f9f9f92d;
+    margin-top: 20px;
+    padding-left: 50px;
+    padding-right: 50px;
+    margin-bottom: 20px;
 }
 
 p {
     color: #333;
+    line-height: 30px;
+    margin-bottom: 0px;
+    font-size: 16px;
 }
 
-ul {
-    padding-left: 1.2em;
+ul, li {
+    margin-left: 15px;
+    line-height: 30px;
+    font-size: 16px;
 }
 
 h3 {
