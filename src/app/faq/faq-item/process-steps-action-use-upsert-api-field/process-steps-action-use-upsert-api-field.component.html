@@ -4,7 +4,7 @@
       whether DSP should leverage Salesforce’s native <strong>Upsert API</strong> 
       when performing upsert actions.
     </p>
-    <h3>### <strong>Key Purposes:</strong></h3>
+    <h3><strong>Key Purposes:</strong></h3>
     <ol>
       <li>
         1️⃣ <strong>External ID Matching</strong> – If enabled, DSP requires the 
@@ -24,14 +24,19 @@
         specified External ID.
       </li>
     </ol>
-    <p>
-      <strong>### Considerations:</strong><br />
-      &bull; <em>Cannot Use Skip Record Update if No Changes</em> – Since DSP does 
-      <strong>not</strong> perform its own Match step when using the Upsert API, 
-      it cannot check if the target record already contains the same values before 
-      updating.<br />
-      &bull; <em>External ID Requirement</em> – The 
-      <strong>Target Matching Field</strong> must be an External ID field.
-    </p>
+    <h3>Considerations</h3>
+    <ul>
+      <li>
+        <em>Skip Record Update if No Changes cannot be used</em> &mdash;
+        Because the Upsert API bypasses DSP’s own <strong>Match</strong> step, it
+        cannot verify whether the target record already holds identical values
+        before updating.
+      </li>
+      <li>
+        <em>External ID required</em> &mdash;
+        The <strong>Target Matching Field</strong> you supply must be an
+        External&nbsp;ID field.
+      </li>
+    </ul>
   </section>
   
