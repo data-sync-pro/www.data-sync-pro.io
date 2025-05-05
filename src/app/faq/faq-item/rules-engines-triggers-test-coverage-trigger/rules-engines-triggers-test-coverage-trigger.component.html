@@ -4,17 +4,20 @@
       covered by an Apex test class before deployment to production.
     </p>
     <p>
-      For triggers integrated with <strong>Data Sync Pro (DSP)</strong>, each 
+      For triggers integrated with Data Sync Pro (DSP), each 
       trigger contains a single line:
     </p>
-    ```apex
+    <br />
+    <code>
     pushtopics.TriggerServices.execute();
-    ```
+    </code>
+    <br /><br />
     <p>
       To satisfy this requirement, write an Apex test that performs a DML operation 
       (such as an insert or update) on the triggering object. This will invoke the 
       trigger and ensure the line is covered.
     </p>
+    <br />
     <p>
       If the object has complex automation or dependencies, consider writing 
       dedicated Apex test classes to ensure expected behavior is fully verified.

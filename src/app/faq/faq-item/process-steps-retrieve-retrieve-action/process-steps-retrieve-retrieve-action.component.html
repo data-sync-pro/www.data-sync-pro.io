@@ -1,18 +1,26 @@
 <section>
     <p>
-      **A:** The <strong>Retrieve</strong> step in Data Sync Pro (DSP) defines 
+      The <strong>Retrieve</strong> step in Data Sync Pro (DSP) defines 
       how source data is queried from a connected Salesforce org. It serves as 
       the entry point for record selection in both <strong>Batches</strong> and 
       <strong>Data Lists</strong>.
     </p>
-    <p>
-      - <strong>In Batches:</strong> Retrieve specifies the source records used 
+    
+      <ul>
+        <li>
+          <strong>In Batches:</strong> Retrieve specifies the source records used 
       during batch execution—similar to the data returned by the 
       <code>start()</code> method in Salesforce’s 
-      <code>Database.Batchable</code> interface.<br />
-      - <strong>In Data Lists:</strong> Retrieve defines the SOQL query used 
-      to display records to users in the UI.
-    </p>
+      <code>Database.Batchable</code> interface.
+        </li><br />
+        <li>
+          <strong>In Data Lists:</strong> Retrieve defines the SOQL query used 
+          to display records to users in the UI.
+        </li>
+      </ul>
+      
+     
+    
     <p>
       At runtime, DSP automatically fetches only the fields required by 
       downstream steps—<strong>Scoping, Match, and Mapping</strong>—based on 

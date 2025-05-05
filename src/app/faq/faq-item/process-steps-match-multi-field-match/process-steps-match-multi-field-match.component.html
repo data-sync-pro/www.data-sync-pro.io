@@ -1,26 +1,33 @@
 <section>
-    <p>
-      To match target records using multiple fields, use a <strong>`VLOOKUP`</strong> 
-      formula in the <strong>Target Matching Field</strong>. This allows you to 
-      locate the correct record based on multiple criteria.
-    </p>
-    <h3>### 🔍 <strong>Example:</strong></h3>
-    <pre><code>VLOOKUP("PermissionSetAssignment", "Id", 
+  <p>
+    To match target records using multiple fields, use a
+    <strong>`VLOOKUP`</strong> formula in the
+    <strong>Target Matching Field</strong>. This allows you to locate the
+    correct record based on multiple criteria.
+  </p>
+  <p><strong>Example:</strong></p>
+  <pre><code>VLOOKUP("PermissionSetAssignment", "Id", 
           "AssigneeId", Id, 
           "PermissionSet.Name", "DataSyncProStarter")
   </code></pre>
-    <p>
-      - <strong>Target Matching Field</strong>: <code>Id</code> (of 
-      <code>PermissionSetAssignment</code>)<br />
-      - <strong>Source Object</strong>: e.g., <code>User</code>, using the 
-      <code>Id</code> field<br />
-      - <strong>Matches on</strong>: <code>AssigneeId</code> (User Id) and 
+  <ul>
+    <li>
+      <strong>Target Matching Field</strong>: <code>Id</code> (of
+      <code>PermissionSetAssignment</code>)
+    </li>
+    <li>
+      <strong>Source Object</strong>: e.g., <code>User</code>, using the
+      <code>Id</code> field
+    </li>
+    <li>
+      <strong>Matches on</strong>: <code>AssigneeId</code> (User Id) and
       <code>PermissionSet.Name</code>
-    </p>
-    <p>
-      📌 If multiple matches are found, use the 
-      <strong>Principal Matched Record Selection Rule</strong> to control 
-      which record is selected.
-    </p>
-  </section>
-  
+    </li>
+  </ul>
+
+  <p>
+    📌 If multiple matches are found, use the
+    <strong>Principal Matched Record Selection Rule</strong> to control which
+    record is selected.
+  </p>
+</section>
