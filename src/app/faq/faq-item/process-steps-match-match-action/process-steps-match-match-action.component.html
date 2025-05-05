@@ -6,27 +6,44 @@
       Delete, and Undelete</strong> operations to ensure that records are 
       processed correctly.
     </p>
-    <p>
-      <strong>### How Match Works:</strong><br /><br />
-      &bull; <strong>Determines Record Matching</strong> – Identifies whether a 
-      source record has a corresponding record in the target object based on the 
-      <strong>Target Matching Field</strong>.<br />
-      &bull; <strong>Insert Logic</strong> – If a <strong>Target Matching Field</strong> 
-      is provided, DSP inserts a record <em>only if no match is found</em> in the target. 
-      If <em>no Target Matching Field is specified</em>, DSP performs an 
-      <strong>Insert</strong> without checking for existing records.<br />
-      &bull; <strong>Supports Mult-Fields Matching</strong> – DSP allows one 
-      <strong>Target Matching Field</strong> but supports <strong>multi-field matching</strong> 
-      using transformations like <code>VLOOKUP</code> assigned to the 
-      <strong>Target Matching Field</strong>.<br />
-      &bull; <strong>Sorting &amp; Selection</strong> – Enables sorting of matched 
-      records and choosing whether to apply actions to the <em>first matched record</em> 
-      (using the <strong>Principal Matched Record Selection Rule</strong>) or 
-      <em>all matched records</em>.<br />
-      &bull; <strong>Merge-Specific Matching</strong> – In <strong>Merge</strong> operations, 
-      the <strong>Principal Matched Record</strong> is treated as the 
-      <strong>Master Record</strong>, ensuring proper consolidation of duplicate records.
-    </p>
+    <h3>How Match Works</h3>
+    <ul>
+      <li>
+        <strong>Determines Record Matching —</strong>
+        Identifies whether a source record has a corresponding record in the target
+        object based on the <strong>Target Matching Field</strong>.
+      </li>
+  
+      <li>
+        <strong>Insert Logic —</strong>
+        If a <strong>Target Matching Field</strong> is provided, DSP inserts a record
+        <em>only if no match is found</em> in the target.  
+        If <em>no Target Matching Field</em> is specified, DSP performs an
+        <strong>Insert</strong> without any match check.
+      </li>
+  
+      <li>
+        <strong>Supports Multi-Field Matching —</strong>
+        DSP allows one <strong>Target Matching Field</strong> but lets you achieve
+        <strong>multi-field matching</strong> by assigning a transformation (e.g.,
+        <code>VLOOKUP</code>) to that field.
+      </li>
+  
+      <li>
+        <strong>Sorting & Selection —</strong>
+        You can sort matched records and choose whether actions apply to the
+        <em>first matched record</em>
+        (via the <strong>Principal Matched Record Selection Rule</strong>) or to
+        <em>all matched records</em>.
+      </li>
+  
+      <li>
+        <strong>Merge-Specific Matching —</strong>
+        During a <strong>Merge</strong>, the <strong>Principal Matched Record</strong>
+        becomes the <strong>Master Record</strong>, ensuring duplicates consolidate
+        correctly.
+      </li>
+    </ul>
     <p>
       📌 <strong>Matching</strong> ensures accurate data operations by identifying 
       target records before applying any action, reducing duplication and 
