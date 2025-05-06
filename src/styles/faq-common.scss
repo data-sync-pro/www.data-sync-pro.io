@@ -27,3 +27,23 @@ ol{
     list-style: none;
     padding-left: 0;
 }
+
+img{
+    max-width: 100%;
+    height: auto;
+    cursor: zoom-in;
+    user-select: none;
+    touch-action: none;
+  }
+
+ 
+.zoom-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, .6); 
+    z-index: 9;                  
+    pointer-events: none;          
+    transition: opacity .25s ease;
+  }
+  
+  
