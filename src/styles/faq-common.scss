@@ -6,8 +6,6 @@ body {
 article {
   background-color: #f9f9f92d;
   margin-top: 20px;
-  padding-left: 35px;
-  padding-right: 35px;
   margin-bottom: 20px;
 }
 
@@ -20,13 +18,11 @@ p {
 
 ul,
 li {
-  padding-right: 40px;
   line-height: 30px;
   font-size: 16px;
 }
 
 ol {
-    padding-right: 40px;
     padding-left: 30px;
     line-height: 30px;
     font-size: 16px;
@@ -43,7 +39,6 @@ h3 {
 h3 + p {
   padding-left: 35px;
   padding-right: 35px;
-  padding-bottom: 15px;
 }
 
 p + ul {
@@ -52,5 +47,5 @@ p + ul {
 }
 
 img {
-  width: 70vw;
+    max-width: 100%; height: auto;
 }

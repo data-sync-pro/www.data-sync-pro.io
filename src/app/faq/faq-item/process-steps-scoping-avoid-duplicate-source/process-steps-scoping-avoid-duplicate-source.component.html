@@ -1,4 +1,4 @@
-<section>
+<article>
     <p>
       To avoid duplicate source records based on specific conditions, 
       use the <code>IS_FIRST_IN_ITERATION(...expressions)</code> function 
@@ -7,23 +7,24 @@
       during the current execution cycle and excludes any duplicates that follow.
     </p>
     <hr />
-    <h3><strong>Example Usage</strong></h3>
+    <p><strong>Example Usage</strong></p>
     <p>
       To process only one record per unique combination of 
       <strong>FirstName, LastName, and Email</strong>:<br />
       <code>IS_FIRST_IN_ITERATION(FirstName, LastName, Email)</code>
     </p>
     <hr />
-    <h3><strong>Note</strong></h3>
+    <p><strong>Note</strong></p>
     <p>
       This filter works <strong>within each batch or CSV upload</strong>, 
       not across the entire job. For better control, 
       <strong>sort the source data</strong> so that records with the same key 
       fields appear together.
     </p>
+    <br />
     <p>
       Use <code>IS_FIRST_IN_ITERATION</code> to efficiently handle 
       deduplication—without pre-processing or complex logic.
     </p>
-  </section>
+  </article>
   
