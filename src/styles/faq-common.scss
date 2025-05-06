@@ -18,13 +18,11 @@ p {
 
 ul,
 li {
-  padding-right: 40px;
   line-height: 30px;
   font-size: 16px;
 }
 
 ol {
-    padding-right: 40px;
     padding-left: 30px;
     line-height: 30px;
     font-size: 16px;
@@ -49,5 +47,5 @@ p + ul {
 }
 
 img {
-  width: 70vw;
+    max-width: 100%; height: auto;
 }
