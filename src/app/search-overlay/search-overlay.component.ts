@@ -22,7 +22,7 @@ interface RawFaq {
 }
 
 interface FaqItem {
-  id: string;
+  Id: string;
   question: string;
   route: string;
   category: string;
@@ -60,7 +60,7 @@ export class SearchOverlayComponent implements OnInit, OnChanges {
   ngOnInit() {
     this.http.get<RawFaq[]>('assets/data/faqs.json').subscribe((data) => {
       this.suggestions = data.map((r) => ({
-        id: r.Id,
+        Id: r.Id,
         question: r.Question__c,
         route: r.Answer__c.replace('.html', ''),
         category: r.Category__c,
