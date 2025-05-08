@@ -8,7 +8,7 @@ import {
   Input,
   OnChanges,
   SimpleChanges,
-  HostListener
+  HostListener,
 } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
@@ -22,12 +22,15 @@ interface RawFaq {
 }
 
 interface FaqItem {
-  id: string;
+  Id: string;
   question: string;
   route: string;
   category: string;
   subCategory: string | null;
   tags: string[];
+}
+export interface SelectedSuggestion extends FaqItem {
+  subCatFilterApplied: boolean;
 }
 
 @Component({
@@ -38,13 +41,13 @@ interface FaqItem {
 export class SearchOverlayComponent implements OnInit, OnChanges {
   @Input() isOpen = false;
   @Output() closed = new EventEmitter<void>();
-  @Output() selectedResult = new EventEmitter<FaqItem>(); 
+  @Output() selectedResult = new EventEmitter<FaqItem>();
   @ViewChild('searchInput') searchInputRef!: ElementRef<HTMLInputElement>;
 
   searchQuery = '';
 
-  selectedCategory: string = '';             
-  selectedSubCategories: string[] = [];          
+  selectedCategory: string = '';
+  selectedSubCategories: string[] = [];
 
   categories: string[] = [];
   subCategories: string[] = [];
@@ -55,17 +58,19 @@ export class SearchOverlayComponent implements OnInit, OnChanges {
   constructor(private http: HttpClient, private router: Router) {}
 
   ngOnInit() {
-    this.http.get<RawFaq[]>('assets/data/faqs.json').subscribe(data => {
-      this.suggestions = data.map(r => ({
-        id: r.Id,
+    this.http.get<RawFaq[]>('assets/data/faqs.json').subscribe((data) => {
+      this.suggestions = data.map((r) => ({
+        Id: r.Id,
         question: r.Question__c,
         route: r.Answer__c.replace('.html', ''),
         category: r.Category__c,
         subCategory: r.SubCategory__c,
-        tags: r.SubCategory__c ? [r.Category__c, r.SubCategory__c] : [r.Category__c]
+        tags: r.SubCategory__c
+          ? [r.Category__c, r.SubCategory__c]
+          : [r.Category__c],
       }));
-      this.categories = [...new Set(this.suggestions.map(i => i.category))];
-      this.filterSubCategoryList();              
+      this.categories = [...new Set(this.suggestions.map((i) => i.category))];
+      this.filterSubCategoryList();
       this.filterSuggestions();
     });
   }
@@ -76,42 +81,50 @@ export class SearchOverlayComponent implements OnInit, OnChanges {
   }
 
   onSelectSuggestion(item: FaqItem) {
-    this.selectedResult.emit(item); 
+    const subCatFilterApplied = this.selectedSubCategories.length > 0;
+
+    this.selectedResult.emit({
+      ...item,
+      subCatFilterApplied,
+    } as SelectedSuggestion);
+
     this.close();
   }
 
-  selectCategory(cat: string) {                
+  selectCategory(cat: string) {
     this.selectedCategory = this.selectedCategory === cat ? '' : cat;
     this.filterSubCategoryList();
     this.filterSuggestions();
   }
 
-  toggleSubCategory(sc: string) {                
+  toggleSubCategory(sc: string) {
     const i = this.selectedSubCategories.indexOf(sc);
-    i >= 0 ? this.selectedSubCategories.splice(i, 1) : this.selectedSubCategories.push(sc);
+    i >= 0
+      ? this.selectedSubCategories.splice(i, 1)
+      : this.selectedSubCategories.push(sc);
     this.filterSuggestions();
   }
 
-  filterSubCategoryList() {                      
-    if (!this.selectedCategory) { 
+  filterSubCategoryList() {
+    if (!this.selectedCategory) {
       this.subCategories = [];
       this.selectedSubCategories = [];
       return;
     }
     const subs = this.suggestions
-      .filter(i => i.category === this.selectedCategory && i.subCategory)
-      .map(i => i.subCategory!) ;
+      .filter((i) => i.category === this.selectedCategory && i.subCategory)
+      .map((i) => i.subCategory!);
     this.subCategories = [...new Set(subs)];
-    this.selectedSubCategories = this.selectedSubCategories.filter(
-      s => this.subCategories.includes(s)   
+    this.selectedSubCategories = this.selectedSubCategories.filter((s) =>
+      this.subCategories.includes(s)
     );
   }
 
   clearFilters() {
     this.searchQuery = '';
-    this.selectedCategory = '';                  
-    this.selectedSubCategories = [];             
-    this.subCategories = [];                     
+    this.selectedCategory = '';
+    this.selectedSubCategories = [];
+    this.subCategories = [];
     this.filterSuggestions();
   }
 
@@ -128,12 +141,13 @@ export class SearchOverlayComponent implements OnInit, OnChanges {
   filterSuggestions() {
     const kw = this.searchQuery.trim().toLowerCase();
 
-    this.filteredSuggestions = this.suggestions.filter(i => {
+    this.filteredSuggestions = this.suggestions.filter((i) => {
       const matchKW = kw ? i.question.toLowerCase().includes(kw) : true;
 
-      const matchCat = !this.selectedCategory || i.category === this.selectedCategory; 
+      const matchCat =
+        !this.selectedCategory || i.category === this.selectedCategory;
 
-        const matchSub =
+      const matchSub =
         this.selectedSubCategories.length === 0 ||
         (i.subCategory && this.selectedSubCategories.includes(i.subCategory));
 
