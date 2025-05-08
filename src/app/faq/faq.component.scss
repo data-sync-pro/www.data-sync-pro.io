@@ -16,17 +16,16 @@
   .faq-search {
     margin-bottom: 20px;
     position: relative;
+    width: 100%;
     .search-wrapper {
       position: relative;
-      width: 45vw;
+      width: 100%;
       justify-self: center;
-
+      padding: 0px;
       input {
         width: 100%;
-        padding-left: 12px;
-        padding-right: 0px;
-        padding-top: 10px;
-        padding-bottom: 10px;
+        height: 100%;
+        padding: 12px 0px;
         font-size: 1rem;
         border: 1px solid #ccc;
         border-radius: 4px;
@@ -34,7 +33,7 @@
 
       .shortcut-hint {
         position: absolute;
-        right: 0px;
+        right: 15px;
         top: 50%;
         transform: translateY(-50%);
         background-color: #eee;
@@ -43,6 +42,10 @@
         border-radius: 4px;
         color: #555;
       }
+    }
+
+    input::placeholder {
+      padding-left: 12px;
     }
 
     .suggestions-list {
@@ -136,7 +139,7 @@
         .breadcrumb-link {
           margin: 0;
           &.clickable {
-            color: #007bff;
+            color: #418796;
             cursor: pointer;
             text-decoration: underline;
           }
@@ -160,8 +163,8 @@
 
           mat-expansion-panel-header {
             background-color: #d5e6e854;
-            padding-top:2px;
-            padding-bottom:2px;;
+            padding-top: 2px;
+            padding-bottom: 2px;
           }
         }
       }
