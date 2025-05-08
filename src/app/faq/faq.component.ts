@@ -5,13 +5,6 @@ import {
   HostListener,
   OnInit,
 } from '@angular/core';
-import {
-  Component,
-  ViewChild,
-  ElementRef,
-  HostListener,
-  OnInit,
-} from '@angular/core';
 import { MatExpansionPanel } from '@angular/material/expansion';
 import { ViewChildren, QueryList } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
@@ -40,7 +33,6 @@ interface FAQItem {
   selector: 'app-faq',
   templateUrl: './faq.component.html',
   styleUrls: ['./faq.component.scss'],
-  styleUrls: ['./faq.component.scss'],
 })
 export class FaqComponent implements OnInit {
   searchQuery = '';
@@ -57,7 +49,6 @@ export class FaqComponent implements OnInit {
   showSuggestions = false;
   selectedSuggestionIndex = -1;
   isSearchOpen = false;
-  isSearchOpen = false;
 
   constructor(
     private sanitizer: DomSanitizer,
@@ -67,7 +58,6 @@ export class FaqComponent implements OnInit {
   ngOnInit(): void {
     const data = faqData as unknown as SourceFAQRecord[];
 
-    data.forEach((record) => {
     data.forEach((record) => {
       const cat = record.Category__c;
       const sub = record.SubCategory__c ?? '';
@@ -81,8 +71,7 @@ export class FaqComponent implements OnInit {
       }
     });
 
-    this.faqList = data.map((rec) => this.toFAQItem(rec));
-    this.faqList = data.map((rec) => this.toFAQItem(rec));
+    this.faqList = data.map(rec => this.toFAQItem(rec));
   }
 
   private toFAQItem(rec: SourceFAQRecord): FAQItem {
@@ -96,14 +85,14 @@ export class FaqComponent implements OnInit {
       safeAnswer: safe,
       category: rec.Category__c ?? '',
       subCategory: rec.SubCategory__c ?? '',
-      isPopular: false,
-      isPopular: false,
+      isPopular: false
     };
   }
 
   private removeParagraphs(str: string): string {
-    return str.replace(/<p[^>]*>/g, '').replace(/<\/p>/g, '');
-    return str.replace(/<p[^>]*>/g, '').replace(/<\/p>/g, '');
+    return str
+      .replace(/<p[^>]*>/g, '')
+      .replace(/<\/p>/g, '');
   }
 
   private unescapeHtml(escapedStr: string): string {
@@ -125,23 +114,11 @@ export class FaqComponent implements OnInit {
 
   get filteredFAQ(): FAQItem[] {
     const q = this.searchQuery.toLowerCase().trim();
-    return this.faqList.filter((item) => {
-      if (this.currentCategory && item.category !== this.currentCategory)
-        return false;
-    return this.faqList.filter((item) => {
-      if (this.currentCategory && item.category !== this.currentCategory)
-        return false;
+    return this.faqList.filter(item => {
 
-      if (
-        this.currentSubCategory &&
-        item.subCategory !== this.currentSubCategory
-      )
-        return false;
-      if (
-        this.currentSubCategory &&
-        item.subCategory !== this.currentSubCategory
-      )
-        return false;
+      if (this.currentCategory && item.category !== this.currentCategory) return false;
+
+      if (this.currentSubCategory && item.subCategory !== this.currentSubCategory) return false;
 
       if (q) {
         return (
@@ -173,8 +150,7 @@ export class FaqComponent implements OnInit {
         eventType: 'faq_open',
         faqQuestion: item.question,
         faqCategory: item.category,
-        timestamp: new Date().toISOString(),
-        timestamp: new Date().toISOString(),
+        timestamp: new Date().toISOString()
       };
       this.analyticsService.trackCustomEvent(payload);
     }
@@ -195,33 +171,12 @@ export class FaqComponent implements OnInit {
   closeSearchOverlay() {
     this.isSearchOpen = false;
   }
-  @ViewChild('faqSearchBox') faqSearchBox!: ElementRef<HTMLInputElement>;
-  @ViewChild('faqSearchBox') faqSearchBox!: ElementRef<HTMLInputElement>;
+  @ViewChild('faqSearchBox') faqSearchBox!: ElementRef<HTMLInputElement>;      
 
-  @HostListener('document:keydown', ['$event']) handleSlash(
-    event: KeyboardEvent
-  ) {
-    if (
-      event.key === '/' &&
-      !event.ctrlKey &&
-      !event.metaKey &&
-      !event.altKey &&
-      this.isTypingField(event.target)
-    ) {
-      event.preventDefault();
-      this.openSearch();
-  @HostListener('document:keydown', ['$event']) handleSlash(
-    event: KeyboardEvent
-  ) {
-    if (
-      event.key === '/' &&
-      !event.ctrlKey &&
-      !event.metaKey &&
-      !event.altKey &&
-      this.isTypingField(event.target)
-    ) {
-      event.preventDefault();
-      this.openSearch();
+  @HostListener('document:keydown', ['$event']) handleSlash(event: KeyboardEvent) {      
+    if (event.key === '/' && !event.ctrlKey && !event.metaKey && !event.altKey && this.isTypingField(event.target)) {      
+      event.preventDefault();      
+      this.openSearch();      
     }
   }
   private isTypingField(t: EventTarget | null): boolean {
@@ -259,44 +214,13 @@ export class FaqComponent implements OnInit {
     this.isSearchOpen = false;
 
     setTimeout(() => {
-      const idx = this.filteredFAQ.findIndex(
-        (f) => f.question === item.question
-      );
+      const idx = this.filteredFAQ.findIndex(f => f.question === item.question);
       if (idx >= 0) {
         this.panels.toArray()[idx].open();
-        this.panelEls.toArray()[idx].nativeElement.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start',
-        });
+        this.panelEls.toArray()[idx].nativeElement
+            .scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     });
   }
-
-  get showHome(): boolean {
-    return (
-      !this.currentCategory && !this.currentSubCategory && !this.searchQuery
-    );
-  }
-
-  handleTrendingSelect(item: {
-    question: string;
-    category: string;
-    subCategory: string | null;
-  }) {
-    this.currentCategory = item.category;
-    this.currentSubCategory = '';
-
-    setTimeout(() => {
-      const idx = this.filteredFAQ.findIndex(
-        (f) => f.question === item.question
-      );
-      if (idx >= 0) {
-        this.panels.toArray()[idx].open();
-        this.panelEls.toArray()[idx].nativeElement.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start',
-        });
-      }
-    });
-  }
+  
 }
