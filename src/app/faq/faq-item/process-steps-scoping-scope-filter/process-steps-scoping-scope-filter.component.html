@@ -19,25 +19,25 @@
     <h3><strong>Sequential Scope Filter Layers</strong></h3>
     <ol>
       <li>
-        1️⃣ <strong>Pipeline Scope Filter</strong><br />
+        <strong>Pipeline Scope Filter</strong><br />
         Applied when the Executable runs as part of a Pipeline. It acts as a 
         global pre-filter to control record scope across all Executables in 
         the Pipeline.
       </li>
       <li>
-        2️⃣ <strong>Executable Scope Filter</strong><br />
+        <strong>Executable Scope Filter</strong><br />
         Defines the core scoping condition for the individual Executable—evaluated 
         whether the Executable runs standalone or within a Pipeline.
       </li>
       <li>
-        3️⃣ <strong>Trigger Scope Filters</strong><br />
+        <strong>Trigger Scope Filters</strong><br />
         Used specifically in <strong>Trigger Executables</strong>, these filters 
         apply to defined trigger events (e.g., <strong>Before Insert</strong>, <strong>After Update</strong>) 
         and allow further control through event-specific logic like 
         <strong>Scope Filter (Before Update Trigger)</strong>.
       </li>
       <li>
-        4️⃣ <strong>Scope Filter (Post Join)</strong><br />
+        <strong>Scope Filter (Post Join)</strong><br />
         Evaluated after the <strong>Join</strong> step, this filter enables 
         additional refinement of the enriched source dataset.
       </li>
