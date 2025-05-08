@@ -1,54 +1,80 @@
-<section>
+<article>
     <p>
       To create a <strong>Data Loader</strong> in Data Sync Pro (DSP), follow these steps:
     </p>
     <ol>
       <li>
         1️⃣ <strong>Go to the Connection Record</strong><br />
-        Navigate to the <strong>Connection</strong> where you want to upload data.
-        If loading into your current Salesforce org, use the 
-        <strong>Current Org</strong> connection.
+        <ul>
+          <li> Navigate to the <strong>Connection</strong> where you want to upload data.
+            If loading into your current Salesforce org, use the 
+            <strong>Current Org</strong> connection.</li>
+        </ul>
+       
       </li>
 
       <img src="../../../../assets/image/rules-engines-data-loader-create-data-loader/rules-engines-data-loader-create-data-loader1.jpg" >
 
       <li>
         2️⃣ <strong>Create a New Executable</strong><br />
-        - Click <strong>“New Executable (Action)”</strong><br />
-        - Set the <strong>Type</strong> to <strong>Data Loader</strong><br />
-        - Specify the <strong>Target Object</strong>, choose an <strong>Action</strong> 
-          (Insert, Update, Upsert, Delete), and define a 
-          <strong>Target Matching Field</strong> if needed
+        <ul>
+          <li>Click <strong>“New Executable (Action)”</strong><br /></li>
+          <li>Set the <strong>Type</strong> to <strong>Data Loader</strong><br /></li>
+          <li>Specify the <strong>Target Object</strong>, choose an <strong>Action</strong> 
+            (Insert, Update, Upsert, Delete), and define a 
+            <strong>Target Matching Field</strong> if needed</li>
+        </ul>
+        
+        
+        
       </li>
       <li>
         3️⃣ <strong>Upload a Template CSV File</strong><br />
-        - Upload a <strong>CSV file</strong> with headers—DSP uses this to generate 
-          the data profile<br />
-        - Make sure column names follow DSP naming conventions: use only letters, 
-          numbers, and underscores, and start with a letter
+        <ul>
+          <li>
+            Upload a <strong>CSV file</strong> with headers—DSP uses this to generate 
+            the data profile<br />
+          </li>
+          <li>
+            Make sure column names follow DSP naming conventions: use only letters, 
+            numbers, and underscores, and start with a letter
+          </li>
+        </ul>
+       
+     
       </li>
       <li>
         4️⃣ <strong>Configure the Data Loader Steps</strong><br />
-        Once created, the Executable will guide you through the following steps:<br /><br />
-        <em><strong>Input</strong> – Define the structure of the uploaded CSV so its 
-        fields can be used in filters and field mappings.</em><br />
-        <em><strong>Scoping</strong> – Refine the retrieved dataset using in-memory 
-        filters and optional joins with other datasets for multi-source 
-        enrichment.</em><br />
-        <em><strong>Match</strong> – Identify target records using matching 
-        rules. Supports insert-only logic, multi-field matching via transformations, 
-        and merge-specific logic.</em><br />
-        <em><strong>Mapping</strong> – Apply formulas and expressions to assign and 
-        transform target field values. Features auto-validation, relational field 
-        support, and a comprehensive function library.</em><br />
-        <em><strong>Action</strong> – Define the operations to be performed, such as 
-        Insert, Update, Upsert, Delete, Merge, Lead Convert, Send Email, and more. 
-        Configure behavior options like “Skip Record Update if No Changes”</em>
+        <ul>
+          <li>Once created, the Executable will guide you through the following steps:<br /></li>
+          <ul>
+            <li><em><strong>Input</strong> – Define the structure of the uploaded CSV so its 
+              fields can be used in filters and field mappings.</em><br /></li>
+            <li><em><strong>Scoping</strong> – Refine the retrieved dataset using in-memory 
+              filters and optional joins with other datasets for multi-source 
+              enrichment.</em><br /></li>
+            <li><em><strong>Match</strong> – Identify target records using matching 
+              rules. Supports insert-only logic, multi-field matching via transformations, 
+              and merge-specific logic.</em><br /></li>
+            <li><em><strong>Mapping</strong> – Apply formulas and expressions to assign and 
+              transform target field values. Features auto-validation, relational field 
+              support, and a comprehensive function library.</em><br /></li>
+            <li><em><strong>Action</strong> – Define the operations to be performed, such as 
+              Insert, Update, Upsert, Delete, Merge, Lead Convert, Send Email, and more. 
+              Configure behavior options like “Skip Record Update if No Changes”</em></li>
+          </ul>
+        </ul>
+        
+        
+        
+        
+        
+        
       </li>
     </ol>
     <p>
-      🚀 Once configured, your Data Loader can be reused to process similar
+      Once configured, your Data Loader can be reused to process similar
       datasets—ensuring fast, accurate, and consistent uploads across your org.
     </p>
-  </section>
+  </article>
   

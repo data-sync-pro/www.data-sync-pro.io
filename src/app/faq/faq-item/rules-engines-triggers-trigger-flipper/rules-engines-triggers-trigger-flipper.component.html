@@ -1,9 +1,10 @@
-<section>
+<article>
     <p>
       <code>TRIGGER_FLIPPER</code> allows users to <strong>repeatedly trigger specific automations</strong> 
       in DSP by checking a <strong>checkbox field</strong> on record update—or by 
       meeting rule-driven conditions.
     </p>
+    <br />
     <p>
       When used in a <strong>before insert</strong> or <strong>before update</strong> 
       trigger, <code>TRIGGER_FLIPPER(field_name)</code> detects when a checkbox 
@@ -11,14 +12,16 @@
       then automatically resets the checkbox back to FALSE—so it can be flipped again 
       later. 
     </p>
+    <br />
     <p>
       An optional formula condition (<code>flip_if_evaluated_true_optional</code>) can 
       simulate the flip automatically based on business logic—without requiring user input.
     </p>
+    <br />
     <p>
       Paired with <code>TRIGGER_IS_FLIPPED(field_name)</code>, this mechanism enables 
-      modular, reusable, and repeatable trigger-based automation—<strong>without</strong> 
+      modular, reusable, and repeatable trigger-based automation—without 
       persisting the trigger flag in the database.
     </p>
-  </section>
+  </article>
   

@@ -1,31 +1,75 @@
 body {
-    font-family: Arial, sans-serif;
-    margin: 0;
+  font-family: Arial, sans-serif;
+  margin: 0;
 }
 
 article {
-    background-color: #fff;
+  background-color: #f9f9f92d;
+  margin-top: 20px;
+  margin-bottom: 20px;
 }
 
 p {
-    color: #333;
+  color: #333;
+  line-height: 30px;
+  margin-bottom: 0px;
+  font-size: 16px;
 }
 
-ul {
-    padding-left: 1.2em;
+ul,
+li {
+  line-height: 30px;
+  font-size: 16px;
 }
 
-h3 {
-    margin: 0;
-}
-
-img{
-    width: 70vw;
-}
-
-ol{
+ol {
+    padding-left: 30px;
+    line-height: 30px;
+    font-size: 16px;
     list-style: none;
-    padding-left: 0;
+    padding-left: 2.4em;
+    
+}
+
+ol > li {
+  position: relative;
+}
+ol > li:nth-child(1)::before { content: "1️⃣"; }
+ol > li:nth-child(2)::before { content: "2️⃣"; }
+ol > li:nth-child(3)::before { content: "3️⃣"; }
+ol > li:nth-child(4)::before { content: "4️⃣"; }
+ol > li:nth-child(5)::before { content: "5️⃣"; }
+ol > li:nth-child(6)::before { content: "6️⃣"; }
+ol > li:nth-child(7)::before { content: "7️⃣"; }
+ol > li:nth-child(8)::before { content: "8️⃣"; }
+ol > li:nth-child(9)::before { content: "9️⃣"; }
+ol > li:nth-child(10)::before { content: "🔟"; }
+ol > li::before {
+  position: absolute;
+  left: -2.4em;          /* 与 padding-left 对齐 */
+  top: 0;
+  font-size: 18px;
+  line-height: 30px;
+}
+h3 {
+  padding-left: 15px;
+  padding-right: 15px;
+  font-size: 16px;
+  margin: 0;
+}
+
+h3 + p {
+  padding-left: 35px;
+  padding-right: 35px;
+}
+
+p + ul {
+    padding-left: 50px;
+    padding-right: 50px;
+}
+
+img {
+    max-width: 100%; height: auto;
 }
 
 img{
@@ -47,3 +91,4 @@ img{
   }
   
   
+

@@ -1,4 +1,4 @@
-<section>
+<article>
   <p>
     DSP applies transformations to the matched target record
     <strong>iteratively based on the order of the source records</strong>. When
@@ -8,10 +8,11 @@
     >, resulting in a <strong>single final version</strong> of the target record
     before execution.
   </p>
+  <br />
   <p>
-    📌 To prevent this behavior, use the
+    To prevent this behavior, use the
     <strong><code>IS_FIRST_IN_ITERATION(...)</code></strong> function in the
     <strong>Scope Filter</strong> to ensure only the first source record per
     group is processed.
   </p>
-</section>
+</article>
