@@ -9,6 +9,7 @@ import {
   OnChanges,
   SimpleChanges,
   HostListener,
+  HostListener,
 } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
@@ -60,7 +61,7 @@ export class SearchOverlayComponent implements OnInit, OnChanges {
   ngOnInit() {
     this.http.get<RawFaq[]>('assets/data/faqs.json').subscribe((data) => {
       this.suggestions = data.map((r) => ({
-        Id: r.Id,
+        id: r.Id,
         question: r.Question__c,
         route: r.Answer__c.replace('.html', ''),
         category: r.Category__c,
