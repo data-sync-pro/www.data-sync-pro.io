@@ -264,12 +264,10 @@ export class FaqComponent implements OnInit {
       );
       if (idx >= 0) {
         this.panels.toArray()[idx].open();
-        this.panelEls
-          .toArray()
-          [idx].nativeElement.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start',
-          });
+        this.panelEls.toArray()[idx].nativeElement.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        });
       }
     });
   }
@@ -280,23 +278,25 @@ export class FaqComponent implements OnInit {
     );
   }
 
-  handleTrendingSelect(item: {                                  
+  handleTrendingSelect(item: {
     question: string;
     category: string;
     subCategory: string | null;
   }) {
-    this.currentCategory = item.category;                        
-    this.currentSubCategory = '';                                
-  
-    setTimeout(() => {                                         
-      const idx = this.filteredFAQ.findIndex(f => f.question === item.question);
+    this.currentCategory = item.category;
+    this.currentSubCategory = '';
+
+    setTimeout(() => {
+      const idx = this.filteredFAQ.findIndex(
+        (f) => f.question === item.question
+      );
       if (idx >= 0) {
         this.panels.toArray()[idx].open();
-        this.panelEls
-          .toArray()[idx]
-          .nativeElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        this.panelEls.toArray()[idx].nativeElement.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        });
       }
     });
   }
-  
 }
