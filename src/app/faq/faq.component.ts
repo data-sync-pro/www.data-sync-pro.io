@@ -214,13 +214,52 @@ export class FaqComponent implements OnInit {
     this.isSearchOpen = false;
 
     setTimeout(() => {
+<<<<<<< HEAD
       const idx = this.filteredFAQ.findIndex(f => f.question === item.question);
       if (idx >= 0) {
         this.panels.toArray()[idx].open();
         this.panelEls.toArray()[idx].nativeElement
             .scrollIntoView({ behavior: 'smooth', block: 'start' });
+=======
+      const idx = this.filteredFAQ.findIndex(
+        (f) => f.question === item.question
+      );
+      if (idx >= 0) {
+        this.panels.toArray()[idx].open();
+        this.panelEls.toArray()[idx].nativeElement.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        });
       }
     });
   }
-  
+
+  get showHome(): boolean {
+    return (
+      !this.currentCategory && !this.currentSubCategory && !this.searchQuery
+    );
+  }
+
+  handleTrendingSelect(item: {
+    question: string;
+    category: string;
+    subCategory: string | null;
+  }) {
+    this.currentCategory = item.category;
+    this.currentSubCategory = '';
+
+    setTimeout(() => {
+      const idx = this.filteredFAQ.findIndex(
+        (f) => f.question === item.question
+      );
+      if (idx >= 0) {
+        this.panels.toArray()[idx].open();
+        this.panelEls.toArray()[idx].nativeElement.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        });
+>>>>>>> 055c221 (update faq home page)
+      }
+    });
+  }
 }
