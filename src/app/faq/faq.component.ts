@@ -71,7 +71,7 @@ export class FaqComponent implements OnInit {
       }
     });
 
-    this.faqList = data.map((rec) => this.toFAQItem(rec));
+    this.faqList = data.map(rec => this.toFAQItem(rec));
   }
 
   private toFAQItem(rec: SourceFAQRecord): FAQItem {
@@ -85,12 +85,14 @@ export class FaqComponent implements OnInit {
       safeAnswer: safe,
       category: rec.Category__c ?? '',
       subCategory: rec.SubCategory__c ?? '',
-      isPopular: false,
+      isPopular: false
     };
   }
 
   private removeParagraphs(str: string): string {
-    return str.replace(/<p[^>]*>/g, '').replace(/<\/p>/g, '');
+    return str
+      .replace(/<p[^>]*>/g, '')
+      .replace(/<\/p>/g, '');
   }
 
   private unescapeHtml(escapedStr: string): string {
@@ -112,15 +114,11 @@ export class FaqComponent implements OnInit {
 
   get filteredFAQ(): FAQItem[] {
     const q = this.searchQuery.toLowerCase().trim();
-    return this.faqList.filter((item) => {
-      if (this.currentCategory && item.category !== this.currentCategory)
-        return false;
+    return this.faqList.filter(item => {
 
-      if (
-        this.currentSubCategory &&
-        item.subCategory !== this.currentSubCategory
-      )
-        return false;
+      if (this.currentCategory && item.category !== this.currentCategory) return false;
+
+      if (this.currentSubCategory && item.subCategory !== this.currentSubCategory) return false;
 
       if (q) {
         return (
@@ -152,7 +150,7 @@ export class FaqComponent implements OnInit {
         eventType: 'faq_open',
         faqQuestion: item.question,
         faqCategory: item.category,
-        timestamp: new Date().toISOString(),
+        timestamp: new Date().toISOString()
       };
       this.analyticsService.trackCustomEvent(payload);
     }
@@ -173,20 +171,12 @@ export class FaqComponent implements OnInit {
   closeSearchOverlay() {
     this.isSearchOpen = false;
   }
-  @ViewChild('faqSearchBox') faqSearchBox!: ElementRef<HTMLInputElement>;
+  @ViewChild('faqSearchBox') faqSearchBox!: ElementRef<HTMLInputElement>;      
 
-  @HostListener('document:keydown', ['$event']) handleSlash(
-    event: KeyboardEvent
-  ) {
-    if (
-      event.key === '/' &&
-      !event.ctrlKey &&
-      !event.metaKey &&
-      !event.altKey &&
-      this.isTypingField(event.target)
-    ) {
-      event.preventDefault();
-      this.openSearch();
+  @HostListener('document:keydown', ['$event']) handleSlash(event: KeyboardEvent) {      
+    if (event.key === '/' && !event.ctrlKey && !event.metaKey && !event.altKey && this.isTypingField(event.target)) {      
+      event.preventDefault();      
+      this.openSearch();      
     }
   }
   private isTypingField(t: EventTarget | null): boolean {
@@ -264,4 +254,7 @@ export class FaqComponent implements OnInit {
       }
     });
   }
+
+  
 }
+

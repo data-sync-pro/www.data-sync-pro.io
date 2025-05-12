@@ -64,6 +64,7 @@
         <h2 class="section-title">All FAQs</h2>
         <mat-accordion>
           <mat-expansion-panel
+            class="faq-panel" 
             *ngFor="let item of allFaqList"
             (opened)="onFaqOpened(item)"
           >
@@ -121,6 +122,24 @@
       <mat-accordion>
         <mat-expansion-panel
           class="faq-panel"  
+          *ngFor="let item of filteredFAQ"
+          (opened)="onFaqOpened(item)"
+        >
+          <mat-expansion-panel-header>
+            <mat-panel-title class="faq-title">
+              {{ item.question }}
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+          <ng-container
+            *ngComponentOutlet="
+              FaqComponentRegistry[toRegistryKey(item.answer)]
+            "
+          ></ng-container>
+        </mat-expansion-panel>
+      </mat-accordion>
+      <mat-accordion>
+        <mat-expansion-panel
+          class="faq-panel" 
           *ngFor="let item of filteredFAQ"
           (opened)="onFaqOpened(item)"
         >
