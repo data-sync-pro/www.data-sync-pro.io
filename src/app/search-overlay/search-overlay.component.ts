@@ -9,10 +9,6 @@ import {
   OnChanges,
   SimpleChanges,
   HostListener,
-<<<<<<< HEAD
-  HostListener,
-=======
->>>>>>> 2139f8f (add faq home page; enhance breadcrumb and search suggestion navigation)
 } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
@@ -26,7 +22,7 @@ interface RawFaq {
 }
 
 interface FaqItem {
-  Id: string;
+  id: string;
   question: string;
   route: string;
   category: string;

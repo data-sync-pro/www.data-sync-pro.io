@@ -1,47 +1,24 @@
 <section class="trending-faq">
-    <h2 class="section-title">Trending questions</h2>
-  
-    <div class="faq-list">
-      <article
-        class="faq-item"
-        *ngFor="let q of questions"
-        (click)="selectQuestion(q)"
-      >
-        <header class="question">
-          {{ q.Question__c }}
-        </header>
-        
-      </article>
-    </div>
-<<<<<<< HEAD
-<<<<<<< HEAD
-  </section>
-  
-<section class="trending-faq">
-    <h2 class="section-title">Trending questions</h2>
-  
-    <div class="faq-list">
-      <article
-        class="faq-item"
-        *ngFor="let q of questions"
-        (click)="selectQuestion(q)"
-      >
-        <header class="question">
-          {{ q.Question__c }}
-        </header>
-        
-      </article>
-=======
+  <h2 class="section-title">Trending questions</h2>
+
+  <div class="faq-list">
+    <article
+      class="faq-item"
+      *ngFor="let q of questions"
+      (click)="selectQuestion(q)"
+    >
+      <header class="question">
+        {{ q.Question__c }}
+      </header>
+    </article>
+  </div> 
   <div class="need-more-help">
-    
-      <h2 class="section-title">Need more help?</h2>
-      <p class="help-text">
-        Contact us at
-        <a class="help-text-link" href="mailto:hello&#64;data-sync-pro.io">hello&#64;data-sync-pro.io</a>
-      </p>
->>>>>>> 2139f8f (add faq home page; enhance breadcrumb and search suggestion navigation)
-    </div>
-=======
->>>>>>> 055c221 (update faq home page)
-  </section>
-  
+    <h2 class="section-title">Need more help?</h2>
+    <p class="help-text">
+      Contact us at
+      <a class="help-text-link" href="mailto:hello&#64;data-sync-pro.io">
+        hello&#64;data-sync-pro.io
+      </a>
+    </p>
+  </div>
+</section>
