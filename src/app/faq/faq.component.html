@@ -118,24 +118,23 @@
           </ng-container>
         </nav>
 
-        <mat-accordion>
-          <mat-expansion-panel
-            class="faq-panel"
-            *ngFor="let item of filteredFAQ"
-            (opened)="onFaqOpened(item)"
-          >
-            <mat-expansion-panel-header>
-              <mat-panel-title class="faq-title">
-                {{ item.question }}
-              </mat-panel-title>
-            </mat-expansion-panel-header>
-            <ng-container
-              *ngComponentOutlet="
-                FaqComponentRegistry[toRegistryKey(item.answer)]
-              "
-            ></ng-container>
-          </mat-expansion-panel>
-        </mat-accordion>
+      <mat-accordion>
+        <mat-expansion-panel
+          *ngFor="let item of filteredFAQ"
+          (opened)="onFaqOpened(item)"
+        >
+          <mat-expansion-panel-header>
+            <mat-panel-title class="faq-title">
+              {{ item.question }}
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+          <ng-container
+            *ngComponentOutlet="
+              FaqComponentRegistry[toRegistryKey(item.answer)]
+            "
+          ></ng-container>
+        </mat-expansion-panel>
+      </mat-accordion>
 
         <div class="no-results" *ngIf="filteredFAQ.length === 0">
           No FAQs found. Try a different search or reset the filters.

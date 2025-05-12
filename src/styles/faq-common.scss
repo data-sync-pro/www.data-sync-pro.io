@@ -41,25 +41,33 @@ ol {
 ol > li {
   position: relative;
 }
-
-/* 手写 1️⃣–🔟 */
-ol > li:nth-child(1)::before  { content: "1️⃣"; }
-ol > li:nth-child(2)::before  { content: "2️⃣"; }
-ol > li:nth-child(3)::before  { content: "3️⃣"; }
-ol > li:nth-child(4)::before  { content: "4️⃣"; }
-ol > li:nth-child(5)::before  { content: "5️⃣"; }
-ol > li:nth-child(6)::before  { content: "6️⃣"; }
-ol > li:nth-child(7)::before  { content: "7️⃣"; }
-ol > li:nth-child(8)::before  { content: "8️⃣"; }
-ol > li:nth-child(9)::before  { content: "9️⃣"; }
+ol > li:nth-child(1)::before { content: "1️⃣"; }
+ol > li:nth-child(2)::before { content: "2️⃣"; }
+ol > li:nth-child(3)::before { content: "3️⃣"; }
+ol > li:nth-child(4)::before { content: "4️⃣"; }
+ol > li:nth-child(5)::before { content: "5️⃣"; }
+ol > li:nth-child(6)::before { content: "6️⃣"; }
+ol > li:nth-child(7)::before { content: "7️⃣"; }
+ol > li:nth-child(8)::before { content: "8️⃣"; }
+ol > li:nth-child(9)::before { content: "9️⃣"; }
 ol > li:nth-child(10)::before { content: "🔟"; }
-
 ol > li::before {
   position: absolute;
-  left: -1.6em;             
+  left: -2.4em;      
   top: 0;
   font-size: 18px;
   line-height: 30px;
+}
+h3 {
+  padding-left: 15px;
+  padding-right: 15px;
+  font-size: 16px;
+  margin: 0;
+}
+
+h3 + p {
+  padding-left: 35px;
+  padding-right: 35px;
 }
 
 ul > li {
@@ -72,8 +80,28 @@ p + ul {
   padding-right: 50px;      
 }
 
-/* =======  Images  ======= */
 img {
   max-width: 100%;
   height: auto;
 }
+
+img{
+    max-width: 100%;
+    height: auto;
+    cursor: zoom-in;
+    user-select: none;
+    touch-action: none;
+  }
+
+ 
+.zoom-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, .6); 
+    z-index: 9;                  
+    pointer-events: none;          
+    transition: opacity .25s ease;
+  }
+  
+  
+

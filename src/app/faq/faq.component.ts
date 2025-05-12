@@ -254,4 +254,7 @@ export class FaqComponent implements OnInit {
       }
     });
   }
+
+  
 }
+

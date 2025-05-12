@@ -184,6 +184,7 @@ import { QueryManagerqManageQueriesComponent } from './faq-item/query-managerq-m
 import { QueryManagerqIntegrateQLightningComponent } from './faq-item/query-managerq-integrate-q-lightning/query-managerq-integrate-q-lightning.component';
 import { SearchOverlayComponent } from '../search-overlay/search-overlay.component';
 import { FaqHomeComponent } from './faq-home/faq-home.component';
+import { ZoomableDirective } from 'src/styles/zoomable.directive';
 @NgModule({
   declarations: [
     FaqComponent,
@@ -359,7 +360,8 @@ import { FaqHomeComponent } from './faq-home/faq-home.component';
     QueryManagerqManageQueriesComponent,
     QueryManagerqIntegrateQLightningComponent,
     SearchOverlayComponent,
-    FaqHomeComponent
+    FaqHomeComponent,
+    ZoomableDirective
   ],
   imports: [
     CommonModule,
@@ -369,7 +371,8 @@ import { FaqHomeComponent } from './faq-home/faq-home.component';
     MatButtonModule,
   ],
   exports: [
-    FaqComponent
+    FaqComponent,
+    ZoomableDirective
   ]
 })
 export class FaqModule {}
