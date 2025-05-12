@@ -1,3 +1,4 @@
+/* =======  Base Typography & Layout  ======= */
 body {
   font-family: Arial, sans-serif;
   margin: 0;
@@ -5,21 +6,27 @@ body {
 
 article {
   background-color: #f9f9f92d;
-  margin-top: 20px;
-  margin-bottom: 20px;
+  margin: 20px 0;
 }
 
-p {
-  color: #333;
-  line-height: 30px;
-  margin-bottom: 0px;
-  font-size: 16px;
-}
-
+p,
 ul,
-li {
-  line-height: 30px;
+li,
+ol {
   font-size: 16px;
+  line-height: 30px;
+  color: #333;
+  margin: 0;           
+}
+
+h3 {
+  padding: 0 15px;
+  font-size: 16px;
+  margin: 0;
+}
+
+h3 + p {
+  padding: 0 35px;
 }
 
 ol {
@@ -27,25 +34,46 @@ ol {
     line-height: 30px;
     font-size: 16px;
     list-style: none;
+    padding-left: 2.4em;
+    
 }
 
-h3 {
-  padding-left: 15px;
-  padding-right: 15px;
-  font-size: 16px;
-  margin: 0;
+ol > li {
+  position: relative;
 }
 
-h3 + p {
-  padding-left: 35px;
-  padding-right: 35px;
+/* 手写 1️⃣–🔟 */
+ol > li:nth-child(1)::before  { content: "1️⃣"; }
+ol > li:nth-child(2)::before  { content: "2️⃣"; }
+ol > li:nth-child(3)::before  { content: "3️⃣"; }
+ol > li:nth-child(4)::before  { content: "4️⃣"; }
+ol > li:nth-child(5)::before  { content: "5️⃣"; }
+ol > li:nth-child(6)::before  { content: "6️⃣"; }
+ol > li:nth-child(7)::before  { content: "7️⃣"; }
+ol > li:nth-child(8)::before  { content: "8️⃣"; }
+ol > li:nth-child(9)::before  { content: "9️⃣"; }
+ol > li:nth-child(10)::before { content: "🔟"; }
+
+ol > li::before {
+  position: absolute;
+  left: -1.6em;             
+  top: 0;
+  font-size: 18px;
+  line-height: 30px;
 }
+
+ul > li {
+  position: relative;
+}
+
 
 p + ul {
-    padding-left: 50px;
-    padding-right: 50px;
+  padding-left: 2.4em;      
+  padding-right: 50px;      
 }
 
+/* =======  Images  ======= */
 img {
-    max-width: 100%; height: auto;
+  max-width: 100%;
+  height: auto;
 }

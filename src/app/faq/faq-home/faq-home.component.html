@@ -15,3 +15,20 @@
     </div>
   </section>
   
+<section class="trending-faq">
+    <h2 class="section-title">Trending questions</h2>
+  
+    <div class="faq-list">
+      <article
+        class="faq-item"
+        *ngFor="let q of questions"
+        (click)="selectQuestion(q)"
+      >
+        <header class="question">
+          {{ q.Question__c }}
+        </header>
+        
+      </article>
+    </div>
+  </section>
+  
