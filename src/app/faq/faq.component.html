@@ -64,6 +64,7 @@
         <h2 class="section-title">All FAQs</h2>
         <mat-accordion>
           <mat-expansion-panel
+            class="faq-panel" 
             *ngFor="let item of allFaqList"
             (opened)="onFaqOpened(item)"
           >
@@ -120,6 +121,7 @@
 
       <mat-accordion>
         <mat-expansion-panel
+          class="faq-panel" 
           *ngFor="let item of filteredFAQ"
           (opened)="onFaqOpened(item)"
         >
