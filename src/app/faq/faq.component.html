@@ -1,10 +1,5 @@
 <div class="faq-container">
   <div class="faq-search">
-    <div class="search-shortcut-wrapper">
-
-    <label class="visually-hidden" for="faqSearchInput"> Search FAQs </label>
-    
-    </div>
     <div class="search-wrapper">
       <input
         #faqSearchBox
@@ -18,7 +13,8 @@
       <span
         class="shortcut-hint shortcut-clickable"
         (click)="isSearchOpen = true"
-        >/</span>
+        >/</span
+      >
     </div>
   </div>
 
@@ -63,35 +59,64 @@
     </aside> -->
 
     <main class="faq-main">
-      <nav class="breadcrumb" *ngIf="currentCategory || currentSubCategory">
-        <span
-          class="breadcrumb-link"
-          (click)="clearCategory()"
-          [class.clickable]="currentCategory || currentSubCategory"
-        >
-          Home
-        </span>
-        <ng-container *ngIf="currentCategory">
-          <span class="breadcrumb-separator">/</span>
+      <app-faq-home *ngIf="showHome" (selectedTrending)="handleTrendingSelect($event)" ></app-faq-home>
+      <div *ngIf="showHome" class="all-faqs">
+        <h2 class="section-title">All FAQs</h2>
+        <mat-accordion>
+          <mat-expansion-panel
+            *ngFor="let item of allFaqList"
+            (opened)="onFaqOpened(item)"
+          >
+            <mat-expansion-panel-header>
+              <mat-panel-title class="faq-title">
+                {{ item.question }}
+              </mat-panel-title>
+            </mat-expansion-panel-header>
+            <ng-container
+              *ngComponentOutlet="
+                FaqComponentRegistry[toRegistryKey(item.answer)]
+              "
+            ></ng-container>
+          </mat-expansion-panel>
+        </mat-accordion>
+      </div>
+      <div *ngIf="showHome" class="need-more-help">
+        <h2 class="section-title">Need more help?</h2>
+        <p class="help-text">
+          Contact us at
+          <a class="help-text-link" href="mailto:hello&#64;data-sync-pro.io">hello&#64;data-sync-pro.io</a>
+        </p>
+      </div>
+      <ng-container *ngIf="!showHome">
+        <nav class="breadcrumb" *ngIf="currentCategory || currentSubCategory">
           <span
             class="breadcrumb-link"
-            (click)="pickCategory(currentCategory)"
-            [class.clickable]="true"
+            (click)="clearCategory()"
+            [class.clickable]="currentCategory || currentSubCategory"
           >
-            {{ currentCategory }}
+          FAQ Home
           </span>
-        </ng-container>
-        <ng-container *ngIf="currentSubCategory">
-          <span class="breadcrumb-separator">/</span>
-          <span
-            class="breadcrumb-link"
-            (click)="pickSubCategory(currentSubCategory)"
-            [class.clickable]="true"
-          >
-            {{ currentSubCategory }}
-          </span>
-        </ng-container>
-      </nav>
+          <ng-container *ngIf="currentCategory">
+            <span class="breadcrumb-separator">/</span>
+            <span
+              class="breadcrumb-link"
+              (click)="pickCategory(currentCategory)"
+              [class.clickable]="true"
+            >
+              {{ currentCategory }}
+            </span>
+          </ng-container>
+          <ng-container *ngIf="currentSubCategory">
+            <span class="breadcrumb-separator">/</span>
+            <span
+              class="breadcrumb-link"
+              (click)="pickSubCategory(currentSubCategory)"
+              [class.clickable]="true"
+            >
+              {{ currentSubCategory }}
+            </span>
+          </ng-container>
+        </nav>
 
       <mat-accordion>
         <mat-expansion-panel
@@ -112,16 +137,16 @@
         </mat-expansion-panel>
       </mat-accordion>
 
-      <div class="no-results" *ngIf="filteredFAQ.length === 0">
-        No FAQs found. Try a different search or reset the filters.
-      </div>
+        <div class="no-results" *ngIf="filteredFAQ.length === 0">
+          No FAQs found. Try a different search or reset the filters.
+        </div>
+      </ng-container>
     </main>
-    
   </div>
   <app-search-overlay
-      *ngIf="isSearchOpen"
-      [isOpen]="isSearchOpen"
-      (closed)="isSearchOpen = false"
-      (selectedResult)="handleSearchSelect($event)" 
-    ></app-search-overlay>
+    *ngIf="isSearchOpen"
+    [isOpen]="isSearchOpen"
+    (closed)="isSearchOpen = false"
+    (selectedResult)="handleSearchSelect($event)"
+  ></app-search-overlay>
 </div>

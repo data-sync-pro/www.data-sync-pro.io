@@ -183,6 +183,7 @@ import { QueryManagerqQToolingApiComponent } from './faq-item/query-managerq-q-t
 import { QueryManagerqManageQueriesComponent } from './faq-item/query-managerq-manage-queries/query-managerq-manage-queries.component';
 import { QueryManagerqIntegrateQLightningComponent } from './faq-item/query-managerq-integrate-q-lightning/query-managerq-integrate-q-lightning.component';
 import { SearchOverlayComponent } from '../search-overlay/search-overlay.component';
+import { FaqHomeComponent } from './faq-home/faq-home.component';
 @NgModule({
   declarations: [
     FaqComponent,
@@ -357,7 +358,8 @@ import { SearchOverlayComponent } from '../search-overlay/search-overlay.compone
     QueryManagerqQToolingApiComponent,
     QueryManagerqManageQueriesComponent,
     QueryManagerqIntegrateQLightningComponent,
-    SearchOverlayComponent
+    SearchOverlayComponent,
+    FaqHomeComponent
   ],
   imports: [
     CommonModule,

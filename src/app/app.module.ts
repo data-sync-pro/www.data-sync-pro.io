@@ -18,6 +18,7 @@ import { RulesEnginesComponent } from './rules-engines/rules-engines.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
+import { ScrollToTopComponent } from './scroll-to-top/scroll-to-top.component';
 
 @NgModule({
   // Now only declare non-FAQ components here
@@ -30,7 +31,8 @@ import { HttpClientModule } from '@angular/common/http';
     SupportComponent,
     SolutionsComponent,
     RulesEnginesComponent,
-    CookieConsentComponent
+    CookieConsentComponent,
+    ScrollToTopComponent
   ],
   imports: [
     BrowserModule,
