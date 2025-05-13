@@ -94,6 +94,7 @@ p + ul {
 img:not([noZoom]) {
   cursor: zoom-in;
   max-width: 100%;
+  border-radius: 8px; 
   height: auto;
   user-select: none;
   touch-action: none;
