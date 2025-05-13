@@ -184,7 +184,7 @@ import { QueryManagerqManageQueriesComponent } from './faq-item/query-managerq-m
 import { QueryManagerqIntegrateQLightningComponent } from './faq-item/query-managerq-integrate-q-lightning/query-managerq-integrate-q-lightning.component';
 import { SearchOverlayComponent } from '../search-overlay/search-overlay.component';
 import { FaqHomeComponent } from './faq-home/faq-home.component';
-import { ZoomableDirective } from 'src/styles/zoomable.directive';
+import { ZoomableDirective } from 'src/app/zoomable.directive';
 @NgModule({
   declarations: [
     FaqComponent,
