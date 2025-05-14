@@ -6,10 +6,25 @@ import { Component, HostListener } from '@angular/core';
   styleUrls: ['./scroll-to-top.component.css']
 })
 export class ScrollToTopComponent {
-  isVisible: boolean = false;
+  isVisible = false;  
+  isZooming = false;  
 
   @HostListener('window:scroll', [])
   onWindowScroll() {
+    if (!this.isZooming) {
+      this.isVisible = window.pageYOffset > 200;
+    }
+  }
+
+  @HostListener('window:zoomStart', [])
+  onZoomStart() {
+    this.isZooming = true;
+    this.isVisible = false;      
+  }
+
+  @HostListener('window:zoomEnd', [])
+  onZoomEnd() {
+    this.isZooming = false;
     this.isVisible = window.pageYOffset > 200;
   }
 
