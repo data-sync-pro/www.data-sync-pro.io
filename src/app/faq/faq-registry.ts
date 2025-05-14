@@ -1,5 +1,3 @@
-// faq-registry.ts
-
 import { GeneralWhatIsDspComponent } from './faq-item/general-what-is-dsp/general-what-is-dsp.component';
 import { GeneralFiveDspEnginesComponent } from './faq-item/general-five-dsp-engines/general-five-dsp-engines.component';
 import { GeneralNoCodeRulesTransformComponent } from './faq-item/general-no-code-rules-transform/general-no-code-rules-transform.component';

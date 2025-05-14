@@ -10,7 +10,6 @@ export class ScrollToTopComponent {
 
   @HostListener('window:scroll', [])
   onWindowScroll() {
-    // Check if the scroll position is greater than 200px
     this.isVisible = window.pageYOffset > 200;
   }
 
