@@ -81,29 +81,24 @@ p + ul {
   padding-right: 50px;      
 }
 
-/* =======  Images  ======= */
-img {
-  max-width: 100%;
-  height: auto;
+
+.zoom-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, .6);
+  z-index: 9;
+  pointer-events: auto;
+  transition: opacity .25s ease;
 }
 
-img{
-    max-width: 100%;
-    height: auto;
-    cursor: zoom-in;
-    user-select: none;
-    touch-action: none;
-  }
+img:not([noZoom]) {
+  cursor: zoom-in;
+  max-width: 100%;
+  height: auto;
+  user-select: none;
+  touch-action: none;
+}
 
- 
-.zoom-backdrop {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, .6); 
-    z-index: 9;                  
-    pointer-events: none;          
-    transition: opacity .25s ease;
-  }
   
   
 
