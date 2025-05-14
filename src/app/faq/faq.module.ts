@@ -1,15 +1,11 @@
-// file: src/app/faq/faq.module.ts
-
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-/* If you need Material or other modules for your FAQ components, import them here: */
 import { MatButtonModule } from '@angular/material/button';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 
-/* Import all your FAQ components: */
 import { FaqComponent } from './faq.component';
 import { GeneralWhatIsDspComponent } from './faq-item/general-what-is-dsp/general-what-is-dsp.component';
 import { GeneralFiveDspEnginesComponent } from './faq-item/general-five-dsp-engines/general-five-dsp-engines.component';
