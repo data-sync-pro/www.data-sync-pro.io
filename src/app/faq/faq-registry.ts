@@ -185,18 +185,6 @@ import { QueryManagerqQToolingApiComponent } from './faq-item/query-managerq-q-t
 import { QueryManagerqManageQueriesComponent } from './faq-item/query-managerq-manage-queries/query-managerq-manage-queries.component';
 import { QueryManagerqIntegrateQLightningComponent } from './faq-item/query-managerq-integrate-q-lightning/query-managerq-integrate-q-lightning.component';
 
-/**
- * Maps each kebab-case filename (stripping `.html`) to the 
- * corresponding component class. 
- * 
- * Example: 
- *   "general-what-is-dsp.html" -> "general-what-is-dsp"
- * 
- * In your code, you'll do something like:
- *   const key = item.Answer__c.replace(/\.html$/, '').toLowerCase();
- *   const component = FaqComponentRegistry[key];
- *   ...
- */
 export const FaqComponentRegistry: Record<string, any> = {
   // --- General
   'general-what-is-dsp': GeneralWhatIsDspComponent,
