@@ -1,0 +1,19 @@
+<!-- admin-guide.component.html -->
+<nav class="toc">
+    <ul>
+      <li *ngFor="let section of nav">
+        <h3>{{ section.title }}</h3>
+        <ul>
+          <li *ngFor="let item of section.items">
+            <a [routerLink]="[slug(item)]" routerLinkActive="active">
+              {{ item }}
+            </a>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </nav>
+  
+  <!-- 把 router-outlet 放在内容区 -->
+  <router-outlet class="content"></router-outlet>
+  

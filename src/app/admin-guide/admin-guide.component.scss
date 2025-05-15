@@ -1,44 +1,30 @@
-/* admin-guide.component.scss */
 :host {
     display: flex;
     gap: 2rem;
     padding: 2rem;
-  
-    /* Collapse to single-column on narrow screens */
-    @media (max-width: 900px) {
-      flex-direction: column;
-    }
   }
   
-  .toc {                               // left column = table-of-contents
-    flex: 0 0 240px;
+  /* ----- sidebar ---------------------------------------------------- */
+  .toc {
+    flex: 0 0 260px;
+    max-height: calc(100vh - 6rem);
+    overflow-y: auto;
     position: sticky;
-    top: 5rem;                         // below navbar
-    ul {
-      list-style: none;
-      margin: 0;
-      padding: 0;
+    top: 4rem;
   
-      li {
-        margin: .25rem 0;
-        a {
-          text-decoration: none;
-          color: var(--color-primary);
-          &.active { font-weight: 600; }
-        }
-      }
-    }
+    h3 { margin: 1rem 0 .25rem; font-size: 1rem; }
+    a { text-decoration: none; color: var(--color-primary); }
   }
   
-  .content {                           // right column = main guide
+  /* ----- main content ---------------------------------------------- */
+  .content {
     flex: 1 1 auto;
-    h2, h3 { scroll-margin-top: 6rem; } // leave room for fixed header
-    pre {                               // optional code blocks
-      background: #272822;
-      padding: 1rem;
-      border-radius: .5rem;
-      overflow: auto;
-      color: #fff;
-    }
+    h2 { scroll-margin-top: 5rem; }   /* leave room for fixed header */
+  }
+  
+  /* mobile: stack columns */
+  @media (max-width: 900px) {
+    :host { flex-direction: column; }
+    .toc { position: static; max-height: none; }
   }
   
