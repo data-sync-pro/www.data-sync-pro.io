@@ -1,23 +1,20 @@
 <article>
     <p>
-      The "Matched Records Sorting Components" field defines the 
-      sorting logic for matched target records when multiple records are found. 
-      It consists of semicolon-separated expressions that compare and sort 
+      The <strong>"Matched Records Sorting Components"</strong> field defines the 
+      <strong>sorting logic</strong> for matched target records when multiple records are found. 
+      It consists of semicolon-separated expressions that <strong>compare</strong> and <strong>sort</strong>
       records in ascending order by default.
     </p>
-    <br/>
+    <img src="../../../../assets/image/process-steps-match-matched-records-sorting/process-steps-match-matched-records-sorting.jpg" >   
     <p>
       To sort in descending order, prefix an expression with a negative sign 
       (<code>-</code>). <br />For example:<br />
-      <code>-LEN(Description) ; -LastModifiedDate</code><br />
-      <br />
+      <code>-LEN(Description) <br />-LastModifiedDate</code><br />
       This sorts matched records first by <code>Description</code> length (DESC), 
       and if lengths are the same, by <code>LastModifiedDate</code> (DESC).
     </p>
-    <br/>
     <p>
       For Boolean values, TRUE is considered smaller than FALSE.
     </p>
-  </article>
-  
-    <img src="../../../../assets/image/process-steps-match-matched-records-sorting/process-steps-match-matched-records-sorting.jpg" >      
+       
+</article>

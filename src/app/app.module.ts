@@ -4,9 +4,8 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { MatButtonModule } from '@angular/material/button';
-import { FaqModule } from './faq/faq.module'; // <--- Import the new FAQ module
+import { FaqModule } from './faq/faq.module'; // 
 
-// Non-FAQ imports remain:
 import { CookieConsentComponent } from './cookie-consent/cookie-consent.component';
 import { HomeComponent } from './home/home.component';
 import { HeaderComponent } from './header/header.component';
@@ -21,7 +20,6 @@ import { HttpClientModule } from '@angular/common/http';
 import { ScrollToTopComponent } from './scroll-to-top/scroll-to-top.component';
 
 @NgModule({
-  // Now only declare non-FAQ components here
   declarations: [
     AppComponent,
     HomeComponent,
