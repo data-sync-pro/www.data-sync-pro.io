@@ -4,13 +4,15 @@ import { ActivatedRoute } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
+import { HttpClientModule }  from '@angular/common/http';
+import { RouterModule,ParamMap } from '@angular/router';
+
 
 @Component({
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, HttpClientModule, RouterModule],
   template: `<div class="article" [innerHTML]="html"></div>`,
-  styles: [`.article{padding:1rem 2rem;}`],
-  
+  styles: [`.article{padding:1rem 2rem;}`]
 })
 export class AdminGuideItemComponent {
   private route = inject(ActivatedRoute);
@@ -20,12 +22,13 @@ export class AdminGuideItemComponent {
   html: SafeHtml | null = null;
 
   ngOnInit() {
-    const parent = this.route.snapshot.paramMap.get('parent')!;
-    const slug   = this.route.snapshot.paramMap.get('slug')!;
-    const extra  = this.route.snapshot.url.length === 3               // 有次级目录？
-                    ? this.route.snapshot.url[1].path + '/' : '';     // e.g. 'examples/'
+    const pm: ParamMap = this.route.snapshot.paramMap;
+    const parent = pm.get('parent')!;
+    const slug   = pm.get('slug')!;
+    const sub    = pm.get('sub');                 // 可能为空
 
-    const url = `assets/admin-guide/${parent}/${extra}${slug}.html`;
+    const url = `/admin-guide/${parent}/${sub ? sub + '/' : ''}${slug}.html`;
+
     this.http.get(url, { responseType: 'text' }).subscribe(raw =>
       this.html = this.safe.bypassSecurityTrustHtml(raw)
     );

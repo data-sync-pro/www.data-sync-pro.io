@@ -20,7 +20,8 @@ const routes: Routes = [
     path: 'admin-guide',
     component: AdminGuideComponent,
     children: [
-      { path: ':parent/:slug', component: AdminGuideItemComponent }
+      { path: ':parent/:sub/:slug', component: AdminGuideItemComponent },
+      { path: ':parent/:slug',     component: AdminGuideItemComponent }
     ]
   },
   { path: '**', redirectTo: '' }
