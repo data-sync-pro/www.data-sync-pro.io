@@ -1,4 +1,4 @@
-// admin-guide-item.component.ts
+// designer-guide-item.component.ts
 import { Component, inject, OnDestroy, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
@@ -11,10 +11,10 @@ import { switchMap } from 'rxjs/operators';
   standalone: true,
   imports: [CommonModule, HttpClientModule, RouterModule],
   template: `<div class="article" [innerHTML]="html"></div>`,
-  styleUrls: ['./admin-guide-item.component.scss'],
+  styleUrls: ['./designer-guide-item.component.scss'],
   encapsulation: ViewEncapsulation.Emulated,  // 默认即可
 })
-export class AdminGuideItemComponent implements OnDestroy {
+export class DesignerGuideItemComponent implements OnDestroy {
   private route = inject(ActivatedRoute);
   private http  = inject(HttpClient);
   private safe  = inject(DomSanitizer);
@@ -28,7 +28,7 @@ export class AdminGuideItemComponent implements OnDestroy {
         const parent = pm.get('parent')!;
         const slug   = pm.get('slug')!;
         const subDir = pm.get('sub');
-        const url = `/admin-guide/${parent}/${subDir ? subDir + '/' : ''}${slug}.html`;
+        const url = `/designer-guide/${parent}/${subDir ? subDir + '/' : ''}${slug}.html`;
         return this.http.get(url, { responseType: 'text' });
       })
     ).subscribe(raw => this.html = this.safe.bypassSecurityTrustHtml(raw));

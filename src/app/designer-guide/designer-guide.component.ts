@@ -5,7 +5,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import navRaw from '../../assets/data/admin-sidebar.json';
+import navRaw from '../../assets/data/designer-sidebar.json';
 
 interface Item {
   title: string;
@@ -28,13 +28,13 @@ const slug = (s: string) =>
     .replace(/^-|-$/g, '');
 
 @Component({
-  selector: 'app-admin-guide',
+  selector: 'app-designer-guide',
   standalone: true,
   imports: [CommonModule, RouterModule],
-  templateUrl: './admin-guide.component.html',
-  styleUrls: ['./admin-guide.component.scss'],
+  templateUrl: './designer-guide.component.html',
+  styleUrls: ['./designer-guide.component.scss'],
 })
-export class AdminGuideComponent implements OnDestroy {
+export class DesignerGuideComponent implements OnDestroy {
   nav: Nav[] = Object.entries(navRaw).map(([parent, val]) => {
     const parentSlug = slug(parent);
     const expanded = false;

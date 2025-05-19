@@ -7,8 +7,8 @@ import { SolutionsComponent } from './solutions/solutions.component';
 import { SupportComponent } from './support/support.component';
 import { FaqComponent } from './faq/faq.component';
 import { AppComponent } from './app.component';
-import {AdminGuideComponent} from './admin-guide/admin-guide.component';
-import { AdminGuideItemComponent } from './admin-guide/admin-guide-item.component'
+import {DesignerGuideComponent} from './designer-guide/designer-guide.component';
+import { DesignerGuideItemComponent } from './designer-guide/designer-guide-item.component'
 const routes: Routes = [
   { path: '', component: HomeComponent },       // Home page
   { path: 'rules-engines', component: RulesEnginesComponent },
@@ -17,11 +17,11 @@ const routes: Routes = [
   { path: 'support', component: SupportComponent },
   { path: 'pricing', component: PricingComponent },
   {
-    path: 'admin-guide',
-    component: AdminGuideComponent,
+    path: 'designer-guide',
+    component: DesignerGuideComponent,
     children: [
-      { path: ':parent/:sub/:slug', component: AdminGuideItemComponent },
-      { path: ':parent/:slug',     component: AdminGuideItemComponent }
+      { path: ':parent/:sub/:slug', component: DesignerGuideItemComponent },
+      { path: ':parent/:slug',     component: DesignerGuideItemComponent }
     ]
   },
   { path: '**', redirectTo: '' }

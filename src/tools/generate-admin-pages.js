@@ -8,8 +8,8 @@ const fs   = require('fs');
 const path = require('path');
 
 /* 路径配置 --------------------------------------------------------- */
-const navPath = path.resolve(__dirname, '../assets/data/admin-sidebar.json');
-const outRoot = path.resolve(__dirname, '../app/admin-guide/admin-guide-item');
+const navPath = path.resolve(__dirname, '../assets/data/designer-sidebar.json');
+const outRoot = path.resolve(__dirname, '../app/designer-guide/designer-guide-item');
 
 /* 模板 ------------------------------------------------------------- */
 const template = (title) => `<!-- ${title} -->
