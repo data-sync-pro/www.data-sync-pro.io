@@ -6,13 +6,11 @@
     line-height: 1.6;
   }
   
-  /* ===== 文章主体 ===== */
   .article {
-    max-width: 800px;
+    max-width: 70vw;
     margin: 0 auto;
     padding: 1.5rem 2rem;
   
-    /* 标题 */
     h1,
     h2,
     h3,
@@ -24,12 +22,10 @@
       line-height: 1.25;
     }
   
-    /* 段落 */
     p {
       margin: 1rem 0;
     }
   
-    /* 列表 */
     ul,
     ol {
       margin: 1rem 0 1rem 1.5rem;
@@ -41,13 +37,11 @@
       margin-left: 1rem;
     }
   
-    /* 链接 */
     a {
       color: #0d6efd;
       text-decoration: underline;
     }
   
-    /* 代码块 & 内联 code */
     pre,
     code {
       font-family: ui-monospace, Menlo, Consolas, "Liberation Mono", monospace;
@@ -65,7 +59,6 @@
       border-radius: 3px;
     }
   
-    /* 引用块 */
     blockquote {
       margin: 1rem 0;
       padding-left: 1rem;
@@ -74,7 +67,6 @@
       font-style: italic;
     }
   
-    /* 图片 */
     img {
       max-width: 100%;
       height: auto;
@@ -84,21 +76,20 @@
       border-radius: 6px;
     }
   
-    /* ========== 表格 ========== */
     .table-wrapper {
-      overflow-x: auto; /* 小屏横向滚动 */
+      overflow-x: auto;
       margin: 1.5rem 0;
     }
   
     .data-table {
       width: 100%;
-      min-width: 640px; /* 过窄时自动出现滚动条 */
+      min-width: 640px;
       border-collapse: collapse;
       font-size: 0.95rem;
       line-height: 1.6;
   
       thead th {
-        position: sticky; /* 粘性表头；若不需要可删掉 */
+        position: sticky; 
         top: 0;
         background: #f1f5f9;
         color: #334155;
@@ -116,10 +107,10 @@
       }
   
       tbody tr:nth-child(odd) {
-        background: #fafafa; /* 斑马纹 */
+        background: #fafafa; 
       }
       tbody tr:hover {
-        background: #ecf4ff; /* 悬浮高亮 */
+        background: #ecf4ff; 
       }
   
       /* 列宽 / 对齐（可酌情保留） */
@@ -187,41 +178,38 @@
     }
   }
   
-  /* ========= 表格样式 ========= */
   .fields {
     .table-wrapper { overflow-x: auto; }
   
     table {
       width: 100%;
-      min-width: 640px;               /* 过窄时可横向滚动 */
-      border-collapse: collapse;
+      min-width: 640px;
+      border-collapse: collapse;         
       margin: 1.5rem 0;
-      font-size: 0.95rem;
-    }
+      font-size: .95rem;
   
-    thead th {
-      background: #f1f5f9;
-      color: #334155;
-      font-weight: 600;
-      padding: 0.625rem 0.75rem;
-      text-align: left;
-      border-bottom: 2px solid #d9e2ef;
-    }
+      border: 1px solid #d9e2ef;     
+      th, td {
+        border: 1px solid #d9e2ef;   
+      }
   
-    tbody td {
-      padding: 0.625rem 0.75rem;
-      border-bottom: 1px solid #e2e8f0;
-      vertical-align: top;
-    }
+      thead th {
+        background: #f1f5f9;
+        color: #334155;
+        font-weight: 600;
+        padding: .625rem .75rem;
+      }
   
-    tbody tr:nth-child(odd) { background: #fafafa; }  /* 斑马纹 */
-    tbody tr:hover          { background: #ecf4ff; } /* 悬浮高亮 */
-  
-    /* “Required” 列居中且固定宽度 */
-    tbody td:nth-child(3),
-    thead th:nth-child(3) {
-      width: 80px;
-      text-align: center;
+      tbody {
+        tr:nth-child(odd)   { background: #fafafa; } 
+        tr:hover            { background: #ecf4ff; } 
+        td {
+          padding: .625rem .75rem;
+          vertical-align: top;
+        }
+
+        td:nth-child(3)   { width: 80px; text-align: center; }
+      }
     }
   }
   
