@@ -12,8 +12,9 @@ import { switchMap } from 'rxjs/operators';
   imports: [CommonModule, HttpClientModule, RouterModule],
   template: `<div class="article" [innerHTML]="html"></div>`,
   styleUrls: ['./designer-guide-item.component.scss'],
-  encapsulation: ViewEncapsulation.Emulated,  // 默认即可
+  encapsulation: ViewEncapsulation.None,
 })
+
 export class DesignerGuideItemComponent implements OnDestroy {
   private route = inject(ActivatedRoute);
   private http  = inject(HttpClient);
