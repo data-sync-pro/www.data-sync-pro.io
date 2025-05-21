@@ -293,30 +293,30 @@ export const FaqComponentRegistry: Record<string, any> = {
   'rules-engines-triggers-test-coverage-trigger': RulesEnginesTriggersTestCoverageTriggerComponent,
   'rules-engines-triggers-trigger-flipper': RulesEnginesTriggersTriggerFlipperComponent,
 
-  // --- Process Steps > Retrieve
+  // --- Process > Retrieve
   'process-steps-retrieve-retrieve-action': ProcessStepsRetrieveRetrieveActionComponent,
   'process-steps-retrieve-retrieve-query-field-requirements': ProcessStepsRetrieveRetrieveQueryFieldRequirementsComponent,
   'process-steps-retrieve-preview-source-record': ProcessStepsRetrievePreviewSourceRecordComponent,
   'process-steps-retrieve-additional-retrieve-criteria': ProcessStepsRetrieveAdditionalRetrieveCriteriaComponent,
 
-  // --- Process Steps > Preview
+  // --- Process > Preview
   'process-steps-preview-preview-overview': ProcessStepsPreviewPreviewOverviewComponent,
   'process-steps-preview-preview-source-record': ProcessStepsPreviewPreviewSourceRecordComponent,
   'process-steps-preview-preview-vs-retrieve': ProcessStepsPreviewPreviewVsRetrieveComponent,
 
-  // --- Process Steps > Input
+  // --- Process > Input
   'process-steps-input-input-action': ProcessStepsInputInputActionComponent,
   'process-steps-input-define-input-data-profile': ProcessStepsInputDefineInputDataProfileComponent,
   'process-steps-input-data-loader-column-format': ProcessStepsInputDataLoaderColumnFormatComponent,
   'process-steps-input-input-data-key-field': ProcessStepsInputInputDataKeyFieldComponent,
 
-  // --- Process Steps > Scoping
+  // --- Process > Scoping
   'process-steps-scoping-scoping-action': ProcessStepsScopingScopingActionComponent,
   'process-steps-scoping-scope-filter': ProcessStepsScopingScopeFilterComponent,
   'process-steps-scoping-avoid-duplicate-source': ProcessStepsScopingAvoidDuplicateSourceComponent,
   'process-steps-scoping-join-source-data': ProcessStepsScopingJoinSourceDataComponent,
 
-  // --- Process Steps > Match
+  // --- Process > Match
   'process-steps-match-match-action': ProcessStepsMatchMatchActionComponent,
   'process-steps-match-multiple-target-records': ProcessStepsMatchMultipleTargetRecordsComponent,
   'process-steps-match-insert-duplicate-check': ProcessStepsMatchInsertDuplicateCheckComponent,
@@ -328,7 +328,7 @@ export const FaqComponentRegistry: Record<string, any> = {
   'process-steps-match-additional-target-matching': ProcessStepsMatchAdditionalTargetMatchingComponent,
   'process-steps-match-matched-records-sorting': ProcessStepsMatchMatchedRecordsSortingComponent,
 
-  // --- Process Steps > Mapping
+  // --- Process > Mapping
   'process-steps-mapping-mapping-action': ProcessStepsMappingMappingActionComponent,
   'process-steps-mapping-mapping-parent-relationship': ProcessStepsMappingMappingParentRelationshipComponent,
   'process-steps-mapping-dsp-relationship-management': ProcessStepsMappingDspRelationshipManagementComponent,
@@ -339,7 +339,7 @@ export const FaqComponentRegistry: Record<string, any> = {
   'process-steps-mapping-refresh-button': ProcessStepsMappingRefreshButtonComponent,
   'process-steps-mapping-save-button': ProcessStepsMappingSaveButtonComponent,
 
-  // --- Process Steps > Action
+  // --- Process > Action
   'process-steps-action-action-phase': ProcessStepsActionActionPhaseComponent,
   'process-steps-action-which-actions-supported': ProcessStepsActionWhichActionsSupportedComponent,
   'process-steps-action-avoid-duplicates': ProcessStepsActionAvoidDuplicatesComponent,
@@ -351,7 +351,7 @@ export const FaqComponentRegistry: Record<string, any> = {
   'process-steps-action-action-big-objects': ProcessStepsActionActionBigObjectsComponent,
   'process-steps-action-action-platform-events': ProcessStepsActionActionPlatformEventsComponent,
 
-  // --- Process Steps > Verify
+  // --- Process > Verify
   'process-steps-verify-verify-phase': ProcessStepsVerifyVerifyPhaseComponent,
   'process-steps-verify-verify-batch-only': ProcessStepsVerifyVerifyBatchOnlyComponent,
   'process-steps-verify-verify-with-bulk-api': ProcessStepsVerifyVerifyWithBulkApiComponent,
