@@ -55,7 +55,7 @@ export class PricingComponent {
       title: 'Batch Engine',
       features: [
         { name: 'Health insurance administration', simple: true, plus: true, premium: true },
-        { name: 'Workers’ compensation', simple: 'Add-on', plus: 'Add-on', premium: 'Add-on' },
+        { name: "Workers' compensation", simple: 'Add-on', plus: 'Add-on', premium: 'Add-on' },
         // ...
       ]
     },

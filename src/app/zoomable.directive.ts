@@ -39,7 +39,7 @@ export class ZoomableDirective {
     this.rd.setStyle(img, 'transform', `translate(-50%, -50%) scale(${scale})`);
     this.rd.setStyle(img, 'z-index', '10');
     this.rd.setStyle(img, 'cursor', 'zoom-out');
-
+    window.dispatchEvent(new Event('zoomStart')); 
     this.zoomed = true;
   }
 
@@ -56,7 +56,7 @@ export class ZoomableDirective {
       this.backdropEl = undefined;
     }
     this.rd.removeStyle(document.body, 'overflow');
-
+    window.dispatchEvent(new Event('zoomEnd'));
     this.zoomed = false;
   }
 }

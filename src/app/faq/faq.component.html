@@ -81,13 +81,6 @@
           </mat-expansion-panel>
         </mat-accordion>
       </div>
-      <div *ngIf="showHome" class="need-more-help">
-        <h2 class="section-title">Need more help?</h2>
-        <p class="help-text">
-          Contact us at
-          <a class="help-text-link" href="mailto:hello&#64;data-sync-pro.io">hello&#64;data-sync-pro.io</a>
-        </p>
-      </div>
       <ng-container *ngIf="!showHome">
         <nav class="breadcrumb" *ngIf="currentCategory || currentSubCategory">
           <span
@@ -119,24 +112,6 @@
           </ng-container>
         </nav>
 
-      <mat-accordion>
-        <mat-expansion-panel
-          class="faq-panel"  
-          *ngFor="let item of filteredFAQ"
-          (opened)="onFaqOpened(item)"
-        >
-          <mat-expansion-panel-header>
-            <mat-panel-title class="faq-title">
-              {{ item.question }}
-            </mat-panel-title>
-          </mat-expansion-panel-header>
-          <ng-container
-            *ngComponentOutlet="
-              FaqComponentRegistry[toRegistryKey(item.answer)]
-            "
-          ></ng-container>
-        </mat-expansion-panel>
-      </mat-accordion>
       <mat-accordion>
         <mat-expansion-panel
           class="faq-panel" 
