@@ -878,7 +878,7 @@
     "Category__c": "Process",
     "SubCategory__c": "Retrieve",
     "SeqNo__c": null,
-    "Question__c": "How can I preview a source record and its transformed values before execution?",
+    "Question__c": "How can I preview a source record and its transformed values before execution in Retrieve?",
     "Answer__c": "process-steps-retrieve-preview-source-record.html"
   },
   {
@@ -905,7 +905,7 @@
     "Category__c": "Process",
     "SubCategory__c": "Preview",
     "SeqNo__c": null,
-    "Question__c": "How can I preview a source record and its transformed values before execution?",
+    "Question__c": "How can I preview a source record and its transformed values before execution in Preview?",
     "Answer__c": "process-steps-preview-preview-source-record.html"
   },
   {
