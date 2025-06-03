@@ -1103,7 +1103,7 @@
     "Category__c": "Process",
     "SubCategory__c": "Mapping",
     "SeqNo__c": null,
-    "Question__c": "How does DSP simplify managing data relationships?",
+    "Question__c": "How does DSP simplify managing data relationships in Mapping?",
     "Answer__c": "process-steps-mapping-dsp-relationship-management.html"
   },
   {
@@ -1319,7 +1319,7 @@
     "Category__c": "Transformation",
     "SubCategory__c": null,
     "SeqNo__c": null,
-    "Question__c": "How does DSP simplify managing data relationships?",
+    "Question__c": "How does DSP simplify managing data relationships in Transformation?",
     "Answer__c": "transformation-dsp-relationship-management.html"
   },
   {
