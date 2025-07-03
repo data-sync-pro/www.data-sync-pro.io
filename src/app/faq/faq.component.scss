@@ -211,3 +211,109 @@ a:-webkit-any-link {
   overflow-y: auto;   
   padding-right: 8px;
 }
+
+
+
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+}
+
+article {
+  background-color: #f9f9f92d;
+  margin: 20px 0;
+}
+
+p,
+ul,
+li,
+ol {
+  font-size: 16px;
+  line-height: 30px;
+  color: #333;
+  margin: 0;           
+}
+
+h3 {
+  padding: 0 15px;
+  font-size: 16px;
+  margin: 0;
+}
+
+h3 + p {
+  padding: 0 35px;
+}
+
+ol {
+    padding-left: 30px;
+    line-height: 30px;
+    font-size: 16px;
+    list-style: none;
+    padding-left: 2.4em;
+    
+}
+
+ol > li {
+  position: relative;
+}
+
+ol > li:nth-child(1)::before  { content: "1️⃣"; }
+ol > li:nth-child(2)::before  { content: "2️⃣"; }
+ol > li:nth-child(3)::before  { content: "3️⃣"; }
+ol > li:nth-child(4)::before  { content: "4️⃣"; }
+ol > li:nth-child(5)::before  { content: "5️⃣"; }
+ol > li:nth-child(6)::before  { content: "6️⃣"; }
+ol > li:nth-child(7)::before  { content: "7️⃣"; }
+ol > li:nth-child(8)::before  { content: "8️⃣"; }
+ol > li:nth-child(9)::before  { content: "9️⃣"; }
+ol > li:nth-child(10)::before { content: "🔟"; }
+
+ol > li::before {
+  position: absolute;
+  left: -1.6em;             
+  top: 0;
+  font-size: 18px;
+  line-height: 30px;
+}
+
+ul > li {
+  position: relative;
+}
+
+h3 + p {
+  padding-left: 35px;
+  padding-right: 35px;
+}
+
+ul > li {
+  position: relative;
+}
+
+
+p + ul {
+  padding-left: 2.4em;      
+  padding-right: 50px;      
+}
+
+
+.zoom-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, .6);
+  z-index: 9;
+  pointer-events: auto;
+  transition: opacity .25s ease;
+}
+
+img:not([noZoom]) {
+  cursor: zoom-in;
+  max-width: 100%;
+  border-radius: 8px; 
+  height: auto;
+  user-select: none;
+  touch-action: none;
+}
+
+  
+  
+

@@ -13,7 +13,10 @@ const routes: Routes = [
   { path: '', component: HomeComponent },       // Home page
   { path: 'rules-engines', component: RulesEnginesComponent },
   { path: 'solutions', component: SolutionsComponent },
-  { path: 'faq', component: FaqComponent },
+  { path: 'faq',                       component: FaqComponent },
+  { path: 'faq/:cat',                  component: FaqComponent },
+  { path: 'faq/:cat/:subCat',          component: FaqComponent }, 
+  { path: '**', redirectTo: 'faq' },
   { path: 'support', component: SupportComponent },
   { path: 'pricing', component: PricingComponent },
   {

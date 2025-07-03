@@ -4,13 +4,15 @@ import {
   ElementRef,
   HostListener,
   OnInit,
+  ViewEncapsulation
 } from '@angular/core';
 import { MatExpansionPanel } from '@angular/material/expansion';
 import { ViewChildren, QueryList } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import faqData from '../../assets/data/faqs.json';
 import { AnalyticsService } from '../analytics.service';
-import { FaqComponentRegistry } from './faq-registry';
+import { HttpClient } from '@angular/common/http';
+import { ActivatedRoute, Router } from '@angular/router';
 interface SourceFAQRecord {
   Id: string;
   Question__c: string;
@@ -23,7 +25,7 @@ interface SourceFAQRecord {
 interface FAQItem {
   question: string;
   answer: string;
-  safeAnswer: SafeHtml;
+  safeAnswer?: SafeHtml;
   category: string;
   subCategory: string;
   isPopular?: boolean;
@@ -33,6 +35,7 @@ interface FAQItem {
   selector: 'app-faq',
   templateUrl: './faq.component.html',
   styleUrls: ['./faq.component.scss'],
+  encapsulation: ViewEncapsulation.None
 })
 export class FaqComponent implements OnInit {
   searchQuery = '';
@@ -51,11 +54,23 @@ export class FaqComponent implements OnInit {
   isSearchOpen = false;
 
   constructor(
+    private route: ActivatedRoute,
+    private router: Router,
+    private http: HttpClient,
     private sanitizer: DomSanitizer,
     private analyticsService: AnalyticsService
   ) {}
 
   ngOnInit(): void {
+
+    this.initFaqData();                     
+    this.route.paramMap.subscribe(p => {
+      this.currentCategory    = p.get('cat')    ?? '';
+      this.currentSubCategory = p.get('subCat') ?? '';
+    });
+    
+  }
+  private initFaqData(): void {
     const data = faqData as unknown as SourceFAQRecord[];
 
     data.forEach((record) => {
@@ -74,18 +89,25 @@ export class FaqComponent implements OnInit {
     this.faqList = data.map(rec => this.toFAQItem(rec));
   }
 
+  goHome(): void { this.router.navigate(['/faq']); }
+  
+  goCategory(cat: string) {
+    this.router.navigate(['/faq', this.slugify(cat)]);
+  }
+  
+  goSub(cat: string, sub: string) {
+    this.router.navigate(['/faq', this.slugify(cat), this.slugify(sub)]);
+  }
+
   private toFAQItem(rec: SourceFAQRecord): FAQItem {
-    let escapedAnswer = rec.Answer__c ?? '';
-    escapedAnswer = this.removeParagraphs(escapedAnswer);
-    const unescaped = this.unescapeHtml(escapedAnswer);
-    const safe = this.sanitizer.bypassSecurityTrustHtml(unescaped);
+    const BASE = 'assets/faq-item/';
+    const file  = (rec.Answer__c ?? '').replace(/^\/+/, '');
     return {
-      question: rec.Question__c ?? '',
-      answer: unescaped,
-      safeAnswer: safe,
-      category: rec.Category__c ?? '',
+      question   : rec.Question__c ?? '',
+      answer : `${BASE}${file}`,
+      category   : rec.Category__c ?? '',
       subCategory: rec.SubCategory__c ?? '',
-      isPopular: false
+      isPopular  : false,
     };
   }
 
@@ -143,6 +165,7 @@ export class FaqComponent implements OnInit {
   pickSubCategory(subCat: string): void {
     this.currentSubCategory = subCat;
   }
+  
 
   onFaqOpened(item: FAQItem) {
     if (this.analyticsService.userConsented) {
@@ -154,13 +177,20 @@ export class FaqComponent implements OnInit {
       };
       this.analyticsService.trackCustomEvent(payload);
     }
+    if (!item.safeAnswer) {
+      this.http
+        .get(item.answer, { responseType: 'text' })
+        .subscribe(raw => {
+          const html = this.unescapeHtml(this.removeParagraphs(raw));
+          item.safeAnswer = this.sanitizer.bypassSecurityTrustHtml(html);
+        });
+    }
   }
 
   onSearchBlur(): void {
     this.searchFocused = false;
   }
 
-  public FaqComponentRegistry = FaqComponentRegistry;
   toRegistryKey(answer: string): string {
     return answer.replace(/\.html$/, '').toLowerCase();
   }
@@ -188,7 +218,11 @@ export class FaqComponent implements OnInit {
       !(t as HTMLElement).isContentEditable
     );
   }
-
+  slugify(s: string): string {
+    return s.toLowerCase()
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/^-+|-+$/g, '');
+  }
   private openSearch() {
     this.faqSearchBox.nativeElement.focus();
     this.searchFocused = true;
@@ -199,62 +233,62 @@ export class FaqComponent implements OnInit {
   @ViewChildren(MatExpansionPanel, { read: ElementRef })
   panelEls!: QueryList<ElementRef<HTMLElement>>;
 
-  handleSearchSelect(item: {
-    question: string;
-    category: string;
-    subCategory: string | null;
-    subCatFilterApplied?: boolean;
-  }) {
-    this.currentCategory = item.category;
-
-    this.currentSubCategory = item.subCatFilterApplied
-      ? item.subCategory ?? ''
-      : '';
-
-    this.isSearchOpen = false;
-
-    setTimeout(() => {
-      const idx = this.filteredFAQ.findIndex(
-        (f) => f.question === item.question
-      );
-      if (idx >= 0) {
-        this.panels.toArray()[idx].open();
-        this.panelEls.toArray()[idx].nativeElement.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start',
-        });
-      }
-    });
-  }
-
+  
   get showHome(): boolean {
     return (
       !this.currentCategory && !this.currentSubCategory && !this.searchQuery
     );
   }
 
-  handleTrendingSelect(item: {
-    question: string;
-    category: string;
-    subCategory: string | null;
-  }) {
-    this.currentCategory = item.category;
-    this.currentSubCategory = '';
-
+  private openAndScroll(question: string): void {
     setTimeout(() => {
-      const idx = this.filteredFAQ.findIndex(
-        (f) => f.question === item.question
-      );
+      const idx = this.filteredFAQ.findIndex(f => f.question === question);
       if (idx >= 0) {
-        this.panels.toArray()[idx].open();
-        this.panelEls.toArray()[idx].nativeElement.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start',
-        });
+        const panel  = this.panels.toArray()[idx];
+        const panelEl= this.panelEls.toArray()[idx].nativeElement;
+  
+        panel.open();                                          // 展开
+        panelEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     });
   }
-
   
+  trackBySlug(_: number, item: FAQItem) { return this.slugify(item.question); }
+
+  handleSearchSelect(sel: {
+    question: string;
+    category: string;
+    subCategory: string | null;
+    subCatFilterApplied?: boolean;
+  }): void {
+  
+    const cat = sel.category;
+    const sub = sel.subCatFilterApplied ? (sel.subCategory ?? '') : '';
+    const frag= this.slugify(sel.question);
+  
+    this.router.navigate(
+      sub ? ['/faq', cat, sub] : ['/faq', cat],
+      { fragment: frag }
+    );
+  
+    this.isSearchOpen = false;
+  
+    setTimeout(() => this.openAndScroll(sel.question));
+  }
+  
+  
+  handleTrendingSelect(sel: {
+    question: string;
+    category: string;
+    subCategory: string | null;
+  }): void {
+  
+    const frag = this.slugify(sel.question);
+  
+    this.router.navigate(['/faq', sel.category], { fragment: frag });
+  
+    setTimeout(() => this.openAndScroll(sel.question));
+  }
+
 }
 

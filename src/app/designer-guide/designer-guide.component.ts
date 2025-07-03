@@ -83,7 +83,6 @@ export class DesignerGuideComponent implements OnDestroy {
   startDrag(ev: MouseEvent, navEl: HTMLElement) {
     ev.preventDefault();
 
-    // 1) 记录初始光标 X 和侧边栏的 CSS 宽度（只取 content-box 部分）
     this.startX = ev.clientX;
     const style = window.getComputedStyle(navEl);
     this.startWidth = parseFloat(style.width);
@@ -91,15 +90,13 @@ export class DesignerGuideComponent implements OnDestroy {
     const min = 160;
     const max = window.innerWidth * 0.6;
 
-    // 2) 每次移动都基于初始宽度 + 偏移
     this.moveRef = (e: MouseEvent) => {
       const delta = e.clientX - this.startX;
       let newW = this.startWidth + delta;
       newW = Math.max(min, Math.min(max, newW));
       this.zone.run(() => (this.sidebarW = `${newW}px`));
     };
-
-    // 3) 松开时保存并解绑
+    
     this.upRef = () => {
       localStorage.setItem('sbW', this.sidebarW);
       window.removeEventListener('mousemove', this.moveRef!);

@@ -19,45 +19,6 @@
   </div>
 
   <div class="faq-layout">
-    <!-- <aside class="faq-sidebar">
-      <h3 class="sidebar-title">Categories</h3>
-      <ul class="category-list">
-        <li
-          class="category-item"
-          [class.active]="!currentCategory"
-          (click)="clearCategory()"
-        >
-          All
-        </li>
-
-        <li
-          *ngFor="let cat of categories"
-          class="category-item"
-          [class.active]="cat === currentCategory"
-          (click)="pickCategory(cat)"
-        >
-          {{ cat }}
-        </li>
-      </ul>
-
-      <div
-        class="subcategory-container"
-        *ngIf="currentCategory && subCategories[currentCategory]?.length"
-      >
-        <h4 class="sidebar-title">Subcategories</h4>
-        <ul class="subcategory-list">
-          <li
-            *ngFor="let subCat of subCategories[currentCategory]"
-            class="subcategory-item"
-            [class.active]="subCat === currentSubCategory"
-            (click)="pickSubCategory(subCat)"
-          >
-            {{ subCat }}
-          </li>
-        </ul>
-      </div>
-    </aside> -->
-
     <main class="faq-main">
       <app-faq-home *ngIf="showHome" (selectedTrending)="handleTrendingSelect($event)" ></app-faq-home>
       <div *ngIf="showHome" class="all-faqs">
@@ -69,15 +30,12 @@
             (opened)="onFaqOpened(item)"
           >
             <mat-expansion-panel-header>
-              <mat-panel-title class="faq-title">
+              <mat-panel-title class="faq-title" [id]="slugify(item.question)">
                 {{ item.question }}
               </mat-panel-title>
-            </mat-expansion-panel-header>
-            <ng-container
-              *ngComponentOutlet="
-                FaqComponentRegistry[toRegistryKey(item.answer)]
-              "
-            ></ng-container>
+            </mat-expansion-panel-header>  
+            <div *ngIf="item.safeAnswer" [innerHTML]="item.safeAnswer"></div>
+            <p *ngIf="!item.safeAnswer">Loading…</p>
           </mat-expansion-panel>
         </mat-accordion>
       </div>
@@ -85,7 +43,7 @@
         <nav class="breadcrumb" *ngIf="currentCategory || currentSubCategory">
           <span
             class="breadcrumb-link"
-            (click)="clearCategory()"
+            (click)="goHome()"
             [class.clickable]="currentCategory || currentSubCategory"
           >
           FAQ Home
@@ -94,7 +52,7 @@
             <span class="breadcrumb-separator">/</span>
             <span
               class="breadcrumb-link"
-              (click)="pickCategory(currentCategory)"
+              (click)="goCategory(currentCategory)"
               [class.clickable]="true"
             >
               {{ currentCategory }}
@@ -104,7 +62,7 @@
             <span class="breadcrumb-separator">/</span>
             <span
               class="breadcrumb-link"
-              (click)="pickSubCategory(currentSubCategory)"
+              (click)="goSub(currentCategory, currentSubCategory)"
               [class.clickable]="true"
             >
               {{ currentSubCategory }}
@@ -123,11 +81,7 @@
               {{ item.question }}
             </mat-panel-title>
           </mat-expansion-panel-header>
-          <ng-container
-            *ngComponentOutlet="
-              FaqComponentRegistry[toRegistryKey(item.answer)]
-            "
-          ></ng-container>
+            <div [innerHTML]="item.safeAnswer"></div>
         </mat-expansion-panel>
       </mat-accordion>
 

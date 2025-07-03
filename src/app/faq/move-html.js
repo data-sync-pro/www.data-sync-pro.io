@@ -15,10 +15,11 @@ async function walk(dir) {
       await walk(full);
     } else if (entry.isFile()) {
       if (path.extname(entry.name) === '.html') {
+        const cleanName = entry.name.replace(/\.?component/gi, '');
         const destName =
           path.join(
             DEST_DIR,
-            entry.name
+            cleanName
           );
         await fs.copyFile(full, destName);
         console.log('COPIED', full, '->', destName);
