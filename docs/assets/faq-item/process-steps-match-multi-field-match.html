@@ -1,0 +1,33 @@
+<article>
+  <p>
+    To match target records using multiple fields, use a
+    <strong>`VLOOKUP`</strong> formula in the
+    <strong>Target Matching Field</strong>. This allows you to locate the
+    correct record based on multiple criteria.
+  </p>
+  <strong>Example: </strong>
+  <code>VLOOKUP("PermissionSetAssignment", "Id", 
+          "AssigneeId", Id, 
+          "PermissionSet.Name", "DataSyncProStarter")
+  </code>
+  <ul>
+    <li>
+      <strong>Target Matching Field</strong>: <code>Id</code> (of
+      <code>PermissionSetAssignment</code>)
+    </li>
+    <li>
+      <strong>Source Object</strong>: e.g., <code>User</code>, using the
+      <code>Id</code> field
+    </li>
+    <li>
+      <strong>Matches on</strong>: <code>AssigneeId</code> (User Id) and
+      <code>PermissionSet.Name</code>
+    </li>
+  </ul>
+
+  <p>
+    If multiple matches are found, use the
+    <strong>Principal Matched Record Selection Rule</strong> to control which
+    record is selected.
+  </p>
+</article>
