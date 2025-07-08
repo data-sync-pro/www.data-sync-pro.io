@@ -181,7 +181,9 @@ export class FaqComponent implements OnInit {
       this.http
         .get(item.answer, { responseType: 'text' })
         .subscribe(raw => {
-          const html = this.unescapeHtml(this.removeParagraphs(raw));
+          const html = this.fixAssetPaths(
+            this.unescapeHtml(this.removeParagraphs(raw))
+          );
           item.safeAnswer = this.sanitizer.bypassSecurityTrustHtml(html);
         });
     }
@@ -197,7 +199,12 @@ export class FaqComponent implements OnInit {
   openSearchOverlay() {
     this.isSearchOpen = true;
   }
-
+  private fixAssetPaths(raw: string): string {
+    const DEPLOY = '/www.data-sync-pro.io/';        // <-- must match --deploy-url
+    return raw
+      .replace(/\\+/g, '/')                         // 1) \ -> /
+      .replace(/src="assets\//g, `src="${DEPLOY}assets/`); // 2) add prefix
+  }
   closeSearchOverlay() {
     this.isSearchOpen = false;
   }
