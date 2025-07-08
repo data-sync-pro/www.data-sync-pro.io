@@ -6,13 +6,34 @@
         id="faqSearchInput"
         type="text"
         placeholder="Search FAQs..."
-        (focus)="openSearchOverlay()"
+        [(ngModel)]="searchQuery"
+        (input)="onSearchInput($event)"
+        (focus)="onSearchFocus()"
+        (blur)="onSearchBlur()"
+        (keydown)="onSearchKeydown($event)"
         role="combobox"
+        [attr.aria-expanded]="showSuggestions"
+        aria-haspopup="listbox"
       />
+
+      <!-- Search suggestions dropdown -->
+      <div class="search-suggestions" *ngIf="showSuggestions && suggestions.length > 0">
+        <div
+          class="suggestion-item"
+          *ngFor="let suggestion of suggestions; let i = index"
+          [class.selected]="i === selectedSuggestionIndex"
+          (click)="selectSuggestion(suggestion)"
+          (mouseenter)="selectedSuggestionIndex = i"
+        >
+          <span class="suggestion-text" [innerHTML]="highlightMatch(suggestion, searchQuery)"></span>
+          <span class="suggestion-category">{{ getCategoryForSuggestion(suggestion) }}</span>
+        </div>
+      </div>
 
       <span
         class="shortcut-hint shortcut-clickable"
-        (click)="isSearchOpen = true"
+        (click)="focusSearch()"
+        title="Press / to search"
         >/</span
       >
     </div>
@@ -25,17 +46,20 @@
         <h2 class="section-title">All FAQs</h2>
         <mat-accordion>
           <mat-expansion-panel
-            class="faq-panel" 
+            class="faq-panel"
             *ngFor="let item of allFaqList"
             (opened)="onFaqOpened(item)"
+            (closed)="onFaqClosed()"
           >
             <mat-expansion-panel-header>
               <mat-panel-title class="faq-title" [id]="slugify(item.question)">
                 {{ item.question }}
               </mat-panel-title>
             </mat-expansion-panel-header>  
-            <div *ngIf="item.safeAnswer" [innerHTML]="item.safeAnswer"></div>
+            <div *ngIf="item.safeAnswer" [innerHTML]="item.safeAnswer" appZoomable></div>
             <p *ngIf="!item.safeAnswer">Loading…</p>
+
+
           </mat-expansion-panel>
         </mat-accordion>
       </div>
@@ -72,16 +96,94 @@
 
       <mat-accordion>
         <mat-expansion-panel
-          class="faq-panel" 
+          class="faq-panel"
           *ngFor="let item of filteredFAQ"
           (opened)="onFaqOpened(item)"
+          (closed)="onFaqClosed()"
         >
           <mat-expansion-panel-header>
-            <mat-panel-title class="faq-title">
+            <mat-panel-title class="faq-title" [id]="slugify(item.question)">
               {{ item.question }}
             </mat-panel-title>
+
           </mat-expansion-panel-header>
-            <div [innerHTML]="item.safeAnswer"></div>
+          <div [innerHTML]="item.safeAnswer" appZoomable></div>
+
+          <!-- FAQ Feedback and Share Section -->
+          <div class="faq-feedback" *ngIf="item.safeAnswer">
+            <div class="feedback-row">
+              <div class="helpful-section">
+                <p class="feedback-question">Was this answer helpful?</p>
+                <div class="feedback-buttons">
+                  <button
+                    class="feedback-btn helpful"
+                    (click)="rateFAQ(item, true)"
+                    [class.selected]="item.userRating === true"
+                  >
+                    👍 Yes
+                  </button>
+                  <button
+                    class="feedback-btn not-helpful"
+                    (click)="rateFAQ(item, false)"
+                    [class.selected]="item.userRating === false"
+                  >
+                    👎 No
+                  </button>
+                </div>
+              </div>
+
+              <div class="share-section">
+                <button
+                  class="share-btn copy-link-btn"
+                  (click)="copyFAQLink(item)"
+                  title="Copy link to this FAQ"
+                  aria-label="Copy link to this FAQ"
+                >
+                  🔗 Copy Link
+                </button>
+                <div class="social-share-dropdown" [class.show]="item.showSocialShare">
+                  <button
+                    class="share-btn social-toggle-btn"
+                    (click)="toggleSocialShare(item)"
+                    title="More sharing options"
+                    aria-label="More sharing options"
+                  >
+                    📤 Share
+                  </button>
+                  <div class="social-dropdown-content" *ngIf="item.showSocialShare">
+                    <button
+                      class="social-btn"
+                      (click)="shareToSocial('twitter', item)"
+                      title="Share on Twitter"
+                    >
+                      🐦 Twitter
+                    </button>
+                    <button
+                      class="social-btn"
+                      (click)="shareToSocial('facebook', item)"
+                      title="Share on Facebook"
+                    >
+                      📘 Facebook
+                    </button>
+                    <button
+                      class="social-btn"
+                      (click)="shareToSocial('linkedin', item)"
+                      title="Share on LinkedIn"
+                    >
+                      💼 LinkedIn
+                    </button>
+                    <button
+                      class="social-btn"
+                      (click)="shareToSocial('email', item)"
+                      title="Share via Email"
+                    >
+                      ✉️ Email
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </mat-expansion-panel>
       </mat-accordion>
 
