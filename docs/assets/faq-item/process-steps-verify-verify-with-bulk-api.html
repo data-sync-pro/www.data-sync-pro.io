@@ -1,0 +1,18 @@
+<article>
+    <p>
+      <strong>Verify</strong> may not function properly when 
+      <strong>Bulk API</strong> is enabled and <strong>target record IDs</strong> 
+      are not captured in the Batch Execution log. This commonly occurs with 
+      <strong>Insert</strong> or <strong>Upsert</strong> actions, where DSP 
+      submits the job asynchronously and the record IDs are not immediately returned.
+    </p>
+        <br />
+    <p>
+      However, for actions like <strong>Update</strong>, where target record 
+      IDs are known before submission, <strong>Verify</strong> will continue 
+      to work as expected.
+    </p>
+  </article>
+
+          <img [src]="'assets/image/process-steps-verify-verify-with-bulk-api/process-steps-verify-verify-with-bulk-api.jpg'"] /> 
+

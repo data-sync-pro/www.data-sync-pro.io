@@ -1,0 +1,79 @@
+<article>
+  <p>
+    Yes, changes made by a Batch execution can be reverted depending on the
+    action type and configuration. DSP provides flexible rollback options when
+    needed:
+  </p>
+
+  <hr />
+
+  <h3><strong>For Update Actions</strong>:</h3>
+  <ul>
+    <li>
+      If <strong>"Log to File"</strong> is enabled, the original target data is
+      saved as a <strong>JSON log file</strong> before the update.
+    </li>
+  </ul>
+
+  <ul>
+    <li>
+      To <strong>revert updates</strong>:
+      <ul>
+        <li>
+          Use <strong>"Restore Updated From Log File"</strong> on the Batch
+          Execution or Execution record.
+        </li>
+      </ul>
+    </li>
+  </ul>
+
+  <h3><strong>For Insert Actions</strong></h3>
+  <ul>
+    <li>
+      To <strong>remove inserted records</strong>:
+      <ul>
+        <li>
+          Click <strong>"Delete Inserted Records"</strong> from the Execution
+          record to delete all records inserted by the job.
+        </li>
+        <li>
+          To delete records from a specific batch, go to the Batch Execution
+          record, open the
+          <strong>Verify</strong> tab, and delete directly from the data list.
+        </li>
+      </ul>
+    </li>
+  </ul>
+
+  <h3><strong>For Delete Actions</strong></h3>
+  <ul>
+    <li>
+      Use <strong>"Restore From Recycle Bin"</strong> if the records are still
+      available there.
+    </li>
+    <li>
+      If <strong>"Log to File"</strong> is enabled:
+      <ul>
+        <li>
+          Use <strong>"Re-Create Deleted From Log File"</strong> on the Batch
+          Execution to restore deleted data from the saved log.
+        </li>
+      </ul>
+    </li>
+  </ul>
+
+  <hr />
+
+  <p>
+    <strong>Note:</strong> Reversion is <strong>not supported</strong> when
+    <strong>"Action to Bulk API"</strong> is enabled.
+  </p>
+
+  <p>
+    These rollback features help ensure reliable recovery from unintended
+    changes—whether from updates, inserts, or deletions—supporting safer data
+    operations in DSP.
+  </p>
+</article>
+
+  <img [src]="'assets/image/rules-engines-batch-revert-batch-changes/rules-engines-batch-revert-batch-changes1.jpg'" />
