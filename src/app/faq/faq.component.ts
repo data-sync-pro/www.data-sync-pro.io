@@ -88,15 +88,15 @@ export class FaqComponent implements OnInit {
 
     this.faqList = data.map(rec => this.toFAQItem(rec));
   }
-
+  private encode = (s: string) => encodeURIComponent(s.trim());
   goHome(): void { this.router.navigate(['/faq']); }
   
-  goCategory(cat: string) {
-    this.router.navigate(['/faq', this.slugify(cat)]);
+  goCategory(cat: string) {          
+    this.router.navigate(['/faq', this.encode(cat)]);
   }
   
   goSub(cat: string, sub: string) {
-    this.router.navigate(['/faq', this.slugify(cat), this.slugify(sub)]);
+    this.router.navigate(['/faq', this.encode(cat), this.encode(sub)]);
   }
 
   private toFAQItem(rec: SourceFAQRecord): FAQItem {
