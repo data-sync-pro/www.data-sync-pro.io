@@ -30,19 +30,59 @@
       margin: 0;
       padding: 0px;
 
-      input {
+      .search-input-container {
+        display: flex;
+        align-items: center;
+        position: relative;
         width: 100%;
-        height: 100%;
-        padding: 12px 0;
-        font-size: 1rem;
         border: 1px solid #ccc;
         border-radius: 8px;
         transition: border-color 0.2s ease, box-shadow 0.2s ease;
 
-        &:focus {
-          outline: none;
+        &:focus-within {
           border-color: #2196F3;
           box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2);
+        }
+
+        input {
+          flex: 1;
+          height: 100%;
+          padding: 12px 16px;
+          font-size: 1rem;
+          border: none;
+          border-radius: 8px 0 0 8px;
+          outline: none;
+          background: transparent;
+        }
+
+        .search-button {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 48px;
+          height: 48px;
+          padding: 0;
+          border: none;
+          border-radius: 0 8px 8px 0;
+          background: #2196F3;
+          color: white;
+          cursor: pointer;
+          transition: background-color 0.2s ease, opacity 0.2s ease;
+
+          &:hover:not(:disabled) {
+            background: #1976D2;
+          }
+
+          &:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            opacity: 0.6;
+          }
+
+          svg {
+            width: 20px;
+            height: 20px;
+          }
         }
       }
 
@@ -117,9 +157,6 @@
       }
     }
 
-    input::placeholder {
-      padding-left: 12px;
-    }
 
     .suggestions-list {
       position: absolute;
@@ -210,6 +247,7 @@
         display: flex;
         align-items: center;
         padding: 12px 0;
+
         .breadcrumb-link {
           margin: 0;
           &.clickable {
@@ -218,8 +256,15 @@
             text-decoration: underline;
           }
         }
+
         .breadcrumb-separator {
           margin: 0 4px;
+        }
+
+        .breadcrumb-current {
+          color: #666;
+          font-style: italic;
+          margin: 0;
         }
       }
 
@@ -775,9 +820,21 @@ a:-webkit-any-link {
     width: 98vw;
     padding: 5px;
 
-    .faq-search .search-wrapper input {
-      padding: 10px 12px;
-      font-size: 0.9rem;
+    .faq-search .search-wrapper .search-input-container {
+      input {
+        padding: 10px 12px;
+        font-size: 0.9rem;
+      }
+
+      .search-button {
+        width: 44px;
+        height: 44px;
+
+        svg {
+          width: 18px;
+          height: 18px;
+        }
+      }
     }
 
     .search-suggestions .suggestion-item {
@@ -889,21 +946,248 @@ p + ul {
 .zoom-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, .6);
-  z-index: 9;
+  background: rgba(0, 0, 0, 0.8);
+  z-index: 9999;
   pointer-events: auto;
-  transition: opacity .25s ease;
+  transition: opacity 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: zoom-out;
 }
 
 img:not([noZoom]) {
   cursor: zoom-in;
   max-width: 100%;
-  border-radius: 8px; 
+  border-radius: 8px;
   height: auto;
   user-select: none;
   touch-action: none;
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: scale(1.02);
+  }
 }
 
-  
-  
+// FAQ图片特定样式
+.faq-image {
+  display: block;
+  margin: 20px auto;
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+  border: 1px solid #e9ecef;
+  cursor: zoom-in;
+  transition: all 0.3s ease;
 
+  &:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  }
+}
+
+// 确保缩放时的样式
+img[data-zoomed="true"] {
+  cursor: zoom-out !important;
+  transform: none !important;
+
+  &:hover {
+    transform: none !important;
+  }
+}
+
+// 搜索增强功能样式
+.search-highlight {
+  background-color: #ffeb3b;
+  color: #333;
+  padding: 1px 2px;
+  border-radius: 2px;
+  font-weight: 500;
+}
+
+.faq-panel.search-result {
+  .mat-expansion-panel-header {
+    .match-type-badge {
+      display: inline-block;
+      background: #e3f2fd;
+      color: #1976d2;
+      font-size: 0.75rem;
+      padding: 2px 6px;
+      border-radius: 12px;
+      margin-left: 8px;
+      font-weight: 500;
+    }
+  }
+
+  .search-preview {
+    padding: 12px 16px;
+    background: #f8f9fa;
+    border-bottom: 1px solid #e0e0e0;
+
+    .preview-content {
+      font-size: 0.9rem;
+      color: #666;
+      line-height: 1.4;
+
+      .search-highlight {
+        background-color: #fff3cd;
+        color: #856404;
+      }
+    }
+
+    .preview-divider {
+      height: 1px;
+      background: #e0e0e0;
+      margin-top: 12px;
+    }
+  }
+}
+
+// 搜索无结果样式
+.search-no-results {
+  text-align: center;
+  padding: 40px 20px;
+  max-width: 600px;
+  margin: 0 auto;
+
+  .no-results-icon {
+    font-size: 3rem;
+    margin-bottom: 16px;
+  }
+
+  h3 {
+    color: #333;
+    margin-bottom: 8px;
+    font-size: 1.5rem;
+  }
+
+  p {
+    color: #666;
+    margin-bottom: 24px;
+    font-size: 1rem;
+  }
+
+  .search-suggestions {
+    text-align: left;
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 24px;
+
+    h4 {
+      color: #333;
+      margin-bottom: 12px;
+      font-size: 1.1rem;
+    }
+
+    ul {
+      margin: 0;
+      padding-left: 20px;
+
+      li {
+        color: #666;
+        margin-bottom: 6px;
+        line-height: 1.4;
+      }
+    }
+  }
+
+  .popular-faqs {
+    text-align: left;
+    margin-bottom: 24px;
+
+    h4 {
+      color: #333;
+      margin-bottom: 12px;
+      font-size: 1.1rem;
+    }
+
+    .popular-faq-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+
+      .popular-faq-item {
+        background: white;
+        border: 1px solid #e0e0e0;
+        border-radius: 6px;
+        padding: 12px 16px;
+        text-align: left;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        color: #333;
+        font-size: 0.9rem;
+
+        &:hover {
+          background: #f5f5f5;
+          border-color: #2196f3;
+          color: #2196f3;
+        }
+      }
+    }
+  }
+
+  .contact-support {
+    background: #e3f2fd;
+    padding: 20px;
+    border-radius: 8px;
+
+    h4 {
+      color: #1976d2;
+      margin-bottom: 8px;
+      font-size: 1.1rem;
+    }
+
+    p {
+      color: #666;
+      margin-bottom: 16px;
+    }
+
+    .contact-button {
+      background: #2196f3;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: background-color 0.2s ease;
+
+      &:hover {
+        background: #1976d2;
+      }
+    }
+  }
+}
+
+.category-no-results {
+  text-align: center;
+  padding: 40px 20px;
+  color: #666;
+}
+
+// 移动端适配
+@media (max-width: 768px) {
+  .search-no-results {
+    padding: 20px 10px;
+
+    .popular-faqs .popular-faq-list {
+      .popular-faq-item {
+        padding: 10px 12px;
+        font-size: 0.85rem;
+      }
+    }
+  }
+
+  .faq-panel.search-result {
+    .search-preview {
+      padding: 10px 12px;
+
+      .preview-content {
+        font-size: 0.85rem;
+      }
+    }
+  }
+}
