@@ -367,8 +367,28 @@ export class FAQService {
       // Improve content formatting
       .replace(/<section[^>]*>/g, '<div class="faq-section">')
       .replace(/<\/section>/g, '</div>')
-      // Ensure images have correct style classes
-      .replace(/<img([^>]*?)>/g, '<img$1 class="faq-image">')
+      // Ensure images have correct style classes and attributes for zooming
+      .replace(/<img([^>]*?)>/g, (match, attrs) => {
+        // 确保图片有正确的类和属性
+        let newAttrs = attrs;
+        if (!newAttrs.includes('class=')) {
+          newAttrs += ' class="faq-image"';
+        } else if (!newAttrs.includes('faq-image')) {
+          newAttrs = newAttrs.replace(/class="([^"]*)"/, 'class="$1 faq-image"');
+        }
+
+        // 添加加载错误处理
+        if (!newAttrs.includes('onerror=')) {
+          newAttrs += ' onerror="this.style.display=\'none\'"';
+        }
+
+        // 添加加载完成处理
+        if (!newAttrs.includes('onload=')) {
+          newAttrs += ' onload="this.style.cursor=\'zoom-in\'"';
+        }
+
+        return `<img${newAttrs}>`;
+      })
       // Clean up extra whitespace
       .replace(/\s+/g, ' ')
       .trim();

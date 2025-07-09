@@ -13,6 +13,7 @@ import { FaqHomeComponent } from './faq-home/faq-home.component';
 import { PaginatedFAQComponent } from './paginated-faq.component';
 import { VirtualScrollFAQComponent } from './virtual-scroll-faq.component';
 import { ZoomableDirective } from 'src/app/zoomable.directive';
+import { SimpleZoomableDirective } from 'src/app/simple-zoomable.directive';
 @NgModule({
   declarations: [
     FaqComponent,
@@ -20,7 +21,8 @@ import { ZoomableDirective } from 'src/app/zoomable.directive';
     FaqHomeComponent,
     PaginatedFAQComponent,
     VirtualScrollFAQComponent,
-    ZoomableDirective
+    ZoomableDirective,
+    SimpleZoomableDirective
   ],
   imports: [
     CommonModule,
@@ -32,7 +34,8 @@ import { ZoomableDirective } from 'src/app/zoomable.directive';
   ],
   exports: [
     FaqComponent,
-    ZoomableDirective
+    ZoomableDirective,
+    SimpleZoomableDirective
   ]
 })
 export class FaqModule {}

@@ -1,21 +1,18 @@
-import { 
-  Component, 
-  OnInit, 
-  ViewChild, 
+import {
+  Component,
+  OnInit,
+  ViewChild,
   ElementRef,
-  HostListener 
+  HostListener,
+  OnDestroy
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subject } from 'rxjs';
-import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
+import { FAQService } from '../shared/services/faq.service';
+import { FAQItem } from '../shared/models/faq.model';
 
-interface PaginatedFAQItem {
-  id: string;
-  question: string;
-  answer: string;
-  category: string;
-  subCategory: string;
-  isExpanded?: boolean;
+interface PaginatedFAQItem extends FAQItem {
   viewCount?: number;
 }
 
@@ -124,7 +121,9 @@ interface PaginationInfo {
             *ngIf="item.isExpanded"
             [@expandCollapse]
           >
-            <div class="faq-answer" [innerHTML]="highlightSearchTerm(item.answer)"></div>
+            <div *ngIf="item.safeAnswer" class="faq-answer" [innerHTML]="item.safeAnswer" appSimpleZoomable></div>
+            <div *ngIf="item.isLoading" class="loading-content">Loading content...</div>
+            <div *ngIf="!item.safeAnswer && !item.isLoading" class="faq-answer" [innerHTML]="highlightSearchTerm(item.answer)" appSimpleZoomable></div>
             
             <!-- FAQ Feedback Area -->
             <div class="faq-feedback">
@@ -224,7 +223,7 @@ interface PaginationInfo {
   styleUrls: ['./paginated-faq.component.scss'],
   animations: []
 })
-export class PaginatedFAQComponent implements OnInit {
+export class PaginatedFAQComponent implements OnInit, OnDestroy {
   @ViewChild('searchInput') searchInput!: ElementRef<HTMLInputElement>;
 
   // Data properties
@@ -237,6 +236,7 @@ export class PaginatedFAQComponent implements OnInit {
   searchQuery = '';
   selectedCategory = '';
   private searchSubject = new Subject<string>();
+  private destroy$ = new Subject<void>();
 
   // Pagination properties
   pageSize = 20;
@@ -255,7 +255,8 @@ export class PaginatedFAQComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private faqService: FAQService
   ) {}
 
   ngOnInit(): void {
@@ -264,49 +265,37 @@ export class PaginatedFAQComponent implements OnInit {
     this.loadFromURL();
   }
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
   /**
    * 初始化数据
    */
-  private async initializeData(): Promise<void> {
+  private initializeData(): void {
     this.isLoading = true;
-    
-    try {
-      // 模拟加载数据
-      this.allItems = await this.loadFAQData();
-      this.categories = [...new Set(this.allItems.map(item => item.category))];
-      this.applyFilters();
-    } catch (error) {
-      console.error('加载FAQ数据失败:', error);
-    } finally {
-      this.isLoading = false;
-    }
-  }
 
-  /**
-   * Simulate loading FAQ data
-   */
-  private async loadFAQData(): Promise<PaginatedFAQItem[]> {
-    return new Promise(resolve => {
-      setTimeout(() => {
-        const items: PaginatedFAQItem[] = [];
-        const categories = ['Technical Support', 'Account Management', 'Product Features', 'Billing Issues', 'Troubleshooting'];
-
-        for (let i = 1; i <= 500; i++) {
-          const category = categories[Math.floor(Math.random() * categories.length)];
-          items.push({
-            id: `faq-${i}`,
-            question: `FAQ Question ${i}: Common questions about ${category}`,
-            answer: `This is the detailed answer for FAQ ${i}. It contains detailed explanations and solutions about ${category}. There will be more content here to demonstrate the search and pagination functionality.`,
-            category,
-            subCategory: `Subcategory ${Math.ceil(i / 50)}`,
-            isExpanded: false,
-            viewCount: Math.floor(Math.random() * 1000)
-          });
-        }
-        resolve(items);
-      }, 800);
+    this.faqService.getFAQs().pipe(
+      takeUntil(this.destroy$)
+    ).subscribe({
+      next: (faqs) => {
+        this.allItems = faqs.map(faq => ({
+          ...faq,
+          viewCount: Math.floor(Math.random() * 1000)
+        }));
+        this.categories = [...new Set(this.allItems.map(item => item.category))];
+        this.applyFilters();
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('加载FAQ数据失败:', error);
+        this.isLoading = false;
+      }
     });
   }
+
+
 
   /**
    * 设置搜索防抖
@@ -496,6 +485,23 @@ export class PaginatedFAQComponent implements OnInit {
     item.isExpanded = !item.isExpanded;
     if (item.isExpanded) {
       item.viewCount = (item.viewCount || 0) + 1;
+
+      // Load FAQ content if not already loaded
+      if (!item.safeAnswer && item.answerPath) {
+        item.isLoading = true;
+        this.faqService.getFAQContent(item.answerPath).pipe(
+          takeUntil(this.destroy$)
+        ).subscribe({
+          next: (content) => {
+            item.safeAnswer = content;
+            item.isLoading = false;
+          },
+          error: (error) => {
+            console.error('Failed to load FAQ content:', error);
+            item.isLoading = false;
+          }
+        });
+      }
     }
   }
 
@@ -508,7 +514,7 @@ export class PaginatedFAQComponent implements OnInit {
     return text.replace(regex, '<mark>$1</mark>');
   }
 
-  trackByFn(index: number, item: PaginatedFAQItem): string {
+  trackByFn(_index: number, item: PaginatedFAQItem): string {
     return item.id;
   }
 

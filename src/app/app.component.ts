@@ -26,6 +26,8 @@ export class AppComponent implements OnInit {
       });
   }
 
+
+
   // Global document click listener (unchanged)
   /*
   @HostListener('document:click', ['$event'])

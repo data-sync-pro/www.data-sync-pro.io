@@ -75,7 +75,7 @@ interface VirtualFAQItem {
             *ngIf="item.isExpanded"
             [style.height]="item.isExpanded ? 'auto' : '0'"
           >
-            <div class="faq-answer" [innerHTML]="item.answer"></div>
+            <div class="faq-answer" [innerHTML]="item.answer" appSimpleZoomable></div>
             <div class="faq-meta">
               <span class="category">{{ item.category }}</span>
               <span class="subcategory" *ngIf="item.subCategory">
@@ -231,7 +231,7 @@ export class VirtualScrollFAQComponent implements OnInit, OnDestroy {
   /**
    * Toggle FAQ expanded state
    */
-  toggleFAQ(item: VirtualFAQItem, index: number): void {
+  toggleFAQ(item: VirtualFAQItem, _index: number): void {
     item.isExpanded = !item.isExpanded;
 
     // Dynamically adjust item height
@@ -265,7 +265,7 @@ export class VirtualScrollFAQComponent implements OnInit, OnDestroy {
   /**
    * Track function to optimize rendering performance
    */
-  trackByFn(index: number, item: VirtualFAQItem): string {
+  trackByFn(_index: number, item: VirtualFAQItem): string {
     return item.id;
   }
 
