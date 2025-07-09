@@ -174,22 +174,24 @@
           <div class="faq-feedback" *ngIf="item.safeAnswer">
             <div class="feedback-row">
               <div class="helpful-section">
-                <p class="feedback-question">Was this answer helpful?</p>
-                <div class="feedback-buttons">
-                  <button
-                    class="feedback-btn helpful"
-                    (click)="rateFAQ(item, true)"
-                    [class.selected]="item.userRating === true"
-                  >
-                    👍 Yes
-                  </button>
-                  <button
-                    class="feedback-btn not-helpful"
-                    (click)="rateFAQ(item, false)"
-                    [class.selected]="item.userRating === false"
-                  >
-                    👎 No
-                  </button>
+                <div class="feedback-question-row">
+                  <p class="feedback-question">Was this answer helpful?</p>
+                  <div class="feedback-buttons">
+                    <button
+                      class="feedback-btn helpful"
+                      (click)="rateFAQ(item, true)"
+                      [class.selected]="item.userRating === true"
+                    >
+                      👍 Yes
+                    </button>
+                    <button
+                      class="feedback-btn not-helpful"
+                      (click)="rateFAQ(item, false)"
+                      [class.selected]="item.userRating === false"
+                    >
+                      👎 No
+                    </button>
+                  </div>
                 </div>
               </div>
 

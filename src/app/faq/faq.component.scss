@@ -333,11 +333,19 @@
               .helpful-section {
                 flex: 1;
 
+                .feedback-question-row {
+                  display: flex;
+                  align-items: center;
+                  gap: 16px;
+                  margin-bottom: 0;
+                }
+
                 .feedback-question {
-                  margin: 0 0 12px 0;
+                  margin: 0;
                   font-weight: 500;
                   color: #495057;
                   font-size: 0.9rem;
+                  white-space: nowrap;
                 }
 
                 .feedback-buttons {
@@ -610,9 +618,16 @@ a:-webkit-any-link {
             align-items: stretch;
 
             .helpful-section {
+              .feedback-question-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+              }
+
               .feedback-buttons {
                 flex-direction: column;
                 gap: 8px;
+                width: 100%;
 
                 .feedback-btn {
                   width: 100%;
