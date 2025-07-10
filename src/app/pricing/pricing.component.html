@@ -1,34 +1,45 @@
 <div class="pricing-page">
 
-    <h1>Honest pricing. No hidden fees.</h1>
+    <h1>Transparent Pricing for Enterprise Data Management</h1>
     <p>
       You won’t pay a cent until you’re ready to run Data Sync Pro.
     </p>
-  
+
+    <div class="pricing-explanation">
+      <div class="explanation-item">
+        <h3>🔗 Connections</h3>
+        <p>Each Salesforce org or environment you connect (typically production + active sandboxes)</p>
+      </div>
+      <div class="explanation-item">
+        <h3>⚙️ Executables</h3>
+        <p>Modular rules for your data processes: ETL, Batch Jobs, Automation, Data Lists, Action Buttons, Data Loaders</p>
+      </div>
+    </div>
+
     <div class="plans-container">
       <div class="plan-card" *ngFor="let plan of plans">
         <div class="badge" *ngIf="plan.badge">{{ plan.badge }}</div>
-  
+
         <h2 class="plan-name">{{ plan.name }}</h2>
         <p class="plan-subtitle">{{ plan.subtitle }}</p>
-  
+
         <div class="price-row">
           <span class="old-price" *ngIf="plan.oldPrice">{{ plan.oldPrice }}</span>
           <span class="current-price">{{ plan.currentPrice }}</span>
           <span class="per-person" *ngIf="plan.perPerson">{{ plan.perPerson }}</span>
         </div>
-  
+
         <button class="cta-button" *ngIf="plan.buttonLabel && plan.buttonLabel.length">
           {{ plan.buttonLabel }}
         </button>
-  
+
         <div class="plan-details" *ngIf="plan.features && plan.features.length">
           <h3>Plan details:</h3>
           <ul>
             <li *ngFor="let feat of plan.features">{{ feat }}</li>
           </ul>
         </div>
-  
+
         <div class="featured-addons" *ngIf="plan.addOns && plan.addOns.length">
           <ul>
             <li *ngFor="let addOn of plan.addOns">{{ addOn }}</li>
@@ -36,9 +47,37 @@
         </div>
       </div>
     </div>
-  
-    <h2>Compare additional features by category</h2>
-    <p>Expand each section to see which plan includes or offers them as add-ons.</p>
+
+    <div class="value-proposition">
+      <h2>Why Choose Data Sync Pro?</h2>
+      <div class="benefits-grid">
+        <div class="benefit-item">
+          <h3>⚡ 10x Faster Performance</h3>
+          <p>Our Batch engine runs 10 times faster than regular APEX batch jobs, dramatically reducing processing time.</p>
+        </div>
+        <div class="benefit-item">
+          <h3>🔧 80% Less Tech Debt</h3>
+          <p>Our Triggers engine reduces automation technical debt by 80%, making your systems more maintainable.</p>
+        </div>
+        <div class="benefit-item">
+          <h3>👥 Unlimited Users</h3>
+          <p>Site-wide license model means unlimited users within your Salesforce org - no per-seat costs.</p>
+        </div>
+        <div class="benefit-item">
+          <h3>🔒 Enterprise Security</h3>
+          <p>Enterprise-grade security and compliance for your most sensitive data operations.</p>
+        </div>
+      </div>
+
+      <div class="cta-section">
+        <h3>Ready to see Data Sync Pro in action?</h3>
+        <p>Share your use cases and pain points, and we'll show you relevant product capabilities in a personalized demo.</p>
+        <button class="demo-button">Schedule Your Demo</button>
+      </div>
+    </div>
+
+    <h2>Explore Our Powerful Rules Engines</h2>
+    <p>Expand each section to see the capabilities of our different engines and how they can solve your data management challenges.</p>
 
     <div class="category-accordion">
       <div class="category-section" *ngFor="let category of categories; let i = index">
@@ -51,21 +90,16 @@
           {{ category.title }}
           <span class="arrow" [class.up]="openIndex === i"></span>
         </div>
-  
+
         <div class="category-panel" *ngIf="openIndex === i">
-          <table>
-            <tbody>
-              <tr *ngFor="let feat of category.features">
-                <td class="feature-name">{{ feat.name }}</td>
-                <td class="center">{{ getDisplay(feat.simple) }}</td>
-                <td class="center">{{ getDisplay(feat.plus) }}</td>
-                <td class="center">{{ getDisplay(feat.premium) }}</td>
-              </tr>
-            </tbody>
-          </table>
+          <div class="features-list">
+            <div class="feature-item" *ngFor="let feat of category.features">
+              <span class="feature-check">{{ getDisplay(feat.included) }}</span>
+              <span class="feature-name">{{ feat.name }}</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
-  
+
   </div>
-  
