@@ -14,26 +14,29 @@ import { switchMap } from 'rxjs/operators';
   styleUrls: ['./designer-guide-item.component.scss'],
   encapsulation: ViewEncapsulation.None,
 })
-
 export class DesignerGuideItemComponent implements OnDestroy {
   private route = inject(ActivatedRoute);
-  private http  = inject(HttpClient);
-  private safe  = inject(DomSanitizer);
+  private http = inject(HttpClient);
+  private safe = inject(DomSanitizer);
   private sub?: Subscription;
 
   html: SafeHtml | null = null;
 
   constructor() {
-    this.sub = this.route.paramMap.pipe(
-      switchMap((pm: ParamMap) => {
-        const parent = pm.get('parent')!;
-        const slug   = pm.get('slug')!;
-        const subDir = pm.get('sub');
-        const url = `/designer-guide/${parent}/${subDir ? subDir + '/' : ''}${slug}.html`;
-        return this.http.get(url, { responseType: 'text' });
-      })
-    ).subscribe(raw => this.html = this.safe.bypassSecurityTrustHtml(raw));
+    this.sub = this.route.paramMap
+      .pipe(
+        switchMap((pm: ParamMap) => {
+          const parent = pm.get('parent')!;
+          const slug = pm.get('slug')!;
+          const subDir = pm.get('sub');
+          const url = `/designer-guide/${parent}/${subDir ? subDir + '/' : ''}${slug}.html`;
+          return this.http.get(url, { responseType: 'text' });
+        })
+      )
+      .subscribe(raw => (this.html = this.safe.bypassSecurityTrustHtml(raw)));
   }
 
-  ngOnDestroy() { this.sub?.unsubscribe(); }
+  ngOnDestroy() {
+    this.sub?.unsubscribe();
+  }
 }

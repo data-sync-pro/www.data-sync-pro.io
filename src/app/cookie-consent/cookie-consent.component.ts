@@ -4,7 +4,7 @@ import { AnalyticsService } from '../analytics.service';
 @Component({
   selector: 'app-cookie-consent',
   templateUrl: './cookie-consent.component.html',
-  styleUrls: ['./cookie-consent.component.scss']
+  styleUrls: ['./cookie-consent.component.scss'],
 })
 export class CookieConsentComponent implements OnInit {
   showBanner = false;
@@ -16,7 +16,7 @@ export class CookieConsentComponent implements OnInit {
     if (storedChoice === null) {
       this.showBanner = true;
     } else {
-      const hasConsent = (storedChoice === 'true');
+      const hasConsent = storedChoice === 'true';
       this.analyticsService.setConsent(hasConsent);
       this.showBanner = false;
     }

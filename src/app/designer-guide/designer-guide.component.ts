@@ -1,8 +1,4 @@
-import {
-  Component,
-  NgZone,
-  OnDestroy,
-} from '@angular/core';
+import { Component, NgZone, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import navRaw from '../../assets/data/designer-sidebar.json';
@@ -52,15 +48,14 @@ export class DesignerGuideComponent implements OnDestroy {
       };
     }
 
-    const items = Object.entries(val as Record<string, string[]>)
-      .flatMap(([sub, arr]) =>
-        arr.map(t => ({
-          title: t,
-          slug: slug(t),
-          parentSlug,
-          sub: slug(sub),
-        })),
-      );
+    const items = Object.entries(val as Record<string, string[]>).flatMap(([sub, arr]) =>
+      arr.map(t => ({
+        title: t,
+        slug: slug(t),
+        parentSlug,
+        sub: slug(sub),
+      }))
+    );
 
     return { parent, parentSlug, expanded, items };
   });
@@ -75,9 +70,7 @@ export class DesignerGuideComponent implements OnDestroy {
   constructor(private zone: NgZone) {}
 
   buildLink(i: Item) {
-    return i.sub
-      ? [i.parentSlug, i.sub, i.slug]
-      : [i.parentSlug, i.slug];
+    return i.sub ? [i.parentSlug, i.sub, i.slug] : [i.parentSlug, i.slug];
   }
 
   startDrag(ev: MouseEvent, navEl: HTMLElement) {
@@ -96,7 +89,7 @@ export class DesignerGuideComponent implements OnDestroy {
       newW = Math.max(min, Math.min(max, newW));
       this.zone.run(() => (this.sidebarW = `${newW}px`));
     };
-    
+
     this.upRef = () => {
       localStorage.setItem('sbW', this.sidebarW);
       window.removeEventListener('mousemove', this.moveRef!);
@@ -108,9 +101,7 @@ export class DesignerGuideComponent implements OnDestroy {
   }
 
   ngOnDestroy() {
-    if (this.moveRef)
-      window.removeEventListener('mousemove', this.moveRef);
-    if (this.upRef)
-      window.removeEventListener('mouseup', this.upRef);
+    if (this.moveRef) window.removeEventListener('mousemove', this.moveRef);
+    if (this.upRef) window.removeEventListener('mouseup', this.upRef);
   }
 }

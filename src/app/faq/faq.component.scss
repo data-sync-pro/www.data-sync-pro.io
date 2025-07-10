@@ -37,10 +37,12 @@
         width: 100%;
         border: 1px solid #ccc;
         border-radius: 8px;
-        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        transition:
+          border-color 0.2s ease,
+          box-shadow 0.2s ease;
 
         &:focus-within {
-          border-color: #2196F3;
+          border-color: #2196f3;
           box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2);
         }
 
@@ -64,13 +66,15 @@
           padding: 0;
           border: none;
           border-radius: 0 8px 8px 0;
-          background: #2196F3;
+          background: #2196f3;
           color: white;
           cursor: pointer;
-          transition: background-color 0.2s ease, opacity 0.2s ease;
+          transition:
+            background-color 0.2s ease,
+            opacity 0.2s ease;
 
           &:hover:not(:disabled) {
-            background: #1976D2;
+            background: #1976d2;
           }
 
           &:disabled {
@@ -156,7 +160,6 @@
         }
       }
     }
-
 
     .suggestions-list {
       position: absolute;
@@ -314,8 +317,6 @@
             }
           }
 
-
-
           .faq-feedback {
             margin-top: 32px;
             padding: 20px 24px;
@@ -432,7 +433,7 @@
                     background: white;
                     border: 1px solid #dee2e6;
                     border-radius: 6px;
-                    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
                     z-index: 1000;
                     min-width: 150px;
                     margin-top: 4px;
@@ -519,7 +520,7 @@
   background-color: #f9f9f9;
   border-radius: 4px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
   &.mat-expanded {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -558,7 +559,6 @@
   margin: 48px auto 100px auto;
   padding-top: 24px;
 }
-
 
 .help-text {
   font-size: 0.95rem;
@@ -605,8 +605,6 @@ a:-webkit-any-link {
           line-height: 1.4;
           padding-right: 16px;
         }
-
-
 
         .faq-feedback {
           margin-top: 24px;
@@ -686,7 +684,12 @@ a:-webkit-any-link {
                 }
               }
 
-              h1, h2, h3, h4, h5, h6 {
+              h1,
+              h2,
+              h3,
+              h4,
+              h5,
+              h6 {
                 margin: 24px 0 16px 0;
                 color: #2c3e50;
                 font-weight: 600;
@@ -701,7 +704,8 @@ a:-webkit-any-link {
                 padding: 0;
               }
 
-              ul, ol {
+              ul,
+              ol {
                 margin: 16px 0;
                 padding-left: 24px;
 
@@ -713,7 +717,8 @@ a:-webkit-any-link {
               }
 
               // 图片样式改进
-              img, .faq-image {
+              img,
+              .faq-image {
                 max-width: 100%;
                 height: auto;
                 margin: 20px auto;
@@ -769,7 +774,8 @@ a:-webkit-any-link {
                 border-collapse: collapse;
                 margin: 16px 0;
 
-                th, td {
+                th,
+                td {
                   padding: 12px;
                   text-align: left;
                   border-bottom: 1px solid #dee2e6;
@@ -813,12 +819,14 @@ a:-webkit-any-link {
               }
 
               // 强调文本样式
-              strong, b {
+              strong,
+              b {
                 font-weight: 600;
                 color: #2c3e50;
               }
 
-              em, i {
+              em,
+              i {
                 font-style: italic;
                 color: #6c757d;
               }
@@ -866,15 +874,11 @@ a:-webkit-any-link {
   }
 }
 
-
-
 ::ng-deep .faq-panel .mat-expansion-panel-body {
-  max-height: 75vh;      
-  overflow-y: auto;   
+  max-height: 75vh;
+  overflow-y: auto;
   padding-right: 8px;
 }
-
-
 
 body {
   font-family: Arial, sans-serif;
@@ -893,7 +897,7 @@ ol {
   font-size: 16px;
   line-height: 30px;
   color: #333;
-  margin: 0;           
+  margin: 0;
 }
 
 h3 {
@@ -907,32 +911,51 @@ h3 + p {
 }
 
 ol {
-    padding-left: 30px;
-    line-height: 30px;
-    font-size: 16px;
-    list-style: none;
-    padding-left: 2.4em;
-    
+  padding-left: 30px;
+  line-height: 30px;
+  font-size: 16px;
+  list-style: none;
+  padding-left: 2.4em;
 }
 
 ol > li {
   position: relative;
 }
 
-ol > li:nth-child(1)::before  { content: "1️⃣"; }
-ol > li:nth-child(2)::before  { content: "2️⃣"; }
-ol > li:nth-child(3)::before  { content: "3️⃣"; }
-ol > li:nth-child(4)::before  { content: "4️⃣"; }
-ol > li:nth-child(5)::before  { content: "5️⃣"; }
-ol > li:nth-child(6)::before  { content: "6️⃣"; }
-ol > li:nth-child(7)::before  { content: "7️⃣"; }
-ol > li:nth-child(8)::before  { content: "8️⃣"; }
-ol > li:nth-child(9)::before  { content: "9️⃣"; }
-ol > li:nth-child(10)::before { content: "🔟"; }
+ol > li:nth-child(1)::before {
+  content: '1️⃣';
+}
+ol > li:nth-child(2)::before {
+  content: '2️⃣';
+}
+ol > li:nth-child(3)::before {
+  content: '3️⃣';
+}
+ol > li:nth-child(4)::before {
+  content: '4️⃣';
+}
+ol > li:nth-child(5)::before {
+  content: '5️⃣';
+}
+ol > li:nth-child(6)::before {
+  content: '6️⃣';
+}
+ol > li:nth-child(7)::before {
+  content: '7️⃣';
+}
+ol > li:nth-child(8)::before {
+  content: '8️⃣';
+}
+ol > li:nth-child(9)::before {
+  content: '9️⃣';
+}
+ol > li:nth-child(10)::before {
+  content: '🔟';
+}
 
 ol > li::before {
   position: absolute;
-  left: -1.6em;             
+  left: -1.6em;
   top: 0;
   font-size: 18px;
   line-height: 30px;
@@ -951,12 +974,10 @@ ul > li {
   position: relative;
 }
 
-
 p + ul {
-  padding-left: 2.4em;      
-  padding-right: 50px;      
+  padding-left: 2.4em;
+  padding-right: 50px;
 }
-
 
 .zoom-backdrop {
   position: fixed;
@@ -1004,7 +1025,7 @@ img:not([noZoom]) {
 }
 
 // 确保缩放时的样式
-img[data-zoomed="true"] {
+img[data-zoomed='true'] {
   cursor: zoom-out !important;
   transform: none !important;
 

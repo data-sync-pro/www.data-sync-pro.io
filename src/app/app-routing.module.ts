@@ -7,7 +7,7 @@ import { SolutionsComponent } from './solutions/solutions.component';
 import { SupportComponent } from './support/support.component';
 import { FaqComponent } from './faq/faq.component';
 import { DesignerGuideComponent } from './designer-guide/designer-guide.component';
-import { DesignerGuideItemComponent } from './designer-guide/designer-guide-item.component'
+import { DesignerGuideItemComponent } from './designer-guide/designer-guide-item.component';
 const routes: Routes = [
   { path: '', component: HomeComponent },
   { path: 'rules-engines', component: RulesEnginesComponent },
@@ -22,15 +22,14 @@ const routes: Routes = [
     component: DesignerGuideComponent,
     children: [
       { path: ':parent/:sub/:slug', component: DesignerGuideItemComponent },
-      { path: ':parent/:slug', component: DesignerGuideItemComponent }
-    ]
+      { path: ':parent/:slug', component: DesignerGuideItemComponent },
+    ],
   },
-  { path: '**', redirectTo: '' }
+  { path: '**', redirectTo: '' },
 ];
-
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
 export class AppRoutingModule {}

@@ -1,7 +1,14 @@
-import { Directive, ElementRef, Renderer2, HostListener, AfterViewInit, OnDestroy } from '@angular/core';
+import {
+  Directive,
+  ElementRef,
+  Renderer2,
+  HostListener,
+  AfterViewInit,
+  OnDestroy,
+} from '@angular/core';
 
 @Directive({
-  selector: '[appSimpleZoomable]'
+  selector: '[appSimpleZoomable]',
 })
 export class SimpleZoomableDirective implements AfterViewInit, OnDestroy {
   private backdropEl?: HTMLElement;
@@ -41,10 +48,10 @@ export class SimpleZoomableDirective implements AfterViewInit, OnDestroy {
   }
 
   private setupMutationObserver(): void {
-    this.mutationObserver = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
+    this.mutationObserver = new MutationObserver(mutations => {
+      mutations.forEach(mutation => {
         if (mutation.type === 'childList') {
-          mutation.addedNodes.forEach((node) => {
+          mutation.addedNodes.forEach(node => {
             if (node.nodeType === Node.ELEMENT_NODE) {
               const element = node as Element;
               if (element.tagName === 'IMG') {
@@ -61,7 +68,7 @@ export class SimpleZoomableDirective implements AfterViewInit, OnDestroy {
 
     this.mutationObserver.observe(this.el.nativeElement, {
       childList: true,
-      subtree: true
+      subtree: true,
     });
   }
 
@@ -76,32 +83,36 @@ export class SimpleZoomableDirective implements AfterViewInit, OnDestroy {
     if (img.hasAttribute('data-zoomable-processed')) {
       return;
     }
-    
+
     this.rd.setStyle(img, 'cursor', 'zoom-in');
     this.rd.setStyle(img, 'transition', 'transform 0.2s ease');
-    
+
     const mouseEnterHandler = () => {
       if (!this.zoomed) {
         this.rd.setStyle(img, 'transform', 'scale(1.02)');
       }
     };
-    
+
     const mouseLeaveHandler = () => {
       if (!this.zoomed) {
         this.rd.setStyle(img, 'transform', 'scale(1)');
       }
     };
-    
+
     img.addEventListener('mouseenter', mouseEnterHandler);
     img.addEventListener('mouseleave', mouseLeaveHandler);
     img.setAttribute('data-zoomable-processed', 'true');
-    
+
     if (img.complete) {
       this.rd.addClass(img, 'faq-image');
     } else {
-      img.addEventListener('load', () => {
-        this.rd.addClass(img, 'faq-image');
-      }, { once: true });
+      img.addEventListener(
+        'load',
+        () => {
+          this.rd.addClass(img, 'faq-image');
+        },
+        { once: true }
+      );
     }
   }
 
@@ -134,7 +145,7 @@ export class SimpleZoomableDirective implements AfterViewInit, OnDestroy {
 
     // 创建图片克隆
     this.clonedImg = img.cloneNode(true) as HTMLImageElement;
-    
+
     // 计算最佳尺寸 - 使用95%的屏幕宽度
     const maxWidth = window.innerWidth * 0.95;
     const maxHeight = window.innerHeight * 0.9;
@@ -166,10 +177,10 @@ export class SimpleZoomableDirective implements AfterViewInit, OnDestroy {
 
     // 添加图片到背景
     this.rd.appendChild(this.backdropEl, this.clonedImg);
-    
+
     // 添加点击事件
     this.backdropEl?.addEventListener('click', () => this.closeZoom(), { once: true });
-    
+
     // 添加到页面
     this.rd.appendChild(document.body, this.backdropEl);
     this.rd.setStyle(document.body, 'overflow', 'hidden');
@@ -183,11 +194,11 @@ export class SimpleZoomableDirective implements AfterViewInit, OnDestroy {
       this.rd.removeChild(document.body, this.backdropEl);
       this.backdropEl = undefined;
     }
-    
+
     if (this.clonedImg) {
       this.clonedImg = undefined;
     }
-    
+
     this.rd.removeStyle(document.body, 'overflow');
     this.zoomed = false;
     window.dispatchEvent(new Event('zoomEnd'));

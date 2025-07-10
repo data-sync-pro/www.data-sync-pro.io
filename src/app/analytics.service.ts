@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AnalyticsService {
   userConsented = false;
@@ -12,7 +12,6 @@ export class AnalyticsService {
   setConsent(consent: boolean) {
     this.userConsented = consent;
   }
-
 
   private getOrSetVisitorIdFromCookie(): string {
     const cookieName = 'visitorId';
@@ -56,13 +55,12 @@ export class AnalyticsService {
       visitorId,
       eventType: 'click',
       element: data.element,
-      timestamp: data.timestamp
+      timestamp: data.timestamp,
     };
-    this.http.post('http://localhost:3000/api/track', payload)
-      .subscribe({
-        next: (res) => console.log('Click tracked successfully:', res),
-        error: (err) => console.error('Tracking error:', err)
-      });
+    this.http.post('http://localhost:3000/api/track', payload).subscribe({
+      next: res => console.log('Click tracked successfully:', res),
+      error: err => console.error('Tracking error:', err),
+    });
   }
 
   trackPageView(pageUrl: string) {
@@ -74,13 +72,12 @@ export class AnalyticsService {
       visitorId,
       eventType: 'page_view',
       page: pageUrl,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
-    this.http.post('http://localhost:3000/api/track', payload)
-      .subscribe({
-        next: (res) => console.log('Page view tracked:', res),
-        error: (err) => console.error('Tracking error:', err)
-      });
+    this.http.post('http://localhost:3000/api/track', payload).subscribe({
+      next: res => console.log('Page view tracked:', res),
+      error: err => console.error('Tracking error:', err),
+    });
   }
   trackCustomEvent(data: any) {
     if (!this.userConsented) {
@@ -89,12 +86,11 @@ export class AnalyticsService {
     const visitorId = this.getVisitorId();
     const payload = {
       visitorId,
-      ...data
+      ...data,
     };
-    this.http.post('http://localhost:3000/api/track', payload)
-      .subscribe({
-        next: (res) => console.log('Custom event tracked:', res),
-        error: (err) => console.error('Tracking error:', err)
-      });
+    this.http.post('http://localhost:3000/api/track', payload).subscribe({
+      next: res => console.log('Custom event tracked:', res),
+      error: err => console.error('Tracking error:', err),
+    });
   }
 }

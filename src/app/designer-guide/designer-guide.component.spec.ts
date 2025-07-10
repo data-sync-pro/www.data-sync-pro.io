@@ -8,9 +8,8 @@ describe('DesignerGuideComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ DesignerGuideComponent ]
-    })
-    .compileComponents();
+      imports: [DesignerGuideComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(DesignerGuideComponent);
     component = fixture.componentInstance;

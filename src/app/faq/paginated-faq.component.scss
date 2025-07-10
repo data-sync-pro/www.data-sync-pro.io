@@ -23,7 +23,7 @@
 
         &:focus {
           outline: none;
-          border-color: #2196F3;
+          border-color: #2196f3;
           box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
         }
       }
@@ -63,7 +63,7 @@
 
         &:focus {
           outline: none;
-          border-color: #2196F3;
+          border-color: #2196f3;
         }
       }
 
@@ -132,7 +132,7 @@
         }
 
         &:focus {
-          outline: 2px solid #2196F3;
+          outline: 2px solid #2196f3;
           outline-offset: -2px;
         }
 
@@ -225,7 +225,8 @@
             }
 
             // 图片样式改进和缩放功能
-            img, .faq-image {
+            img,
+            .faq-image {
               max-width: 100%;
               height: auto;
               margin: 20px auto;
@@ -302,15 +303,19 @@
       width: 40px;
       height: 40px;
       border: 3px solid #f3f3f3;
-      border-top: 3px solid #2196F3;
+      border-top: 3px solid #2196f3;
       border-radius: 50%;
       animation: spin 1s linear infinite;
       margin: 0 auto 20px;
     }
 
     @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+      0% {
+        transform: rotate(0deg);
+      }
+      100% {
+        transform: rotate(360deg);
+      }
     }
   }
 
@@ -335,7 +340,7 @@
     }
 
     .reset-btn {
-      background-color: #2196F3;
+      background-color: #2196f3;
       color: white;
       border: none;
       padding: 10px 20px;
@@ -375,7 +380,7 @@
 
         &:focus {
           outline: none;
-          border-color: #2196F3;
+          border-color: #2196f3;
         }
       }
 
@@ -420,9 +425,9 @@
         }
 
         &.active {
-          background-color: #2196F3;
+          background-color: #2196f3;
           color: white;
-          border-color: #2196F3;
+          border-color: #2196f3;
         }
 
         &.ellipsis {
@@ -483,8 +488,6 @@
         .faq-title-section .faq-question {
           font-size: 15px;
         }
-
-
       }
 
       .faq-content {
@@ -525,8 +528,8 @@
 .zoom-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, .6);
+  background: rgba(0, 0, 0, 0.6);
   z-index: 9;
   pointer-events: auto;
-  transition: opacity .25s ease;
+  transition: opacity 0.25s ease;
 }

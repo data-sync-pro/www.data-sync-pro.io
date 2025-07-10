@@ -1,42 +1,35 @@
 <article>
-    <p>
-      The DSP Trigger Rules Engine is a record-based, no-code automation framework 
-      that executes actions based on Salesforce trigger events 
-      (<strong>Before Insert</strong>, <strong>After Update</strong>, etc.). 
-      Instead of writing complex Apex logic, users configure trigger-based logic 
-      as <strong>Executable</strong> records, ensuring automation is modular, 
-      maintainable, and bulkified.
-    </p>
-    <p>
-      DSP Triggers operate in two ways:
-    </p>
-    <ul>
-      <li>
-        <strong>Self-Adaptive Triggers</strong> – Transform and validate fields 
-        within the same records before they are committed.
-      </li>
-      <li>
-        <strong>Trigger Actions</strong> – Use the triggering records as a source 
-        to perform separate actions, such as updating related records, sending 
-        notifications, or publishing platform events.
-      </li>
-    </ul>
-    <p>
-      When a trigger event occurs, DSP evaluates the <em>scoping criteria</em> to 
-      determine which records should be processed. It then applies field 
-      transformations, validations, or actions in a bulkified manner for optimal 
-      performance.
-    </p>
-    <p>
-      To enable the Trigger Rules Engine, include the required events in your 
-      Apex Trigger and call:
-    </p>
-    <pre><code>pushtopics.TriggerServices.execute();
+  <p>
+    The DSP Trigger Rules Engine is a record-based, no-code automation framework that executes
+    actions based on Salesforce trigger events (<strong>Before Insert</strong>,
+    <strong>After Update</strong>, etc.). Instead of writing complex Apex logic, users configure
+    trigger-based logic as <strong>Executable</strong> records, ensuring automation is modular,
+    maintainable, and bulkified.
+  </p>
+  <p>DSP Triggers operate in two ways:</p>
+  <ul>
+    <li>
+      <strong>Self-Adaptive Triggers</strong> – Transform and validate fields within the same
+      records before they are committed.
+    </li>
+    <li>
+      <strong>Trigger Actions</strong> – Use the triggering records as a source to perform separate
+      actions, such as updating related records, sending notifications, or publishing platform
+      events.
+    </li>
+  </ul>
+  <p>
+    When a trigger event occurs, DSP evaluates the <em>scoping criteria</em> to determine which
+    records should be processed. It then applies field transformations, validations, or actions in a
+    bulkified manner for optimal performance.
+  </p>
+  <p>
+    To enable the Trigger Rules Engine, include the required events in your Apex Trigger and call:
+  </p>
+  <pre><code>pushtopics.TriggerServices.execute();
   </code></pre>
-    <p>
-      This allows DSP to manage execution dynamically, ensuring flexibility, 
-      scalability, and efficient automation without requiring custom Apex 
-      development.
-    </p>
-  </article>
-  
+  <p>
+    This allows DSP to manage execution dynamically, ensuring flexibility, scalability, and
+    efficient automation without requiring custom Apex development.
+  </p>
+</article>

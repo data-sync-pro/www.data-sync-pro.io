@@ -1,47 +1,43 @@
 <article>
   <p>
     A self-adaptive trigger evaluates fields in a
-    <strong>before insert</strong> or <strong>before update</strong> trigger
-    using DSP formulas. A blank update batch retrieves records that need
-    updating and performs an update operation without modifying any fields.
-    During this update, the self-adaptive trigger
-    <strong>re-evaluates all fields</strong> based on the defined transformation
-    logic.
+    <strong>before insert</strong> or <strong>before update</strong> trigger using DSP formulas. A
+    blank update batch retrieves records that need updating and performs an update operation without
+    modifying any fields. During this update, the self-adaptive trigger
+    <strong>re-evaluates all fields</strong> based on the defined transformation logic.
   </p>
-  <br/>
-  <p>
-    Benefits of Combining a Blank Update Batch with a Self-Adaptive Trigger:
-  <p>
+  <br />
+  <p>Benefits of Combining a Blank Update Batch with a Self-Adaptive Trigger:</p>
+
+  <p></p>
   <ul>
     <li>
-      <strong>Reusable &amp; Universal Automation</strong> &ndash; The
-      self-adaptive trigger runs automatically regardless of whether the update
-      is triggered by a batch job, web service, Apex, or manual update, ensuring
-      consistency.
+      <strong>Reusable &amp; Universal Automation</strong> &ndash; The self-adaptive trigger runs
+      automatically regardless of whether the update is triggered by a batch job, web service, Apex,
+      or manual update, ensuring consistency.
     </li>
     <li>
-      <strong>Performance Optimization</strong> &ndash; When the blank update
-      batch is executed with <em>Bulk API</em> enabled (batch size: 2,000), the
-      calculations run significantly faster than traditional Apex batch jobs.
+      <strong>Performance Optimization</strong> &ndash; When the blank update batch is executed with
+      <em>Bulk API</em> enabled (batch size: 2,000), the calculations run significantly faster than
+      traditional Apex batch jobs.
     </li>
     <li>
-      <strong>Modular &amp; Decoupled System</strong> &ndash; Keeping batch
-      execution and automation separate ensures a simplified, modular, and
-      maintainable system, making debugging and scaling easier.
+      <strong>Modular &amp; Decoupled System</strong> &ndash; Keeping batch execution and automation
+      separate ensures a simplified, modular, and maintainable system, making debugging and scaling
+      easier.
     </li>
   </ul>
 
   <p>
     For example, this method is particularly useful for calculating
-    <strong>roll-up summaries</strong> or <strong>aggregated values</strong> across child
-    records. If a parent record needs to maintain a sum, count, or average of
-    related child records, a blank update batch can trigger the <strong>recalculation
-    automatically</strong> via the self-adaptive trigger, eliminating the need for
-    additional processing logic.
+    <strong>roll-up summaries</strong> or <strong>aggregated values</strong> across child records.
+    If a parent record needs to maintain a sum, count, or average of related child records, a blank
+    update batch can trigger the <strong>recalculation automatically</strong> via the self-adaptive
+    trigger, eliminating the need for additional processing logic.
   </p>
   <br />
   <p>
-    This approach enhances efficiency, reusability, and performance while
-    ensuring dynamic, automated recalculations.
+    This approach enhances efficiency, reusability, and performance while ensuring dynamic,
+    automated recalculations.
   </p>
 </article>

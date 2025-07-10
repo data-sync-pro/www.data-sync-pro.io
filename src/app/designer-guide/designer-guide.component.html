@@ -7,20 +7,13 @@
       </button>
       <ul *ngIf="sec.expanded">
         <li *ngFor="let i of sec.items">
-          <a
-            [routerLink]="buildLink(i)"
-            routerLinkActive="active"
-            >{{ i.title }}</a
-          >
+          <a [routerLink]="buildLink(i)" routerLinkActive="active">{{ i.title }}</a>
         </li>
       </ul>
     </li>
   </ul>
 </nav>
-<div
-  class="resizer"
-  (mousedown)="startDrag($event, toc)"
-></div>
+<div class="resizer" (mousedown)="startDrag($event, toc)"></div>
 <div class="content">
   <router-outlet></router-outlet>
 </div>

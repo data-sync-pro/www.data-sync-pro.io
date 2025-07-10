@@ -7,7 +7,7 @@ import {
   OnDestroy,
   ViewEncapsulation,
   ViewChildren,
-  QueryList
+  QueryList,
 } from '@angular/core';
 import { MatExpansionPanel } from '@angular/material/expansion';
 import { DomSanitizer } from '@angular/platform-browser';
@@ -35,7 +35,7 @@ interface SearchResult {
   selector: 'app-faq',
   templateUrl: './faq.component.html',
   styleUrls: ['./faq.component.scss'],
-  encapsulation: ViewEncapsulation.None
+  encapsulation: ViewEncapsulation.None,
 })
 export class FaqComponent implements OnInit, OnDestroy {
   searchQuery = '';
@@ -77,19 +77,15 @@ export class FaqComponent implements OnInit, OnDestroy {
     this.loadRatingsFromLocalStorage();
     this.cleanupFavoriteData();
 
-    this.route.paramMap.pipe(
-      takeUntil(this.destroy$)
-    ).subscribe(p => {
+    this.route.paramMap.pipe(takeUntil(this.destroy$)).subscribe(p => {
       // 解码URL参数以处理特殊字符和空格
-      this.currentCategory    = p.get('cat') ? decodeURIComponent(p.get('cat')!) : '';
+      this.currentCategory = p.get('cat') ? decodeURIComponent(p.get('cat')!) : '';
       this.currentSubCategory = p.get('subCat') ? decodeURIComponent(p.get('subCat')!) : '';
       this.updatePageMetadata();
     });
 
     // 处理URL片段，自动展开对应的FAQ项目
-    this.route.fragment.pipe(
-      takeUntil(this.destroy$)
-    ).subscribe(fragment => {
+    this.route.fragment.pipe(takeUntil(this.destroy$)).subscribe(fragment => {
       if (fragment) {
         this.pendingFragment = fragment;
         this.handlePendingFragment();
@@ -106,32 +102,34 @@ export class FaqComponent implements OnInit, OnDestroy {
     this.isLoading = true;
 
     // 使用新的FAQ服务
-    this.faqService.getFAQs().pipe(
-      takeUntil(this.destroy$)
-    ).subscribe({
-      next: (faqs) => {
-        this.faqList = faqs;
-        this.isLoading = false;
-        // 数据加载完成后处理pending fragment
-        this.handlePendingFragment();
-      },
-      error: (error) => {
-        console.error('Failed to load FAQ data:', error);
-        this.isLoading = false;
-      }
-    });
+    this.faqService
+      .getFAQs()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: faqs => {
+          this.faqList = faqs;
+          this.isLoading = false;
+          // 数据加载完成后处理pending fragment
+          this.handlePendingFragment();
+        },
+        error: error => {
+          console.error('Failed to load FAQ data:', error);
+          this.isLoading = false;
+        },
+      });
 
     // 加载分类信息
-    this.faqService.getCategories().pipe(
-      takeUntil(this.destroy$)
-    ).subscribe({
-      next: (categories) => {
-        this.categories = categories;
-      },
-      error: (error) => {
-        console.error('Failed to load categories:', error);
-      }
-    });
+    this.faqService
+      .getCategories()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: categories => {
+          this.categories = categories;
+        },
+        error: error => {
+          console.error('Failed to load categories:', error);
+        },
+      });
   }
   private encode = (s: string) => encodeURIComponent(s.trim());
   goHome(): void {
@@ -139,7 +137,7 @@ export class FaqComponent implements OnInit, OnDestroy {
     this.clearSearchState();
     this.router.navigate(['/faq']);
   }
-  
+
   goCategory(cat: string) {
     // Clear search state when navigating via breadcrumb
     this.clearSearchState();
@@ -187,7 +185,10 @@ export class FaqComponent implements OnInit, OnDestroy {
     keywords.forEach(keyword => {
       if (keyword.trim()) {
         const regex = new RegExp(`(${this.escapeRegExp(keyword)})`, 'gi');
-        highlightedText = highlightedText.replace(regex, '<mark class="search-highlight">$1</mark>');
+        highlightedText = highlightedText.replace(
+          regex,
+          '<mark class="search-highlight">$1</mark>'
+        );
       }
     });
 
@@ -200,7 +201,10 @@ export class FaqComponent implements OnInit, OnDestroy {
   }
 
   // 计算搜索相关性评分
-  private calculateRelevanceScore(item: FAQItem, query: string): { score: number; matchType: 'title' | 'content' | 'category'; matchedText: string } {
+  private calculateRelevanceScore(
+    item: FAQItem,
+    query: string
+  ): { score: number; matchType: 'title' | 'content' | 'category'; matchedText: string } {
     const lowerQuery = query.toLowerCase();
     const lowerQuestion = item.question.toLowerCase();
     const lowerAnswer = item.answer.toLowerCase();
@@ -286,7 +290,9 @@ export class FaqComponent implements OnInit, OnDestroy {
       if (relevance.score > 0) {
         const highlightedQuestion = this.highlightKeywords(item.question, keywords);
         const highlightedAnswer = this.highlightKeywords(
-          relevance.matchType === 'content' ? relevance.matchedText : item.answer.substring(0, 200) + '...',
+          relevance.matchType === 'content'
+            ? relevance.matchedText
+            : item.answer.substring(0, 200) + '...',
           keywords
         );
 
@@ -296,7 +302,7 @@ export class FaqComponent implements OnInit, OnDestroy {
           matchType: relevance.matchType,
           matchedText: relevance.matchedText,
           highlightedQuestion,
-          highlightedAnswer
+          highlightedAnswer,
         });
       }
     });
@@ -333,10 +339,14 @@ export class FaqComponent implements OnInit, OnDestroy {
     if (!result) return '';
 
     switch (result.matchType) {
-      case 'title': return '标题匹配';
-      case 'content': return '内容匹配';
-      case 'category': return '分类匹配';
-      default: return '';
+      case 'title':
+        return '标题匹配';
+      case 'content':
+        return '内容匹配';
+      case 'category':
+        return '分类匹配';
+      default:
+        return '';
     }
   }
 
@@ -385,8 +395,8 @@ export class FaqComponent implements OnInit, OnDestroy {
 
       // 如果有完全匹配的结果，自动展开第一个
       if (results.length > 0) {
-        const exactMatch = results.find(item =>
-          item.question.toLowerCase() === this.searchQuery.toLowerCase().trim()
+        const exactMatch = results.find(
+          item => item.question.toLowerCase() === this.searchQuery.toLowerCase().trim()
         );
 
         if (exactMatch) {
@@ -419,7 +429,6 @@ export class FaqComponent implements OnInit, OnDestroy {
   pickSubCategory(subCat: string): void {
     this.currentSubCategory = subCat;
   }
-  
 
   onFaqOpened(item: FAQItem): void {
     // Update current FAQ title for breadcrumb
@@ -438,21 +447,22 @@ export class FaqComponent implements OnInit, OnDestroy {
     if (!item.safeAnswer && item.answerPath) {
       item.isLoading = true;
 
-      this.faqService.getFAQContent(item.answerPath).pipe(
-        takeUntil(this.destroy$)
-      ).subscribe({
-        next: (content) => {
-          item.safeAnswer = content;
-          item.isLoading = false;
-        },
-        error: (error) => {
-          console.error('Failed to load FAQ content:', error);
-          item.safeAnswer = this.sanitizer.bypassSecurityTrustHtml(
-            '<p class="error-message">Failed to load content, please try again later</p>'
-          );
-          item.isLoading = false;
-        }
-      });
+      this.faqService
+        .getFAQContent(item.answerPath)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: content => {
+            item.safeAnswer = content;
+            item.isLoading = false;
+          },
+          error: error => {
+            console.error('Failed to load FAQ content:', error);
+            item.safeAnswer = this.sanitizer.bypassSecurityTrustHtml(
+              '<p class="error-message">Failed to load content, please try again later</p>'
+            );
+            item.isLoading = false;
+          },
+        });
     }
   }
 
@@ -476,8 +486,8 @@ export class FaqComponent implements OnInit, OnDestroy {
     }
 
     // 第一步：检查是否有其他展开的FAQ
-    const hasOtherOpenPanels = this.expansionPanels?.some(panel =>
-      panel.expanded && this.getFAQItemFromPanel(panel)?.id !== targetItem.id
+    const hasOtherOpenPanels = this.expansionPanels?.some(
+      panel => panel.expanded && this.getFAQItemFromPanel(panel)?.id !== targetItem.id
     );
 
     if (hasOtherOpenPanels) {
@@ -551,18 +561,18 @@ export class FaqComponent implements OnInit, OnDestroy {
     // 分阶段滚动：先快速接近，再精确定位
 
     // 第一阶段：立即滚动到中间位置（50ms内）
-    const intermediatePosition = startPosition + (distance * 0.6);
+    const intermediatePosition = startPosition + distance * 0.6;
     window.scrollTo({
       top: intermediatePosition,
-      behavior: 'smooth'
+      behavior: 'smooth',
     });
 
     // 第二阶段：等待关闭动画进行一半时，继续滚动（150ms后）
     setTimeout(() => {
-      const secondStagePosition = startPosition + (distance * 0.85);
+      const secondStagePosition = startPosition + distance * 0.85;
       window.scrollTo({
         top: secondStagePosition,
-        behavior: 'smooth'
+        behavior: 'smooth',
       });
     }, 150);
 
@@ -576,7 +586,7 @@ export class FaqComponent implements OnInit, OnDestroy {
 
       window.scrollTo({
         top: Math.max(0, finalScrollTop),
-        behavior: 'smooth'
+        behavior: 'smooth',
       });
     }, 300);
   }
@@ -643,7 +653,7 @@ export class FaqComponent implements OnInit, OnDestroy {
     // 使用Router.navigate更新URL，但不触发导航
     this.router.navigate([newUrl], {
       fragment: fragment,
-      replaceUrl: true // 替换当前历史记录，而不是添加新的
+      replaceUrl: true, // 替换当前历史记录，而不是添加新的
     });
   }
 
@@ -659,7 +669,7 @@ export class FaqComponent implements OnInit, OnDestroy {
 
     // 移除fragment
     this.router.navigate([currentUrl], {
-      replaceUrl: true
+      replaceUrl: true,
     });
   }
 
@@ -670,7 +680,7 @@ export class FaqComponent implements OnInit, OnDestroy {
         faqId: item.id,
         faqQuestion: item.question,
         faqCategory: item.category,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     }
   }
@@ -755,8 +765,8 @@ export class FaqComponent implements OnInit, OnDestroy {
     this.selectedSuggestionIndex = -1;
 
     // Check for exact match first
-    const exactMatch = this.faqList.find(item =>
-      item.question.toLowerCase() === query.toLowerCase()
+    const exactMatch = this.faqList.find(
+      item => item.question.toLowerCase() === query.toLowerCase()
     );
 
     if (exactMatch) {
@@ -781,9 +791,7 @@ export class FaqComponent implements OnInit, OnDestroy {
     clearTimeout(this.searchTimeout);
     this.searchTimeout = setTimeout(() => {
       // Check for exact match first
-      const exactMatch = this.faqList.find(item =>
-        item.question.toLowerCase() === query
-      );
+      const exactMatch = this.faqList.find(item => item.question.toLowerCase() === query);
 
       if (exactMatch) {
         // Auto-navigate to exact match
@@ -792,10 +800,11 @@ export class FaqComponent implements OnInit, OnDestroy {
       }
 
       this.suggestions = this.faqList
-        .filter(item =>
-          item.question.toLowerCase().includes(query) ||
-          item.category.toLowerCase().includes(query) ||
-          (item.subCategory && item.subCategory.toLowerCase().includes(query))
+        .filter(
+          item =>
+            item.question.toLowerCase().includes(query) ||
+            item.category.toLowerCase().includes(query) ||
+            (item.subCategory && item.subCategory.toLowerCase().includes(query))
         )
         .map(item => item.question)
         .slice(0, 8); // Limit to 8 suggestions
@@ -817,12 +826,15 @@ export class FaqComponent implements OnInit, OnDestroy {
 
     // Navigate to the FAQ's category/subcategory if needed
     if (faqItem.subCategory) {
-      this.router.navigate(['/faq', this.encode(faqItem.category), this.encode(faqItem.subCategory)], {
-        fragment: this.slugify(faqItem.question)
-      });
+      this.router.navigate(
+        ['/faq', this.encode(faqItem.category), this.encode(faqItem.subCategory)],
+        {
+          fragment: this.slugify(faqItem.question),
+        }
+      );
     } else {
       this.router.navigate(['/faq', this.encode(faqItem.category)], {
-        fragment: this.slugify(faqItem.question)
+        fragment: this.slugify(faqItem.question),
       });
     }
 
@@ -831,8 +843,6 @@ export class FaqComponent implements OnInit, OnDestroy {
       this.expandFAQPanel(faqItem);
     }, 500);
   }
-
-
 
   selectSuggestion(suggestion: string): void {
     this.searchQuery = suggestion;
@@ -861,7 +871,9 @@ export class FaqComponent implements OnInit, OnDestroy {
 
   getCategoryForSuggestion(suggestion: string): string {
     const faqItem = this.faqList.find(item => item.question === suggestion);
-    return faqItem ? `${faqItem.category}${faqItem.subCategory ? ' > ' + faqItem.subCategory : ''}` : '';
+    return faqItem
+      ? `${faqItem.category}${faqItem.subCategory ? ' > ' + faqItem.subCategory : ''}`
+      : '';
   }
 
   focusSearch(): void {
@@ -875,12 +887,12 @@ export class FaqComponent implements OnInit, OnDestroy {
 
   private isInputFocused(): boolean {
     const activeElement = document.activeElement as HTMLElement;
-    return activeElement?.tagName === 'INPUT' ||
-           activeElement?.tagName === 'TEXTAREA' ||
-           activeElement?.contentEditable === 'true';
+    return (
+      activeElement?.tagName === 'INPUT' ||
+      activeElement?.tagName === 'TEXTAREA' ||
+      activeElement?.contentEditable === 'true'
+    );
   }
-
-
 
   rateFAQ(item: FAQItem, isHelpful: boolean): void {
     item.userRating = isHelpful;
@@ -892,12 +904,10 @@ export class FaqComponent implements OnInit, OnDestroy {
         eventType: 'faq_rating',
         faqQuestion: item.question,
         isHelpful,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     }
   }
-
-
 
   private saveRatingsToLocalStorage(): void {
     const ratings: { [key: string]: boolean } = {};
@@ -946,16 +956,13 @@ export class FaqComponent implements OnInit, OnDestroy {
   private isTypingField(t: EventTarget | null): boolean {
     if (!t || !(t as HTMLElement)) return true;
     const tag = (t as HTMLElement).tagName.toLowerCase();
-    return (
-      tag !== 'input' &&
-      tag !== 'textarea' &&
-      !(t as HTMLElement).isContentEditable
-    );
+    return tag !== 'input' && tag !== 'textarea' && !(t as HTMLElement).isContentEditable;
   }
   slugify(s: string): string {
-    return s.toLowerCase()
-            .replace(/[^a-z0-9]+/g, '-')
-            .replace(/^-+|-+$/g, '');
+    return s
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
   }
   private openSearch() {
     this.faqSearchBox.nativeElement.focus();
@@ -967,27 +974,26 @@ export class FaqComponent implements OnInit, OnDestroy {
   @ViewChildren(MatExpansionPanel, { read: ElementRef })
   panelEls!: QueryList<ElementRef<HTMLElement>>;
 
-  
   get showHome(): boolean {
-    return (
-      !this.currentCategory && !this.currentSubCategory && !this.searchQuery
-    );
+    return !this.currentCategory && !this.currentSubCategory && !this.searchQuery;
   }
 
   private openAndScroll(question: string): void {
     setTimeout(() => {
       const idx = this.filteredFAQ.findIndex(f => f.question === question);
       if (idx >= 0) {
-        const panel  = this.panels.toArray()[idx];
-        const panelEl= this.panelEls.toArray()[idx].nativeElement;
-  
-        panel.open();                                          // 展开
+        const panel = this.panels.toArray()[idx];
+        const panelEl = this.panelEls.toArray()[idx].nativeElement;
+
+        panel.open(); // 展开
         panelEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     });
   }
-  
-  trackBySlug(_: number, item: FAQItem) { return this.slugify(item.question); }
+
+  trackBySlug(_: number, item: FAQItem) {
+    return this.slugify(item.question);
+  }
 
   handleSearchSelect(sel: {
     question: string;
@@ -995,28 +1001,22 @@ export class FaqComponent implements OnInit, OnDestroy {
     subCategory: string | null;
     subCatFilterApplied?: boolean;
   }): void {
-  
     const cat = sel.category;
     const sub = sel.subCatFilterApplied ? (sel.subCategory ?? '') : '';
-    const frag= this.slugify(sel.question);
-  
-    this.router.navigate(
-      sub ? ['/faq', cat, sub] : ['/faq', cat],
-      { fragment: frag }
-    );
-  
+    const frag = this.slugify(sel.question);
+
+    this.router.navigate(sub ? ['/faq', cat, sub] : ['/faq', cat], { fragment: frag });
+
     this.isSearchOpen = false;
-  
+
     setTimeout(() => this.openAndScroll(sel.question));
   }
-  
-  
+
   handleTrendingSelect(sel: {
     question: string;
     category: string;
     subCategory: string | null;
   }): void {
-
     const frag = this.slugify(sel.question);
 
     this.router.navigate(['/faq', sel.category], { fragment: frag });
@@ -1095,7 +1095,7 @@ export class FaqComponent implements OnInit, OnDestroy {
       // 平滑滚动到目标位置
       window.scrollTo({
         top: finalScrollTop,
-        behavior: 'smooth'
+        behavior: 'smooth',
       });
     }
   }
@@ -1109,14 +1109,17 @@ export class FaqComponent implements OnInit, OnDestroy {
       const faqItem = this.faqList.find(item => this.slugify(item.question) === fragment);
       if (faqItem) {
         // 如果当前不在正确的分类页面，导航到正确的页面
-        if (this.currentCategory !== faqItem.category ||
-            (faqItem.subCategory && this.currentSubCategory !== faqItem.subCategory)) {
-
+        if (
+          this.currentCategory !== faqItem.category ||
+          (faqItem.subCategory && this.currentSubCategory !== faqItem.subCategory)
+        ) {
           const categoryPath = faqItem.category ? `/${encodeURIComponent(faqItem.category)}` : '';
-          const subCategoryPath = faqItem.subCategory ? `/${encodeURIComponent(faqItem.subCategory)}` : '';
+          const subCategoryPath = faqItem.subCategory
+            ? `/${encodeURIComponent(faqItem.subCategory)}`
+            : '';
 
           this.router.navigate([`/faq${categoryPath}${subCategoryPath}`], {
-            fragment: fragment
+            fragment: fragment,
           });
           return;
         }
@@ -1163,7 +1166,9 @@ export class FaqComponent implements OnInit, OnDestroy {
     const fragment = this.slugify(faqItem.question);
     const baseUrl = window.location.origin;
     const categoryPath = faqItem.category ? `/${encodeURIComponent(faqItem.category)}` : '';
-    const subCategoryPath = faqItem.subCategory ? `/${encodeURIComponent(faqItem.subCategory)}` : '';
+    const subCategoryPath = faqItem.subCategory
+      ? `/${encodeURIComponent(faqItem.subCategory)}`
+      : '';
 
     return `${baseUrl}/faq${categoryPath}${subCategoryPath}#${fragment}`;
   }
@@ -1183,11 +1188,14 @@ export class FaqComponent implements OnInit, OnDestroy {
     const shareUrl = this.getFAQShareUrl(faqItem);
 
     if (navigator.clipboard && window.isSecureContext) {
-      navigator.clipboard.writeText(shareUrl).then(() => {
-        this.showCopySuccess();
-      }).catch(() => {
-        this.fallbackCopyToClipboard(shareUrl);
-      });
+      navigator.clipboard
+        .writeText(shareUrl)
+        .then(() => {
+          this.showCopySuccess();
+        })
+        .catch(() => {
+          this.fallbackCopyToClipboard(shareUrl);
+        });
     } else {
       this.fallbackCopyToClipboard(shareUrl);
     }
@@ -1198,7 +1206,7 @@ export class FaqComponent implements OnInit, OnDestroy {
       action: 'copy_link',
       faqQuestion: faqItem.question,
       faqCategory: faqItem.category,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   }
 
@@ -1302,10 +1310,8 @@ export class FaqComponent implements OnInit, OnDestroy {
         faqQuestion: faqItem.question,
         faqCategory: faqItem.category,
         platform: platform,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     }
   }
-
 }
-

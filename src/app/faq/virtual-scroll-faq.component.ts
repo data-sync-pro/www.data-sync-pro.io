@@ -1,11 +1,11 @@
-import { 
-  Component, 
-  OnInit, 
-  ViewChild, 
-  ElementRef, 
+import {
+  Component,
+  OnInit,
+  ViewChild,
+  ElementRef,
   HostListener,
   ChangeDetectorRef,
-  OnDestroy 
+  OnDestroy,
 } from '@angular/core';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { Subject } from 'rxjs';
@@ -34,13 +34,11 @@ interface VirtualFAQItem {
           placeholder="Search FAQs..."
           class="search-input"
         />
-        <div class="results-info">
-          Showing {{displayedItems.length}} / {{totalItems}} FAQs
-        </div>
+        <div class="results-info">Showing {{ displayedItems.length }} / {{ totalItems }} FAQs</div>
       </div>
 
       <!-- Virtual Scroll Container -->
-      <cdk-virtual-scroll-viewport 
+      <cdk-virtual-scroll-viewport
         #viewport
         [itemSize]="itemHeight"
         [minBufferPx]="bufferSize"
@@ -48,15 +46,13 @@ interface VirtualFAQItem {
         class="faq-viewport"
         (scrolledIndexChange)="onScrollIndexChange($event)"
       >
-        <div 
-          *cdkVirtualFor="let item of displayedItems; 
-                          let i = index; 
-                          trackBy: trackByFn"
+        <div
+          *cdkVirtualFor="let item of displayedItems; let i = index; trackBy: trackByFn"
           class="virtual-faq-item"
           [class.expanded]="item.isExpanded"
         >
           <!-- FAQ标题 -->
-          <div 
+          <div
             class="faq-header"
             (click)="toggleFAQ(item, i)"
             [attr.aria-expanded]="item.isExpanded"
@@ -70,7 +66,7 @@ interface VirtualFAQItem {
           </div>
 
           <!-- FAQ内容 -->
-          <div 
+          <div
             class="faq-content"
             *ngIf="item.isExpanded"
             [style.height]="item.isExpanded ? 'auto' : '0'"
@@ -78,9 +74,7 @@ interface VirtualFAQItem {
             <div class="faq-answer" [innerHTML]="item.answer" appSimpleZoomable></div>
             <div class="faq-meta">
               <span class="category">{{ item.category }}</span>
-              <span class="subcategory" *ngIf="item.subCategory">
-                > {{ item.subCategory }}
-              </span>
+              <span class="subcategory" *ngIf="item.subCategory"> > {{ item.subCategory }} </span>
             </div>
           </div>
         </div>
@@ -99,7 +93,7 @@ interface VirtualFAQItem {
       </div>
     </div>
   `,
-  styleUrls: ['./virtual-scroll-faq.component.scss']
+  styleUrls: ['./virtual-scroll-faq.component.scss'],
 })
 export class VirtualScrollFAQComponent implements OnInit, OnDestroy {
   @ViewChild('viewport', { static: true }) viewport!: CdkVirtualScrollViewport;
@@ -140,7 +134,7 @@ export class VirtualScrollFAQComponent implements OnInit, OnDestroy {
    */
   private async initializeData(): Promise<void> {
     this.isLoading = true;
-    
+
     try {
       // 模拟加载大量FAQ数据
       this.allItems = await this.loadFAQData();
@@ -169,7 +163,7 @@ export class VirtualScrollFAQComponent implements OnInit, OnDestroy {
             answer: `这是FAQ ${i}的详细答案。包含了相关的解决方案和说明信息。`,
             category: `分类${Math.ceil(i / 100)}`,
             subCategory: `子分类${Math.ceil(i / 20)}`,
-            isExpanded: false
+            isExpanded: false,
           });
         }
         resolve(items);
@@ -181,14 +175,9 @@ export class VirtualScrollFAQComponent implements OnInit, OnDestroy {
    * 设置搜索防抖
    */
   private setupSearchDebounce(): void {
-    this.searchSubject
-      .pipe(
-        debounceTime(300),
-        takeUntil(this.destroy$)
-      )
-      .subscribe(query => {
-        this.performSearch(query);
-      });
+    this.searchSubject.pipe(debounceTime(300), takeUntil(this.destroy$)).subscribe(query => {
+      this.performSearch(query);
+    });
   }
 
   /**
@@ -206,14 +195,15 @@ export class VirtualScrollFAQComponent implements OnInit, OnDestroy {
       this.displayedItems = [...this.allItems];
     } else {
       const lowerQuery = query.toLowerCase();
-      this.displayedItems = this.allItems.filter(item =>
-        item.question.toLowerCase().includes(lowerQuery) ||
-        item.answer.toLowerCase().includes(lowerQuery) ||
-        item.category.toLowerCase().includes(lowerQuery) ||
-        item.subCategory.toLowerCase().includes(lowerQuery)
+      this.displayedItems = this.allItems.filter(
+        item =>
+          item.question.toLowerCase().includes(lowerQuery) ||
+          item.answer.toLowerCase().includes(lowerQuery) ||
+          item.category.toLowerCase().includes(lowerQuery) ||
+          item.subCategory.toLowerCase().includes(lowerQuery)
       );
     }
-    
+
     // 重置滚动位置
     this.viewport.scrollToIndex(0);
     this.cdr.detectChanges();
@@ -282,7 +272,6 @@ export class VirtualScrollFAQComponent implements OnInit, OnDestroy {
 
   private isInputActive(): boolean {
     const activeElement = document.activeElement;
-    return activeElement?.tagName === 'INPUT' || 
-           activeElement?.tagName === 'TEXTAREA';
+    return activeElement?.tagName === 'INPUT' || activeElement?.tagName === 'TEXTAREA';
   }
 }

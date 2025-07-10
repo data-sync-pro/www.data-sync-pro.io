@@ -4,7 +4,7 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { MatButtonModule } from '@angular/material/button';
-import { FaqModule } from './faq/faq.module'; // 
+import { FaqModule } from './faq/faq.module'; //
 
 import { CookieConsentComponent } from './cookie-consent/cookie-consent.component';
 import { HomeComponent } from './home/home.component';
@@ -30,7 +30,7 @@ import { ScrollToTopComponent } from './scroll-to-top/scroll-to-top.component';
     SolutionsComponent,
     RulesEnginesComponent,
     CookieConsentComponent,
-    ScrollToTopComponent
+    ScrollToTopComponent,
   ],
   imports: [
     BrowserModule,
@@ -40,8 +40,8 @@ import { ScrollToTopComponent } from './scroll-to-top/scroll-to-top.component';
     MatExpansionModule,
     FormsModule,
     BrowserAnimationsModule,
-    FaqModule
+    FaqModule,
   ],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}

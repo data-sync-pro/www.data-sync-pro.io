@@ -22,7 +22,7 @@ import { SimpleZoomableDirective } from 'src/app/simple-zoomable.directive';
     PaginatedFAQComponent,
     VirtualScrollFAQComponent,
     ZoomableDirective,
-    SimpleZoomableDirective
+    SimpleZoomableDirective,
   ],
   imports: [
     CommonModule,
@@ -32,10 +32,6 @@ import { SimpleZoomableDirective } from 'src/app/simple-zoomable.directive';
     MatButtonModule,
     ScrollingModule,
   ],
-  exports: [
-    FaqComponent,
-    ZoomableDirective,
-    SimpleZoomableDirective
-  ]
+  exports: [FaqComponent, ZoomableDirective, SimpleZoomableDirective],
 })
 export class FaqModule {}

@@ -55,21 +55,22 @@ export class SearchOverlayComponent implements OnInit, OnChanges {
   suggestions: FaqItem[] = [];
   filteredSuggestions: FaqItem[] = [];
 
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(
+    private http: HttpClient,
+    private router: Router
+  ) {}
 
   ngOnInit() {
-    this.http.get<RawFaq[]>('assets/data/faqs.json').subscribe((data) => {
-      this.suggestions = data.map((r) => ({
+    this.http.get<RawFaq[]>('assets/data/faqs.json').subscribe(data => {
+      this.suggestions = data.map(r => ({
         id: r.Id,
         question: r.Question__c,
         route: r.Answer__c.replace('.html', ''),
         category: r.Category__c,
         subCategory: r.SubCategory__c,
-        tags: r.SubCategory__c
-          ? [r.Category__c, r.SubCategory__c]
-          : [r.Category__c],
+        tags: r.SubCategory__c ? [r.Category__c, r.SubCategory__c] : [r.Category__c],
       }));
-      this.categories = [...new Set(this.suggestions.map((i) => i.category))];
+      this.categories = [...new Set(this.suggestions.map(i => i.category))];
       this.filterSubCategoryList();
       this.filterSuggestions();
     });
@@ -99,9 +100,7 @@ export class SearchOverlayComponent implements OnInit, OnChanges {
 
   toggleSubCategory(sc: string) {
     const i = this.selectedSubCategories.indexOf(sc);
-    i >= 0
-      ? this.selectedSubCategories.splice(i, 1)
-      : this.selectedSubCategories.push(sc);
+    i >= 0 ? this.selectedSubCategories.splice(i, 1) : this.selectedSubCategories.push(sc);
     this.filterSuggestions();
   }
 
@@ -112,10 +111,10 @@ export class SearchOverlayComponent implements OnInit, OnChanges {
       return;
     }
     const subs = this.suggestions
-      .filter((i) => i.category === this.selectedCategory && i.subCategory)
-      .map((i) => i.subCategory!);
+      .filter(i => i.category === this.selectedCategory && i.subCategory)
+      .map(i => i.subCategory!);
     this.subCategories = [...new Set(subs)];
-    this.selectedSubCategories = this.selectedSubCategories.filter((s) =>
+    this.selectedSubCategories = this.selectedSubCategories.filter(s =>
       this.subCategories.includes(s)
     );
   }
@@ -141,11 +140,10 @@ export class SearchOverlayComponent implements OnInit, OnChanges {
   filterSuggestions() {
     const kw = this.searchQuery.trim().toLowerCase();
 
-    this.filteredSuggestions = this.suggestions.filter((i) => {
+    this.filteredSuggestions = this.suggestions.filter(i => {
       const matchKW = kw ? i.question.toLowerCase().includes(kw) : true;
 
-      const matchCat =
-        !this.selectedCategory || i.category === this.selectedCategory;
+      const matchCat = !this.selectedCategory || i.category === this.selectedCategory;
 
       const matchSub =
         this.selectedSubCategories.length === 0 ||

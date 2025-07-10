@@ -1,11 +1,4 @@
-import {
-  Component,
-  OnInit,
-  ViewChild,
-  ElementRef,
-  HostListener,
-  OnDestroy
-} from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, HostListener, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
@@ -32,15 +25,15 @@ interface PaginationInfo {
       <!-- 头部控制区 -->
       <div class="faq-controls">
         <div class="search-section">
-          <input 
+          <input
             #searchInput
             [(ngModel)]="searchQuery"
             (input)="onSearchInput()"
             placeholder="搜索FAQ..."
             class="search-input"
           />
-          <button 
-            *ngIf="searchQuery" 
+          <button
+            *ngIf="searchQuery"
             (click)="clearSearch()"
             class="clear-search-btn"
             title="清除搜索"
@@ -50,7 +43,7 @@ interface PaginationInfo {
         </div>
 
         <div class="filter-section">
-          <select 
+          <select
             [(ngModel)]="selectedCategory"
             (change)="onCategoryChange()"
             class="category-filter"
@@ -61,11 +54,7 @@ interface PaginationInfo {
             </option>
           </select>
 
-          <select 
-            [(ngModel)]="pageSize"
-            (change)="onPageSizeChange()"
-            class="page-size-selector"
-          >
+          <select [(ngModel)]="pageSize" (change)="onPageSizeChange()" class="page-size-selector">
             <option [value]="10">每页 10 条</option>
             <option [value]="20">每页 20 条</option>
             <option [value]="50">每页 50 条</option>
@@ -77,8 +66,8 @@ interface PaginationInfo {
       <!-- 结果信息 -->
       <div class="results-info">
         <span class="results-count">
-          显示第 {{ paginationInfo.startIndex + 1 }} - {{ paginationInfo.endIndex }} 条，
-          共 {{ paginationInfo.totalItems }} 条FAQ
+          显示第 {{ paginationInfo.startIndex + 1 }} - {{ paginationInfo.endIndex }} 条， 共
+          {{ paginationInfo.totalItems }} 条FAQ
         </span>
         <span class="page-info">
           第 {{ paginationInfo.currentPage }} / {{ paginationInfo.totalPages }} 页
@@ -92,7 +81,7 @@ interface PaginationInfo {
           class="faq-item"
           [class.expanded]="item.isExpanded"
         >
-          <div 
+          <div
             class="faq-header"
             (click)="toggleFAQ(item)"
             [attr.aria-expanded]="item.isExpanded"
@@ -105,26 +94,30 @@ interface PaginationInfo {
               <h3 class="faq-question" [innerHTML]="highlightSearchTerm(item.question)"></h3>
               <div class="faq-badges">
                 <span class="category-badge">{{ item.category }}</span>
-                <span class="view-count" *ngIf="item.viewCount">
-                  👁 {{ item.viewCount }}
-                </span>
+                <span class="view-count" *ngIf="item.viewCount"> 👁 {{ item.viewCount }} </span>
               </div>
             </div>
-            
+
             <div class="faq-actions">
               <span class="expand-icon" [class.rotated]="item.isExpanded">▼</span>
             </div>
           </div>
 
-          <div 
-            class="faq-content"
-            *ngIf="item.isExpanded"
-            [@expandCollapse]
-          >
-            <div *ngIf="item.safeAnswer" class="faq-answer" [innerHTML]="item.safeAnswer" appSimpleZoomable></div>
+          <div class="faq-content" *ngIf="item.isExpanded" [@expandCollapse]>
+            <div
+              *ngIf="item.safeAnswer"
+              class="faq-answer"
+              [innerHTML]="item.safeAnswer"
+              appSimpleZoomable
+            ></div>
             <div *ngIf="item.isLoading" class="loading-content">Loading content...</div>
-            <div *ngIf="!item.safeAnswer && !item.isLoading" class="faq-answer" [innerHTML]="highlightSearchTerm(item.answer)" appSimpleZoomable></div>
-            
+            <div
+              *ngIf="!item.safeAnswer && !item.isLoading"
+              class="faq-answer"
+              [innerHTML]="highlightSearchTerm(item.answer)"
+              appSimpleZoomable
+            ></div>
+
             <!-- FAQ Feedback Area -->
             <div class="faq-feedback">
               <p>Was this answer helpful to you?</p>
@@ -168,7 +161,7 @@ interface PaginationInfo {
         </div>
 
         <div class="pagination-buttons">
-          <button 
+          <button
             (click)="goToPage(1)"
             [disabled]="paginationInfo.currentPage === 1"
             class="page-btn first-btn"
@@ -176,8 +169,8 @@ interface PaginationInfo {
           >
             ⏮
           </button>
-          
-          <button 
+
+          <button
             (click)="goToPage(paginationInfo.currentPage - 1)"
             [disabled]="paginationInfo.currentPage === 1"
             class="page-btn prev-btn"
@@ -187,7 +180,7 @@ interface PaginationInfo {
           </button>
 
           <div class="page-numbers">
-            <button 
+            <button
               *ngFor="let page of getVisiblePages()"
               (click)="goToPage(page)"
               [class.active]="page === paginationInfo.currentPage"
@@ -199,7 +192,7 @@ interface PaginationInfo {
             </button>
           </div>
 
-          <button 
+          <button
             (click)="goToPage(paginationInfo.currentPage + 1)"
             [disabled]="paginationInfo.currentPage === paginationInfo.totalPages"
             class="page-btn next-btn"
@@ -207,8 +200,8 @@ interface PaginationInfo {
           >
             ▶
           </button>
-          
-          <button 
+
+          <button
             (click)="goToPage(paginationInfo.totalPages)"
             [disabled]="paginationInfo.currentPage === paginationInfo.totalPages"
             class="page-btn last-btn"
@@ -221,7 +214,7 @@ interface PaginationInfo {
     </div>
   `,
   styleUrls: ['./paginated-faq.component.scss'],
-  animations: []
+  animations: [],
 })
 export class PaginatedFAQComponent implements OnInit, OnDestroy {
   @ViewChild('searchInput') searchInput!: ElementRef<HTMLInputElement>;
@@ -247,7 +240,7 @@ export class PaginatedFAQComponent implements OnInit, OnDestroy {
     pageSize: 20,
     totalItems: 0,
     startIndex: 0,
-    endIndex: 0
+    endIndex: 0,
   };
 
   // State
@@ -276,40 +269,34 @@ export class PaginatedFAQComponent implements OnInit, OnDestroy {
   private initializeData(): void {
     this.isLoading = true;
 
-    this.faqService.getFAQs().pipe(
-      takeUntil(this.destroy$)
-    ).subscribe({
-      next: (faqs) => {
-        this.allItems = faqs.map(faq => ({
-          ...faq,
-          viewCount: Math.floor(Math.random() * 1000)
-        }));
-        this.categories = [...new Set(this.allItems.map(item => item.category))];
-        this.applyFilters();
-        this.isLoading = false;
-      },
-      error: (error) => {
-        console.error('加载FAQ数据失败:', error);
-        this.isLoading = false;
-      }
-    });
+    this.faqService
+      .getFAQs()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: faqs => {
+          this.allItems = faqs.map(faq => ({
+            ...faq,
+            viewCount: Math.floor(Math.random() * 1000),
+          }));
+          this.categories = [...new Set(this.allItems.map(item => item.category))];
+          this.applyFilters();
+          this.isLoading = false;
+        },
+        error: error => {
+          console.error('加载FAQ数据失败:', error);
+          this.isLoading = false;
+        },
+      });
   }
-
-
 
   /**
    * 设置搜索防抖
    */
   private setupSearchDebounce(): void {
-    this.searchSubject
-      .pipe(
-        debounceTime(300),
-        distinctUntilChanged()
-      )
-      .subscribe(() => {
-        this.applyFilters();
-        this.updateURL();
-      });
+    this.searchSubject.pipe(debounceTime(300), distinctUntilChanged()).subscribe(() => {
+      this.applyFilters();
+      this.updateURL();
+    });
   }
 
   /**
@@ -321,7 +308,7 @@ export class PaginatedFAQComponent implements OnInit, OnDestroy {
       this.selectedCategory = params['category'] || '';
       this.pageSize = parseInt(params['pageSize']) || 20;
       this.paginationInfo.currentPage = parseInt(params['page']) || 1;
-      
+
       if (this.allItems.length > 0) {
         this.applyFilters();
       }
@@ -333,7 +320,7 @@ export class PaginatedFAQComponent implements OnInit, OnDestroy {
    */
   private updateURL(): void {
     const queryParams: any = {};
-    
+
     if (this.searchQuery) queryParams.q = this.searchQuery;
     if (this.selectedCategory) queryParams.category = this.selectedCategory;
     if (this.pageSize !== 20) queryParams.pageSize = this.pageSize;
@@ -342,7 +329,7 @@ export class PaginatedFAQComponent implements OnInit, OnDestroy {
     this.router.navigate([], {
       relativeTo: this.route,
       queryParams,
-      queryParamsHandling: 'merge'
+      queryParamsHandling: 'merge',
     });
   }
 
@@ -355,10 +342,11 @@ export class PaginatedFAQComponent implements OnInit, OnDestroy {
     // 搜索筛选
     if (this.searchQuery.trim()) {
       const query = this.searchQuery.toLowerCase();
-      filtered = filtered.filter(item =>
-        item.question.toLowerCase().includes(query) ||
-        item.answer.toLowerCase().includes(query) ||
-        item.category.toLowerCase().includes(query)
+      filtered = filtered.filter(
+        item =>
+          item.question.toLowerCase().includes(query) ||
+          item.answer.toLowerCase().includes(query) ||
+          item.category.toLowerCase().includes(query)
       );
     }
 
@@ -377,7 +365,7 @@ export class PaginatedFAQComponent implements OnInit, OnDestroy {
   private updatePagination(): void {
     const totalItems = this.filteredItems.length;
     const totalPages = Math.ceil(totalItems / this.pageSize);
-    
+
     // 确保当前页面在有效范围内
     if (this.paginationInfo.currentPage > totalPages) {
       this.paginationInfo.currentPage = Math.max(1, totalPages);
@@ -392,7 +380,7 @@ export class PaginatedFAQComponent implements OnInit, OnDestroy {
       pageSize: this.pageSize,
       totalItems,
       startIndex,
-      endIndex
+      endIndex,
     };
 
     // 获取当前页数据
@@ -422,7 +410,7 @@ export class PaginatedFAQComponent implements OnInit, OnDestroy {
       this.paginationInfo.currentPage = page;
       this.updatePagination();
       this.updateURL();
-      
+
       // 滚动到顶部
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -441,24 +429,24 @@ export class PaginatedFAQComponent implements OnInit, OnDestroy {
     } else {
       // 复杂的页码显示逻辑
       pages.push(1);
-      
+
       if (current > 4) {
         pages.push(-1); // 省略号
       }
-      
+
       const start = Math.max(2, current - 1);
       const end = Math.min(total - 1, current + 1);
-      
+
       for (let i = start; i <= end; i++) {
         if (!pages.includes(i)) {
           pages.push(i);
         }
       }
-      
+
       if (current < total - 3) {
         pages.push(-1); // 省略号
       }
-      
+
       if (!pages.includes(total)) {
         pages.push(total);
       }
@@ -489,27 +477,26 @@ export class PaginatedFAQComponent implements OnInit, OnDestroy {
       // Load FAQ content if not already loaded
       if (!item.safeAnswer && item.answerPath) {
         item.isLoading = true;
-        this.faqService.getFAQContent(item.answerPath).pipe(
-          takeUntil(this.destroy$)
-        ).subscribe({
-          next: (content) => {
-            item.safeAnswer = content;
-            item.isLoading = false;
-          },
-          error: (error) => {
-            console.error('Failed to load FAQ content:', error);
-            item.isLoading = false;
-          }
-        });
+        this.faqService
+          .getFAQContent(item.answerPath)
+          .pipe(takeUntil(this.destroy$))
+          .subscribe({
+            next: content => {
+              item.safeAnswer = content;
+              item.isLoading = false;
+            },
+            error: error => {
+              console.error('Failed to load FAQ content:', error);
+              item.isLoading = false;
+            },
+          });
       }
     }
   }
 
-
-
   highlightSearchTerm(text: string): string {
     if (!this.searchQuery.trim()) return text;
-    
+
     const regex = new RegExp(`(${this.searchQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
     return text.replace(regex, '<mark>$1</mark>');
   }
@@ -528,8 +515,10 @@ export class PaginatedFAQComponent implements OnInit, OnDestroy {
 
   private isInputActive(): boolean {
     const activeElement = document.activeElement;
-    return activeElement?.tagName === 'INPUT' || 
-           activeElement?.tagName === 'TEXTAREA' ||
-           activeElement?.tagName === 'SELECT';
+    return (
+      activeElement?.tagName === 'INPUT' ||
+      activeElement?.tagName === 'TEXTAREA' ||
+      activeElement?.tagName === 'SELECT'
+    );
   }
 }

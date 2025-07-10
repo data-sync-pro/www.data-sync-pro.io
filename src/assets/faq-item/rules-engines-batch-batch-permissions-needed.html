@@ -1,41 +1,42 @@
 <article>
-    <p>
-      All DSP processes are structured as custom objects, meaning execution permissions depend on 
-      object, field, and record access.
-    </p>
-    <br />
-    <p>
-      To execute a Batch Executable in DSP, users <strong>must</strong> have:
-    </p>
-    <ul>
-      <li>✅ <strong>Read access</strong> to the Executable record.</li>
-      <li>✅ Create permissions on execution-related objects, including:
-        <ul>
-          <li>Pipeline Execution (if executed from a Pipeline).</li>
-          <li>Execution and Batch Execution objects.</li>
-          <li>Platform Events: Execution Result and Batch Execution Result.</li>
-        </ul>
-      </li>
-    </ul>
-  
-    <p><strong>Recommended Permission Sets:</strong></p>
-    <ul>
-      <li>
-        <strong>DSP: Data Sync Pro Administrator</strong> – Grants full access, including all 
-        Executable records, enabling users to execute any Batch Executable. This is ideal for 
-        super users or admins.
-      </li>
-      <li>
-        <strong>DSP: Data Sync Pro App User</strong> – Provides necessary object and field-level 
-        access without direct access to Batch Executables. To allow execution, manually share 
-        specific Batch Executables with users via Salesforce's standard record-sharing mechanisms.
-      </li>
-    </ul>
-  
-    <p>
-      Using the appropriate permission set ensures users have the necessary access while 
-      maintaining security and control over Batch Executions.
-    </p>
-  </article>
-  
-  <img src="assets/image/rules-engines-batch-batch-permissions-needed/rules-engines-batch-batch-permissions-needed.jpg" />
+  <p>
+    All DSP processes are structured as custom objects, meaning execution permissions depend on
+    object, field, and record access.
+  </p>
+  <br />
+  <p>To execute a Batch Executable in DSP, users <strong>must</strong> have:</p>
+  <ul>
+    <li>✅ <strong>Read access</strong> to the Executable record.</li>
+    <li>
+      ✅ Create permissions on execution-related objects, including:
+      <ul>
+        <li>Pipeline Execution (if executed from a Pipeline).</li>
+        <li>Execution and Batch Execution objects.</li>
+        <li>Platform Events: Execution Result and Batch Execution Result.</li>
+      </ul>
+    </li>
+  </ul>
+
+  <p><strong>Recommended Permission Sets:</strong></p>
+  <ul>
+    <li>
+      <strong>DSP: Data Sync Pro Administrator</strong> – Grants full access, including all
+      Executable records, enabling users to execute any Batch Executable. This is ideal for super
+      users or admins.
+    </li>
+    <li>
+      <strong>DSP: Data Sync Pro App User</strong> – Provides necessary object and field-level
+      access without direct access to Batch Executables. To allow execution, manually share specific
+      Batch Executables with users via Salesforce's standard record-sharing mechanisms.
+    </li>
+  </ul>
+
+  <p>
+    Using the appropriate permission set ensures users have the necessary access while maintaining
+    security and control over Batch Executions.
+  </p>
+</article>
+
+<img
+  src="assets/image/rules-engines-batch-batch-permissions-needed/rules-engines-batch-batch-permissions-needed.jpg"
+/>

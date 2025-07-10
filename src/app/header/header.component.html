@@ -3,17 +3,10 @@
     <img src="assets/logo.png" alt="Company Logo" class="company-logo" />
     <span class="company-name">DSP</span>
   </a>
-  <button
-    class="portrait-toggle-btn"
-    (click)="toggleNav()"
-    *ngIf="isPortrait"
-  >
+  <button class="portrait-toggle-btn" (click)="toggleNav()" *ngIf="isPortrait">
     {{ navOpen ? 'Close Menu' : 'Open Menu' }}
   </button>
-  <nav
-    class="nav-links"
-    [class.portrait-nav]="isPortrait && navOpen"
-  >
+  <nav class="nav-links" [class.portrait-nav]="isPortrait && navOpen">
     <div
       class="nav-item"
       *ngFor="let item of navItems; let i = index"

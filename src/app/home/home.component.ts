@@ -3,10 +3,9 @@ import { Component } from '@angular/core';
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
-  styleUrls: ['./home.component.scss']
+  styleUrls: ['./home.component.scss'],
 })
 export class HomeComponent {
-
   tabs = [
     {
       name: 'Batch',
@@ -52,7 +51,7 @@ export class HomeComponent {
       cardOneContent: 'Record Action card one content goes here.',
       cardTwoTitle: 'Record Action Card Two',
       cardTwoContent: 'Record Action card two content goes here.',
-    }
+    },
   ];
 
   selectedTab = this.tabs[0];
@@ -60,5 +59,4 @@ export class HomeComponent {
   selectTab(tab: any) {
     this.selectedTab = tab;
   }
-
 }

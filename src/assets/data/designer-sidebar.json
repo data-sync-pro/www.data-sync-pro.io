@@ -1,8 +1,5 @@
 {
-  "Permission": [
-    "Permission Sets",
-    "Custom Permissions"
-  ],
+  "Permission": ["Permission Sets", "Custom Permissions"],
   "Connection": [
     "Create Connection - Current Org",
     "Create Connection - Named Credential",
@@ -11,10 +8,7 @@
     "Create Named Credential - Remote Org (OAuth2.0 Client Credential)",
     "Create Executable from Connection"
   ],
-  "Direction": [
-    "Create Direction",
-    "Create Executable from Direction"
-  ],
+  "Direction": ["Create Direction", "Create Executable from Direction"],
   "Pipeline": [
     "Create Pipeline",
     "Create Executable from Pipeline",

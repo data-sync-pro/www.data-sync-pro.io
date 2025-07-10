@@ -142,7 +142,7 @@ export enum FAQContentStatus {
   NOT_LOADED = 'not_loaded',
   LOADING = 'loading',
   LOADED = 'loaded',
-  ERROR = 'error'
+  ERROR = 'error',
 }
 
 /**
@@ -185,4 +185,205 @@ export interface FAQExportOptions {
   includeCategories: string[];
   includeAnswers: boolean;
   includeMetadata: boolean;
+}
+
+/**
+ * API响应包装器
+ */
+export interface APIResponse<T> {
+  data: T;
+  success: boolean;
+  message?: string;
+  timestamp: Date;
+  version: string;
+}
+
+/**
+ * 错误处理接口
+ */
+export interface FAQError {
+  code: string;
+  message: string;
+  details?: any;
+  timestamp: Date;
+  severity: 'low' | 'medium' | 'high' | 'critical';
+}
+
+/**
+ * 性能指标接口
+ */
+export interface PerformanceMetrics {
+  loadTime: number;
+  searchTime: number;
+  renderTime: number;
+  memoryUsage: number;
+  cacheHitRate: number;
+}
+
+/**
+ * 用户会话接口
+ */
+export interface UserSession {
+  sessionId: string;
+  userId?: string;
+  startTime: Date;
+  lastActivity: Date;
+  viewedFAQs: string[];
+  searchQueries: string[];
+  preferences: UserPreferences;
+}
+
+/**
+ * FAQ内容版本控制
+ */
+export interface FAQVersion {
+  version: string;
+  content: string;
+  author: string;
+  timestamp: Date;
+  changeLog: string;
+}
+
+/**
+ * 高级搜索配置
+ */
+export interface AdvancedSearchConfig {
+  fuzzySearch: boolean;
+  synonyms: Record<string, string[]>;
+  stopWords: string[];
+  minQueryLength: number;
+  maxResults: number;
+  boostFactors: {
+    titleMatch: number;
+    categoryMatch: number;
+    contentMatch: number;
+    popularityBoost: number;
+  };
+}
+
+/**
+ * 缓存配置
+ */
+export interface CacheConfig {
+  enabled: boolean;
+  ttl: number; // Time to live in milliseconds
+  maxSize: number;
+  strategy: 'lru' | 'fifo' | 'lfu';
+}
+
+/**
+ * 分析数据接口
+ */
+export interface AnalyticsData {
+  pageViews: number;
+  uniqueVisitors: number;
+  searchQueries: Array<{ query: string; count: number }>;
+  popularFAQs: Array<{ faqId: string; views: number }>;
+  categoryDistribution: Array<{ category: string; percentage: number }>;
+  userEngagement: {
+    averageSessionDuration: number;
+    bounceRate: number;
+    pagesPerSession: number;
+  };
+}
+
+/**
+ * 主题配置接口
+ */
+export interface ThemeConfig {
+  name: string;
+  primaryColor: string;
+  secondaryColor: string;
+  backgroundColor: string;
+  textColor: string;
+  fontFamily: string;
+  fontSize: {
+    small: string;
+    medium: string;
+    large: string;
+  };
+}
+
+/**
+ * 可访问性配置
+ */
+export interface AccessibilityConfig {
+  highContrast: boolean;
+  largeText: boolean;
+  screenReaderOptimized: boolean;
+  keyboardNavigation: boolean;
+  reducedMotion: boolean;
+}
+
+/**
+ * 国际化配置
+ */
+export interface I18nConfig {
+  defaultLanguage: string;
+  supportedLanguages: string[];
+  translations: Record<string, Record<string, string>>;
+  dateFormat: string;
+  numberFormat: string;
+}
+
+/**
+ * 严格类型的事件处理器
+ */
+export type FAQEventHandler<T = any> = (event: FAQEvent & { data?: T }) => void;
+
+/**
+ * 组件状态接口
+ */
+export interface ComponentState {
+  loading: boolean;
+  error: FAQError | null;
+  data: any;
+  lastUpdated: Date;
+}
+
+/**
+ * 验证规则接口
+ */
+export interface ValidationRule {
+  field: string;
+  required: boolean;
+  minLength?: number;
+  maxLength?: number;
+  pattern?: RegExp;
+  customValidator?: (value: any) => boolean;
+}
+
+/**
+ * 数据转换接口
+ */
+export interface DataTransformer<TInput, TOutput> {
+  transform(input: TInput): TOutput;
+  reverse?(output: TOutput): TInput;
+}
+
+/**
+ * 严格类型的配置对象
+ */
+export interface AppConfig {
+  api: {
+    baseUrl: string;
+    timeout: number;
+    retryAttempts: number;
+  };
+  features: {
+    search: boolean;
+    analytics: boolean;
+    socialSharing: boolean;
+    offlineMode: boolean;
+  };
+  performance: {
+    virtualScrolling: boolean;
+    lazyLoading: boolean;
+    caching: CacheConfig;
+  };
+  ui: {
+    theme: ThemeConfig;
+    accessibility: AccessibilityConfig;
+    i18n: I18nConfig;
+  };
 }

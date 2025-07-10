@@ -1,32 +1,22 @@
 <article>
-    <p>
-      To control the order in which target fields are evaluated during Mapping:
-    </p>
-    <ul>
-      <li>
-        After configuring the Mapping step, go to the <strong>Related</strong> 
-        tab on the Executable.
-      </li>
-      <li>
-        Locate the <strong>Field Mappings</strong> related list.
-      </li>
-      <li>
-        Edit the <strong>Seq No.</strong> column inline to define the desired 
-        evaluation order.
-      </li>
-      <li>
-        Save your changes.
-      </li>
-    </ul>
-    <p>
-      📌 When <strong>Seq No.</strong> is specified, DSP evaluates field mappings 
-      in that order. If the <strong>source and target are the same record</strong>, 
-      transformations are <strong>accumulative</strong>—meaning the result of 
-      a previously evaluated field can be used in subsequent transformations. 
-      This is useful when one field’s output depends on another’s value.
-    </p>
+  <p>To control the order in which target fields are evaluated during Mapping:</p>
+  <ul>
+    <li>
+      After configuring the Mapping step, go to the <strong>Related</strong>
+      tab on the Executable.
+    </li>
+    <li>Locate the <strong>Field Mappings</strong> related list.</li>
+    <li>Edit the <strong>Seq No.</strong> column inline to define the desired evaluation order.</li>
+    <li>Save your changes.</li>
+  </ul>
+  <p>
+    📌 When <strong>Seq No.</strong> is specified, DSP evaluates field mappings in that order. If
+    the <strong>source and target are the same record</strong>, transformations are
+    <strong>accumulative</strong>—meaning the result of a previously evaluated field can be used in
+    subsequent transformations. This is useful when one field’s output depends on another’s value.
+  </p>
 
-        <img src="assets/image/process-steps-mapping-sequence-of-transformations/process-steps-mapping-sequence-of-transformations.jpg" />     
-
-  </article>
-  
+  <img
+    src="assets/image/process-steps-mapping-sequence-of-transformations/process-steps-mapping-sequence-of-transformations.jpg"
+  />
+</article>

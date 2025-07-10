@@ -3,11 +3,11 @@ import { Component, HostListener } from '@angular/core';
 @Component({
   selector: 'app-scroll-to-top',
   templateUrl: './scroll-to-top.component.html',
-  styleUrls: ['./scroll-to-top.component.css']
+  styleUrls: ['./scroll-to-top.component.css'],
 })
 export class ScrollToTopComponent {
-  isVisible = false;  
-  isZooming = false;  
+  isVisible = false;
+  isZooming = false;
 
   @HostListener('window:scroll', [])
   onWindowScroll() {
@@ -19,7 +19,7 @@ export class ScrollToTopComponent {
   @HostListener('window:zoomStart', [])
   onZoomStart() {
     this.isZooming = true;
-    this.isVisible = false;      
+    this.isVisible = false;
   }
 
   @HostListener('window:zoomEnd', [])

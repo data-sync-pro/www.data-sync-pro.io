@@ -23,7 +23,7 @@
 
       &:focus {
         outline: none;
-        border-color: #2196F3;
+        border-color: #2196f3;
         box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
       }
 
@@ -82,7 +82,7 @@
         }
 
         &:focus {
-          outline: 2px solid #2196F3;
+          outline: 2px solid #2196f3;
           outline-offset: -2px;
         }
 
@@ -132,7 +132,8 @@
               }
             }
 
-            ul, ol {
+            ul,
+            ol {
               margin: 12px 0;
               padding-left: 20px;
             }
@@ -145,7 +146,8 @@
             }
 
             // 图片样式改进和缩放功能
-            img, .faq-image {
+            img,
+            .faq-image {
               max-width: 100%;
               height: auto;
               margin: 20px auto;
@@ -202,14 +204,18 @@
       width: 20px;
       height: 20px;
       border: 2px solid #e1e5e9;
-      border-top: 2px solid #2196F3;
+      border-top: 2px solid #2196f3;
       border-radius: 50%;
       animation: spin 1s linear infinite;
     }
 
     @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+      0% {
+        transform: rotate(0deg);
+      }
+      100% {
+        transform: rotate(360deg);
+      }
     }
   }
 
@@ -224,7 +230,7 @@
     }
 
     .clear-btn {
-      background-color: #2196F3;
+      background-color: #2196f3;
       color: white;
       border: none;
       padding: 10px 20px;
@@ -238,7 +244,7 @@
       }
 
       &:focus {
-        outline: 2px solid #2196F3;
+        outline: 2px solid #2196f3;
         outline-offset: 2px;
       }
     }
@@ -331,7 +337,7 @@
   &::-webkit-scrollbar-thumb {
     background: #c1c1c1;
     border-radius: 4px;
-    
+
     &:hover {
       background: #a8a8a8;
     }
@@ -340,7 +346,7 @@
 
 // 焦点可见性增强
 .virtual-faq-item .faq-header:focus-visible {
-  outline: 2px solid #2196F3;
+  outline: 2px solid #2196f3;
   outline-offset: -2px;
   background-color: rgba(33, 150, 243, 0.1);
 }
@@ -349,8 +355,8 @@
 .zoom-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, .6);
+  background: rgba(0, 0, 0, 0.6);
   z-index: 9;
   pointer-events: auto;
-  transition: opacity .25s ease;
+  transition: opacity 0.25s ease;
 }

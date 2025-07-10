@@ -8,9 +8,8 @@ describe('SearchOverlayComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ SearchOverlayComponent ]
-    })
-    .compileComponents();
+      declarations: [SearchOverlayComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(SearchOverlayComponent);
     component = fixture.componentInstance;

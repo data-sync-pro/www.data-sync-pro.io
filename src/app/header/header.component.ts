@@ -23,7 +23,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     { label: 'FAQ', link: '/faq', isOpen: false },
     //{ label: 'Support', link: '/support', hasMegaMenu: true, isOpen: false },
     { label: 'Pricing', link: '/pricing', isOpen: false },
-    { label: 'Designer Guide', link:'/designer-guide', isOpen: false}
+    { label: 'Designer Guide', link: '/designer-guide', isOpen: false },
   ];
 
   private orientationQuery!: MediaQueryList;

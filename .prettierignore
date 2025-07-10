@@ -1,0 +1,33 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+docs/
+out-tsc/
+tmp/
+bazel-out/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Coverage
+coverage/
+
+# Angular
+.angular/
+
+# Package files
+package-lock.json
+yarn.lock
+
+# Generated files
+*.d.ts

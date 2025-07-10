@@ -1,6 +1,6 @@
 .home-container {
   max-width: 100%;
-  
+
   margin: 0 auto;
   padding: 0 1rem;
 }
@@ -8,7 +8,7 @@
 .hero-section {
   aspect-ratio: 27 / 9;
   width: 100%;
-  background: url("https://cdn.midjourney.com/fa8a7948-dd52-40d3-b259-0b42d6f56d4f/0_2.png");
+  background: url('https://cdn.midjourney.com/fa8a7948-dd52-40d3-b259-0b42d6f56d4f/0_2.png');
   background-size: cover;
   position: relative;
   margin-top: 60px;
@@ -73,7 +73,7 @@
       padding: 0;
 
       a {
-        display: block; 
+        display: block;
         padding: 0.75rem 1.5rem;
         background-color: #fafafa;
         color: #333;
@@ -175,10 +175,12 @@
 @media (max-width: 768px) {
   .hero-section,
   .second-hero {
-    aspect-ratio: auto; 
+    aspect-ratio: auto;
   }
-  .hero-content, .second-hero-content {
-    .hero-title, h2 {
+  .hero-content,
+  .second-hero-content {
+    .hero-title,
+    h2 {
       font-size: clamp(1.25rem, 4vw, 1.75rem);
     }
   }

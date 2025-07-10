@@ -2,14 +2,14 @@ import { Component } from '@angular/core';
 
 interface Plan {
   name?: string;
-  oldPrice?: string;      
+  oldPrice?: string;
   currentPrice?: string;
   perPerson?: string;
   buttonLabel?: string;
-  badge?: string;        
-  subtitle?: string;      
-  features?: string[];    
-  addOns?: string[];     
+  badge?: string;
+  subtitle?: string;
+  features?: string[];
+  addOns?: string[];
 }
 
 interface FeatureCategory {
@@ -23,10 +23,9 @@ interface FeatureCategory {
 @Component({
   selector: 'app-pricing',
   templateUrl: './pricing.component.html',
-  styleUrls: ['./pricing.component.scss']
+  styleUrls: ['./pricing.component.scss'],
 })
 export class PricingComponent {
-  
   plans: Plan[] = [
     {
       name: 'Connections',
@@ -41,8 +40,8 @@ export class PricingComponent {
         'Connect multiple sandbox environments',
         'Secure data synchronization between orgs',
         'Real-time monitoring and alerts',
-        'Enterprise-grade security and compliance'
-      ]
+        'Enterprise-grade security and compliance',
+      ],
     },
     {
       name: 'Executables',
@@ -56,9 +55,9 @@ export class PricingComponent {
         'Automation rules with 80% less tech debt',
         'Data List management and processing',
         'Action Button configurations',
-        'Data Loader operations'
-      ]
-    }
+        'Data Loader operations',
+      ],
+    },
   ];
 
   categories: FeatureCategory[] = [
@@ -71,8 +70,8 @@ export class PricingComponent {
         { name: 'Real-time progress monitoring', included: true },
         { name: 'Custom batch job scheduling', included: true },
         { name: 'Performance optimization tools', included: true },
-        { name: 'Memory-efficient processing', included: true }
-      ]
+        { name: 'Memory-efficient processing', included: true },
+      ],
     },
     {
       title: 'Triggers Engine - 80% Less Tech Debt',
@@ -83,8 +82,8 @@ export class PricingComponent {
         { name: 'Conditional logic and branching', included: true },
         { name: 'Audit trail and version control', included: true },
         { name: 'Code-free automation setup', included: true },
-        { name: 'Maintenance-friendly architecture', included: true }
-      ]
+        { name: 'Maintenance-friendly architecture', included: true },
+      ],
     },
     {
       title: 'ETL (Extract, Transform, Load)',
@@ -95,8 +94,8 @@ export class PricingComponent {
         { name: 'Incremental data loading', included: true },
         { name: 'Data mapping and field transformation', included: true },
         { name: 'Real-time data synchronization', included: true },
-        { name: 'Error handling and data recovery', included: true }
-      ]
+        { name: 'Error handling and data recovery', included: true },
+      ],
     },
     {
       title: 'Data List Engine',
@@ -107,8 +106,8 @@ export class PricingComponent {
         { name: 'Export and import capabilities', included: true },
         { name: 'Custom list views and dashboards', included: true },
         { name: 'Automated list maintenance', included: true },
-        { name: 'Integration with Salesforce reports', included: true }
-      ]
+        { name: 'Integration with Salesforce reports', included: true },
+      ],
     },
     {
       title: 'Action Button & Data Loader',
@@ -119,12 +118,12 @@ export class PricingComponent {
         { name: 'Data validation before loading', included: true },
         { name: 'Rollback and recovery options', included: true },
         { name: 'Scheduled data operations', included: true },
-        { name: 'Multi-format file support', included: true }
-      ]
-    }
+        { name: 'Multi-format file support', included: true },
+      ],
+    },
   ];
 
- openIndex: number | null = null;
+  openIndex: number | null = null;
 
   toggleCategory(index: number) {
     this.openIndex = this.openIndex === index ? null : index;

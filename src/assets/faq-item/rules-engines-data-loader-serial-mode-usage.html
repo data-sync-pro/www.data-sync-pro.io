@@ -1,29 +1,34 @@
 <article>
-    <p>
-      Serial mode should be used when processing records sequentially is necessary 
-      to prevent record locking issues, ensure data integrity, or maintain the 
-      correct execution order. It is particularly useful in scenarios where multiple 
-      records update the same parent record or when actions depend on the completion 
-      of previous records.
-    </p>
-    <p><strong>Key Considerations:</strong></p>
-    <ul>
-      <li><strong>Prevents Record Locking</strong> – Reduces the likelihood of lock
-          contention, especially when updating or inserting related records.</li>
-    
-      <li><strong>Ensures Order of Execution</strong> – Processes records one at a
-          time rather than in parallel, which is beneficial for workflows that require
-          strict sequencing.</li>
-    
-      <li><strong>Potential Performance Impact</strong> – Since records are processed
-          sequentially, execution time may increase compared to parallel processing.</li>
-    
-      <li><strong>Use for Dependent Transactions</strong> – Ideal when data dependencies
-          exist between records that must be processed in a specific order.</li>
-    </ul>    
-    <p>
-      Enabling <strong>serial mode</strong> ensures safer execution in these cases, 
-      but it should be used selectively based on the needs of the batch process. 
-    </p>
-  </article>
-  
+  <p>
+    Serial mode should be used when processing records sequentially is necessary to prevent record
+    locking issues, ensure data integrity, or maintain the correct execution order. It is
+    particularly useful in scenarios where multiple records update the same parent record or when
+    actions depend on the completion of previous records.
+  </p>
+  <p><strong>Key Considerations:</strong></p>
+  <ul>
+    <li>
+      <strong>Prevents Record Locking</strong> – Reduces the likelihood of lock contention,
+      especially when updating or inserting related records.
+    </li>
+
+    <li>
+      <strong>Ensures Order of Execution</strong> – Processes records one at a time rather than in
+      parallel, which is beneficial for workflows that require strict sequencing.
+    </li>
+
+    <li>
+      <strong>Potential Performance Impact</strong> – Since records are processed sequentially,
+      execution time may increase compared to parallel processing.
+    </li>
+
+    <li>
+      <strong>Use for Dependent Transactions</strong> – Ideal when data dependencies exist between
+      records that must be processed in a specific order.
+    </li>
+  </ul>
+  <p>
+    Enabling <strong>serial mode</strong> ensures safer execution in these cases, but it should be
+    used selectively based on the needs of the batch process.
+  </p>
+</article>

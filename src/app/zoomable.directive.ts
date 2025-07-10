@@ -1,7 +1,14 @@
-import { Directive, ElementRef, Renderer2, HostListener, AfterViewInit, OnDestroy } from '@angular/core';
+import {
+  Directive,
+  ElementRef,
+  Renderer2,
+  HostListener,
+  AfterViewInit,
+  OnDestroy,
+} from '@angular/core';
 
 @Directive({
-  selector: '[appZoomable]'
+  selector: '[appZoomable]',
 })
 export class ZoomableDirective implements AfterViewInit, OnDestroy {
   private backdropEl?: HTMLElement;
@@ -45,10 +52,10 @@ export class ZoomableDirective implements AfterViewInit, OnDestroy {
 
   private setupMutationObserver(): void {
     // 监听DOM变化，为新添加的图片设置样式
-    this.mutationObserver = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
+    this.mutationObserver = new MutationObserver(mutations => {
+      mutations.forEach(mutation => {
         if (mutation.type === 'childList') {
-          mutation.addedNodes.forEach((node) => {
+          mutation.addedNodes.forEach(node => {
             if (node.nodeType === Node.ELEMENT_NODE) {
               const element = node as Element;
               // 检查新添加的元素是否是图片或包含图片
@@ -66,7 +73,7 @@ export class ZoomableDirective implements AfterViewInit, OnDestroy {
 
     this.mutationObserver.observe(this.el.nativeElement, {
       childList: true,
-      subtree: true
+      subtree: true,
     });
   }
 
@@ -109,9 +116,13 @@ export class ZoomableDirective implements AfterViewInit, OnDestroy {
     if (img.complete) {
       this.rd.addClass(img, 'faq-image');
     } else {
-      img.addEventListener('load', () => {
-        this.rd.addClass(img, 'faq-image');
-      }, { once: true });
+      img.addEventListener(
+        'load',
+        () => {
+          this.rd.addClass(img, 'faq-image');
+        },
+        { once: true }
+      );
     }
   }
 
@@ -147,7 +158,7 @@ export class ZoomableDirective implements AfterViewInit, OnDestroy {
       padding: img.style.padding || getComputedStyle(img).padding,
       border: img.style.border || getComputedStyle(img).border,
       borderRadius: img.style.borderRadius || getComputedStyle(img).borderRadius,
-      boxShadow: img.style.boxShadow || getComputedStyle(img).boxShadow
+      boxShadow: img.style.boxShadow || getComputedStyle(img).boxShadow,
     };
 
     // 保存原始位置信息
@@ -155,7 +166,7 @@ export class ZoomableDirective implements AfterViewInit, OnDestroy {
       top: rect.top,
       left: rect.left,
       width: rect.width,
-      height: rect.height
+      height: rect.height,
     };
 
     img.setAttribute('data-original-styles', JSON.stringify(originalStyles));
@@ -195,11 +206,15 @@ export class ZoomableDirective implements AfterViewInit, OnDestroy {
     this.rd.setStyle(this.backdropEl, 'cursor', 'zoom-out');
 
     // 添加点击关闭事件
-    this.backdropEl?.addEventListener('click', (e) => {
-      if (e.target === this.backdropEl) {
-        this.reset(img);
-      }
-    }, { once: true });
+    this.backdropEl?.addEventListener(
+      'click',
+      e => {
+        if (e.target === this.backdropEl) {
+          this.reset(img);
+        }
+      },
+      { once: true }
+    );
 
     this.rd.appendChild(document.body, this.backdropEl!);
     this.rd.setStyle(document.body, 'overflow', 'hidden');
@@ -232,12 +247,9 @@ export class ZoomableDirective implements AfterViewInit, OnDestroy {
     this.currentZoomedImg = img;
     window.dispatchEvent(new Event('zoomStart'));
     this.zoomed = true;
-
-
   }
 
   private reset(img: HTMLImageElement): void {
-
     // 恢复原始样式
     const originalStylesStr = img.getAttribute('data-original-styles');
     if (originalStylesStr) {
@@ -246,10 +258,23 @@ export class ZoomableDirective implements AfterViewInit, OnDestroy {
 
         // 先清除所有可能的缩放样式
         [
-          'position', 'top', 'left', 'width', 'height',
-          'transform', 'z-index', 'max-width', 'max-height',
-          'margin', 'padding', 'border', 'border-radius', 'box-shadow',
-          'display', 'visibility', 'opacity'
+          'position',
+          'top',
+          'left',
+          'width',
+          'height',
+          'transform',
+          'z-index',
+          'max-width',
+          'max-height',
+          'margin',
+          'padding',
+          'border',
+          'border-radius',
+          'box-shadow',
+          'display',
+          'visibility',
+          'opacity',
         ].forEach(prop => this.rd.removeStyle(img, prop));
 
         // 恢复原始样式
@@ -266,10 +291,24 @@ export class ZoomableDirective implements AfterViewInit, OnDestroy {
         console.error('Failed to restore original styles:', e);
         // 备用方案：移除所有可能的样式
         [
-          'position', 'top', 'left', 'width', 'height',
-          'transform', 'transition', 'z-index', 'max-width', 'max-height',
-          'margin', 'padding', 'border', 'border-radius', 'box-shadow',
-          'display', 'visibility', 'opacity'
+          'position',
+          'top',
+          'left',
+          'width',
+          'height',
+          'transform',
+          'transition',
+          'z-index',
+          'max-width',
+          'max-height',
+          'margin',
+          'padding',
+          'border',
+          'border-radius',
+          'box-shadow',
+          'display',
+          'visibility',
+          'opacity',
         ].forEach(s => this.rd.removeStyle(img, s));
       }
     }

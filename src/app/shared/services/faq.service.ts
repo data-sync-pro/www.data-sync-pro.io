@@ -12,16 +12,16 @@ import {
   SearchOptions,
   FAQStats,
   FAQFilter,
-  FAQSortOptions
+  FAQSortOptions,
 } from '../models/faq.model';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class FAQService {
   private readonly FAQ_DATA_URL = 'assets/data/faqs.json';
   private readonly FAQ_CONTENT_BASE = 'assets/faq-item/';
-  
+
   // Cache
   private faqsCache$ = new BehaviorSubject<FAQItem[]>([]);
   private contentCache = new Map<string, SafeHtml>();
@@ -59,18 +59,14 @@ export class FAQService {
    * 获取FAQ总数
    */
   getFAQCount(): Observable<number> {
-    return this.getFAQs().pipe(
-      map(faqs => faqs.length)
-    );
+    return this.getFAQs().pipe(map(faqs => faqs.length));
   }
 
   /**
    * 根据ID获取单个FAQ
    */
   getFAQById(id: string): Observable<FAQItem | undefined> {
-    return this.getFAQs().pipe(
-      map(faqs => faqs.find(faq => faq.id === id))
-    );
+    return this.getFAQs().pipe(map(faqs => faqs.find(faq => faq.id === id)));
   }
 
   /**
@@ -78,11 +74,13 @@ export class FAQService {
    */
   getFAQsByCategory(category: string, subCategory?: string): Observable<FAQItem[]> {
     return this.getFAQs().pipe(
-      map(faqs => faqs.filter(faq => {
-        const categoryMatch = faq.category === category;
-        const subCategoryMatch = !subCategory || faq.subCategory === subCategory;
-        return categoryMatch && subCategoryMatch;
-      }))
+      map(faqs =>
+        faqs.filter(faq => {
+          const categoryMatch = faq.category === category;
+          const subCategoryMatch = !subCategory || faq.subCategory === subCategory;
+          return categoryMatch && subCategoryMatch;
+        })
+      )
     );
   }
 
@@ -102,7 +100,7 @@ export class FAQService {
           const categoryMatch = faq.category.toLowerCase().includes(lowerQuery);
           const subCategoryMatch = faq.subCategory?.toLowerCase().includes(lowerQuery);
           const tagsMatch = faq.tags?.some(tag => tag.toLowerCase().includes(lowerQuery));
-          
+
           let answerMatch = false;
           if (options.includeAnswers && faq.answer) {
             answerMatch = faq.answer.toLowerCase().includes(lowerQuery);
@@ -148,12 +146,12 @@ export class FAQService {
           if (faq.question.toLowerCase().includes(lowerQuery)) {
             suggestions.add(faq.question);
           }
-          
+
           // 分类匹配
           if (faq.category.toLowerCase().includes(lowerQuery)) {
             suggestions.add(faq.category);
           }
-          
+
           // 子分类匹配
           if (faq.subCategory?.toLowerCase().includes(lowerQuery)) {
             suggestions.add(faq.subCategory);
@@ -209,19 +207,19 @@ export class FAQService {
     return this.getFAQs().pipe(
       map(faqs => {
         const categoryMap = new Map<string, FAQCategory>();
-        
+
         faqs.forEach(faq => {
           if (!categoryMap.has(faq.category)) {
             categoryMap.set(faq.category, {
               name: faq.category,
               count: 0,
-              subCategories: []
+              subCategories: [],
             });
           }
-          
+
           const category = categoryMap.get(faq.category)!;
           category.count++;
-          
+
           if (faq.subCategory) {
             const existingSub = category.subCategories.find(sub => sub.name === faq.subCategory);
             if (existingSub) {
@@ -230,12 +228,12 @@ export class FAQService {
               category.subCategories.push({
                 name: faq.subCategory,
                 count: 1,
-                parentCategory: faq.category
+                parentCategory: faq.category,
               });
             }
           }
         });
-        
+
         this.categoriesCache = Array.from(categoryMap.values());
         return this.categoriesCache;
       }),
@@ -250,9 +248,7 @@ export class FAQService {
     return this.getFAQs().pipe(
       map(faqs => {
         const faqMap = new Map(faqs.map(faq => [faq.id, faq]));
-        return ids
-          .map(id => faqMap.get(id))
-          .filter(Boolean) as FAQItem[];
+        return ids.map(id => faqMap.get(id)).filter(Boolean) as FAQItem[];
       })
     );
   }
@@ -264,9 +260,7 @@ export class FAQService {
     return this.getFAQs().pipe(
       map(faqs => {
         const categories = new Set(faqs.map(faq => faq.category));
-        const subCategories = new Set(
-          faqs.map(faq => faq.subCategory).filter(Boolean)
-        );
+        const subCategories = new Set(faqs.map(faq => faq.subCategory).filter(Boolean));
 
         const mostViewed = faqs
           .filter(faq => faq.viewCount && faq.viewCount > 0)
@@ -278,7 +272,7 @@ export class FAQService {
           totalCategories: categories.size,
           totalSubCategories: subCategories.size,
           mostViewedFAQs: mostViewed,
-          recentlyUpdated: []
+          recentlyUpdated: [],
         };
       })
     );
@@ -289,9 +283,7 @@ export class FAQService {
    */
   updateFAQItem(id: string, updates: Partial<FAQItem>): void {
     const currentFAQs = this.faqsCache$.value;
-    const updatedFAQs = currentFAQs.map(faq => 
-      faq.id === id ? { ...faq, ...updates } : faq
-    );
+    const updatedFAQs = currentFAQs.map(faq => (faq.id === id ? { ...faq, ...updates } : faq));
     this.faqsCache$.next(updatedFAQs);
   }
 
@@ -317,18 +309,21 @@ export class FAQService {
    */
   private loadFAQs(): void {
     if (this.isLoading) return;
-    
+
     this.isLoading = true;
-    this.http.get<SourceFAQRecord[]>(this.FAQ_DATA_URL).pipe(
-      map(records => records.map(record => this.transformToFAQItem(record))),
-      catchError(error => {
-        console.error('Failed to load FAQ data', error);
-        return of([]);
-      }),
-      finalize(() => this.isLoading = false)
-    ).subscribe(faqs => {
-      this.faqsCache$.next(faqs);
-    });
+    this.http
+      .get<SourceFAQRecord[]>(this.FAQ_DATA_URL)
+      .pipe(
+        map(records => records.map(record => this.transformToFAQItem(record))),
+        catchError(error => {
+          console.error('Failed to load FAQ data', error);
+          return of([]);
+        }),
+        finalize(() => (this.isLoading = false))
+      )
+      .subscribe(faqs => {
+        this.faqsCache$.next(faqs);
+      });
   }
 
   /**
@@ -347,10 +342,10 @@ export class FAQService {
       viewCount: 0,
       isPopular: false,
       isLoading: false,
-      tags: record.SubCategory__c ?
-        [record.Category__c, record.SubCategory__c] :
-        [record.Category__c],
-      lastUpdated: new Date()
+      tags: record.SubCategory__c
+        ? [record.Category__c, record.SubCategory__c]
+        : [record.Category__c],
+      lastUpdated: new Date(),
     };
   }
 
@@ -358,39 +353,41 @@ export class FAQService {
    * Private method: Process FAQ content
    */
   private processContent(content: string): string {
-    return content
-      // Remove empty p tags but preserve content structure
-      .replace(/<p[^>]*>\s*<\/p>/g, '')
-      // Fix image paths - ensure relative paths are correctly resolved
-      .replace(/src="assets\//g, 'src="assets/')
-      .replace(/src="(?!http|\/|assets)/g, 'src="assets/')
-      // Improve content formatting
-      .replace(/<section[^>]*>/g, '<div class="faq-section">')
-      .replace(/<\/section>/g, '</div>')
-      // Ensure images have correct style classes and attributes for zooming
-      .replace(/<img([^>]*?)>/g, (match, attrs) => {
-        // 确保图片有正确的类和属性
-        let newAttrs = attrs;
-        if (!newAttrs.includes('class=')) {
-          newAttrs += ' class="faq-image"';
-        } else if (!newAttrs.includes('faq-image')) {
-          newAttrs = newAttrs.replace(/class="([^"]*)"/, 'class="$1 faq-image"');
-        }
+    return (
+      content
+        // Remove empty p tags but preserve content structure
+        .replace(/<p[^>]*>\s*<\/p>/g, '')
+        // Fix image paths - ensure relative paths are correctly resolved
+        .replace(/src="assets\//g, 'src="assets/')
+        .replace(/src="(?!http|\/|assets)/g, 'src="assets/')
+        // Improve content formatting
+        .replace(/<section[^>]*>/g, '<div class="faq-section">')
+        .replace(/<\/section>/g, '</div>')
+        // Ensure images have correct style classes and attributes for zooming
+        .replace(/<img([^>]*?)>/g, (match, attrs) => {
+          // 确保图片有正确的类和属性
+          let newAttrs = attrs;
+          if (!newAttrs.includes('class=')) {
+            newAttrs += ' class="faq-image"';
+          } else if (!newAttrs.includes('faq-image')) {
+            newAttrs = newAttrs.replace(/class="([^"]*)"/, 'class="$1 faq-image"');
+          }
 
-        // 添加加载错误处理
-        if (!newAttrs.includes('onerror=')) {
-          newAttrs += ' onerror="this.style.display=\'none\'"';
-        }
+          // 添加加载错误处理
+          if (!newAttrs.includes('onerror=')) {
+            newAttrs += ' onerror="this.style.display=\'none\'"';
+          }
 
-        // 添加加载完成处理
-        if (!newAttrs.includes('onload=')) {
-          newAttrs += ' onload="this.style.cursor=\'zoom-in\'"';
-        }
+          // 添加加载完成处理
+          if (!newAttrs.includes('onload=')) {
+            newAttrs += ' onload="this.style.cursor=\'zoom-in\'"';
+          }
 
-        return `<img${newAttrs}>`;
-      })
-      // Clean up extra whitespace
-      .replace(/\s+/g, ' ')
-      .trim();
+          return `<img${newAttrs}>`;
+        })
+        // Clean up extra whitespace
+        .replace(/\s+/g, ' ')
+        .trim()
+    );
   }
 }
