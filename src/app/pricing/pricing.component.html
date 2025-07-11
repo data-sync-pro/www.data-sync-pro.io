@@ -1,71 +1,223 @@
-<div class="pricing-page">
-
-    <h1>Honest pricing. No hidden fees.</h1>
-    <p>
-      You won’t pay a cent until you’re ready to run Data Sync Pro.
+﻿<div class="pricing-page">
+  <!-- Hero Section -->
+  <div class="hero-section">
+    <h1>Simple, Transparent Pricing</h1>
+    <p class="hero-subtitle">
+      Pay only for what you use. No per-user fees, no hidden costs.
     </p>
-  
-    <div class="plans-container">
-      <div class="plan-card" *ngFor="let plan of plans">
-        <div class="badge" *ngIf="plan.badge">{{ plan.badge }}</div>
-  
-        <h2 class="plan-name">{{ plan.name }}</h2>
-        <p class="plan-subtitle">{{ plan.subtitle }}</p>
-  
-        <div class="price-row">
-          <span class="old-price" *ngIf="plan.oldPrice">{{ plan.oldPrice }}</span>
-          <span class="current-price">{{ plan.currentPrice }}</span>
-          <span class="per-person" *ngIf="plan.perPerson">{{ plan.perPerson }}</span>
-        </div>
-  
-        <button class="cta-button" *ngIf="plan.buttonLabel && plan.buttonLabel.length">
-          {{ plan.buttonLabel }}
-        </button>
-  
-        <div class="plan-details" *ngIf="plan.features && plan.features.length">
-          <h3>Plan details:</h3>
-          <ul>
-            <li *ngFor="let feat of plan.features">{{ feat }}</li>
-          </ul>
-        </div>
-  
-        <div class="featured-addons" *ngIf="plan.addOns && plan.addOns.length">
-          <ul>
-            <li *ngFor="let addOn of plan.addOns">{{ addOn }}</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  
-    <h2>Compare additional features by category</h2>
-    <p>Expand each section to see which plan includes or offers them as add-ons.</p>
-
-    <div class="category-accordion">
-      <div class="category-section" *ngFor="let category of categories; let i = index">
-
-        <div
-          class="category-header"
-          [class.open]="openIndex === i"
-          (click)="toggleCategory(i)"
-        >
-          {{ category.title }}
-          <span class="arrow" [class.up]="openIndex === i"></span>
-        </div>
-  
-        <div class="category-panel" *ngIf="openIndex === i">
-          <table>
-            <tbody>
-              <tr *ngFor="let feat of category.features">
-                <td class="feature-name">{{ feat.name }}</td>
-                <td class="center">{{ getDisplay(feat.simple) }}</td>
-                <td class="center">{{ getDisplay(feat.plus) }}</td>
-                <td class="center">{{ getDisplay(feat.premium) }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  
   </div>
-  
+
+  <!-- Pricing Model Overview -->
+  <div class="pricing-model-section">
+    <div class="pricing-components">
+      <div class="component-card">
+        <div class="component-icon">🔗</div>
+        <h3>Connections</h3>
+        <p class="component-price">$1,000/month</p>
+        <p class="component-description">
+          Each Salesforce org or environment you connect to Data Sync Pro
+        </p>
+        <div class="component-note">
+          Includes <strong>50 free executables</strong> per connection
+        </div>
+      </div>
+
+      <div class="component-card">
+        <div class="component-icon">⚙️</div>
+        <h3>Executables</h3>
+        <p class="component-price">$10/month</p>
+        <p class="component-description">
+          Each rule or automation you create (ETL, Batch Job, Data Loader, etc.)
+        </p>
+        <div class="component-note">
+          Minimum purchase: <strong>100 executables per order</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- What's Included -->
+  <div class="whats-included-section">
+    <h2>What's Included</h2>
+    <div class="included-grid">
+      <div class="included-item">
+        <div class="check-icon">✓</div>
+        <div>
+          <h4>Unlimited Users</h4>
+          <p>Site-wide license for your entire Salesforce org</p>
+        </div>
+      </div>
+      <div class="included-item">
+        <div class="check-icon">✓</div>
+        <div>
+          <h4>All Engine Types</h4>
+          <p>Batch, Triggers, Data List, Data Loader, and Record Action engines</p>
+        </div>
+      </div>
+      <div class="included-item">
+        <div class="check-icon">✓</div>
+        <div>
+          <h4>High Performance</h4>
+          <p>Batch engine runs 10x faster than regular APEX batch jobs</p>
+        </div>
+      </div>
+      <div class="included-item">
+        <div class="check-icon">✓</div>
+        <div>
+          <h4>Reduced Tech Debt</h4>
+          <p>Triggers engine reduces automation tech debt by 80%</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Interactive Pricing Calculator -->
+  <div class="pricing-calculator-section">
+    <h2>Configure Your Plan</h2>
+    <p class="calculator-description">
+      Adjust the sliders below to see your custom pricing based on your specific needs.
+    </p>
+
+    <div class="calculator-container">
+      <div class="calculator-card">
+        <div class="calculator-inputs">
+          <!-- Connections Input -->
+          <div class="input-group">
+            <div class="input-header">
+              <div class="input-icon">🔗</div>
+              <div class="input-info">
+                <h4>Connections</h4>
+                <p>Number of Salesforce orgs</p>
+              </div>
+              <div class="input-value">{{ connections }}</div>
+            </div>
+            <div class="slider-container">
+              <input
+                type="range"
+                min="1"
+                max="10"
+                [(ngModel)]="connections"
+                (input)="calculateTotal()"
+                class="slider connections-slider"
+              >
+              <div class="slider-labels">
+                <span>1</span>
+                <span>5</span>
+                <span>10</span>
+              </div>
+            </div>
+            <div class="input-cost">
+              ${{ (connections * 1000) | number:'1.0-0' }}/month
+            </div>
+          </div>
+
+          <!-- Executables Input -->
+          <div class="input-group">
+            <div class="input-header">
+              <div class="input-icon">⚙️</div>
+              <div class="input-info">
+                <h4>Executables</h4>
+                <p>Number of rules/automations</p>
+              </div>
+              <div class="input-value">{{ executables }}</div>
+            </div>
+            <div class="slider-container">
+              <input
+                type="range"
+                min="0"
+                max="1000"
+                step="50"
+                [(ngModel)]="executables"
+                (input)="calculateTotal()"
+                class="slider executables-slider"
+              >
+              <div class="slider-labels">
+                <span>0</span>
+                <span>500</span>
+                <span>1000</span>
+              </div>
+            </div>
+            <div class="input-cost">
+              ${{ (executables * 10) | number:'1.0-0' }}/month
+            </div>
+            <div class="executable-note">
+              {{ freeExecutables }} included free with connections
+            </div>
+          </div>
+        </div>
+
+        <!-- Pricing Summary -->
+        <div class="pricing-summary">
+          <div class="summary-row">
+            <span class="summary-label">{{ connections }} Connection{{ connections > 1 ? 's' : '' }}:</span>
+            <span class="summary-cost">${{ (connections * 1000) | number:'1.0-0' }}</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">{{ executables }} Executable{{ executables > 1 ? 's' : '' }}:</span>
+            <span class="summary-cost">${{ (executables * 10) | number:'1.0-0' }}</span>
+          </div>
+          <div class="summary-row free-row">
+            <span class="summary-label">{{ freeExecutables }} Free Executable{{ freeExecutables > 1 ? 's' : '' }} Included:</span>
+            <span class="summary-cost free">Bonus</span>
+          </div>
+          <div class="summary-total">
+            <span class="total-label">Total Monthly Cost:</span>
+            <span class="total-cost">${{ totalCost | number:'1.0-0' }}</span>
+          </div>
+          <div class="summary-details">
+            <small>{{ connections }} orgs • {{ executables }} executables • {{ freeExecutables }} bonus executables • Unlimited users</small>
+          </div>
+        </div>
+
+        <!-- Preset Configurations -->
+        <div class="preset-configs">
+          <h4>Popular Configurations:</h4>
+          <div class="preset-buttons">
+            <button class="preset-btn" (click)="setPreset(1, 0)">
+              Starter<br><small>1 connection, 0 exec (50 free)</small>
+            </button>
+            <button class="preset-btn" (click)="setPreset(3, 300)">
+              Standard<br><small>3 connections, 300 exec (150 free)</small>
+            </button>
+            <button class="preset-btn contact-sales" (click)="contactSales()">
+              Enterprise<br><small>Contact sales team</small>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA Section -->
+  <div class="cta-section">
+    <h2>Ready to Get Started?</h2>
+    <p>Let's discuss your specific use case and show you how Data Sync Pro can solve your data management challenges.</p>
+    <div class="cta-buttons">
+      <button class="primary-cta">Schedule a Demo</button>
+      <button class="secondary-cta">Contact Sales</button>
+    </div>
+  </div>
+
+  <!-- FAQ Section -->
+  <div class="pricing-faq-section">
+    <h2>Frequently Asked Questions</h2>
+    <div class="faq-grid">
+      <div class="faq-item">
+        <h4>What counts as a Connection?</h4>
+        <p>A Connection represents each Salesforce org or environment that Data Sync Pro connects to. Most customers need connections for their sandboxes plus production.</p>
+      </div>
+      <div class="faq-item">
+        <h4>What is an Executable?</h4>
+        <p>An Executable is a modular rule for your data management process, such as ETL operations, Batch Jobs, Automations, Data Lists, Action Buttons, or Data Loaders.</p>
+      </div>
+      <div class="faq-item">
+        <h4>Are there any user limits?</h4>
+        <p>No! Data Sync Pro uses a site-wide license model, meaning unlimited users within your Salesforce org can access and use the platform.</p>
+      </div>
+      <div class="faq-item">
+        <h4>How does billing work?</h4>
+        <p>Billing is monthly based on your active Connections and Executables. You can scale up or down as your needs change.</p>
+      </div>
+    </div>
+  </div>
+</div>

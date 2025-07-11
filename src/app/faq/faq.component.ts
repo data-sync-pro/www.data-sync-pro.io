@@ -18,7 +18,7 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 // 导入统一的模型和服务
-import { FAQItem, FAQCategory } from '../shared/models/faq.model';
+import { FAQItem, FAQCategory, FAQSubCategory } from '../shared/models/faq.model';
 import { FAQService } from '../shared/services/faq.service';
 
 // 搜索结果接口
@@ -47,6 +47,7 @@ export class FaqComponent implements OnInit, OnDestroy {
   currentCategory = '';
   currentSubCategory = '';
   currentFAQTitle = '';
+  currentFAQItem: FAQItem | null = null;
 
   faqList: FAQItem[] = [];
   categories: FAQCategory[] = [];
@@ -56,6 +57,11 @@ export class FaqComponent implements OnInit, OnDestroy {
   selectedSuggestionIndex = -1;
   isSearchOpen = false;
   isLoading = false;
+
+  // Sidebar state
+  sidebarCollapsed = false;
+  mobileSidebarOpen = false;
+  isMobile = false;
 
   private searchTimeout: any;
   private destroy$ = new Subject<void>();
@@ -76,6 +82,8 @@ export class FaqComponent implements OnInit, OnDestroy {
     this.initFaqData();
     this.loadRatingsFromLocalStorage();
     this.cleanupFavoriteData();
+    this.loadSidebarState();
+    this.checkMobileView();
 
     this.route.paramMap.pipe(
       takeUntil(this.destroy$)
@@ -155,6 +163,7 @@ export class FaqComponent implements OnInit, OnDestroy {
   private clearSearchState(): void {
     this.searchQuery = '';
     this.currentFAQTitle = '';
+    this.currentFAQItem = null;
     this.suggestions = [];
     this.showSuggestions = false;
     this.selectedSuggestionIndex = -1;
@@ -369,6 +378,7 @@ export class FaqComponent implements OnInit, OnDestroy {
     this.showSuggestions = false;
     this.selectedSuggestionIndex = -1;
     this.currentFAQTitle = '';
+    this.currentFAQItem = null;
     // 关闭所有展开的FAQ面板
     this.closeAllFAQPanels();
   }
@@ -424,6 +434,7 @@ export class FaqComponent implements OnInit, OnDestroy {
   onFaqOpened(item: FAQItem): void {
     // Update current FAQ title for breadcrumb
     this.currentFAQTitle = item.question;
+    this.currentFAQItem = item;
 
     // Update browser URL
     this.updateBrowserURL(item);
@@ -465,6 +476,7 @@ export class FaqComponent implements OnInit, OnDestroy {
         this.clearBrowserURLFragment();
         // 清除当前FAQ标题
         this.currentFAQTitle = '';
+        this.currentFAQItem = null;
       }
     }, 100);
   }
@@ -974,6 +986,18 @@ export class FaqComponent implements OnInit, OnDestroy {
     );
   }
 
+  /**
+   * 获取分类描述
+   */
+  getCategoryDescription(): string {
+    if (this.currentSubCategory) {
+      return `浏览 ${this.currentCategory} > ${this.currentSubCategory} 分类下的常见问题。`;
+    } else if (this.currentCategory) {
+      return `浏览 ${this.currentCategory} 分类下的常见问题。`;
+    }
+    return '选择一个分类来浏览相关的常见问题。';
+  }
+
   private openAndScroll(question: string): void {
     setTimeout(() => {
       const idx = this.filteredFAQ.findIndex(f => f.question === question);
@@ -1305,6 +1329,262 @@ export class FaqComponent implements OnInit, OnDestroy {
         timestamp: new Date().toISOString()
       });
     }
+  }
+
+  // Sidebar navigation methods
+  selectCategory(categoryName: string): void {
+    // Clear search when navigating via sidebar
+    this.searchQuery = '';
+    this.isSearching = false;
+
+    // If clicking the same category, toggle to show/hide subcategories
+    if (this.currentCategory === categoryName && !this.currentSubCategory) {
+      // If we're already in this category, go to home to "collapse" it
+      this.goHome();
+    } else {
+      // Navigate to category
+      this.router.navigate(['/faq', this.encode(categoryName)]);
+    }
+
+    // Close mobile sidebar after navigation
+    if (this.isMobile) {
+      this.closeMobileSidebar();
+    }
+  }
+
+  selectSubCategory(subCategoryName: string): void {
+    // Clear search when navigating via sidebar
+    this.searchQuery = '';
+    this.isSearching = false;
+
+    // Navigate to subcategory
+    if (this.currentCategory) {
+      this.router.navigate(['/faq', this.encode(this.currentCategory), this.encode(subCategoryName)]);
+    }
+
+    // Close mobile sidebar after navigation
+    if (this.isMobile) {
+      this.closeMobileSidebar();
+    }
+  }
+
+  getSubCategoriesForCategory(categoryName: string): FAQSubCategory[] {
+    const category = this.categories.find(cat => cat.name === categoryName);
+    return category ? category.subCategories : [];
+  }
+
+  // Sidebar toggle functionality
+  toggleSidebar(): void {
+    this.sidebarCollapsed = !this.sidebarCollapsed;
+    // Save state to localStorage for persistence
+    localStorage.setItem('faq-sidebar-collapsed', this.sidebarCollapsed.toString());
+  }
+
+  // Load sidebar state from localStorage
+  private loadSidebarState(): void {
+    const savedState = localStorage.getItem('faq-sidebar-collapsed');
+    if (savedState !== null) {
+      this.sidebarCollapsed = savedState === 'true';
+    }
+  }
+
+  // Mobile functionality
+  private checkMobileView(): void {
+    this.isMobile = window.innerWidth <= 768;
+  }
+
+  toggleMobileSidebar(): void {
+    this.mobileSidebarOpen = !this.mobileSidebarOpen;
+  }
+
+  closeMobileSidebar(): void {
+    this.mobileSidebarOpen = false;
+  }
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event: any): void {
+    this.checkMobileView();
+    // Close mobile sidebar when switching to desktop
+    if (!this.isMobile) {
+      this.mobileSidebarOpen = false;
+    }
+  }
+
+  // Keyboard shortcut for search overlay
+  @HostListener('document:keydown', ['$event'])
+  onKeydown(event: KeyboardEvent): void {
+    // Ctrl+K or Cmd+K to open search overlay
+    if ((event.ctrlKey || event.metaKey) && event.key === 'k') {
+      event.preventDefault();
+      this.openSearchOverlay();
+    }
+
+    // Escape to close search overlay
+    if (event.key === 'Escape' && this.isSearchOpen) {
+      this.isSearchOpen = false;
+    }
+  }
+
+  // ==================== Table of Contents Methods ====================
+
+  /**
+   * 判断是否应该显示右侧目录
+   */
+  shouldShowTOC(): boolean {
+    // 移动设备不显示
+    if (this.isMobile) {
+      return false;
+    }
+
+    // 搜索状态不显示
+    if (this.isSearching || this.searchQuery.trim()) {
+      return false;
+    }
+
+    // 首页显示trending questions
+    if (this.showHome) {
+      return this.getTrendingQuestions().length > 0;
+    }
+
+    // 分类页面显示分类TOC
+    return (!!this.currentCategory || !!this.currentSubCategory) &&
+           this.getCurrentFAQList().length > 1; // 至少有2个FAQ项目才显示目录
+  }
+
+  /**
+   * 获取当前TOC的标题
+   */
+  getCurrentTOCTitle(): string {
+    if (this.currentSubCategory) {
+      return this.currentSubCategory;
+    }
+    if (this.currentCategory) {
+      return this.currentCategory;
+    }
+    return 'Contents';
+  }
+
+  /**
+   * 获取当前分类下的FAQ列表
+   */
+  getCurrentFAQList(): FAQItem[] {
+    return this.filteredFAQ || [];
+  }
+
+  /**
+   * 判断是否为当前展开的FAQ
+   */
+  isCurrentFAQ(item: FAQItem): boolean {
+    return this.currentFAQTitle === item.question;
+  }
+
+  /**
+   * 选择并显示指定FAQ项目
+   */
+  scrollToFAQ(item: FAQItem): void {
+    // 设置当前FAQ项目
+    this.currentFAQItem = item;
+    this.currentFAQTitle = item.question;
+
+    // 更新浏览器URL
+    this.updateBrowserURL(item);
+
+    // 跟踪FAQ查看
+    this.trackFAQView(item);
+
+    // 加载FAQ内容（如果尚未加载）
+    if (!item.safeAnswer && item.answerPath) {
+      item.isLoading = true;
+
+      this.faqService.getFAQContent(item.answerPath).pipe(
+        takeUntil(this.destroy$)
+      ).subscribe({
+        next: (content) => {
+          item.safeAnswer = content;
+          item.isLoading = false;
+        },
+        error: (error) => {
+          console.error('Failed to load FAQ content:', error);
+          item.safeAnswer = this.sanitizer.bypassSecurityTrustHtml(
+            '<p class="error-message">Failed to load content, please try again later</p>'
+          );
+          item.isLoading = false;
+        }
+      });
+    }
+
+    // 滚动到页面顶部以显示FAQ内容
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  }
+
+  /**
+   * 获取热门问题列表
+   */
+  getTrendingQuestions(): FAQItem[] {
+    const trendingIds = [
+      'a0oEc000005JohNIAS',
+      'a0oEc000005JohOIAS',
+      'a0oEc000005JohSIAS',
+      'a0oEc000005JohTIAS',
+      'a0oEc000005JohUIAS',
+      'a0oEc000005JohVIAS',
+      'a0oEc000005JohWIAS',
+      'a0oEc000005JohXIAS',
+      'a0oEc000005JohYIAS'
+    ];
+
+    return trendingIds
+      .map(id => this.allFaqList.find(faq => faq.id === id))
+      .filter(Boolean) as FAQItem[];
+  }
+
+  /**
+   * 选择热门问题
+   */
+  selectTrendingQuestion(item: FAQItem): void {
+    // 滚动到对应的FAQ项目
+    const elementId = this.slugify(item.question);
+    const element = document.getElementById(elementId);
+
+    if (element) {
+      // 先展开对应的FAQ面板
+      const panel = element.closest('mat-expansion-panel');
+      if (panel) {
+        const panelComponent = panel as any;
+        if (panelComponent._expansionPanel && !panelComponent._expansionPanel.expanded) {
+          panelComponent._expansionPanel.open();
+        }
+      }
+
+      // 滚动到元素位置
+      setTimeout(() => {
+        element.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+          inline: 'nearest'
+        });
+      }, 300); // 等待面板展开动画完成
+    }
+
+    // 设置当前FAQ
+    this.currentFAQTitle = item.question;
+    this.currentFAQItem = item;
+
+    // 更新浏览器URL
+    this.updateBrowserURL(item);
+
+    // 跟踪FAQ查看
+    this.trackFAQView(item);
+  }
+
+  /**
+   * TrackBy函数用于优化ngFor性能
+   */
+  trackByFAQ(index: number, item: FAQItem): string {
+    return item.question;
   }
 
 }

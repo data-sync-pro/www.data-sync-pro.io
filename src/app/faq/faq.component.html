@@ -1,53 +1,126 @@
-<div class="faq-container">
-  <div class="faq-search">
-    <div class="search-wrapper">
-      <div class="search-input-container">
-        <input
-          #faqSearchBox
-          id="faqSearchInput"
-          type="text"
-          placeholder="Search text"
-          [(ngModel)]="searchQuery"
-          (input)="onSearchInput($event)"
-          (focus)="onSearchFocus()"
-          (blur)="onSearchBlur()"
-          (keydown)="onSearchKeydown($event)"
-          role="combobox"
-          [attr.aria-expanded]="showSuggestions"
-          aria-haspopup="listbox"
-        />
-        <button
-          class="search-button"
-          type="button"
-          (click)="searchAndClear()"
-          [disabled]="!searchQuery.trim()"
-          title="Search and clear"
-        >
-          search
-        </button>
-      </div>
+<!-- Mobile sidebar toggle button -->
+<button
+  class="mobile-sidebar-toggle"
+  (click)="toggleMobileSidebar()"
+  *ngIf="isMobile"
+>
+  ☰
+</button>
 
-      <!-- Search suggestions dropdown -->
-      <div class="search-suggestions" *ngIf="showSuggestions && suggestions.length > 0">
-        <div
-          class="suggestion-item"
-          *ngFor="let suggestion of suggestions; let i = index"
-          [class.selected]="i === selectedSuggestionIndex"
-          (click)="selectSuggestion(suggestion)"
-          (mouseenter)="selectedSuggestionIndex = i"
-        >
-          <span class="suggestion-text" [innerHTML]="highlightMatch(suggestion, searchQuery)"></span>
-          <span class="suggestion-category">{{ getCategoryForSuggestion(suggestion) }}</span>
+<!-- Mobile sidebar overlay -->
+<div
+  class="sidebar-overlay"
+  [class.active]="mobileSidebarOpen"
+  (click)="closeMobileSidebar()"
+></div>
+
+<!-- Left Sidebar - Always visible, independent of container -->
+<aside
+  class="faq-sidebar"
+  [class.mobile-open]="mobileSidebarOpen"
+  [class.collapsed]="sidebarCollapsed"
+>
+      <div class="sidebar-content">
+        <!-- Sidebar Header -->
+        <div class="sidebar-header">
+          <div class="sidebar-title-section" *ngIf="!sidebarCollapsed">
+            <h2 class="sidebar-main-title">FAQ</h2>
+            <span class="sidebar-subtitle">{{ faqList.length }} articles</span>
+          </div>
+          <button
+            class="sidebar-toggle-btn"
+            (click)="toggleSidebar()"
+            title="Toggle sidebar"
+          >
+            <span class="toggle-icon">{{ sidebarCollapsed ? '▶' : '◀' }}</span>
+          </button>
+        </div>
+
+        <div class="sidebar-body">
+          <!-- Search in sidebar -->
+          <div class="sidebar-search" *ngIf="!sidebarCollapsed">
+            <button
+              class="sidebar-search-btn"
+              (click)="openSearchOverlay()"
+              title="Search FAQs"
+            >
+              <span class="search-icon">🔍</span>
+              <span class="search-text">Search...</span>
+            </button>
+          </div>
+
+          <!-- Navigation Tree -->
+          <div class="sidebar-nav">
+            <!-- Home -->
+            <div class="nav-item home-nav" [class.active]="showHome" (click)="goHome()">
+              <div class="nav-content">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-text" *ngIf="!sidebarCollapsed">All FAQs</span>
+                <span class="nav-count" *ngIf="!sidebarCollapsed">{{ faqList.length }}</span>
+              </div>
+            </div>
+
+            <!-- Categories -->
+            <div class="nav-section" *ngIf="!sidebarCollapsed">
+              <div class="section-divider"></div>
+              <div class="section-label">Categories</div>
+            </div>
+
+            <div class="nav-tree">
+              <div
+                *ngFor="let category of categories"
+                class="nav-category"
+              >
+                <!-- Category Item -->
+                <div
+                  class="nav-item category-nav"
+                  [class.active]="currentCategory === category.name && !currentSubCategory"
+                  [class.expanded]="currentCategory === category.name"
+                  (click)="selectCategory(category.name)"
+                >
+                  <div class="nav-content">
+                    <span
+                      class="expand-toggle"
+                      *ngIf="category.subCategories.length > 0 && !sidebarCollapsed"
+                    >
+                      {{ currentCategory === category.name ? '−' : '+' }}
+                    </span>
+                    <span class="nav-icon">📁</span>
+                    <span class="nav-text" *ngIf="!sidebarCollapsed">{{ category.name }}</span>
+                    <span class="nav-count" *ngIf="!sidebarCollapsed">{{ category.count }}</span>
+                  </div>
+                </div>
+
+                <!-- Subcategories -->
+                <div
+                  class="subcategory-container"
+                  *ngIf="currentCategory === category.name && category.subCategories.length > 0 && !sidebarCollapsed"
+                >
+                  <div
+                    *ngFor="let subCategory of category.subCategories"
+                    class="nav-item subcategory-nav"
+                    [class.active]="currentSubCategory === subCategory.name"
+                    (click)="selectSubCategory(subCategory.name)"
+                  >
+                    <div class="nav-content">
+                      <span class="nav-indent"></span>
+                      <span class="nav-icon">📄</span>
+                      <span class="nav-text">{{ subCategory.name }}</span>
+                      <span class="nav-count">{{ subCategory.count }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
+    </aside>
 
-
-    </div>
-  </div>
-
-  <div class="faq-layout">
-    <main class="faq-main">
-      <app-faq-home *ngIf="showHome" (selectedTrending)="handleTrendingSelect($event)" ></app-faq-home>
+<!-- Main content area with proper container -->
+<div class="faq-container">
+  <main class="faq-main">
+      <!-- 首页：显示所有FAQ -->
       <div *ngIf="showHome" class="all-faqs">
         <h2 class="section-title">All FAQs</h2>
         <mat-accordion>
@@ -61,15 +134,194 @@
               <mat-panel-title class="faq-title" [id]="slugify(item.question)">
                 {{ item.question }}
               </mat-panel-title>
-            </mat-expansion-panel-header>  
+            </mat-expansion-panel-header>
             <div *ngIf="item.safeAnswer" [innerHTML]="item.safeAnswer" appSimpleZoomable></div>
             <p *ngIf="!item.safeAnswer">Loading…</p>
 
+            <!-- FAQ Feedback and Share Section -->
+            <div class="faq-feedback" *ngIf="item.safeAnswer">
+              <div class="feedback-row">
+                <div class="helpful-section">
+                  <div class="feedback-question-row">
+                    <p class="feedback-question">Was this answer helpful?</p>
+                    <div class="feedback-buttons">
+                      <button
+                        class="feedback-btn helpful"
+                        (click)="rateFAQ(item, true)"
+                        [class.selected]="item.userRating === true"
+                      >
+                        👍 Yes
+                      </button>
+                      <button
+                        class="feedback-btn not-helpful"
+                        (click)="rateFAQ(item, false)"
+                        [class.selected]="item.userRating === false"
+                      >
+                        👎 No
+                      </button>
+                    </div>
+                  </div>
+                </div>
 
+                <div class="share-section">
+                  <button
+                    class="share-btn copy-link-btn"
+                    (click)="copyFAQLink(item)"
+                    title="Copy link to this FAQ"
+                    aria-label="Copy link to this FAQ"
+                  >
+                    🔗 Copy Link
+                  </button>
+                  <div class="social-share-dropdown" [class.show]="item.showSocialShare">
+                    <button
+                      class="share-btn social-toggle-btn"
+                      (click)="toggleSocialShare(item)"
+                      title="More sharing options"
+                      aria-label="More sharing options"
+                    >
+                      📤 Share
+                    </button>
+                    <div class="social-dropdown-content" *ngIf="item.showSocialShare">
+                      <button
+                        class="social-btn"
+                        (click)="shareToSocial('twitter', item)"
+                        title="Share on Twitter"
+                      >
+                        🐦 Twitter
+                      </button>
+                      <button
+                        class="social-btn"
+                        (click)="shareToSocial('facebook', item)"
+                        title="Share on Facebook"
+                      >
+                        📘 Facebook
+                      </button>
+                      <button
+                        class="social-btn"
+                        (click)="shareToSocial('linkedin', item)"
+                        title="Share on LinkedIn"
+                      >
+                        💼 LinkedIn
+                      </button>
+                      <button
+                        class="social-btn"
+                        (click)="shareToSocial('email', item)"
+                        title="Share via Email"
+                      >
+                        ✉️ Email
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </mat-expansion-panel>
         </mat-accordion>
       </div>
-      <ng-container *ngIf="!showHome && !isSearching">
+
+      <!-- 分类页面：显示分类介绍 -->
+      <div *ngIf="!showHome && !currentFAQItem && !isSearching" class="category-intro">
+        <div class="category-header">
+          <h2 class="category-title">
+            {{ currentSubCategory || currentCategory }}
+          </h2>
+          <p class="category-description">
+            {{ getCategoryDescription() }}
+          </p>
+          <div class="category-stats">
+            <span class="faq-count">{{ filteredFAQ.length }} FAQ{{ filteredFAQ.length !== 1 ? 's' : '' }}</span>
+            <span class="category-hint">← 选择左侧分类或使用右侧目录浏览问题</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 单个FAQ详情显示 -->
+      <div *ngIf="currentFAQItem && !isSearching && !searchQuery.trim()" class="faq-detail">
+        <div class="faq-detail-content">
+          <h2 class="faq-question">{{ currentFAQItem.question }}</h2>
+          <div class="faq-answer" [innerHTML]="currentFAQItem.safeAnswer" appSimpleZoomable></div>
+
+          <!-- FAQ Feedback and Share Section -->
+          <div class="faq-feedback">
+            <div class="feedback-row">
+              <div class="helpful-section">
+                <div class="feedback-question-row">
+                  <p class="feedback-question">Was this answer helpful?</p>
+                  <div class="feedback-buttons">
+                    <button
+                      class="feedback-btn helpful"
+                      (click)="rateFAQ(currentFAQItem, true)"
+                      [class.selected]="currentFAQItem.userRating === true"
+                    >
+                      👍 Yes
+                    </button>
+                    <button
+                      class="feedback-btn not-helpful"
+                      (click)="rateFAQ(currentFAQItem, false)"
+                      [class.selected]="currentFAQItem.userRating === false"
+                    >
+                      👎 No
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="share-section">
+                <button
+                  class="share-btn copy-link-btn"
+                  (click)="copyFAQLink(currentFAQItem)"
+                  title="Copy link to this FAQ"
+                  aria-label="Copy link to this FAQ"
+                >
+                  🔗 Copy Link
+                </button>
+                <div class="social-share-dropdown" [class.show]="currentFAQItem.showSocialShare">
+                  <button
+                    class="share-btn social-toggle-btn"
+                    (click)="toggleSocialShare(currentFAQItem)"
+                    title="More sharing options"
+                    aria-label="More sharing options"
+                  >
+                    📤 Share
+                  </button>
+                  <div class="social-dropdown-content" *ngIf="currentFAQItem.showSocialShare">
+                    <button
+                      class="social-btn"
+                      (click)="shareToSocial('twitter', currentFAQItem)"
+                      title="Share on Twitter"
+                    >
+                      🐦 Twitter
+                    </button>
+                    <button
+                      class="social-btn"
+                      (click)="shareToSocial('facebook', currentFAQItem)"
+                      title="Share on Facebook"
+                    >
+                      📘 Facebook
+                    </button>
+                    <button
+                      class="social-btn"
+                      (click)="shareToSocial('linkedin', currentFAQItem)"
+                      title="Share on LinkedIn"
+                    >
+                      💼 LinkedIn
+                    </button>
+                    <button
+                      class="social-btn"
+                      (click)="shareToSocial('email', currentFAQItem)"
+                      title="Share via Email"
+                    >
+                      ✉️ Email
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- 搜索结果和分类浏览的FAQ列表 -->
+      <ng-container *ngIf="!showHome && (!currentFAQItem || isSearching || searchQuery.trim())">
         <!-- 搜索时显示搜索结果面包屑 -->
         <nav class="breadcrumb" *ngIf="searchQuery.trim(); else normalBreadcrumb">
           <span
@@ -296,12 +548,62 @@
           </ng-template>
         </div>
       </ng-container>
-    </main>
-  </div>
-  <app-search-overlay
-    *ngIf="isSearchOpen"
-    [isOpen]="isSearchOpen"
-    (closed)="isSearchOpen = false"
-    (selectedResult)="handleSearchSelect($event)"
-  ></app-search-overlay>
+  </main>
 </div>
+
+<!-- Right Table of Contents - Show trending questions on home, category TOC on category pages -->
+<aside
+  class="faq-toc"
+  *ngIf="shouldShowTOC()"
+  [class.collapsed]="sidebarCollapsed"
+>
+  <div class="toc-content">
+    <!-- Trending Questions for Home Page -->
+    <div *ngIf="showHome" class="trending-toc">
+      <div class="toc-header">
+        <h3 class="toc-title">Trending Questions</h3>
+        <span class="toc-count">{{ getTrendingQuestions().length }} items</span>
+      </div>
+
+      <div class="toc-list">
+        <div
+          class="toc-item trending-item"
+          *ngFor="let item of getTrendingQuestions(); trackBy: trackByFAQ"
+          [class.active]="isCurrentFAQ(item)"
+          (click)="selectTrendingQuestion(item)"
+        >
+          <div class="toc-item-title">{{ item.question }}</div>
+          <div class="toc-item-indicator" *ngIf="isCurrentFAQ(item)"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Category TOC for Category Pages -->
+    <div *ngIf="!showHome" class="category-toc">
+      <div class="toc-header">
+        <h3 class="toc-title">{{ getCurrentTOCTitle() }}</h3>
+        <span class="toc-count">{{ getCurrentFAQList().length }} items</span>
+      </div>
+
+      <div class="toc-list">
+        <div
+          class="toc-item"
+          *ngFor="let item of getCurrentFAQList(); trackBy: trackByFAQ"
+          [class.active]="isCurrentFAQ(item)"
+          (click)="scrollToFAQ(item)"
+        >
+          <div class="toc-item-title">{{ item.question }}</div>
+          <div class="toc-item-indicator" *ngIf="isCurrentFAQ(item)"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- Search overlay - independent of containers -->
+<app-search-overlay
+  *ngIf="isSearchOpen"
+  [isOpen]="isSearchOpen"
+  (closed)="isSearchOpen = false"
+  (selectedResult)="handleSearchSelect($event)"
+></app-search-overlay>

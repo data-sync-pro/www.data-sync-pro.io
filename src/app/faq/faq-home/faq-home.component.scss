@@ -1,40 +1,66 @@
 .trending-faq {
   width: 100%;
-  margin: 40px auto;
+  margin: 20px auto 32px auto; // 减少上下边距
 
   .section-title {
-    font-size: 1.2rem;
+    font-size: 1.25rem;
     font-weight: 600;
-    margin-bottom: 20px;
+    margin-bottom: 16px; // 减少标题下方间距
+    color: #2c3e50;
   }
 
   .faq-list {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 13px;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); // 稍微增加最小宽度
+    gap: 16px; // 增加卡片间距
   }
 
   .faq-item {
-    background: #f9f9f9;
-    border: 1px solid #e5e5e5;
-    border-radius: 8px;
-    padding: 30px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
-    transition: box-shadow 0.2s ease;
+    background: #ffffff;
+    border: 1px solid #e1e5e9;
+    border-radius: 12px; // 增加圆角
+    padding: 24px 20px; // 减少内边距
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); // 增强阴影
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     height: auto;
-    text-align: center;
-    align-content: center;
+    text-align: left; // 改为左对齐，更易阅读
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
     font-size: 0.95rem;
     cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    margin: 0;
+    // 添加微妙的渐变背景
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #2196F3, #21CBF3);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
 
     &:hover {
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+      border-color: #2196F3;
+
+      &::before {
+        opacity: 1;
+      }
     }
 
     .question {
-      font-weight: 450;
-      margin-bottom: 8px;
-      line-height: 1.3;
+      font-weight: 500;
+      margin-bottom: 0;
+      line-height: 1.4;
+      color: #2c3e50;
+      font-size: 1rem;
     }
 
     .answer {
@@ -44,14 +70,54 @@
     }
   }
 }
-@media (max-width: 600px) {
+// 平板响应式
+@media (max-width: 768px) {
   .trending-faq {
+    margin: 16px auto 24px auto;
+
     .section-title {
       font-size: 1.2rem;
+      margin-bottom: 12px;
+    }
+
+    .faq-list {
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 12px;
+    }
+
+    .faq-item {
+      padding: 20px 16px;
+
+      .question {
+        font-size: 0.95rem;
+      }
+    }
+  }
+}
+
+// 手机响应式
+@media (max-width: 480px) {
+  .trending-faq {
+    margin: 12px auto 20px auto;
+
+    .section-title {
+      font-size: 1.1rem;
+      margin-bottom: 10px;
     }
 
     .faq-list {
       grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    .faq-item {
+      padding: 16px 14px;
+      border-radius: 8px;
+
+      .question {
+        font-size: 0.9rem;
+        line-height: 1.3;
+      }
     }
   }
 }
