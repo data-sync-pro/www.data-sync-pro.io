@@ -100,7 +100,13 @@ export class FaqComponent implements OnInit, OnDestroy {
     ).subscribe(fragment => {
       if (fragment) {
         this.pendingFragment = fragment;
+        // 立即处理fragment，不等待路由器滚动
         this.handlePendingFragment();
+      } else {
+        // 如果没有fragment，确保页面滚动到顶部
+        setTimeout(() => {
+          window.scrollTo({ top: 0, behavior: 'auto' });
+        }, 50);
       }
     });
   }
@@ -151,12 +157,24 @@ export class FaqComponent implements OnInit, OnDestroy {
   goCategory(cat: string) {
     // Clear search state when navigating via breadcrumb
     this.clearSearchState();
+
+    // Clear current FAQ item to return to category list
+    this.currentFAQTitle = '';
+    this.currentFAQItem = null;
+
+    // Navigate to category page
     this.router.navigate(['/faq', this.encode(cat)]);
   }
 
   goSub(cat: string, sub: string) {
     // Clear search state when navigating via breadcrumb
     this.clearSearchState();
+
+    // Clear current FAQ item to return to subcategory list
+    this.currentFAQTitle = '';
+    this.currentFAQItem = null;
+
+    // Navigate to subcategory page
     this.router.navigate(['/faq', this.encode(cat), this.encode(sub)]);
   }
 
@@ -442,8 +460,8 @@ export class FaqComponent implements OnInit, OnDestroy {
     // Track FAQ view
     this.trackFAQView(item);
 
-    // Handle FAQ transition smoothly
-    this.smoothFAQTransition(item);
+    // 移除滚动逻辑，直接展开FAQ即可
+    // this.smoothFAQTransition(item); // 注释掉滚动逻辑
 
     // Load FAQ content
     if (!item.safeAnswer && item.answerPath) {
@@ -465,6 +483,33 @@ export class FaqComponent implements OnInit, OnDestroy {
         }
       });
     }
+  }
+
+  navigateToFAQ(item: FAQItem): void {
+    // 增加查看次数
+    if (!item.viewCount) {
+      item.viewCount = 0;
+    }
+    item.viewCount++;
+
+    // 设置当前FAQ
+    this.currentFAQTitle = item.question;
+    this.currentFAQItem = item;
+
+    // 更新浏览器URL
+    this.updateBrowserURL(item);
+
+    // 跟踪FAQ查看
+    this.trackFAQView(item);
+
+    // 确保总是滚动到页面顶部
+    // 使用 setTimeout 确保在所有其他操作完成后执行
+    setTimeout(() => {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    }, 0);
   }
 
   onFaqClosed(): void {
@@ -854,13 +899,9 @@ export class FaqComponent implements OnInit, OnDestroy {
     // Find and expand the corresponding FAQ
     const faqItem = this.faqList.find(item => item.question === suggestion);
     if (faqItem) {
-      // Scroll to the FAQ item
-      setTimeout(() => {
-        const element = document.getElementById(this.slugify(faqItem.question));
-        if (element) {
-          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-      }, 100);
+      // 直接展开FAQ，不进行滚动
+      this.expandFAQPanel(faqItem);
+      this.onFaqOpened(faqItem);
     }
   }
 
@@ -1003,10 +1044,10 @@ export class FaqComponent implements OnInit, OnDestroy {
       const idx = this.filteredFAQ.findIndex(f => f.question === question);
       if (idx >= 0) {
         const panel  = this.panels.toArray()[idx];
-        const panelEl= this.panelEls.toArray()[idx].nativeElement;
-  
-        panel.open();                                          // 展开
-        panelEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        // const panelEl= this.panelEls.toArray()[idx].nativeElement;
+
+        panel.open();                                          // 只展开，不滚动
+        // panelEl.scrollIntoView({ behavior: 'smooth', block: 'start' }); // 移除滚动
       }
     });
   }
@@ -1072,10 +1113,11 @@ export class FaqComponent implements OnInit, OnDestroy {
 
   private handlePendingFragment(): void {
     if (this.pendingFragment && this.faqList.length > 0) {
+      // 立即处理fragment，不需要长时间延迟
       setTimeout(() => {
         this.scrollToAndExpandFAQ(this.pendingFragment!);
         this.pendingFragment = undefined;
-      }, 100);
+      }, 100); // 减少延迟时间，只等待DOM更新
     }
   }
 
@@ -1097,31 +1139,34 @@ export class FaqComponent implements OnInit, OnDestroy {
   }
 
   private scrollToSecondPosition(element: HTMLElement): void {
-    // 计算将元素放在第二个位置的滚动位置
-    const elementRect = element.getBoundingClientRect();
-    const viewportHeight = window.innerHeight;
+    // 等待一小段时间确保DOM完全渲染
+    setTimeout(() => {
+      // 重新获取元素位置，确保准确性
+      const elementRect = element.getBoundingClientRect();
+      const viewportHeight = window.innerHeight;
 
-    // 动态计算偏移量，确保FAQ标题在视口的理想位置
-    const idealOffset = Math.min(120, viewportHeight * 0.15); // 视口高度的15%，最多120px
+      // 动态计算偏移量，确保FAQ标题在视口的理想位置
+      const idealOffset = Math.min(120, viewportHeight * 0.15); // 视口高度的15%，最多120px
 
-    // 计算目标滚动位置
-    const targetScrollTop = window.scrollY + elementRect.top - idealOffset;
+      // 计算目标滚动位置
+      const targetScrollTop = window.scrollY + elementRect.top - idealOffset;
 
-    // 确保不会滚动到页面顶部之上
-    const finalScrollTop = Math.max(0, targetScrollTop);
+      // 确保不会滚动到页面顶部之上
+      const finalScrollTop = Math.max(0, targetScrollTop);
 
-    // 检查是否需要滚动（避免不必要的滚动）
-    const currentScrollTop = window.scrollY;
-    const scrollDifference = Math.abs(finalScrollTop - currentScrollTop);
+      // 检查是否需要滚动（避免不必要的滚动）
+      const currentScrollTop = window.scrollY;
+      const scrollDifference = Math.abs(finalScrollTop - currentScrollTop);
 
-    // 只有当滚动距离超过50px时才进行滚动
-    if (scrollDifference > 50) {
-      // 平滑滚动到目标位置
-      window.scrollTo({
-        top: finalScrollTop,
-        behavior: 'smooth'
-      });
-    }
+      // 只有当滚动距离超过30px时才进行滚动（降低阈值）
+      if (scrollDifference > 30) {
+        // 使用auto行为进行即时滚动，避免与其他滚动冲突
+        window.scrollTo({
+          top: finalScrollTop,
+          behavior: 'auto'
+        });
+      }
+    }, 50);
   }
 
   private scrollToAndExpandFAQ(fragment: string): void {
@@ -1150,13 +1195,13 @@ export class FaqComponent implements OnInit, OnDestroy {
         this.onFaqOpened(faqItem);
         this.updateFAQMetadata(faqItem);
 
-        // 等待DOM更新后再查找元素
+        // 等待DOM更新后再查找元素并滚动
         setTimeout(() => {
           element = document.getElementById(fragment);
           if (element) {
             this.scrollToSecondPosition(element);
           }
-        }, 300);
+        }, 200); // 减少延迟时间
       }
     } else {
       // 找到对应的FAQ项目并展开
@@ -1165,10 +1210,19 @@ export class FaqComponent implements OnInit, OnDestroy {
         this.expandFAQPanel(faqItem);
         this.onFaqOpened(faqItem);
         this.updateFAQMetadata(faqItem);
-      }
 
-      // 滚动到元素
-      this.scrollToSecondPosition(element);
+        // 等待展开动画完成后滚动
+        setTimeout(() => {
+          if (element) {
+            this.scrollToSecondPosition(element);
+          }
+        }, 200);
+      } else {
+        // 如果没有找到对应的FAQ项目，直接滚动到元素
+        if (element) {
+          this.scrollToSecondPosition(element);
+        }
+      }
     }
   }
 
@@ -1337,6 +1391,10 @@ export class FaqComponent implements OnInit, OnDestroy {
     this.searchQuery = '';
     this.isSearching = false;
 
+    // Clear current FAQ item to return to category list
+    this.currentFAQTitle = '';
+    this.currentFAQItem = null;
+
     // If clicking the same category, toggle to show/hide subcategories
     if (this.currentCategory === categoryName && !this.currentSubCategory) {
       // If we're already in this category, go to home to "collapse" it
@@ -1356,6 +1414,10 @@ export class FaqComponent implements OnInit, OnDestroy {
     // Clear search when navigating via sidebar
     this.searchQuery = '';
     this.isSearching = false;
+
+    // Clear current FAQ item to return to subcategory list
+    this.currentFAQTitle = '';
+    this.currentFAQItem = null;
 
     // Navigate to subcategory
     if (this.currentCategory) {
@@ -1479,7 +1541,7 @@ export class FaqComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * 选择并显示指定FAQ项目
+   * 选择并显示指定FAQ项目（从右侧目录点击）
    */
   scrollToFAQ(item: FAQItem): void {
     // 设置当前FAQ项目
@@ -1491,6 +1553,9 @@ export class FaqComponent implements OnInit, OnDestroy {
 
     // 跟踪FAQ查看
     this.trackFAQView(item);
+
+    // 展开对应的FAQ面板，不进行滚动
+    this.expandFAQPanel(item);
 
     // 加载FAQ内容（如果尚未加载）
     if (!item.safeAnswer && item.answerPath) {
@@ -1512,12 +1577,6 @@ export class FaqComponent implements OnInit, OnDestroy {
         }
       });
     }
-
-    // 滚动到页面顶部以显示FAQ内容
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth'
-    });
   }
 
   /**
@@ -1545,30 +1604,6 @@ export class FaqComponent implements OnInit, OnDestroy {
    * 选择热门问题
    */
   selectTrendingQuestion(item: FAQItem): void {
-    // 滚动到对应的FAQ项目
-    const elementId = this.slugify(item.question);
-    const element = document.getElementById(elementId);
-
-    if (element) {
-      // 先展开对应的FAQ面板
-      const panel = element.closest('mat-expansion-panel');
-      if (panel) {
-        const panelComponent = panel as any;
-        if (panelComponent._expansionPanel && !panelComponent._expansionPanel.expanded) {
-          panelComponent._expansionPanel.open();
-        }
-      }
-
-      // 滚动到元素位置
-      setTimeout(() => {
-        element.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start',
-          inline: 'nearest'
-        });
-      }, 300); // 等待面板展开动画完成
-    }
-
     // 设置当前FAQ
     this.currentFAQTitle = item.question;
     this.currentFAQItem = item;
@@ -1578,12 +1613,21 @@ export class FaqComponent implements OnInit, OnDestroy {
 
     // 跟踪FAQ查看
     this.trackFAQView(item);
+
+    // 展开对应的FAQ面板，不进行滚动
+    this.expandFAQPanel(item);
+
+    // 移除滚动到页面顶部的逻辑
+    // window.scrollTo({
+    //   top: 0,
+    //   behavior: 'smooth'
+    // });
   }
 
   /**
    * TrackBy函数用于优化ngFor性能
    */
-  trackByFAQ(index: number, item: FAQItem): string {
+  trackByFAQ(_index: number, item: FAQItem): string {
     return item.question;
   }
 

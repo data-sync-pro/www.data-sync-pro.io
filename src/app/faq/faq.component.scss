@@ -358,39 +358,7 @@
   background: #ffffff;
   min-height: calc(100vh - 120px);
 
-  .breadcrumb {
-    margin-bottom: 24px;
-    font-size: 0.95rem;
-    display: flex;
-    align-items: center;
-    padding: 12px 0;
-
-    .breadcrumb-link {
-      color: #2196F3;
-      cursor: pointer;
-      text-decoration: none;
-      transition: color 0.2s ease;
-
-      &:hover {
-        color: #1976D2;
-        text-decoration: underline;
-      }
-
-      &.clickable {
-        color: #2196F3;
-      }
-    }
-
-    .breadcrumb-separator {
-      margin: 0 8px;
-      color: #666;
-    }
-
-    .breadcrumb-current {
-      color: #333;
-      font-weight: 500;
-    }
-  }
+  // 移除面包屑样式
 }
 
 // Main content area
@@ -402,33 +370,145 @@
       background: #ffffff;
       min-height: calc(100vh - 120px);
 
-      .breadcrumb {
-        margin-bottom: 24px;
-        font-size: 0.95rem;
-        display: flex;
-        align-items: center;
-        padding: 12px 0;
+      // 移除面包屑样式
 
-        .breadcrumb-link {
-          margin: 0;
-          &.clickable {
-            color: #418796;
-            cursor: pointer;
-            text-decoration: underline;
+      // 新的卡片式FAQ列表样式
+      .faq-list {
+        .faq-item {
+          background: white;
+          border: 1px solid #e1e5e9;
+          border-radius: 12px;
+          margin-bottom: 16px;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+          cursor: pointer;
+          position: relative;
+          overflow: hidden;
+
+          // 添加顶部装饰条
+          &::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #2196F3, #21CBF3);
+            opacity: 0;
+            transition: opacity 0.3s ease;
           }
-        }
 
-        .breadcrumb-separator {
-          margin: 0 4px;
-        }
+          &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+            border-color: #2196F3;
 
-        .breadcrumb-current {
-          color: #666;
-          font-style: italic;
-          margin: 0;
+            &::before {
+              opacity: 1;
+            }
+
+            .faq-question {
+              color: #2196F3;
+            }
+
+            .category-badge {
+              background: #2196F3;
+              color: white;
+            }
+
+            .faq-actions .navigate-icon {
+              color: #2196F3;
+              transform: translateX(4px);
+            }
+          }
+
+          &:active {
+            transform: translateY(-1px);
+          }
+
+          &.favorited {
+            border-left: 4px solid #ffd700;
+          }
+
+          .faq-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            padding: 20px 24px;
+            user-select: none;
+
+            &:focus {
+              outline: 2px solid #2196F3;
+              outline-offset: -2px;
+            }
+
+            .faq-title-section {
+              flex: 1;
+              min-width: 0;
+              padding-right: 20px;
+
+              .faq-question {
+                margin: 0 0 12px 0;
+                font-size: 17px;
+                font-weight: 600;
+                color: #2c3e50;
+                line-height: 1.5;
+                white-space: normal;
+                word-wrap: break-word;
+                overflow-wrap: break-word;
+                max-width: none;
+                transition: color 0.3s ease;
+              }
+
+              .faq-badges {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                flex-wrap: wrap;
+
+                .category-badge {
+                  background: #f1f3f4;
+                  color: #5f6368;
+                  padding: 6px 12px;
+                  border-radius: 16px;
+                  font-size: 13px;
+                  font-weight: 500;
+                  text-transform: capitalize;
+                  transition: all 0.3s ease;
+                  border: 1px solid transparent;
+                }
+
+                .view-count {
+                  color: #6c757d;
+                  font-size: 13px;
+                  display: flex;
+                  align-items: center;
+                  gap: 6px;
+                  background: #f8f9fa;
+                  padding: 4px 8px;
+                  border-radius: 12px;
+                  font-weight: 500;
+                }
+              }
+            }
+
+            .faq-actions {
+              display: flex;
+              align-items: center;
+              margin-left: 16px;
+
+              .navigate-icon {
+                color: #9ca3af;
+                font-size: 18px;
+                transition: all 0.3s ease;
+                transform: translateX(0);
+              }
+            }
+          }
         }
       }
 
+      // 保留原有的mat-accordion样式作为备用
       mat-accordion {
         mat-expansion-panel {
           margin-bottom: 20px;
@@ -1593,9 +1673,12 @@ img[data-zoomed="true"] {
     border-bottom: 1px solid #f1f3f4;
     background: #fafbfc;
     flex-shrink: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 
     .toc-title {
-      margin: 0 0 4px 0;
+      margin: 0;
       font-size: 1.1rem;
       font-weight: 600;
       color: #1a1a1a;
@@ -1606,6 +1689,10 @@ img[data-zoomed="true"] {
       font-size: 0.85rem;
       color: #666;
       font-weight: 400;
+      background: #e9ecef;
+      padding: 4px 8px;
+      border-radius: 12px;
+      white-space: nowrap;
     }
   }
 
@@ -1672,16 +1759,7 @@ img[data-zoomed="true"] {
     }
 
     .toc-item-indicator {
-      position: absolute;
-      right: 16px;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 6px;
-      height: 6px;
-      background: #2563eb;
-      border-radius: 50%;
-      opacity: 0;
-      transition: opacity 0.2s ease;
+      display: none; // 隐藏蓝点指示器
     }
   }
 }
@@ -2007,6 +2085,7 @@ img[data-zoomed="true"] {
     .toc-count {
       background: linear-gradient(135deg, #e74c3c, #c0392b);
       color: white;
+      border: none;
     }
   }
 
@@ -2029,7 +2108,7 @@ img[data-zoomed="true"] {
       }
 
       .toc-item-indicator {
-        background: #e74c3c;
+        display: none; // 隐藏trending questions的指示器
       }
     }
 

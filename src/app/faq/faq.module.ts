@@ -10,8 +10,6 @@ import { ScrollingModule } from '@angular/cdk/scrolling';
 import { FaqComponent } from './faq.component';
 import { SearchOverlayComponent } from '../search-overlay/search-overlay.component';
 import { FaqHomeComponent } from './faq-home/faq-home.component';
-import { PaginatedFAQComponent } from './paginated-faq.component';
-import { VirtualScrollFAQComponent } from './virtual-scroll-faq.component';
 import { ZoomableDirective } from 'src/app/zoomable.directive';
 import { SimpleZoomableDirective } from 'src/app/simple-zoomable.directive';
 @NgModule({
@@ -19,8 +17,6 @@ import { SimpleZoomableDirective } from 'src/app/simple-zoomable.directive';
     FaqComponent,
     SearchOverlayComponent,
     FaqHomeComponent,
-    PaginatedFAQComponent,
-    VirtualScrollFAQComponent,
     ZoomableDirective,
     SimpleZoomableDirective
   ],

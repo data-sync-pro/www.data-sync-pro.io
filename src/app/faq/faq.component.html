@@ -123,100 +123,34 @@
       <!-- 首页：显示所有FAQ -->
       <div *ngIf="showHome" class="all-faqs">
         <h2 class="section-title">All FAQs</h2>
-        <mat-accordion>
-          <mat-expansion-panel
-            class="faq-panel"
+        <div class="faq-list">
+          <div
+            class="faq-item"
             *ngFor="let item of allFaqList"
-            (opened)="onFaqOpened(item)"
-            (closed)="onFaqClosed()"
+            (click)="navigateToFAQ(item)"
+            [attr.aria-label]="'Navigate to FAQ: ' + item.question"
+            role="button"
+            tabindex="0"
+            (keydown.enter)="navigateToFAQ(item)"
+            (keydown.space)="$event.preventDefault(); navigateToFAQ(item)"
           >
-            <mat-expansion-panel-header>
-              <mat-panel-title class="faq-title" [id]="slugify(item.question)">
-                {{ item.question }}
-              </mat-panel-title>
-            </mat-expansion-panel-header>
-            <div *ngIf="item.safeAnswer" [innerHTML]="item.safeAnswer" appSimpleZoomable></div>
-            <p *ngIf="!item.safeAnswer">Loading…</p>
-
-            <!-- FAQ Feedback and Share Section -->
-            <div class="faq-feedback" *ngIf="item.safeAnswer">
-              <div class="feedback-row">
-                <div class="helpful-section">
-                  <div class="feedback-question-row">
-                    <p class="feedback-question">Was this answer helpful?</p>
-                    <div class="feedback-buttons">
-                      <button
-                        class="feedback-btn helpful"
-                        (click)="rateFAQ(item, true)"
-                        [class.selected]="item.userRating === true"
-                      >
-                        👍 Yes
-                      </button>
-                      <button
-                        class="feedback-btn not-helpful"
-                        (click)="rateFAQ(item, false)"
-                        [class.selected]="item.userRating === false"
-                      >
-                        👎 No
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="share-section">
-                  <button
-                    class="share-btn copy-link-btn"
-                    (click)="copyFAQLink(item)"
-                    title="Copy link to this FAQ"
-                    aria-label="Copy link to this FAQ"
-                  >
-                    🔗 Copy Link
-                  </button>
-                  <div class="social-share-dropdown" [class.show]="item.showSocialShare">
-                    <button
-                      class="share-btn social-toggle-btn"
-                      (click)="toggleSocialShare(item)"
-                      title="More sharing options"
-                      aria-label="More sharing options"
-                    >
-                      📤 Share
-                    </button>
-                    <div class="social-dropdown-content" *ngIf="item.showSocialShare">
-                      <button
-                        class="social-btn"
-                        (click)="shareToSocial('twitter', item)"
-                        title="Share on Twitter"
-                      >
-                        🐦 Twitter
-                      </button>
-                      <button
-                        class="social-btn"
-                        (click)="shareToSocial('facebook', item)"
-                        title="Share on Facebook"
-                      >
-                        📘 Facebook
-                      </button>
-                      <button
-                        class="social-btn"
-                        (click)="shareToSocial('linkedin', item)"
-                        title="Share on LinkedIn"
-                      >
-                        💼 LinkedIn
-                      </button>
-                      <button
-                        class="social-btn"
-                        (click)="shareToSocial('email', item)"
-                        title="Share via Email"
-                      >
-                        ✉️ Email
-                      </button>
-                    </div>
-                  </div>
+            <div class="faq-header">
+              <div class="faq-title-section">
+                <h3 class="faq-question" [id]="slugify(item.question)">{{ item.question }}</h3>
+                <div class="faq-badges">
+                  <span class="category-badge">{{ item.category }}</span>
+                  <span class="view-count" *ngIf="item.viewCount">
+                    👁 {{ item.viewCount || 0 }}
+                  </span>
                 </div>
               </div>
+
+              <div class="faq-actions">
+                <span class="navigate-icon">→</span>
+              </div>
             </div>
-          </mat-expansion-panel>
-        </mat-accordion>
+          </div>
+        </div>
       </div>
 
       <!-- 分类页面：显示分类介绍 -->
@@ -322,185 +256,35 @@
       </div>
       <!-- 搜索结果和分类浏览的FAQ列表 -->
       <ng-container *ngIf="!showHome && (!currentFAQItem || isSearching || searchQuery.trim())">
-        <!-- 搜索时显示搜索结果面包屑 -->
-        <nav class="breadcrumb" *ngIf="searchQuery.trim(); else normalBreadcrumb">
-          <span
-            class="breadcrumb-link"
-            (click)="goHome()"
-            [class.clickable]="true"
-          >
-          FAQ Home
-          </span>
-          <!-- 如果在特定分类页面搜索，显示当前分类路径 -->
-          <ng-container *ngIf="currentCategory">
-            <span class="breadcrumb-separator">/</span>
-            <span
-              class="breadcrumb-link"
-              (click)="goCategory(currentCategory)"
-              [class.clickable]="true"
-            >
-              {{ currentCategory }}
-            </span>
-          </ng-container>
-          <ng-container *ngIf="currentSubCategory">
-            <span class="breadcrumb-separator">/</span>
-            <span
-              class="breadcrumb-link"
-              (click)="goSub(currentCategory, currentSubCategory)"
-              [class.clickable]="true"
-            >
-              {{ currentSubCategory }}
-            </span>
-          </ng-container>
-          <!-- 如果有展开的FAQ，显示FAQ标题 -->
-          <ng-container *ngIf="currentFAQTitle">
-            <span class="breadcrumb-separator">/</span>
-            <span class="breadcrumb-current">
-              {{ currentFAQTitle }}
-            </span>
-          </ng-container>
-          <!-- 如果没有展开的FAQ，显示搜索信息 -->
-          <ng-container *ngIf="!currentFAQTitle">
-            <span class="breadcrumb-separator">/</span>
-            <span class="breadcrumb-current">
-              Search: "{{ searchQuery.trim() }}"
-            </span>
-          </ng-container>
-        </nav>
 
-        <!-- 正常分类浏览时的面包屑 -->
-        <ng-template #normalBreadcrumb>
-          <nav class="breadcrumb" *ngIf="currentCategory || currentSubCategory">
-            <span
-              class="breadcrumb-link"
-              (click)="goHome()"
-              [class.clickable]="currentCategory || currentSubCategory"
-            >
-            FAQ Home
-            </span>
-            <ng-container *ngIf="currentCategory">
-              <span class="breadcrumb-separator">/</span>
-              <span
-                class="breadcrumb-link"
-                (click)="goCategory(currentCategory)"
-                [class.clickable]="true"
-              >
-                {{ currentCategory }}
-              </span>
-            </ng-container>
-            <ng-container *ngIf="currentSubCategory">
-              <span class="breadcrumb-separator">/</span>
-              <span
-                class="breadcrumb-link"
-                (click)="goSub(currentCategory, currentSubCategory)"
-                [class.clickable]="true"
-              >
-                {{ currentSubCategory }}
-              </span>
-            </ng-container>
-            <!-- 如果有展开的FAQ，显示FAQ标题 -->
-            <ng-container *ngIf="currentFAQTitle">
-              <span class="breadcrumb-separator">/</span>
-              <span class="breadcrumb-current">
-                {{ currentFAQTitle }}
-              </span>
-            </ng-container>
-          </nav>
-        </ng-template>
-
-      <mat-accordion>
-        <mat-expansion-panel
-          class="faq-panel"
+      <div class="faq-list">
+        <div
+          class="faq-item"
           *ngFor="let item of filteredFAQ"
-          (opened)="onFaqOpened(item)"
-          (closed)="onFaqClosed()"
+          (click)="navigateToFAQ(item)"
+          [attr.aria-label]="'Navigate to FAQ: ' + item.question"
+          role="button"
+          tabindex="0"
+          (keydown.enter)="navigateToFAQ(item)"
+          (keydown.space)="$event.preventDefault(); navigateToFAQ(item)"
         >
-          <mat-expansion-panel-header>
-            <mat-panel-title class="faq-title" [id]="slugify(item.question)">
-              {{ item.question }}
-            </mat-panel-title>
-          </mat-expansion-panel-header>
-          <div [innerHTML]="item.safeAnswer" appSimpleZoomable></div>
-
-          <!-- FAQ Feedback and Share Section -->
-          <div class="faq-feedback" *ngIf="item.safeAnswer">
-            <div class="feedback-row">
-              <div class="helpful-section">
-                <div class="feedback-question-row">
-                  <p class="feedback-question">Was this answer helpful?</p>
-                  <div class="feedback-buttons">
-                    <button
-                      class="feedback-btn helpful"
-                      (click)="rateFAQ(item, true)"
-                      [class.selected]="item.userRating === true"
-                    >
-                      👍 Yes
-                    </button>
-                    <button
-                      class="feedback-btn not-helpful"
-                      (click)="rateFAQ(item, false)"
-                      [class.selected]="item.userRating === false"
-                    >
-                      👎 No
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              <div class="share-section">
-                <button
-                  class="share-btn copy-link-btn"
-                  (click)="copyFAQLink(item)"
-                  title="Copy link to this FAQ"
-                  aria-label="Copy link to this FAQ"
-                >
-                  🔗 Copy Link
-                </button>
-                <div class="social-share-dropdown" [class.show]="item.showSocialShare">
-                  <button
-                    class="share-btn social-toggle-btn"
-                    (click)="toggleSocialShare(item)"
-                    title="More sharing options"
-                    aria-label="More sharing options"
-                  >
-                    📤 Share
-                  </button>
-                  <div class="social-dropdown-content" *ngIf="item.showSocialShare">
-                    <button
-                      class="social-btn"
-                      (click)="shareToSocial('twitter', item)"
-                      title="Share on Twitter"
-                    >
-                      🐦 Twitter
-                    </button>
-                    <button
-                      class="social-btn"
-                      (click)="shareToSocial('facebook', item)"
-                      title="Share on Facebook"
-                    >
-                      📘 Facebook
-                    </button>
-                    <button
-                      class="social-btn"
-                      (click)="shareToSocial('linkedin', item)"
-                      title="Share on LinkedIn"
-                    >
-                      💼 LinkedIn
-                    </button>
-                    <button
-                      class="social-btn"
-                      (click)="shareToSocial('email', item)"
-                      title="Share via Email"
-                    >
-                      ✉️ Email
-                    </button>
-                  </div>
-                </div>
+          <div class="faq-header">
+            <div class="faq-title-section">
+              <h3 class="faq-question" [id]="slugify(item.question)">{{ item.question }}</h3>
+              <div class="faq-badges">
+                <span class="category-badge">{{ item.category }}</span>
+                <span class="view-count" *ngIf="item.viewCount">
+                  👁 {{ item.viewCount || 0 }}
+                </span>
               </div>
             </div>
+
+            <div class="faq-actions">
+              <span class="navigate-icon">→</span>
+            </div>
           </div>
-        </mat-expansion-panel>
-      </mat-accordion>
+        </div>
+      </div>
 
         <!-- 搜索无结果时的优化显示 -->
         <div class="no-results" *ngIf="filteredFAQ.length === 0">
