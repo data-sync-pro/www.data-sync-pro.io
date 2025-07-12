@@ -1,49 +1,75 @@
-<header class="header-container" [class.is-portrait]="isPortrait">
-  <a routerLink="/home" class="logo-area">
-    <img src="assets/logo.png" alt="Company Logo" class="company-logo" />
+<header class="header-container"
+        [class.is-portrait]="isPortrait"
+        [class.is-mobile]="isMobile"
+        [class.is-tablet]="isTablet"
+        role="banner">
+  <a routerLink="/home" class="logo-area" aria-label="Data Sync Pro - Go to homepage">
+    <img src="assets/logo.png" alt="Data Sync Pro Logo" class="company-logo" />
     <span class="company-name">DSP</span>
   </a>
   <button
-    class="portrait-toggle-btn"
+    class="mobile-toggle-btn"
     (click)="toggleNav()"
-    *ngIf="isPortrait"
+    *ngIf="isMobile"
+    [attr.aria-expanded]="navOpen"
+    [attr.aria-controls]="'main-navigation'"
+    aria-label="Toggle navigation menu"
+    type="button"
   >
-    {{ navOpen ? 'Close Menu' : 'Open Menu' }}
+    <span class="sr-only">{{ navOpen ? 'Close Menu' : 'Open Menu' }}</span>
+    <span class="hamburger-icon" [class.active]="navOpen">
+      <span></span>
+      <span></span>
+      <span></span>
+    </span>
   </button>
   <nav
+    id="main-navigation"
     class="nav-links"
-    [class.portrait-nav]="isPortrait && navOpen"
+    [class.mobile-nav]="isMobile && navOpen"
+    [class.tablet-nav]="isTablet"
+    role="navigation"
+    aria-label="Main navigation"
   >
-    <div
-      class="nav-item"
-      *ngFor="let item of navItems; let i = index"
-      (click)="onNavItemClick(i)"
-      [class.open]="item.isOpen"
-    >
-      <a [routerLink]="item.link">
-        {{ item.label }}
-      </a>
+    <ul class="nav-list" role="menubar">
+      <li
+        class="nav-item"
+        *ngFor="let item of navItems; let i = index"
+        (click)="onNavItemClick(i)"
+        [class.open]="item.isOpen"
+        role="none"
+      >
+        <a
+          [routerLink]="item.link"
+          class="nav-link"
+          role="menuitem"
+          [attr.aria-haspopup]="item.hasMegaMenu ? 'true' : null"
+          [attr.aria-expanded]="item.hasMegaMenu ? item.isOpen : null"
+        >
+          {{ item.label }}
+        </a>
 
-      <div class="mega-menu" *ngIf="item.hasMegaMenu">
-        <div class="mega-menu-inner">
-          <div class="mega-column">
-            <h3>Column A</h3>
-            <p class="column-description">Description for Column A</p>
-            <div class="mega-sub-menu">
-              <a routerLink="/sub-link1">Sub Link 1</a>
-              <a routerLink="/sub-link2">Sub Link 2</a>
+        <div class="mega-menu" *ngIf="item.hasMegaMenu" role="menu">
+          <div class="mega-menu-inner">
+            <div class="mega-column">
+              <h3>Column A</h3>
+              <p class="column-description">Description for Column A</p>
+              <div class="mega-sub-menu">
+                <a routerLink="/sub-link1" role="menuitem">Sub Link 1</a>
+                <a routerLink="/sub-link2" role="menuitem">Sub Link 2</a>
+              </div>
             </div>
-          </div>
 
-          <div class="mega-column">
-            <h3>Column B</h3>
-            <p class="column-description">Description for Column B</p>
-            <div class="mega-sub-menu">
-              <a routerLink="/sub-link3">Sub Link 3</a>
+            <div class="mega-column">
+              <h3>Column B</h3>
+              <p class="column-description">Description for Column B</p>
+              <div class="mega-sub-menu">
+                <a routerLink="/sub-link3" role="menuitem">Sub Link 3</a>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </div>
+      </li>
+    </ul>
   </nav>
 </header>

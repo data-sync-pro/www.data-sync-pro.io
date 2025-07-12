@@ -1,8 +1,3 @@
-// 全局平滑滚动
-:host {
-  scroll-behavior: smooth;
-}
-
 // Global styles for FAQ page
 :host {
   scroll-behavior: smooth;
@@ -11,7 +6,7 @@
 .faq-container {
   margin: 0;
   padding: 20px 40px;
-  margin-top: 80px;
+  margin-top: 60px;
   margin-left: 280px; // Make room for left sidebar
   margin-right: 320px; // Make room for right TOC (280px + 40px extra space)
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -33,10 +28,10 @@
 .faq-sidebar {
   position: fixed;
   left: 0;
-  top: 80px;
+  top: 60px;
   width: 280px;
   min-width: 280px;
-  height: calc(100vh - 80px);
+  height: calc(100vh - 60px);
   background: #ffffff;
   border-right: 1px solid #e1e5e9;
   overflow: hidden;
@@ -210,17 +205,7 @@
         min-height: 36px;
       }
 
-      .expand-toggle {
-        width: 16px;
-        height: 16px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 12px;
-        color: #5f6368;
-        font-weight: 500;
-        flex-shrink: 0;
-      }
+
 
       .nav-icon {
         font-size: 16px;
@@ -249,7 +234,7 @@
       }
 
       .nav-indent {
-        width: 24px;
+        width: 16px;
         flex-shrink: 0;
       }
     }
@@ -293,7 +278,7 @@
         .subcategory-container {
           .subcategory-nav {
             .nav-content {
-              padding-left: 20px;
+              padding-left: 16px;
             }
 
             .nav-text {
@@ -332,7 +317,6 @@
         justify-content: center;
       }
 
-      .expand-toggle,
       .nav-text,
       .nav-count,
       .nav-indent {
@@ -411,9 +395,17 @@
               color: #2196F3;
             }
 
-            .category-badge {
-              background: #2196F3;
-              color: white;
+            .category-badges {
+              .category-badge {
+                background: #2196F3;
+                color: white;
+              }
+
+              .subcategory-badge {
+                background: #1976d2;
+                color: white;
+                border-color: #1976d2;
+              }
             }
 
             .faq-actions .navigate-icon {
@@ -432,7 +424,7 @@
 
           .faq-header {
             display: flex;
-            align-items: flex-start;
+            align-items: center; // 改为center对齐，改善问题标题和category的视觉对齐
             justify-content: space-between;
             padding: 20px 24px;
             user-select: none;
@@ -447,17 +439,58 @@
               min-width: 0;
               padding-right: 20px;
 
-              .faq-question {
-                margin: 0 0 12px 0;
-                font-size: 17px;
-                font-weight: 600;
-                color: #2c3e50;
-                line-height: 1.5;
-                white-space: normal;
-                word-wrap: break-word;
-                overflow-wrap: break-word;
-                max-width: none;
-                transition: color 0.3s ease;
+              .faq-question-row {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                margin-bottom: 8px;
+                flex-wrap: wrap;
+
+                .faq-question {
+                  margin: 0;
+                  font-size: 17px;
+                  font-weight: 600;
+                  color: #2c3e50;
+                  line-height: 1.5;
+                  white-space: normal;
+                  word-wrap: break-word;
+                  overflow-wrap: break-word;
+                  flex: 1;
+                  min-width: 0;
+                  transition: color 0.3s ease;
+                }
+
+                .category-badges {
+                  display: flex;
+                  align-items: center;
+                  gap: 8px;
+                  flex-shrink: 0;
+                  flex-wrap: wrap;
+
+                  .category-badge {
+                    background: #f1f3f4;
+                    color: #5f6368;
+                    padding: 6px 12px;
+                    border-radius: 16px;
+                    font-size: 13px;
+                    font-weight: 500;
+                    text-transform: capitalize;
+                    transition: all 0.3s ease;
+                    border: 1px solid transparent;
+                  }
+
+                  .subcategory-badge {
+                    background: #e3f2fd;
+                    color: #1976d2;
+                    padding: 6px 12px;
+                    border-radius: 16px;
+                    font-size: 12px;
+                    font-weight: 500;
+                    text-transform: capitalize;
+                    transition: all 0.3s ease;
+                    border: 1px solid #bbdefb;
+                  }
+                }
               }
 
               .faq-badges {
@@ -465,18 +498,6 @@
                 align-items: center;
                 gap: 10px;
                 flex-wrap: wrap;
-
-                .category-badge {
-                  background: #f1f3f4;
-                  color: #5f6368;
-                  padding: 6px 12px;
-                  border-radius: 16px;
-                  font-size: 13px;
-                  font-weight: 500;
-                  text-transform: capitalize;
-                  transition: all 0.3s ease;
-                  border: 1px solid transparent;
-                }
 
                 .view-count {
                   color: #6c757d;
@@ -1274,7 +1295,7 @@ a:-webkit-any-link {
     .subcategory-nav {
       .nav-content {
         padding: 6px 10px;
-        padding-left: 16px;
+        padding-left: 14px;
       }
 
       .nav-text {
@@ -1649,7 +1670,7 @@ img[data-zoomed="true"] {
   top: 80px;
   right: 40px;
   width: 280px;
-  height: calc(100vh - 120px);
+  height: calc(100vh - 100px);
   background: #ffffff;
   border: 1px solid #e1e5e9;
   border-radius: 12px;
@@ -1699,25 +1720,34 @@ img[data-zoomed="true"] {
   .toc-list {
     flex: 1;
     overflow-y: auto;
+    overflow-x: hidden;
     padding: 8px 0;
+    min-height: 200px;
+    max-height: calc(100vh - 200px);
 
     // 自定义滚动条
     &::-webkit-scrollbar {
-      width: 6px;
+      width: 8px;
     }
 
     &::-webkit-scrollbar-track {
-      background: transparent;
+      background: #f1f3f4;
+      border-radius: 4px;
     }
 
     &::-webkit-scrollbar-thumb {
-      background: #d1d5db;
-      border-radius: 3px;
+      background: #c1c7cd;
+      border-radius: 4px;
+      border: 1px solid #f1f3f4;
     }
 
     &::-webkit-scrollbar-thumb:hover {
       background: #9ca3af;
     }
+
+    // Firefox滚动条样式
+    scrollbar-width: thin;
+    scrollbar-color: #c1c7cd #f1f3f4;
   }
 
   .toc-item {

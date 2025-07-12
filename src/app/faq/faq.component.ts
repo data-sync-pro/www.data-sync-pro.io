@@ -66,7 +66,6 @@ export class FaqComponent implements OnInit, OnDestroy {
   private searchTimeout: any;
   private destroy$ = new Subject<void>();
   private pendingFragment?: string;
-  private isTransitioning = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -460,8 +459,7 @@ export class FaqComponent implements OnInit, OnDestroy {
     // Track FAQ view
     this.trackFAQView(item);
 
-    // 移除滚动逻辑，直接展开FAQ即可
-    // this.smoothFAQTransition(item); // 注释掉滚动逻辑
+
 
     // Load FAQ content
     if (!item.safeAnswer && item.answerPath) {
@@ -507,7 +505,7 @@ export class FaqComponent implements OnInit, OnDestroy {
     setTimeout(() => {
       window.scrollTo({
         top: 0,
-        behavior: 'smooth'
+        behavior: 'auto' // 改为立即跳转，避免慢动画
       });
     }, 0);
   }
@@ -526,117 +524,7 @@ export class FaqComponent implements OnInit, OnDestroy {
     }, 100);
   }
 
-  private smoothFAQTransition(targetItem: FAQItem): void {
-    // 防止并发过渡动画
-    if (this.isTransitioning) {
-      return;
-    }
 
-    // 第一步：检查是否有其他展开的FAQ
-    const hasOtherOpenPanels = this.expansionPanels?.some(panel =>
-      panel.expanded && this.getFAQItemFromPanel(panel)?.id !== targetItem.id
-    );
-
-    if (hasOtherOpenPanels) {
-      // 如果有其他展开的FAQ，执行平滑切换
-      this.isTransitioning = true;
-      this.performSmoothTransition(targetItem);
-
-      // 500ms后重置状态
-      setTimeout(() => {
-        this.isTransitioning = false;
-      }, 500);
-    } else {
-      // 如果没有其他展开的FAQ，直接滚动到目标位置
-      this.scrollToFAQTitle(targetItem);
-    }
-  }
-
-  private performSmoothTransition(targetItem: FAQItem): void {
-    const fragment = this.slugify(targetItem.question);
-    const targetElement = document.getElementById(fragment);
-
-    if (!targetElement) return;
-
-    // 第一步：计算最终滚动位置（考虑其他FAQ关闭后的布局变化）
-    const finalScrollPosition = this.calculateFinalScrollPosition(targetElement);
-
-    // 第二步：开始关闭其他FAQ
-    this.closeOtherFAQPanels(targetItem);
-
-    // 第三步：在关闭动画进行时，开始渐进式滚动
-    this.performProgressiveScroll(targetElement, finalScrollPosition);
-  }
-
-  private calculateFinalScrollPosition(targetElement: HTMLElement): number {
-    const elementRect = targetElement.getBoundingClientRect();
-    const viewportHeight = window.innerHeight;
-
-    // 计算理想的偏移量（视口高度的12%，确保标题在第二位置）
-    const idealOffset = Math.min(100, viewportHeight * 0.12);
-
-    // 估算其他FAQ关闭后可能节省的空间
-    const estimatedSpaceSaved = this.estimateSpaceSavedFromClosing();
-
-    // 计算最终滚动位置
-    const targetScrollTop = window.scrollY + elementRect.top - idealOffset - estimatedSpaceSaved;
-
-    return Math.max(0, targetScrollTop);
-  }
-
-  private estimateSpaceSavedFromClosing(): number {
-    if (!this.expansionPanels) return 0;
-
-    let estimatedHeight = 0;
-    this.expansionPanels.forEach(panel => {
-      if (panel.expanded) {
-        // 估算每个展开的FAQ内容高度（平均值）
-        estimatedHeight += 200; // 大概的内容高度
-      }
-    });
-
-    return Math.min(estimatedHeight, 300); // 限制最大估算值
-  }
-
-  private performProgressiveScroll(targetElement: HTMLElement, finalPosition: number): void {
-    const startPosition = window.scrollY;
-    const distance = finalPosition - startPosition;
-
-    // 如果距离很小，直接跳过滚动
-    if (Math.abs(distance) < 30) return;
-
-    // 分阶段滚动：先快速接近，再精确定位
-
-    // 第一阶段：立即滚动到中间位置（50ms内）
-    const intermediatePosition = startPosition + (distance * 0.6);
-    window.scrollTo({
-      top: intermediatePosition,
-      behavior: 'smooth'
-    });
-
-    // 第二阶段：等待关闭动画进行一半时，继续滚动（150ms后）
-    setTimeout(() => {
-      const secondStagePosition = startPosition + (distance * 0.85);
-      window.scrollTo({
-        top: secondStagePosition,
-        behavior: 'smooth'
-      });
-    }, 150);
-
-    // 第三阶段：最终精确定位（300ms后，关闭动画基本完成）
-    setTimeout(() => {
-      // 重新计算位置，因为DOM可能已经改变
-      const currentRect = targetElement.getBoundingClientRect();
-      const viewportHeight = window.innerHeight;
-      const idealOffset = Math.min(100, viewportHeight * 0.12);
-      const finalScrollTop = window.scrollY + currentRect.top - idealOffset;
-
-      window.scrollTo({
-        top: Math.max(0, finalScrollTop),
-        behavior: 'smooth'
-      });
-    }, 300);
-  }
 
   private getFAQItemFromPanel(panel: MatExpansionPanel): FAQItem | null {
     if (!this.expansionPanels) return null;
@@ -653,16 +541,15 @@ export class FaqComponent implements OnInit, OnDestroy {
   }
 
   private scrollToFAQTitle(item: FAQItem): void {
-    // 等待DOM更新后滚动到FAQ标题
+    // 简化的滚动逻辑：直接滚动到元素
     setTimeout(() => {
       const fragment = this.slugify(item.question);
       const element = document.getElementById(fragment);
 
       if (element) {
-        // 滚动到FAQ标题，确保标题在视口的上方第二个位置
-        this.scrollToSecondPosition(element);
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
-    }, 200); // 给足够时间让expansion panel动画完成
+    }, 200);
   }
 
   private closeOtherFAQPanels(currentItem: FAQItem): void {
@@ -1031,12 +918,7 @@ export class FaqComponent implements OnInit, OnDestroy {
    * 获取分类描述
    */
   getCategoryDescription(): string {
-    if (this.currentSubCategory) {
-      return `浏览 ${this.currentCategory} > ${this.currentSubCategory} 分类下的常见问题。`;
-    } else if (this.currentCategory) {
-      return `浏览 ${this.currentCategory} 分类下的常见问题。`;
-    }
-    return '选择一个分类来浏览相关的常见问题。';
+    return '';
   }
 
   private openAndScroll(question: string): void {
@@ -1046,8 +928,7 @@ export class FaqComponent implements OnInit, OnDestroy {
         const panel  = this.panels.toArray()[idx];
         // const panelEl= this.panelEls.toArray()[idx].nativeElement;
 
-        panel.open();                                          // 只展开，不滚动
-        // panelEl.scrollIntoView({ behavior: 'smooth', block: 'start' }); // 移除滚动
+        panel.open();
       }
     });
   }
@@ -1138,36 +1019,7 @@ export class FaqComponent implements OnInit, OnDestroy {
     }, 50);
   }
 
-  private scrollToSecondPosition(element: HTMLElement): void {
-    // 等待一小段时间确保DOM完全渲染
-    setTimeout(() => {
-      // 重新获取元素位置，确保准确性
-      const elementRect = element.getBoundingClientRect();
-      const viewportHeight = window.innerHeight;
 
-      // 动态计算偏移量，确保FAQ标题在视口的理想位置
-      const idealOffset = Math.min(120, viewportHeight * 0.15); // 视口高度的15%，最多120px
-
-      // 计算目标滚动位置
-      const targetScrollTop = window.scrollY + elementRect.top - idealOffset;
-
-      // 确保不会滚动到页面顶部之上
-      const finalScrollTop = Math.max(0, targetScrollTop);
-
-      // 检查是否需要滚动（避免不必要的滚动）
-      const currentScrollTop = window.scrollY;
-      const scrollDifference = Math.abs(finalScrollTop - currentScrollTop);
-
-      // 只有当滚动距离超过30px时才进行滚动（降低阈值）
-      if (scrollDifference > 30) {
-        // 使用auto行为进行即时滚动，避免与其他滚动冲突
-        window.scrollTo({
-          top: finalScrollTop,
-          behavior: 'auto'
-        });
-      }
-    }, 50);
-  }
 
   private scrollToAndExpandFAQ(fragment: string): void {
     // 首先尝试通过ID找到元素
@@ -1199,9 +1051,9 @@ export class FaqComponent implements OnInit, OnDestroy {
         setTimeout(() => {
           element = document.getElementById(fragment);
           if (element) {
-            this.scrollToSecondPosition(element);
+            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
           }
-        }, 200); // 减少延迟时间
+        }, 200);
       }
     } else {
       // 找到对应的FAQ项目并展开
@@ -1214,13 +1066,13 @@ export class FaqComponent implements OnInit, OnDestroy {
         // 等待展开动画完成后滚动
         setTimeout(() => {
           if (element) {
-            this.scrollToSecondPosition(element);
+            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
           }
         }, 200);
       } else {
         // 如果没有找到对应的FAQ项目，直接滚动到元素
         if (element) {
-          this.scrollToSecondPosition(element);
+          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
       }
     }
@@ -1617,11 +1469,7 @@ export class FaqComponent implements OnInit, OnDestroy {
     // 展开对应的FAQ面板，不进行滚动
     this.expandFAQPanel(item);
 
-    // 移除滚动到页面顶部的逻辑
-    // window.scrollTo({
-    //   top: 0,
-    //   behavior: 'smooth'
-    // });
+
   }
 
   /**

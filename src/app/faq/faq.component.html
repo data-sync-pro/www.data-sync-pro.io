@@ -79,13 +79,9 @@
                   (click)="selectCategory(category.name)"
                 >
                   <div class="nav-content">
-                    <span
-                      class="expand-toggle"
-                      *ngIf="category.subCategories.length > 0 && !sidebarCollapsed"
-                    >
-                      {{ currentCategory === category.name ? '−' : '+' }}
+                    <span class="nav-icon">
+                      {{ currentCategory === category.name ? '📂' : '📁' }}
                     </span>
-                    <span class="nav-icon">📁</span>
                     <span class="nav-text" *ngIf="!sidebarCollapsed">{{ category.name }}</span>
                     <span class="nav-count" *ngIf="!sidebarCollapsed">{{ category.count }}</span>
                   </div>
@@ -104,7 +100,7 @@
                   >
                     <div class="nav-content">
                       <span class="nav-indent"></span>
-                      <span class="nav-icon">📄</span>
+                      <span class="nav-icon">🏷️</span>
                       <span class="nav-text">{{ subCategory.name }}</span>
                       <span class="nav-count">{{ subCategory.count }}</span>
                     </div>
@@ -136,10 +132,15 @@
           >
             <div class="faq-header">
               <div class="faq-title-section">
-                <h3 class="faq-question" [id]="slugify(item.question)">{{ item.question }}</h3>
-                <div class="faq-badges">
-                  <span class="category-badge">{{ item.category }}</span>
-                  <span class="view-count" *ngIf="item.viewCount">
+                <div class="faq-question-row">
+                  <h3 class="faq-question" [id]="slugify(item.question)">{{ item.question }}</h3>
+                  <div class="category-badges">
+                    <span class="category-badge">{{ item.category }}</span>
+                    <span class="subcategory-badge" *ngIf="item.subCategory">{{ item.subCategory }}</span>
+                  </div>
+                </div>
+                <div class="faq-badges" *ngIf="item.viewCount">
+                  <span class="view-count">
                     👁 {{ item.viewCount || 0 }}
                   </span>
                 </div>
@@ -162,10 +163,7 @@
           <p class="category-description">
             {{ getCategoryDescription() }}
           </p>
-          <div class="category-stats">
-            <span class="faq-count">{{ filteredFAQ.length }} FAQ{{ filteredFAQ.length !== 1 ? 's' : '' }}</span>
-            <span class="category-hint">← 选择左侧分类或使用右侧目录浏览问题</span>
-          </div>
+
         </div>
       </div>
 
@@ -270,10 +268,15 @@
         >
           <div class="faq-header">
             <div class="faq-title-section">
-              <h3 class="faq-question" [id]="slugify(item.question)">{{ item.question }}</h3>
-              <div class="faq-badges">
-                <span class="category-badge">{{ item.category }}</span>
-                <span class="view-count" *ngIf="item.viewCount">
+              <div class="faq-question-row">
+                <h3 class="faq-question" [id]="slugify(item.question)">{{ item.question }}</h3>
+                <div class="category-badges">
+                  <span class="category-badge">{{ item.category }}</span>
+                  <span class="subcategory-badge" *ngIf="item.subCategory">{{ item.subCategory }}</span>
+                </div>
+              </div>
+              <div class="faq-badges" *ngIf="item.viewCount">
+                <span class="view-count">
                   👁 {{ item.viewCount || 0 }}
                 </span>
               </div>
