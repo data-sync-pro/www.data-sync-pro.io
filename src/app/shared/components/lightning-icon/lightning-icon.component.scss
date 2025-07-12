@@ -1,0 +1,248 @@
+// Salesforce Lightning Design System Icon Styles
+:host {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  vertical-align: middle;
+}
+
+.slds-icon_container {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+
+  // Default utility icon colors
+  &.slds-icon-utility-home {
+    background-color: #1589ee;
+    border-radius: 0.25rem;
+  }
+
+  &.slds-icon-utility-search {
+    background-color: #1589ee;
+    border-radius: 0.25rem;
+  }
+
+  &.slds-icon-utility-folder {
+    background-color: #1589ee;
+    border-radius: 0.25rem;
+  }
+
+  &.slds-icon-utility-tag {
+    background-color: #1589ee;
+    border-radius: 0.25rem;
+  }
+
+  &.slds-icon-utility-chevronright {
+    background-color: transparent;
+  }
+
+  &.slds-icon-utility-chevronleft {
+    background-color: transparent;
+  }
+
+  &.slds-icon-utility-chevrondown {
+    background-color: transparent;
+  }
+
+  &.slds-icon-utility-chevronup {
+    background-color: transparent;
+  }
+
+  // Action icons
+  &.slds-icon-utility-settings {
+    background-color: #706e6b;
+    border-radius: 0.25rem;
+  }
+
+  &.slds-icon-utility-menu {
+    background-color: transparent;
+  }
+
+  &.slds-icon-utility-close {
+    background-color: transparent;
+  }
+
+  &.slds-icon-utility-add {
+    background-color: #1589ee;
+    border-radius: 0.25rem;
+  }
+
+  &.slds-icon-utility-edit {
+    background-color: #1589ee;
+    border-radius: 0.25rem;
+  }
+
+  &.slds-icon-utility-delete {
+    background-color: #ea001e;
+    border-radius: 0.25rem;
+  }
+
+  // Status icons
+  &.slds-icon-utility-success {
+    background-color: #2e844a;
+    border-radius: 0.25rem;
+  }
+
+  &.slds-icon-utility-error {
+    background-color: #ea001e;
+    border-radius: 0.25rem;
+  }
+
+  &.slds-icon-utility-warning {
+    background-color: #ffb75d;
+    border-radius: 0.25rem;
+  }
+
+  &.slds-icon-utility-info {
+    background-color: #1589ee;
+    border-radius: 0.25rem;
+  }
+
+  &.slds-icon-utility-check {
+    background-color: #2e844a;
+    border-radius: 0.25rem;
+  }
+
+  // Communication icons
+  &.slds-icon-utility-email {
+    background-color: #1589ee;
+    border-radius: 0.25rem;
+  }
+
+  &.slds-icon-utility-phone_portrait {
+    background-color: #1589ee;
+    border-radius: 0.25rem;
+  }
+
+  &.slds-icon-utility-call {
+    background-color: #2e844a;
+    border-radius: 0.25rem;
+  }
+
+  // File icons
+  &.slds-icon-utility-file {
+    background-color: #706e6b;
+    border-radius: 0.25rem;
+  }
+
+  &.slds-icon-utility-download {
+    background-color: #1589ee;
+    border-radius: 0.25rem;
+  }
+
+  &.slds-icon-utility-upload {
+    background-color: #1589ee;
+    border-radius: 0.25rem;
+  }
+
+  // Other utility icons
+  &.slds-icon-utility-refresh {
+    background-color: #1589ee;
+    border-radius: 0.25rem;
+  }
+
+  &.slds-icon-utility-lock {
+    background-color: #706e6b;
+    border-radius: 0.25rem;
+  }
+
+  &.slds-icon-utility-unlock {
+    background-color: #706e6b;
+    border-radius: 0.25rem;
+  }
+
+  &.slds-icon-utility-user {
+    background-color: #1589ee;
+    border-radius: 0.25rem;
+  }
+
+  &.slds-icon-utility-groups {
+    background-color: #1589ee;
+    border-radius: 0.25rem;
+  }
+}
+
+.slds-icon {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  fill: currentColor;
+  flex-shrink: 0;
+  vertical-align: middle;
+  overflow: hidden;
+
+  // Size variants - increased for better visibility
+  &.slds-icon_xx-small {
+    width: 1rem;      // 16px
+    height: 1rem;
+  }
+
+  &.slds-icon_x-small {
+    width: 1.125rem;  // 18px
+    height: 1.125rem;
+  }
+
+  &.slds-icon_small {
+    width: 1.375rem;  // 22px
+    height: 1.375rem;
+  }
+
+  &.slds-icon_medium {
+    width: 1.625rem;  // 26px
+    height: 1.625rem;
+  }
+
+  &.slds-icon_large {
+    width: 2.25rem;   // 36px
+    height: 2.25rem;
+  }
+
+  // Style variants
+  &.slds-icon_container {
+    border-radius: 0.25rem;
+    padding: 0.25rem;
+    fill: white;
+  }
+
+  &.slds-icon_border {
+    border: 1px solid #d8dde6;
+    border-radius: 0.25rem;
+    padding: 0.25rem;
+    background-color: white;
+    fill: #706e6b;
+  }
+
+  &.slds-icon_border-filled {
+    border: 1px solid #d8dde6;
+    border-radius: 0.25rem;
+    padding: 0.25rem;
+    background-color: #f3f2f2;
+    fill: #706e6b;
+  }
+
+  // SVG styling
+  svg {
+    width: 100%;
+    height: 100%;
+    fill: inherit;
+    pointer-events: none;
+    display: block;
+    max-width: 100%;
+    max-height: 100%;
+  }
+}
+
+.slds-assistive-text {
+  position: absolute !important;
+  margin: -1px !important;
+  border: 0 !important;
+  padding: 0 !important;
+  width: 1px !important;
+  height: 1px !important;
+  overflow: hidden !important;
+  clip: rect(0 0 0 0) !important;
+  text-transform: none !important;
+  white-space: nowrap !important;
+}

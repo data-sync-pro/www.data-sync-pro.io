@@ -1,0 +1,227 @@
+// ==================== FAQ Layout Styles ====================
+
+// Global styles for FAQ page
+:host {
+  scroll-behavior: smooth;
+}
+
+.faq-container {
+  margin: 0;
+  padding: 20px 40px;
+  margin-top: 60px;
+  margin-left: 280px; // Make room for left sidebar
+  margin-right: 320px; // Make room for right TOC (280px + 40px extra space)
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  .visually-hidden {
+    position: absolute !important;
+    height: 1px;
+    width: 1px;
+    overflow: hidden;
+    clip: rect(1px, 1px, 1px, 1px);
+    white-space: nowrap;
+  }
+}
+
+// Main content area
+.faq-main {
+  flex: 1;
+  min-width: 0; // Allow flex item to shrink
+  padding: 20px 40px;
+  margin-bottom: 100px;
+  background: #ffffff;
+  min-height: calc(100vh - 120px);
+}
+
+// Section titles
+.section-title {
+  font-size: 2.5rem !important;
+  font-weight: 600;
+  color: #1a1a1a;
+  padding-bottom: 40px;
+  margin-top: 0;
+  line-height: 1.2;
+  text-align: center;
+}
+
+// All FAQs container
+.all-faqs {
+  margin: 0 auto 100px auto;
+  padding-top: 40px;
+  max-width: 800px;
+
+  .faq-list {
+    text-align: left; // 确保FAQ列表左对齐
+  }
+}
+
+// Help text
+.help-text {
+  font-size: 0.95rem;
+  font-weight: 450;
+  margin-bottom: 16px;
+}
+
+// Category introduction
+.category-intro {
+  padding-top: 40px;
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto;
+
+  .category-header {
+    .category-title {
+      padding-bottom: 40px;
+      font-size: 2.5rem;
+      font-weight: 600;
+      color: #1a1a1a;
+      line-height: 1.2;
+    }
+
+    .category-stats {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 24px;
+      margin-bottom: 32px;
+
+      .stat-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        background: #f8f9fa;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        color: #495057;
+
+        .stat-icon {
+          width: 16px;
+          height: 16px;
+          opacity: 0.7;
+        }
+      }
+    }
+  }
+}
+
+// FAQ detail page
+.faq-detail {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 40px 0;
+
+  .faq-detail-content {
+    .faq-question {
+      font-size: 2rem;
+      font-weight: 600;
+      color: #1a1a1a;
+      margin-bottom: 24px;
+      line-height: 1.3;
+      border-bottom: 2px solid #e9ecef;
+      padding-bottom: 16px;
+    }
+
+    .faq-answer {
+      font-size: 1rem;
+      line-height: 1.7;
+      color: #333;
+      margin-bottom: 40px;
+
+      h1, h2, h3, h4, h5, h6 {
+        margin-top: 24px;
+        margin-bottom: 12px;
+        font-weight: 600;
+      }
+
+      p {
+        margin-bottom: 16px;
+      }
+
+      ul, ol {
+        margin-bottom: 16px;
+        padding-left: 24px;
+      }
+
+      li {
+        margin-bottom: 8px;
+      }
+
+      code {
+        background: #f8f9fa;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+        font-size: 0.9em;
+      }
+
+      pre {
+        background: #f8f9fa;
+        padding: 16px;
+        border-radius: 8px;
+        overflow-x: auto;
+        margin-bottom: 16px;
+      }
+    }
+  }
+}
+
+// No results states
+.category-no-results {
+  text-align: center;
+  padding: 40px 20px;
+  color: #666;
+}
+
+// Image zoom functionality
+.zoom-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  z-index: 9999;
+  pointer-events: auto;
+  cursor: zoom-out;
+
+  .zoomed-image {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 95%;
+    max-height: 95%;
+    object-fit: contain;
+    cursor: zoom-out;
+    transition: transform 0.2s ease;
+  }
+
+  .zoomed-image:hover {
+    transform: translate(-50%, -50%) scale(1.02);
+  }
+}
+
+// FAQ image specific styles
+.faq-image {
+  display: block;
+  margin: 20px auto;
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  cursor: zoom-in;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    transform: scale(1.02);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  }
+}
+
+// Mobile adjustments for images
+@media (max-width: 768px) {
+  .faq-image {
+    margin: 15px auto;
+    border-radius: 6px;
+    cursor: default;
+    transform: none !important;
+  }
+}

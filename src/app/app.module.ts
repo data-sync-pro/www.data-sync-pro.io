@@ -18,6 +18,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { ScrollToTopComponent } from './scroll-to-top/scroll-to-top.component';
+import { SharedModule } from './shared/shared.module';
 
 @NgModule({
   declarations: [
@@ -40,7 +41,8 @@ import { ScrollToTopComponent } from './scroll-to-top/scroll-to-top.component';
     MatExpansionModule,
     FormsModule,
     BrowserAnimationsModule,
-    FaqModule
+    FaqModule,
+    SharedModule
   ],
   bootstrap: [AppComponent]
 })

@@ -2,7 +2,7 @@
 <button
   class="mobile-sidebar-toggle"
   (click)="toggleMobileSidebar()"
-  *ngIf="isMobile"
+  *ngIf="ui.isMobile"
 >
   ☰
 </button>
@@ -10,20 +10,20 @@
 <!-- Mobile sidebar overlay -->
 <div
   class="sidebar-overlay"
-  [class.active]="mobileSidebarOpen"
+  [class.active]="ui.mobileSidebarOpen"
   (click)="closeMobileSidebar()"
 ></div>
 
 <!-- Left Sidebar - Always visible, independent of container -->
 <aside
   class="faq-sidebar"
-  [class.mobile-open]="mobileSidebarOpen"
-  [class.collapsed]="sidebarCollapsed"
+  [class.mobile-open]="ui.mobileSidebarOpen"
+  [class.collapsed]="ui.sidebarCollapsed"
 >
       <div class="sidebar-content">
         <!-- Sidebar Header -->
         <div class="sidebar-header">
-          <div class="sidebar-title-section" *ngIf="!sidebarCollapsed">
+          <div class="sidebar-title-section" *ngIf="!ui.sidebarCollapsed">
             <h2 class="sidebar-main-title">FAQ</h2>
             <span class="sidebar-subtitle">{{ faqList.length }} articles</span>
           </div>
@@ -32,19 +32,27 @@
             (click)="toggleSidebar()"
             title="Toggle sidebar"
           >
-            <span class="toggle-icon">{{ sidebarCollapsed ? '▶' : '◀' }}</span>
+            <lightning-icon
+              [iconName]="ui.sidebarCollapsed ? 'utility:chevronright' : 'utility:chevronleft'"
+              size="xx-small"
+              [alternativeText]="ui.sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'"
+            ></lightning-icon>
           </button>
         </div>
 
         <div class="sidebar-body">
           <!-- Search in sidebar -->
-          <div class="sidebar-search" *ngIf="!sidebarCollapsed">
+          <div class="sidebar-search" *ngIf="!ui.sidebarCollapsed">
             <button
               class="sidebar-search-btn"
               (click)="openSearchOverlay()"
               title="Search FAQs"
             >
-              <span class="search-icon">🔍</span>
+              <lightning-icon
+                iconName="utility:search"
+                size="xx-small"
+                alternativeText="Search"
+              ></lightning-icon>
               <span class="search-text">Search...</span>
             </button>
           </div>
@@ -54,14 +62,19 @@
             <!-- Home -->
             <div class="nav-item home-nav" [class.active]="showHome" (click)="goHome()">
               <div class="nav-content">
-                <span class="nav-icon">🏠</span>
-                <span class="nav-text" *ngIf="!sidebarCollapsed">All FAQs</span>
-                <span class="nav-count" *ngIf="!sidebarCollapsed">{{ faqList.length }}</span>
+                <lightning-icon
+                  iconName="utility:home"
+                  size="xx-small"
+                  alternativeText="Home"
+                  class="nav-icon"
+                ></lightning-icon>
+                <span class="nav-text" *ngIf="!ui.sidebarCollapsed">All FAQs</span>
+                <span class="nav-count" *ngIf="!ui.sidebarCollapsed">{{ faqList.length }}</span>
               </div>
             </div>
 
             <!-- Categories -->
-            <div class="nav-section" *ngIf="!sidebarCollapsed">
+            <div class="nav-section" *ngIf="!ui.sidebarCollapsed">
               <div class="section-divider"></div>
               <div class="section-label">Categories</div>
             </div>
@@ -74,33 +87,41 @@
                 <!-- Category Item -->
                 <div
                   class="nav-item category-nav"
-                  [class.active]="currentCategory === category.name && !currentSubCategory"
-                  [class.expanded]="currentCategory === category.name"
+                  [class.active]="current.category === category.name && !current.subCategory"
+                  [class.expanded]="current.category === category.name"
                   (click)="selectCategory(category.name)"
                 >
                   <div class="nav-content">
-                    <span class="nav-icon">
-                      {{ currentCategory === category.name ? '📂' : '📁' }}
-                    </span>
-                    <span class="nav-text" *ngIf="!sidebarCollapsed">{{ category.name }}</span>
-                    <span class="nav-count" *ngIf="!sidebarCollapsed">{{ category.count }}</span>
+                    <lightning-icon
+                      iconName="utility:folder"
+                      size="xx-small"
+                      [alternativeText]="category.name + ' category'"
+                      class="nav-icon"
+                    ></lightning-icon>
+                    <span class="nav-text" *ngIf="!ui.sidebarCollapsed">{{ category.name }}</span>
+                    <span class="nav-count" *ngIf="!ui.sidebarCollapsed">{{ category.count }}</span>
                   </div>
                 </div>
 
                 <!-- Subcategories -->
                 <div
                   class="subcategory-container"
-                  *ngIf="currentCategory === category.name && category.subCategories.length > 0 && !sidebarCollapsed"
+                  *ngIf="current.category === category.name && category.subCategories.length > 0 && !ui.sidebarCollapsed"
                 >
                   <div
                     *ngFor="let subCategory of category.subCategories"
                     class="nav-item subcategory-nav"
-                    [class.active]="currentSubCategory === subCategory.name"
+                    [class.active]="current.subCategory === subCategory.name"
                     (click)="selectSubCategory(subCategory.name)"
                   >
                     <div class="nav-content">
                       <span class="nav-indent"></span>
-                      <span class="nav-icon">🏷️</span>
+                      <lightning-icon
+                        iconName="utility:tag"
+                        size="xx-small"
+                        [alternativeText]="subCategory.name + ' subcategory'"
+                        class="nav-icon"
+                      ></lightning-icon>
                       <span class="nav-text">{{ subCategory.name }}</span>
                       <span class="nav-count">{{ subCategory.count }}</span>
                     </div>
@@ -147,7 +168,12 @@
               </div>
 
               <div class="faq-actions">
-                <span class="navigate-icon">→</span>
+                <lightning-icon
+                  iconName="utility:chevronright"
+                  size="xx-small"
+                  alternativeText="Navigate to FAQ"
+                  class="navigate-icon"
+                ></lightning-icon>
               </div>
             </div>
           </div>
@@ -155,23 +181,19 @@
       </div>
 
       <!-- 分类页面：显示分类介绍 -->
-      <div *ngIf="!showHome && !currentFAQItem && !isSearching" class="category-intro">
+      <div *ngIf="!showHome && !current.faqItem && !search.isActive" class="category-intro">
         <div class="category-header">
           <h2 class="category-title">
-            {{ currentSubCategory || currentCategory }}
+            {{ current.subCategory || current.category }}
           </h2>
-          <p class="category-description">
-            {{ getCategoryDescription() }}
-          </p>
-
         </div>
       </div>
 
       <!-- 单个FAQ详情显示 -->
-      <div *ngIf="currentFAQItem && !isSearching && !searchQuery.trim()" class="faq-detail">
+      <div *ngIf="current.faqItem && !search.isActive && !search.query.trim()" class="faq-detail">
         <div class="faq-detail-content">
-          <h2 class="faq-question">{{ currentFAQItem.question }}</h2>
-          <div class="faq-answer" [innerHTML]="currentFAQItem.safeAnswer" appSimpleZoomable></div>
+          <h2 class="faq-question">{{ current.faqItem.question }}</h2>
+          <div class="faq-answer" [innerHTML]="current.faqItem.safeAnswer" appSimpleZoomable></div>
 
           <!-- FAQ Feedback and Share Section -->
           <div class="faq-feedback">
@@ -182,15 +204,15 @@
                   <div class="feedback-buttons">
                     <button
                       class="feedback-btn helpful"
-                      (click)="rateFAQ(currentFAQItem, true)"
-                      [class.selected]="currentFAQItem.userRating === true"
+                      (click)="rateFAQ(current.faqItem, true)"
+                      [class.selected]="current.faqItem.userRating === true"
                     >
                       👍 Yes
                     </button>
                     <button
                       class="feedback-btn not-helpful"
-                      (click)="rateFAQ(currentFAQItem, false)"
-                      [class.selected]="currentFAQItem.userRating === false"
+                      (click)="rateFAQ(current.faqItem, false)"
+                      [class.selected]="current.faqItem.userRating === false"
                     >
                       👎 No
                     </button>
@@ -201,46 +223,46 @@
               <div class="share-section">
                 <button
                   class="share-btn copy-link-btn"
-                  (click)="copyFAQLink(currentFAQItem)"
+                  (click)="copyFAQLink(current.faqItem)"
                   title="Copy link to this FAQ"
                   aria-label="Copy link to this FAQ"
                 >
                   🔗 Copy Link
                 </button>
-                <div class="social-share-dropdown" [class.show]="currentFAQItem.showSocialShare">
+                <div class="social-share-dropdown" [class.show]="current.faqItem.showSocialShare">
                   <button
                     class="share-btn social-toggle-btn"
-                    (click)="toggleSocialShare(currentFAQItem)"
+                    (click)="toggleSocialShare(current.faqItem)"
                     title="More sharing options"
                     aria-label="More sharing options"
                   >
                     📤 Share
                   </button>
-                  <div class="social-dropdown-content" *ngIf="currentFAQItem.showSocialShare">
+                  <div class="social-dropdown-content" *ngIf="current.faqItem.showSocialShare">
                     <button
                       class="social-btn"
-                      (click)="shareToSocial('twitter', currentFAQItem)"
+                      (click)="shareToSocial('twitter', current.faqItem)"
                       title="Share on Twitter"
                     >
                       🐦 Twitter
                     </button>
                     <button
                       class="social-btn"
-                      (click)="shareToSocial('facebook', currentFAQItem)"
+                      (click)="shareToSocial('facebook', current.faqItem)"
                       title="Share on Facebook"
                     >
                       📘 Facebook
                     </button>
                     <button
                       class="social-btn"
-                      (click)="shareToSocial('linkedin', currentFAQItem)"
+                      (click)="shareToSocial('linkedin', current.faqItem)"
                       title="Share on LinkedIn"
                     >
                       💼 LinkedIn
                     </button>
                     <button
                       class="social-btn"
-                      (click)="shareToSocial('email', currentFAQItem)"
+                      (click)="shareToSocial('email', current.faqItem)"
                       title="Share via Email"
                     >
                       ✉️ Email
@@ -253,7 +275,7 @@
         </div>
       </div>
       <!-- 搜索结果和分类浏览的FAQ列表 -->
-      <ng-container *ngIf="!showHome && (!currentFAQItem || isSearching || searchQuery.trim())">
+      <ng-container *ngIf="!showHome && (!current.faqItem || search.isActive || search.query.trim())">
 
       <div class="faq-list">
         <div
@@ -283,7 +305,12 @@
             </div>
 
             <div class="faq-actions">
-              <span class="navigate-icon">→</span>
+              <lightning-icon
+                iconName="utility:chevronright"
+                size="xx-small"
+                alternativeText="Navigate to FAQ"
+                class="navigate-icon"
+              ></lightning-icon>
             </div>
           </div>
         </div>
@@ -291,12 +318,18 @@
 
         <!-- 搜索无结果时的优化显示 -->
         <div class="no-results" *ngIf="filteredFAQ.length === 0">
-          <div *ngIf="searchQuery.trim(); else noSearchResults" class="search-no-results">
-            <div class="no-results-icon">🔍</div>
+          <div *ngIf="search.query.trim(); else noSearchResults" class="search-no-results">
+            <div class="no-results-icon">
+              <lightning-icon
+                iconName="utility:search"
+                size="medium"
+                alternativeText="No search results"
+              ></lightning-icon>
+            </div>
             <h3>没有找到相关结果</h3>
-            <p>没有找到包含 "<strong>{{ searchQuery }}</strong>" 的FAQ。</p>
+            <p>没有找到包含 "<strong>{{ search.query }}</strong>" 的FAQ。</p>
 
-            <div class="search-suggestions">
+            <div class="search-search.suggestions">
               <h4>建议：</h4>
               <ul>
                 <li>检查拼写是否正确</li>
@@ -342,7 +375,7 @@
 <aside
   class="faq-toc"
   *ngIf="shouldShowTOC()"
-  [class.collapsed]="sidebarCollapsed"
+  [class.collapsed]="ui.sidebarCollapsed"
 >
   <div class="toc-content">
     <!-- Trending Questions for Home Page -->
@@ -389,8 +422,8 @@
 
 <!-- Search overlay - independent of containers -->
 <app-search-overlay
-  *ngIf="isSearchOpen"
-  [isOpen]="isSearchOpen"
-  (closed)="isSearchOpen = false"
+  *ngIf="search.isOpen"
+  [isOpen]="search.isOpen"
+  (closed)="search.isOpen = false"
   (selectedResult)="handleSearchSelect($event)"
 ></app-search-overlay>

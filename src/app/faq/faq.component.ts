@@ -31,6 +31,33 @@ interface SearchResult {
   highlightedAnswer: string;
 }
 
+// 简化的状态管理接口
+interface SearchState {
+  query: string;
+  focused: boolean;
+  isActive: boolean;
+  results: SearchResult[];
+  hasResults: boolean;
+  suggestions: string[];
+  showSuggestions: boolean;
+  selectedIndex: number;
+  isOpen: boolean;
+}
+
+interface CurrentState {
+  category: string;
+  subCategory: string;
+  faqTitle: string;
+  faqItem: FAQItem | null;
+}
+
+interface UIState {
+  isLoading: boolean;
+  sidebarCollapsed: boolean;
+  mobileSidebarOpen: boolean;
+  isMobile: boolean;
+}
+
 @Component({
   selector: 'app-faq',
   templateUrl: './faq.component.html',
@@ -38,30 +65,88 @@ interface SearchResult {
   encapsulation: ViewEncapsulation.None
 })
 export class FaqComponent implements OnInit, OnDestroy {
-  searchQuery = '';
-  searchFocused = false;
-  isSearching = false; // 控制面包屑显示
-  searchResults: SearchResult[] = []; // 搜索结果
-  hasSearchResults = true; // 是否有搜索结果
+  // 简化的状态管理
+  search: SearchState = {
+    query: '',
+    focused: false,
+    isActive: false,
+    results: [],
+    hasResults: true,
+    suggestions: [],
+    showSuggestions: false,
+    selectedIndex: -1,
+    isOpen: false
+  };
 
-  currentCategory = '';
-  currentSubCategory = '';
-  currentFAQTitle = '';
-  currentFAQItem: FAQItem | null = null;
+  current: CurrentState = {
+    category: '',
+    subCategory: '',
+    faqTitle: '',
+    faqItem: null
+  };
 
+  ui: UIState = {
+    isLoading: false,
+    sidebarCollapsed: false,
+    mobileSidebarOpen: false,
+    isMobile: false
+  };
+
+  // 数据
   faqList: FAQItem[] = [];
   categories: FAQCategory[] = [];
 
-  suggestions: string[] = [];
-  showSuggestions = false;
-  selectedSuggestionIndex = -1;
-  isSearchOpen = false;
-  isLoading = false;
+  // 向后兼容的getter属性 (临时解决方案)
+  get searchQuery() { return this.search.query; }
+  set searchQuery(value: string) { this.search.query = value; }
 
-  // Sidebar state
-  sidebarCollapsed = false;
-  mobileSidebarOpen = false;
-  isMobile = false;
+  get searchFocused() { return this.search.focused; }
+  set searchFocused(value: boolean) { this.search.focused = value; }
+
+  get isSearching() { return this.search.isActive; }
+  set isSearching(value: boolean) { this.search.isActive = value; }
+
+  get searchResults() { return this.search.results; }
+  set searchResults(value: SearchResult[]) { this.search.results = value; }
+
+  get hasSearchResults() { return this.search.hasResults; }
+  set hasSearchResults(value: boolean) { this.search.hasResults = value; }
+
+  get suggestions() { return this.search.suggestions; }
+  set suggestions(value: string[]) { this.search.suggestions = value; }
+
+  get showSuggestions() { return this.search.showSuggestions; }
+  set showSuggestions(value: boolean) { this.search.showSuggestions = value; }
+
+  get selectedSuggestionIndex() { return this.search.selectedIndex; }
+  set selectedSuggestionIndex(value: number) { this.search.selectedIndex = value; }
+
+  get isSearchOpen() { return this.search.isOpen; }
+  set isSearchOpen(value: boolean) { this.search.isOpen = value; }
+
+  get currentCategory() { return this.current.category; }
+  set currentCategory(value: string) { this.current.category = value; }
+
+  get currentSubCategory() { return this.current.subCategory; }
+  set currentSubCategory(value: string) { this.current.subCategory = value; }
+
+  get currentFAQTitle() { return this.current.faqTitle; }
+  set currentFAQTitle(value: string) { this.current.faqTitle = value; }
+
+  get currentFAQItem() { return this.current.faqItem; }
+  set currentFAQItem(value: FAQItem | null) { this.current.faqItem = value; }
+
+  get isLoading() { return this.ui.isLoading; }
+  set isLoading(value: boolean) { this.ui.isLoading = value; }
+
+  get sidebarCollapsed() { return this.ui.sidebarCollapsed; }
+  set sidebarCollapsed(value: boolean) { this.ui.sidebarCollapsed = value; }
+
+  get mobileSidebarOpen() { return this.ui.mobileSidebarOpen; }
+  set mobileSidebarOpen(value: boolean) { this.ui.mobileSidebarOpen = value; }
+
+  get isMobile() { return this.ui.isMobile; }
+  set isMobile(value: boolean) { this.ui.isMobile = value; }
 
   private searchTimeout: any;
   private destroy$ = new Subject<void>();
@@ -88,8 +173,8 @@ export class FaqComponent implements OnInit, OnDestroy {
       takeUntil(this.destroy$)
     ).subscribe(p => {
       // 解码URL参数以处理特殊字符和空格
-      this.currentCategory    = p.get('cat') ? decodeURIComponent(p.get('cat')!) : '';
-      this.currentSubCategory = p.get('subCat') ? decodeURIComponent(p.get('subCat')!) : '';
+      this.current.category    = p.get('cat') ? decodeURIComponent(p.get('cat')!) : '';
+      this.current.subCategory = p.get('subCat') ? decodeURIComponent(p.get('subCat')!) : '';
       this.updatePageMetadata();
     });
 
@@ -116,7 +201,7 @@ export class FaqComponent implements OnInit, OnDestroy {
   }
 
   private initFaqData(): void {
-    this.isLoading = true;
+    this.ui.isLoading = true;
 
     // 使用新的FAQ服务
     this.faqService.getFAQs().pipe(
@@ -124,13 +209,13 @@ export class FaqComponent implements OnInit, OnDestroy {
     ).subscribe({
       next: (faqs) => {
         this.faqList = faqs;
-        this.isLoading = false;
+        this.ui.isLoading = false;
         // 数据加载完成后处理pending fragment
         this.handlePendingFragment();
       },
       error: (error) => {
         console.error('Failed to load FAQ data:', error);
-        this.isLoading = false;
+        this.ui.isLoading = false;
       }
     });
 
@@ -158,8 +243,8 @@ export class FaqComponent implements OnInit, OnDestroy {
     this.clearSearchState();
 
     // Clear current FAQ item to return to category list
-    this.currentFAQTitle = '';
-    this.currentFAQItem = null;
+    this.current.faqTitle = '';
+    this.current.faqItem = null;
 
     // Navigate to category page
     this.router.navigate(['/faq', this.encode(cat)]);
@@ -170,23 +255,23 @@ export class FaqComponent implements OnInit, OnDestroy {
     this.clearSearchState();
 
     // Clear current FAQ item to return to subcategory list
-    this.currentFAQTitle = '';
-    this.currentFAQItem = null;
+    this.current.faqTitle = '';
+    this.current.faqItem = null;
 
     // Navigate to subcategory page
     this.router.navigate(['/faq', this.encode(cat), this.encode(sub)]);
   }
 
   private clearSearchState(): void {
-    this.searchQuery = '';
-    this.currentFAQTitle = '';
-    this.currentFAQItem = null;
-    this.suggestions = [];
-    this.showSuggestions = false;
-    this.selectedSuggestionIndex = -1;
-    this.isSearching = false; // 重置搜索状态
-    this.searchResults = []; // 清除搜索结果
-    this.hasSearchResults = true; // 重置搜索结果状态
+    this.search.query = '';
+    this.current.faqTitle = '';
+    this.current.faqItem = null;
+    this.search.suggestions = [];
+    this.search.showSuggestions = false;
+    this.search.selectedIndex = -1;
+    this.search.isActive = false; // 重置搜索状态
+    this.search.results = []; // 清除搜索结果
+    this.search.hasResults = true; // 重置搜索结果状态
     // 关闭所有展开的FAQ面板
     this.closeAllFAQPanels();
   }
@@ -286,7 +371,7 @@ export class FaqComponent implements OnInit, OnDestroy {
   }
 
   get filteredFAQ(): FAQItem[] {
-    const q = this.searchQuery.toLowerCase().trim();
+    const q = this.search.query.toLowerCase().trim();
 
     // 如果有搜索查询，使用智能搜索
     if (q) {
@@ -295,8 +380,8 @@ export class FaqComponent implements OnInit, OnDestroy {
 
     // 如果没有搜索查询，则应用分类过滤
     return this.faqList.filter(item => {
-      if (this.currentCategory && item.category !== this.currentCategory) return false;
-      if (this.currentSubCategory && item.subCategory !== this.currentSubCategory) return false;
+      if (this.current.category && item.category !== this.current.category) return false;
+      if (this.current.subCategory && item.subCategory !== this.current.subCategory) return false;
       return true;
     });
   }
@@ -331,21 +416,21 @@ export class FaqComponent implements OnInit, OnDestroy {
     results.sort((a, b) => b.score - a.score);
 
     // 更新搜索结果状态
-    this.searchResults = results;
-    this.hasSearchResults = results.length > 0;
+    this.search.results = results;
+    this.search.hasResults = results.length > 0;
 
     return results.map(r => r.item);
   }
 
   // 获取搜索结果的高亮问题
   getHighlightedQuestion(item: FAQItem): string {
-    const result = this.searchResults.find(r => r.item.id === item.id);
+    const result = this.search.results.find(r => r.item.id === item.id);
     return result ? result.highlightedQuestion : item.question;
   }
 
   // 获取搜索结果的高亮答案预览
   getHighlightedAnswerPreview(item: FAQItem): string {
-    const result = this.searchResults.find(r => r.item.id === item.id);
+    const result = this.search.results.find(r => r.item.id === item.id);
     if (result) {
       return result.highlightedAnswer;
     }
@@ -355,7 +440,7 @@ export class FaqComponent implements OnInit, OnDestroy {
 
   // 获取搜索结果的匹配类型
   getMatchType(item: FAQItem): string {
-    const result = this.searchResults.find(r => r.item.id === item.id);
+    const result = this.search.results.find(r => r.item.id === item.id);
     if (!result) return '';
 
     switch (result.matchType) {
@@ -374,8 +459,8 @@ export class FaqComponent implements OnInit, OnDestroy {
 
   // 选择热门FAQ
   selectPopularFAQ(faq: FAQItem): void {
-    this.searchQuery = faq.question;
-    this.isSearching = false;
+    this.search.query = faq.question;
+    this.search.isActive = false;
     this.performSearch();
   }
 
@@ -387,25 +472,25 @@ export class FaqComponent implements OnInit, OnDestroy {
 
   // 清空搜索
   clearSearch(): void {
-    this.searchQuery = '';
-    this.isSearching = false;
-    this.searchResults = [];
-    this.hasSearchResults = true;
-    this.suggestions = [];
-    this.showSuggestions = false;
-    this.selectedSuggestionIndex = -1;
-    this.currentFAQTitle = '';
-    this.currentFAQItem = null;
+    this.search.query = '';
+    this.search.isActive = false;
+    this.search.results = [];
+    this.search.hasResults = true;
+    this.search.suggestions = [];
+    this.search.showSuggestions = false;
+    this.search.selectedIndex = -1;
+    this.current.faqTitle = '';
+    this.current.faqItem = null;
     // 关闭所有展开的FAQ面板
     this.closeAllFAQPanels();
   }
 
   // 搜索并清空
   searchAndClear(): void {
-    if (this.searchQuery.trim()) {
+    if (this.search.query.trim()) {
       // 清空当前分类，确保搜索覆盖所有问题
-      this.currentCategory = '';
-      this.currentSubCategory = '';
+      this.current.category = '';
+      this.current.subCategory = '';
 
       // 先执行搜索（触发filteredFAQ getter）
       const results = this.filteredFAQ;
@@ -413,7 +498,7 @@ export class FaqComponent implements OnInit, OnDestroy {
       // 如果有完全匹配的结果，自动展开第一个
       if (results.length > 0) {
         const exactMatch = results.find(item =>
-          item.question.toLowerCase() === this.searchQuery.toLowerCase().trim()
+          item.question.toLowerCase() === this.search.query.toLowerCase().trim()
         );
 
         if (exactMatch) {
@@ -425,33 +510,33 @@ export class FaqComponent implements OnInit, OnDestroy {
       }
 
       // 然后清空搜索框
-      this.searchQuery = '';
-      this.isSearching = false;
-      this.suggestions = [];
-      this.showSuggestions = false;
-      this.selectedSuggestionIndex = -1;
+      this.search.query = '';
+      this.search.isActive = false;
+      this.search.suggestions = [];
+      this.search.showSuggestions = false;
+      this.search.selectedIndex = -1;
     }
   }
 
   pickCategory(cat: string): void {
-    this.currentCategory = cat;
-    this.currentSubCategory = '';
+    this.current.category = cat;
+    this.current.subCategory = '';
   }
 
   clearCategory(): void {
-    this.currentCategory = '';
-    this.currentSubCategory = '';
+    this.current.category = '';
+    this.current.subCategory = '';
   }
 
   pickSubCategory(subCat: string): void {
-    this.currentSubCategory = subCat;
+    this.current.subCategory = subCat;
   }
   
 
   onFaqOpened(item: FAQItem): void {
     // Update current FAQ title for breadcrumb
-    this.currentFAQTitle = item.question;
-    this.currentFAQItem = item;
+    this.current.faqTitle = item.question;
+    this.current.faqItem = item;
 
     // Update browser URL
     this.updateBrowserURL(item);
@@ -491,8 +576,8 @@ export class FaqComponent implements OnInit, OnDestroy {
     item.viewCount++;
 
     // 设置当前FAQ
-    this.currentFAQTitle = item.question;
-    this.currentFAQItem = item;
+    this.current.faqTitle = item.question;
+    this.current.faqItem = item;
 
     // 更新浏览器URL
     this.updateBrowserURL(item);
@@ -518,8 +603,8 @@ export class FaqComponent implements OnInit, OnDestroy {
         // 如果没有展开的FAQ，移除URL中的fragment
         this.clearBrowserURLFragment();
         // 清除当前FAQ标题
-        this.currentFAQTitle = '';
-        this.currentFAQItem = null;
+        this.current.faqTitle = '';
+        this.current.faqItem = null;
       }
     }, 100);
   }
@@ -533,7 +618,7 @@ export class FaqComponent implements OnInit, OnDestroy {
     const panelIndex = panels.indexOf(panel);
 
     if (panelIndex >= 0) {
-      const faqList = this.currentCategory ? this.filteredFAQ : this.allFaqList;
+      const faqList = this.current.category ? this.filteredFAQ : this.allFaqList;
       return faqList[panelIndex] || null;
     }
 
@@ -559,7 +644,7 @@ export class FaqComponent implements OnInit, OnDestroy {
         const panels = this.expansionPanels.toArray();
 
         // 根据当前页面类型确定使用哪个FAQ列表
-        const faqList = this.currentCategory ? this.filteredFAQ : this.allFaqList;
+        const faqList = this.current.category ? this.filteredFAQ : this.allFaqList;
         const currentIndex = faqList.findIndex(item => item.id === currentItem.id);
 
         // 关闭除当前FAQ外的所有其他FAQ
@@ -594,10 +679,10 @@ export class FaqComponent implements OnInit, OnDestroy {
   private clearBrowserURLFragment(): void {
     // 构建当前URL路径（不包含fragment）
     let currentUrl = '/faq';
-    if (this.currentCategory) {
-      currentUrl += `/${encodeURIComponent(this.currentCategory)}`;
-      if (this.currentSubCategory) {
-        currentUrl += `/${encodeURIComponent(this.currentSubCategory)}`;
+    if (this.current.category) {
+      currentUrl += `/${encodeURIComponent(this.current.category)}`;
+      if (this.current.subCategory) {
+        currentUrl += `/${encodeURIComponent(this.current.subCategory)}`;
       }
     }
 
@@ -620,41 +705,41 @@ export class FaqComponent implements OnInit, OnDestroy {
   }
 
   onSearchBlur(): void {
-    this.searchFocused = false;
+    this.search.focused = false;
     // Delay hiding suggestions to allow for click events
     setTimeout(() => {
-      this.showSuggestions = false;
+      this.search.showSuggestions = false;
     }, 200);
   }
 
   onSearchFocus(): void {
-    this.searchFocused = true;
-    if (this.searchQuery.trim()) {
+    this.search.focused = true;
+    if (this.search.query.trim()) {
       this.updateSuggestions();
     }
   }
 
   onSearchInput(event: any): void {
-    this.searchQuery = event.target.value;
-    this.isSearching = this.searchQuery.trim().length > 0; // 设置搜索状态
+    this.search.query = event.target.value;
+    this.search.isActive = this.search.query.trim().length > 0; // 设置搜索状态
 
     // 如果开始搜索，清空当前分类以确保搜索覆盖所有问题
-    if (this.searchQuery.trim().length > 0) {
-      this.currentCategory = '';
-      this.currentSubCategory = '';
+    if (this.search.query.trim().length > 0) {
+      this.current.category = '';
+      this.current.subCategory = '';
     }
 
     // 如果搜索框为空，重置搜索结果状态
-    if (!this.searchQuery.trim()) {
-      this.searchResults = [];
-      this.hasSearchResults = true;
+    if (!this.search.query.trim()) {
+      this.search.results = [];
+      this.search.hasResults = true;
     }
 
     this.updateSuggestions();
   }
 
   onSearchKeydown(event: KeyboardEvent): void {
-    if (!this.showSuggestions || this.suggestions.length === 0) {
+    if (!this.search.showSuggestions || this.search.suggestions.length === 0) {
       // If no suggestions, allow Enter to trigger search
       if (event.key === 'Enter') {
         event.preventDefault();
@@ -666,37 +751,37 @@ export class FaqComponent implements OnInit, OnDestroy {
     switch (event.key) {
       case 'ArrowDown':
         event.preventDefault();
-        this.selectedSuggestionIndex = Math.min(
-          this.selectedSuggestionIndex + 1,
-          this.suggestions.length - 1
+        this.search.selectedIndex = Math.min(
+          this.search.selectedIndex + 1,
+          this.search.suggestions.length - 1
         );
         break;
       case 'ArrowUp':
         event.preventDefault();
-        this.selectedSuggestionIndex = Math.max(this.selectedSuggestionIndex - 1, -1);
+        this.search.selectedIndex = Math.max(this.search.selectedIndex - 1, -1);
         break;
       case 'Enter':
         event.preventDefault();
-        if (this.selectedSuggestionIndex >= 0) {
-          this.selectSuggestion(this.suggestions[this.selectedSuggestionIndex]);
+        if (this.search.selectedIndex >= 0) {
+          this.selectSuggestion(this.search.suggestions[this.search.selectedIndex]);
         } else {
           this.performSearch();
         }
         break;
       case 'Escape':
-        this.showSuggestions = false;
-        this.selectedSuggestionIndex = -1;
+        this.search.showSuggestions = false;
+        this.search.selectedIndex = -1;
         break;
     }
   }
 
   performSearch(): void {
-    const query = this.searchQuery.trim();
+    const query = this.search.query.trim();
     if (!query) return;
 
     // Hide suggestions
-    this.showSuggestions = false;
-    this.selectedSuggestionIndex = -1;
+    this.search.showSuggestions = false;
+    this.search.selectedIndex = -1;
 
     // Check for exact match first
     const exactMatch = this.faqList.find(item =>
@@ -714,10 +799,10 @@ export class FaqComponent implements OnInit, OnDestroy {
   }
 
   private updateSuggestions(): void {
-    const query = this.searchQuery.toLowerCase().trim();
+    const query = this.search.query.toLowerCase().trim();
     if (query.length < 2) {
-      this.suggestions = [];
-      this.showSuggestions = false;
+      this.search.suggestions = [];
+      this.search.showSuggestions = false;
       return;
     }
 
@@ -735,7 +820,7 @@ export class FaqComponent implements OnInit, OnDestroy {
         return;
       }
 
-      this.suggestions = this.faqList
+      this.search.suggestions = this.faqList
         .filter(item =>
           item.question.toLowerCase().includes(query) ||
           item.category.toLowerCase().includes(query) ||
@@ -744,20 +829,20 @@ export class FaqComponent implements OnInit, OnDestroy {
         .map(item => item.question)
         .slice(0, 8); // Limit to 8 suggestions
 
-      this.showSuggestions = this.suggestions.length > 0;
-      this.selectedSuggestionIndex = -1;
+      this.search.showSuggestions = this.search.suggestions.length > 0;
+      this.search.selectedIndex = -1;
     }, 300);
   }
 
   private autoNavigateToFAQ(faqItem: FAQItem): void {
     // Clear suggestions
-    this.suggestions = [];
-    this.showSuggestions = false;
-    this.selectedSuggestionIndex = -1;
-    this.isSearching = false; // 重置搜索状态，显示面包屑
+    this.search.suggestions = [];
+    this.search.showSuggestions = false;
+    this.search.selectedIndex = -1;
+    this.search.isActive = false; // 重置搜索状态，显示面包屑
 
     // Update current FAQ title for breadcrumb
-    this.currentFAQTitle = faqItem.question;
+    this.current.faqTitle = faqItem.question;
 
     // Navigate to the FAQ's category/subcategory if needed
     if (faqItem.subCategory) {
@@ -779,9 +864,9 @@ export class FaqComponent implements OnInit, OnDestroy {
 
 
   selectSuggestion(suggestion: string): void {
-    this.searchQuery = suggestion;
-    this.showSuggestions = false;
-    this.selectedSuggestionIndex = -1;
+    this.search.query = suggestion;
+    this.search.showSuggestions = false;
+    this.search.selectedIndex = -1;
 
     // Find and expand the corresponding FAQ
     const faqItem = this.faqList.find(item => item.question === suggestion);
@@ -873,11 +958,11 @@ export class FaqComponent implements OnInit, OnDestroy {
     return answer.replace(/\.html$/, '').toLowerCase();
   }
   openSearchOverlay() {
-    this.isSearchOpen = true;
+    this.search.isOpen = true;
   }
 
   closeSearchOverlay() {
-    this.isSearchOpen = false;
+    this.search.isOpen = false;
   }
   @ViewChild('faqSearchBox') faqSearchBox!: ElementRef<HTMLInputElement>;
   @ViewChildren(MatExpansionPanel) expansionPanels!: QueryList<MatExpansionPanel>;
@@ -899,8 +984,8 @@ export class FaqComponent implements OnInit, OnDestroy {
   }
   private openSearch() {
     this.faqSearchBox.nativeElement.focus();
-    this.searchFocused = true;
-    this.showSuggestions = !!this.searchQuery.trim();
+    this.search.focused = true;
+    this.search.showSuggestions = !!this.search.query.trim();
   }
 
   @ViewChildren(MatExpansionPanel) panels!: QueryList<MatExpansionPanel>;
@@ -910,7 +995,7 @@ export class FaqComponent implements OnInit, OnDestroy {
   
   get showHome(): boolean {
     return (
-      !this.currentCategory && !this.currentSubCategory && !this.searchQuery
+      !this.current.category && !this.current.subCategory && !this.search.query
     );
   }
 
@@ -951,7 +1036,7 @@ export class FaqComponent implements OnInit, OnDestroy {
       { fragment: frag }
     );
   
-    this.isSearchOpen = false;
+    this.search.isOpen = false;
   
     setTimeout(() => this.openAndScroll(sel.question));
   }
@@ -975,13 +1060,13 @@ export class FaqComponent implements OnInit, OnDestroy {
     let pageTitle = 'FAQ - Data Sync Pro';
     let pageDescription = 'Frequently Asked Questions about Data Sync Pro';
 
-    if (this.currentCategory) {
-      pageTitle = `${this.currentCategory} FAQ - Data Sync Pro`;
-      pageDescription = `Frequently Asked Questions about ${this.currentCategory}`;
+    if (this.current.category) {
+      pageTitle = `${this.current.category} FAQ - Data Sync Pro`;
+      pageDescription = `Frequently Asked Questions about ${this.current.category}`;
 
-      if (this.currentSubCategory) {
-        pageTitle = `${this.currentSubCategory} FAQ - Data Sync Pro`;
-        pageDescription = `Frequently Asked Questions about ${this.currentSubCategory}`;
+      if (this.current.subCategory) {
+        pageTitle = `${this.current.subCategory} FAQ - Data Sync Pro`;
+        pageDescription = `Frequently Asked Questions about ${this.current.subCategory}`;
       }
     }
 
@@ -1009,7 +1094,7 @@ export class FaqComponent implements OnInit, OnDestroy {
         const panels = this.expansionPanels.toArray();
 
         // 根据当前页面类型确定使用哪个FAQ列表
-        const faqList = this.currentCategory ? this.filteredFAQ : this.allFaqList;
+        const faqList = this.current.category ? this.filteredFAQ : this.allFaqList;
         const targetIndex = faqList.findIndex(item => item.id === faqItem.id);
 
         if (targetIndex >= 0 && panels[targetIndex]) {
@@ -1030,8 +1115,8 @@ export class FaqComponent implements OnInit, OnDestroy {
       const faqItem = this.faqList.find(item => this.slugify(item.question) === fragment);
       if (faqItem) {
         // 如果当前不在正确的分类页面，导航到正确的页面
-        if (this.currentCategory !== faqItem.category ||
-            (faqItem.subCategory && this.currentSubCategory !== faqItem.subCategory)) {
+        if (this.current.category !== faqItem.category ||
+            (faqItem.subCategory && this.current.subCategory !== faqItem.subCategory)) {
 
           const categoryPath = faqItem.category ? `/${encodeURIComponent(faqItem.category)}` : '';
           const subCategoryPath = faqItem.subCategory ? `/${encodeURIComponent(faqItem.subCategory)}` : '';
@@ -1240,15 +1325,15 @@ export class FaqComponent implements OnInit, OnDestroy {
   // Sidebar navigation methods
   selectCategory(categoryName: string): void {
     // Clear search when navigating via sidebar
-    this.searchQuery = '';
-    this.isSearching = false;
+    this.search.query = '';
+    this.search.isActive = false;
 
     // Clear current FAQ item to return to category list
-    this.currentFAQTitle = '';
-    this.currentFAQItem = null;
+    this.current.faqTitle = '';
+    this.current.faqItem = null;
 
     // If clicking the same category, toggle to show/hide subcategories
-    if (this.currentCategory === categoryName && !this.currentSubCategory) {
+    if (this.current.category === categoryName && !this.current.subCategory) {
       // If we're already in this category, go to home to "collapse" it
       this.goHome();
     } else {
@@ -1257,27 +1342,27 @@ export class FaqComponent implements OnInit, OnDestroy {
     }
 
     // Close mobile sidebar after navigation
-    if (this.isMobile) {
+    if (this.ui.isMobile) {
       this.closeMobileSidebar();
     }
   }
 
   selectSubCategory(subCategoryName: string): void {
     // Clear search when navigating via sidebar
-    this.searchQuery = '';
-    this.isSearching = false;
+    this.search.query = '';
+    this.search.isActive = false;
 
     // Clear current FAQ item to return to subcategory list
-    this.currentFAQTitle = '';
-    this.currentFAQItem = null;
+    this.current.faqTitle = '';
+    this.current.faqItem = null;
 
     // Navigate to subcategory
-    if (this.currentCategory) {
-      this.router.navigate(['/faq', this.encode(this.currentCategory), this.encode(subCategoryName)]);
+    if (this.current.category) {
+      this.router.navigate(['/faq', this.encode(this.current.category), this.encode(subCategoryName)]);
     }
 
     // Close mobile sidebar after navigation
-    if (this.isMobile) {
+    if (this.ui.isMobile) {
       this.closeMobileSidebar();
     }
   }
@@ -1289,38 +1374,38 @@ export class FaqComponent implements OnInit, OnDestroy {
 
   // Sidebar toggle functionality
   toggleSidebar(): void {
-    this.sidebarCollapsed = !this.sidebarCollapsed;
+    this.ui.sidebarCollapsed = !this.ui.sidebarCollapsed;
     // Save state to localStorage for persistence
-    localStorage.setItem('faq-sidebar-collapsed', this.sidebarCollapsed.toString());
+    localStorage.setItem('faq-sidebar-collapsed', this.ui.sidebarCollapsed.toString());
   }
 
   // Load sidebar state from localStorage
   private loadSidebarState(): void {
     const savedState = localStorage.getItem('faq-sidebar-collapsed');
     if (savedState !== null) {
-      this.sidebarCollapsed = savedState === 'true';
+      this.ui.sidebarCollapsed = savedState === 'true';
     }
   }
 
   // Mobile functionality
   private checkMobileView(): void {
-    this.isMobile = window.innerWidth <= 768;
+    this.ui.isMobile = window.innerWidth <= 768;
   }
 
   toggleMobileSidebar(): void {
-    this.mobileSidebarOpen = !this.mobileSidebarOpen;
+    this.ui.mobileSidebarOpen = !this.ui.mobileSidebarOpen;
   }
 
   closeMobileSidebar(): void {
-    this.mobileSidebarOpen = false;
+    this.ui.mobileSidebarOpen = false;
   }
 
   @HostListener('window:resize', ['$event'])
   onResize(event: any): void {
     this.checkMobileView();
     // Close mobile sidebar when switching to desktop
-    if (!this.isMobile) {
-      this.mobileSidebarOpen = false;
+    if (!this.ui.isMobile) {
+      this.ui.mobileSidebarOpen = false;
     }
   }
 
@@ -1334,8 +1419,8 @@ export class FaqComponent implements OnInit, OnDestroy {
     }
 
     // Escape to close search overlay
-    if (event.key === 'Escape' && this.isSearchOpen) {
-      this.isSearchOpen = false;
+    if (event.key === 'Escape' && this.search.isOpen) {
+      this.search.isOpen = false;
     }
   }
 
@@ -1346,12 +1431,12 @@ export class FaqComponent implements OnInit, OnDestroy {
    */
   shouldShowTOC(): boolean {
     // 移动设备不显示
-    if (this.isMobile) {
+    if (this.ui.isMobile) {
       return false;
     }
 
     // 搜索状态不显示
-    if (this.isSearching || this.searchQuery.trim()) {
+    if (this.search.isActive || this.search.query.trim()) {
       return false;
     }
 
@@ -1361,7 +1446,7 @@ export class FaqComponent implements OnInit, OnDestroy {
     }
 
     // 分类页面显示分类TOC
-    return (!!this.currentCategory || !!this.currentSubCategory) &&
+    return (!!this.current.category || !!this.current.subCategory) &&
            this.getCurrentFAQList().length > 1; // 至少有2个FAQ项目才显示目录
   }
 
@@ -1369,11 +1454,11 @@ export class FaqComponent implements OnInit, OnDestroy {
    * 获取当前TOC的标题
    */
   getCurrentTOCTitle(): string {
-    if (this.currentSubCategory) {
-      return this.currentSubCategory;
+    if (this.current.subCategory) {
+      return this.current.subCategory;
     }
-    if (this.currentCategory) {
-      return this.currentCategory;
+    if (this.current.category) {
+      return this.current.category;
     }
     return 'Contents';
   }
@@ -1389,7 +1474,7 @@ export class FaqComponent implements OnInit, OnDestroy {
    * 判断是否为当前展开的FAQ
    */
   isCurrentFAQ(item: FAQItem): boolean {
-    return this.currentFAQTitle === item.question;
+    return this.current.faqTitle === item.question;
   }
 
   /**
@@ -1397,8 +1482,8 @@ export class FaqComponent implements OnInit, OnDestroy {
    */
   scrollToFAQ(item: FAQItem): void {
     // 设置当前FAQ项目
-    this.currentFAQItem = item;
-    this.currentFAQTitle = item.question;
+    this.current.faqItem = item;
+    this.current.faqTitle = item.question;
 
     // 更新浏览器URL
     this.updateBrowserURL(item);
@@ -1457,8 +1542,8 @@ export class FaqComponent implements OnInit, OnDestroy {
    */
   selectTrendingQuestion(item: FAQItem): void {
     // 设置当前FAQ
-    this.currentFAQTitle = item.question;
-    this.currentFAQItem = item;
+    this.current.faqTitle = item.question;
+    this.current.faqItem = item;
 
     // 更新浏览器URL
     this.updateBrowserURL(item);

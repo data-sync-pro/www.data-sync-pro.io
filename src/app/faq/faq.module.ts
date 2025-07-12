@@ -9,14 +9,13 @@ import { ScrollingModule } from '@angular/cdk/scrolling';
 
 import { FaqComponent } from './faq.component';
 import { SearchOverlayComponent } from '../search-overlay/search-overlay.component';
-import { FaqHomeComponent } from './faq-home/faq-home.component';
 import { ZoomableDirective } from 'src/app/zoomable.directive';
 import { SimpleZoomableDirective } from 'src/app/simple-zoomable.directive';
+import { SharedModule } from '../shared/shared.module';
 @NgModule({
   declarations: [
     FaqComponent,
     SearchOverlayComponent,
-    FaqHomeComponent,
     ZoomableDirective,
     SimpleZoomableDirective
   ],
@@ -27,6 +26,7 @@ import { SimpleZoomableDirective } from 'src/app/simple-zoomable.directive';
     MatExpansionModule,
     MatButtonModule,
     ScrollingModule,
+    SharedModule,
   ],
   exports: [
     FaqComponent,
