@@ -599,7 +599,6 @@ export class FAQService {
     // Enhanced error handling with better visual feedback
     const onErrorHandler = `
       console.error('Failed to load image:', this.src);
-      console.error('Current page URL:', window.location.href);
       console.error('Image absolute URL:', new URL(this.src, window.location.href).href);
       this.parentElement.style.display = 'block';
       this.parentElement.style.padding = '20px';
@@ -621,7 +620,7 @@ export class FAQService {
         style="display: block; margin: 20px auto; max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); transition: transform 0.3s ease;"
         loading="lazy"
         onerror="${onErrorHandler}"
-        onload="console.log('Image loaded successfully:', this.src); console.log('Full image URL:', new URL(this.src, window.location.href).href); this.parentElement.classList.add('image-loaded');"
+        onload="console.log('Image loaded successfully:', this.src); this.parentElement.classList.add('image-loaded');"
       >
     </div>`;
   }
@@ -645,8 +644,7 @@ export class FAQService {
         }
 
         const originalSrc = srcMatch[1];
-        console.log('Processing image with src:', originalSrc);
-        
+
         // Handle specific problematic URLs
         if (originalSrc.includes('undefined') || originalSrc.trim() === '') {
           console.warn('Invalid image src detected:', originalSrc);
@@ -656,7 +654,7 @@ export class FAQService {
             </div>
           </div>`;
         }
-        
+
         return this.createResponsiveImage(originalSrc, attrs);
       })
       // Clean up extra whitespace but preserve line breaks in content
