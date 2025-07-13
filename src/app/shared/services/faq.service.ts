@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject, of, throwError } from 'rxjs';
 import { map, catchError, shareReplay, tap, finalize } from 'rxjs/operators';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { PerformanceService } from './performance.service';
 
 import {
   SourceFAQRecord,
@@ -26,16 +27,30 @@ export class FAQService {
   private faqsCache$ = new BehaviorSubject<FAQItem[]>([]);
   private contentCache = new Map<string, SafeHtml>();
   private categoriesCache: FAQCategory[] = [];
+  
+  // Local Storage Cache Keys
+  private readonly STORAGE_KEY_FAQ_CONTENT = 'faq_content_cache';
+  private readonly STORAGE_KEY_FAQ_METADATA = 'faq_metadata_cache';
+  private readonly STORAGE_KEY_POPULAR_FAQS = 'popular_faqs_cache';
+  private readonly CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
 
   // Loading state
   private isLoading = false;
   private isInitialized = false;
 
+  // Preloading
+  private preloadingQueue = new Set<string>();
+  private intersectionObserver?: IntersectionObserver;
+  private readonly PRELOAD_THRESHOLD = 0.1; // Start preloading when item is 10% visible
+
   constructor(
     private http: HttpClient,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
+    private performanceService: PerformanceService
   ) {
     this.initializeService();
+    this.initializeIntersectionObserver();
+    this.loadFromLocalStorage();
   }
 
   /**
@@ -46,6 +61,169 @@ export class FAQService {
       this.loadFAQs();
       this.isInitialized = true;
     }
+  }
+
+  /**
+   * Load cached content from local storage
+   */
+  private loadFromLocalStorage(): void {
+    try {
+      const cachedContent = localStorage.getItem(this.STORAGE_KEY_FAQ_CONTENT);
+      if (cachedContent) {
+        const parsedCache = JSON.parse(cachedContent);
+        Object.entries(parsedCache).forEach(([key, value]: [string, any]) => {
+          if (this.isCacheValid(value.timestamp)) {
+            this.contentCache.set(key, this.sanitizer.bypassSecurityTrustHtml(value.content));
+          }
+        });
+      }
+    } catch (error) {
+      console.warn('Failed to load FAQ content from local storage:', error);
+    }
+  }
+
+  /**
+   * Save content to local storage
+   */
+  private saveToLocalStorage(answerPath: string, content: string): void {
+    try {
+      const existingCache = localStorage.getItem(this.STORAGE_KEY_FAQ_CONTENT);
+      const cache = existingCache ? JSON.parse(existingCache) : {};
+      
+      cache[answerPath] = {
+        content,
+        timestamp: Date.now()
+      };
+
+      localStorage.setItem(this.STORAGE_KEY_FAQ_CONTENT, JSON.stringify(cache));
+    } catch (error) {
+      console.warn('Failed to save FAQ content to local storage:', error);
+    }
+  }
+
+  /**
+   * Check if cached item is still valid
+   */
+  private isCacheValid(timestamp: number): boolean {
+    return Date.now() - timestamp < this.CACHE_TTL;
+  }
+
+  /**
+   * Clean expired cache entries
+   */
+  private cleanExpiredCache(): void {
+    try {
+      const cachedContent = localStorage.getItem(this.STORAGE_KEY_FAQ_CONTENT);
+      if (cachedContent) {
+        const cache = JSON.parse(cachedContent);
+        const cleanedCache: any = {};
+        
+        Object.entries(cache).forEach(([key, value]: [string, any]) => {
+          if (this.isCacheValid(value.timestamp)) {
+            cleanedCache[key] = value;
+          }
+        });
+        
+        localStorage.setItem(this.STORAGE_KEY_FAQ_CONTENT, JSON.stringify(cleanedCache));
+      }
+    } catch (error) {
+      console.warn('Failed to clean expired cache:', error);
+    }
+  }
+
+  /**
+   * Warm cache for popular FAQs
+   */
+  warmCacheForPopularFAQs(popularFaqIds: string[]): void {
+    this.getFAQs().pipe(
+      map(faqs => faqs.filter(faq => popularFaqIds.includes(faq.id))),
+      tap(popularFaqs => {
+        popularFaqs.forEach(faq => {
+          if (faq.answerPath && !this.contentCache.has(faq.answerPath)) {
+            this.preloadContent(faq.answerPath);
+          }
+        });
+      })
+    ).subscribe();
+  }
+
+  /**
+   * Initialize intersection observer for content preloading
+   */
+  private initializeIntersectionObserver(): void {
+    if (typeof window !== 'undefined' && 'IntersectionObserver' in window) {
+      this.intersectionObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              const faqId = entry.target.getAttribute('data-faq-id');
+              const answerPath = entry.target.getAttribute('data-answer-path');
+              
+              if (faqId && answerPath && !this.contentCache.has(answerPath)) {
+                this.preloadContent(answerPath);
+              }
+            }
+          });
+        },
+        {
+          threshold: this.PRELOAD_THRESHOLD,
+          rootMargin: '100px 0px' // Start preloading 100px before element enters viewport
+        }
+      );
+    }
+  }
+
+  /**
+   * Observe FAQ element for preloading
+   */
+  observeForPreloading(element: Element, faqId: string, answerPath: string): void {
+    if (this.intersectionObserver && answerPath && !this.contentCache.has(answerPath)) {
+      element.setAttribute('data-faq-id', faqId);
+      element.setAttribute('data-answer-path', answerPath);
+      this.intersectionObserver.observe(element);
+    }
+  }
+
+  /**
+   * Stop observing element
+   */
+  unobserveElement(element: Element): void {
+    if (this.intersectionObserver) {
+      this.intersectionObserver.unobserve(element);
+    }
+  }
+
+  /**
+   * Preload FAQ content in background
+   */
+  private preloadContent(answerPath: string): void {
+    if (this.preloadingQueue.has(answerPath) || this.contentCache.has(answerPath)) {
+      return;
+    }
+
+    this.preloadingQueue.add(answerPath);
+    
+    const fullPath = `${this.FAQ_CONTENT_BASE}${answerPath}`;
+    this.http.get(fullPath, { responseType: 'text' }).pipe(
+      map(content => {
+        const processedContent = this.processContent(content);
+        const safeContent = this.sanitizer.bypassSecurityTrustHtml(processedContent);
+        
+        // Save to local storage for future use
+        this.saveToLocalStorage(answerPath, processedContent);
+        
+        return safeContent;
+      }),
+      catchError(error => {
+        console.warn(`Failed to preload FAQ content: ${fullPath}`, error);
+        return of(null);
+      })
+    ).subscribe(safeContent => {
+      this.preloadingQueue.delete(answerPath);
+      if (safeContent) {
+        this.contentCache.set(answerPath, safeContent);
+      }
+    });
   }
 
   /**
@@ -86,53 +264,18 @@ export class FAQService {
     );
   }
 
-  /**
-   * 搜索FAQ
-   */
   searchFAQs(query: string, options: SearchOptions = {}): Observable<FAQItem[]> {
     if (!query.trim()) {
       return this.getFAQs();
     }
 
-    return this.getFAQs().pipe(
-      map(faqs => {
-        const lowerQuery = query.toLowerCase();
-        let filtered = faqs.filter(faq => {
-          const questionMatch = faq.question.toLowerCase().includes(lowerQuery);
-          const categoryMatch = faq.category.toLowerCase().includes(lowerQuery);
-          const subCategoryMatch = faq.subCategory?.toLowerCase().includes(lowerQuery);
-          const tagsMatch = faq.tags?.some(tag => tag.toLowerCase().includes(lowerQuery));
-          
-          let answerMatch = false;
-          if (options.includeAnswers && faq.answer) {
-            answerMatch = faq.answer.toLowerCase().includes(lowerQuery);
-          }
-
-          return questionMatch || categoryMatch || subCategoryMatch || tagsMatch || answerMatch;
-        });
-
-        // 应用分类过滤
-        if (options.category) {
-          filtered = filtered.filter(faq => faq.category === options.category);
-        }
-
-        if (options.subCategory) {
-          filtered = filtered.filter(faq => faq.subCategory === options.subCategory);
-        }
-
-        // 限制结果数量
-        if (options.maxResults) {
-          filtered = filtered.slice(0, options.maxResults);
-        }
-
-        return filtered;
-      })
-    );
+    return this.performanceService.measure('faq-search', () => {
+      return this.getFAQs().pipe(
+        map(faqs => this.filterFAQs(faqs, query, options))
+      );
+    }) as Observable<FAQItem[]>;
   }
 
-  /**
-   * 获取搜索建议
-   */
   getSearchSuggestions(query: string, maxSuggestions = 8): Observable<string[]> {
     if (!query.trim() || query.length < 2) {
       return of([]);
@@ -144,17 +287,12 @@ export class FAQService {
         const suggestions = new Set<string>();
 
         faqs.forEach(faq => {
-          // 问题匹配
           if (faq.question.toLowerCase().includes(lowerQuery)) {
             suggestions.add(faq.question);
           }
-          
-          // 分类匹配
           if (faq.category.toLowerCase().includes(lowerQuery)) {
             suggestions.add(faq.category);
           }
-          
-          // 子分类匹配
           if (faq.subCategory?.toLowerCase().includes(lowerQuery)) {
             suggestions.add(faq.subCategory);
           }
@@ -165,33 +303,83 @@ export class FAQService {
     );
   }
 
+  private filterFAQs(faqs: FAQItem[], query: string, options: SearchOptions): FAQItem[] {
+    const lowerQuery = query.toLowerCase();
+    let filtered = faqs.filter(faq => this.matchesFAQ(faq, lowerQuery, options));
+
+    if (options.category) {
+      filtered = filtered.filter(faq => faq.category === options.category);
+    }
+
+    if (options.subCategory) {
+      filtered = filtered.filter(faq => faq.subCategory === options.subCategory);
+    }
+
+    if (options.maxResults) {
+      filtered = filtered.slice(0, options.maxResults);
+    }
+
+    return filtered;
+  }
+
+  private matchesFAQ(faq: FAQItem, lowerQuery: string, options: SearchOptions): boolean {
+    const questionMatch = faq.question.toLowerCase().includes(lowerQuery);
+    const categoryMatch = faq.category.toLowerCase().includes(lowerQuery);
+    const subCategoryMatch = faq.subCategory?.toLowerCase().includes(lowerQuery);
+    const tagsMatch = faq.tags?.some(tag => tag.toLowerCase().includes(lowerQuery));
+    
+    let answerMatch = false;
+    if (options.includeAnswers && faq.answer) {
+      answerMatch = faq.answer.toLowerCase().includes(lowerQuery);
+    }
+
+    return questionMatch || categoryMatch || subCategoryMatch || tagsMatch || answerMatch;
+  }
+
   /**
    * 获取FAQ内容
    */
   getFAQContent(answerPath: string): Observable<SafeHtml> {
     if (!answerPath) {
-      return of(this.sanitizer.bypassSecurityTrustHtml('<p>Content not available</p>'));
+      console.warn('FAQ content requested with empty answerPath');
+      return of(this.sanitizer.bypassSecurityTrustHtml('<p class="error-message">Content path not specified</p>'));
     }
 
-    // Check cache
+    // Check memory cache first
     if (this.contentCache.has(answerPath)) {
+      console.log('FAQ content loaded from cache:', answerPath);
       return of(this.contentCache.get(answerPath)!);
     }
 
+    const startTime = performance.now();
     const fullPath = `${this.FAQ_CONTENT_BASE}${answerPath}`;
+    console.log('Loading FAQ content from:', fullPath);
+    
     return this.http.get(fullPath, { responseType: 'text' }).pipe(
       map(content => {
+        console.log('FAQ content loaded successfully:', answerPath, 'Length:', content.length);
         const processedContent = this.processContent(content);
         const safeContent = this.sanitizer.bypassSecurityTrustHtml(processedContent);
 
-        // Cache content
+        // Cache content in memory and local storage
         this.contentCache.set(answerPath, safeContent);
+        this.saveToLocalStorage(answerPath, processedContent);
+        
+        // Track performance
+        const loadTime = performance.now() - startTime;
+        this.performanceService.trackCustomMetric('faqContentLoadTime', loadTime);
+        
         return safeContent;
       }),
       catchError(error => {
         console.error(`Failed to load FAQ content: ${fullPath}`, error);
         const errorContent = this.sanitizer.bypassSecurityTrustHtml(
-          '<p class="error-message">Failed to load content, please try again later</p>'
+          `<div class="error-message">
+            <p><strong>Failed to load content</strong></p>
+            <p>Path: ${fullPath}</p>
+            <p>Error: ${error.message || 'Unknown error'}</p>
+            <button onclick="window.location.reload()" style="margin-top: 10px; padding: 8px 16px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">Reload Page</button>
+          </div>`
         );
         return of(errorContent);
       })
@@ -355,42 +543,125 @@ export class FAQService {
   }
 
   /**
+   * Check if browser supports WebP format
+   */
+  private supportsWebP(): boolean {
+    const canvas = document.createElement('canvas');
+    canvas.width = 1;
+    canvas.height = 1;
+    return canvas.toDataURL('image/webp').indexOf('data:image/webp') === 0;
+  }
+
+  /**
+   * Convert image source to WebP if supported and available
+   */
+  private getOptimizedImageSrc(originalSrc: string): string {
+    if (!this.supportsWebP()) {
+      return originalSrc;
+    }
+
+    // Convert common image extensions to WebP variants
+    const webpSrc = originalSrc
+      .replace(/\.(jpg|jpeg|png)$/i, '.webp')
+      .replace(/\.(jpg|jpeg|png)\?/i, '.webp?');
+
+    return webpSrc;
+  }
+
+  /**
+   * Create responsive image with proper error handling
+   */
+  private createResponsiveImage(src: string, attrs: string): string {
+    // Extract alt text
+    const altMatch = attrs.match(/alt="([^"]*)"/);
+    const alt = altMatch ? altMatch[1] : 'FAQ Image';
+    
+    // Normalize the image source URL
+    let normalizedSrc = src;
+    
+    // Handle different URL patterns
+    if (src.startsWith('http') || src.startsWith('//')) {
+      // External URL - use as is
+      normalizedSrc = src;
+    } else if (src.startsWith('/')) {
+      // Absolute path - use as is
+      normalizedSrc = src;
+    } else if (src.startsWith('assets/')) {
+      // Already correctly formatted - ensure proper path
+      normalizedSrc = src;
+    } else {
+      // Relative path - ensure it starts with assets/
+      normalizedSrc = `assets/${src}`;
+    }
+    
+    console.log(`Processing image: ${src} -> ${normalizedSrc}`);
+    
+    // Enhanced error handling with better visual feedback
+    const onErrorHandler = `
+      console.error('Failed to load image:', this.src);
+      console.error('Current page URL:', window.location.href);
+      console.error('Image absolute URL:', new URL(this.src, window.location.href).href);
+      this.parentElement.style.display = 'block';
+      this.parentElement.style.padding = '20px';
+      this.parentElement.style.backgroundColor = '#fff3cd';
+      this.parentElement.style.border = '2px dashed #ffeaa7';
+      this.parentElement.style.borderRadius = '8px';
+      this.parentElement.style.textAlign = 'center';
+      this.parentElement.style.color = '#856404';
+      this.parentElement.style.fontStyle = 'italic';
+      this.parentElement.innerHTML = '🖼️ Image could not be loaded<br><small>Path: ' + this.src + '</small><br><small>Full URL: ' + new URL(this.src, window.location.href).href + '</small>';
+    `;
+
+    // Create container with better structure
+    return `<div class="faq-picture">
+      <img 
+        src="${normalizedSrc}" 
+        alt="${alt}"
+        class="faq-image"
+        style="display: block; margin: 20px auto; max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); transition: transform 0.3s ease;"
+        loading="lazy"
+        onerror="${onErrorHandler}"
+        onload="console.log('Image loaded successfully:', this.src); console.log('Full image URL:', new URL(this.src, window.location.href).href); this.parentElement.classList.add('image-loaded');"
+      >
+    </div>`;
+  }
+
+  /**
    * Private method: Process FAQ content
    */
   private processContent(content: string): string {
     return content
       // Remove empty p tags but preserve content structure
       .replace(/<p[^>]*>\s*<\/p>/g, '')
-      // Fix image paths - ensure relative paths are correctly resolved
-      .replace(/src="assets\//g, 'src="assets/')
-      .replace(/src="(?!http|\/|assets)/g, 'src="assets/')
       // Improve content formatting
       .replace(/<section[^>]*>/g, '<div class="faq-section">')
       .replace(/<\/section>/g, '</div>')
-      // Ensure images have correct style classes and attributes for zooming
+      // Enhanced image processing with better URL handling
       .replace(/<img([^>]*?)>/g, (match, attrs) => {
-        // 确保图片有正确的类和属性
-        let newAttrs = attrs;
-        if (!newAttrs.includes('class=')) {
-          newAttrs += ' class="faq-image"';
-        } else if (!newAttrs.includes('faq-image')) {
-          newAttrs = newAttrs.replace(/class="([^"]*)"/, 'class="$1 faq-image"');
+        const srcMatch = attrs.match(/src="([^"]*)"/);
+        if (!srcMatch) {
+          console.warn('Image tag without src attribute:', match);
+          return match;
         }
 
-        // 添加加载错误处理
-        if (!newAttrs.includes('onerror=')) {
-          newAttrs += ' onerror="this.style.display=\'none\'"';
+        const originalSrc = srcMatch[1];
+        console.log('Processing image with src:', originalSrc);
+        
+        // Handle specific problematic URLs
+        if (originalSrc.includes('undefined') || originalSrc.trim() === '') {
+          console.warn('Invalid image src detected:', originalSrc);
+          return `<div class="faq-picture image-error">
+            <div style="padding: 20px; background: #f8f9fa; border: 2px dashed #dee2e6; border-radius: 8px; text-align: center; color: #6c757d; font-style: italic;">
+              🖼️ Invalid image URL detected
+            </div>
+          </div>`;
         }
-
-        // 添加加载完成处理
-        if (!newAttrs.includes('onload=')) {
-          newAttrs += ' onload="this.style.cursor=\'zoom-in\'"';
-        }
-
-        return `<img${newAttrs}>`;
+        
+        return this.createResponsiveImage(originalSrc, attrs);
       })
-      // Clean up extra whitespace
-      .replace(/\s+/g, ' ')
+      // Clean up extra whitespace but preserve line breaks in content
+      .replace(/[ \t]+/g, ' ')
+      .replace(/\n\s*\n/g, '\n')
       .trim();
   }
 }

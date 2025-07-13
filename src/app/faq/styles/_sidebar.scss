@@ -1,30 +1,53 @@
 // ==================== FAQ Sidebar Styles ====================
 
+// 共用变量
+$sidebar-width: 280px;
+$sidebar-collapsed: 56px;
+$transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
 .faq-sidebar {
   position: fixed;
   left: 0;
   top: 60px;
-  width: 280px;
-  min-width: 280px;
+  width: $sidebar-width;
   height: calc(100vh - 60px);
   background: #ffffff;
   border-right: 1px solid #e1e5e9;
   overflow: hidden;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: $transition;
   z-index: 100;
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05);
 
   &.collapsed {
-    width: 56px;
-    min-width: 56px;
+    width: $sidebar-collapsed;
 
     ~ .faq-container {
-      margin-left: 56px;
-      margin-right: 320px;
+      margin-left: $sidebar-collapsed;
     }
 
-    ~ .faq-toc {
-      right: 40px;
+    .sidebar-title-section {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .sidebar-search {
+      display: none;
+    }
+
+    .nav-item {
+      justify-content: center;
+      padding: 12px 8px;
+      margin-right: 0;
+      border-radius: 4px;
+
+      .nav-text,
+      .nav-count {
+        display: none;
+      }
+
+      .nav-icon {
+        margin: 0;
+      }
     }
   }
 
@@ -40,26 +63,18 @@
     justify-content: space-between;
     padding: 16px 20px;
     border-bottom: 1px solid #f1f3f4;
-    background: #ffffff;
     min-height: 64px;
 
-    .sidebar-title-section {
-      flex: 1;
-      transition: opacity 0.3s ease;
+    .sidebar-main-title {
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: #202124;
+      margin: 0;
+    }
 
-      .sidebar-main-title {
-        font-size: 1.125rem;
-        font-weight: 600;
-        color: #202124;
-        margin: 0;
-        line-height: 1.2;
-      }
-
-      .sidebar-subtitle {
-        font-size: 0.75rem;
-        color: #5f6368;
-        font-weight: 400;
-      }
+    .sidebar-subtitle {
+      font-size: 0.75rem;
+      color: #5f6368;
     }
 
     .sidebar-toggle-btn {
@@ -72,16 +87,12 @@
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: $transition;
       color: #5f6368;
 
       &:hover {
         background-color: #f1f3f4;
         color: #202124;
-      }
-
-      &:active {
-        background-color: #e8eaed;
       }
     }
   }
@@ -89,15 +100,10 @@
   .sidebar-body {
     flex: 1;
     overflow-y: auto;
-    overflow-x: hidden;
     padding: 8px 0;
 
     &::-webkit-scrollbar {
       width: 6px;
-    }
-
-    &::-webkit-scrollbar-track {
-      background: transparent;
     }
 
     &::-webkit-scrollbar-thumb {
@@ -123,11 +129,10 @@
       color: #5f6368;
       font-size: 0.875rem;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: $transition;
       display: flex;
       align-items: center;
       gap: 8px;
-      text-align: left;
 
       &:hover {
         background: #f1f3f4;
@@ -138,19 +143,14 @@
         outline: 2px solid #1a73e8;
         outline-offset: 2px;
       }
-
-      .search-icon {
-        opacity: 0.6;
-      }
     }
   }
 
   .sidebar-nav {
-    // Section dividers and labels
     .section-divider {
       height: 1px;
       background: #f1f3f4;
-      margin: 16px 20px 8px 20px;
+      margin: 16px 20px 8px;
     }
 
     .section-label {
@@ -159,19 +159,16 @@
       color: #5f6368;
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      padding: 0 20px 8px 20px;
+      padding: 0 20px 8px;
     }
 
-    // Navigation items
     .nav-item {
       display: flex;
       align-items: center;
       padding: 8px 20px;
       color: #5f6368;
-      text-decoration: none;
       font-size: 0.875rem;
-      font-weight: 400;
-      transition: all 0.2s ease;
+      transition: $transition;
       cursor: pointer;
       border-radius: 0 20px 20px 0;
       margin-right: 8px;
@@ -228,7 +225,6 @@
       }
     }
 
-    // Subcategory styles
     .subcategory-container {
       margin-left: 20px;
       border-left: 1px solid #f1f3f4;
@@ -242,7 +238,6 @@
 
         .nav-indent {
           width: 8px;
-          height: 1px;
           margin-right: 4px;
         }
 
@@ -252,41 +247,9 @@
       }
     }
   }
-
-  // Collapsed state styles
-  &.collapsed {
-    .sidebar-title-section {
-      opacity: 0;
-      pointer-events: none;
-    }
-
-    .sidebar-search {
-      display: none;
-    }
-
-    .nav-item {
-      justify-content: center;
-      padding: 12px 8px;
-      margin-right: 0;
-      border-radius: 4px;
-
-      .nav-text,
-      .nav-count {
-        display: none;
-      }
-
-      .nav-icon {
-        margin: 0;
-      }
-    }
-
-    .nav-subcategories {
-      display: none;
-    }
-  }
 }
 
-// Mobile sidebar styles
+// 移动端侧边栏
 .mobile-sidebar-toggle {
   display: none;
   position: fixed;
@@ -304,7 +267,7 @@
   color: #5f6368;
   cursor: pointer;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  transition: all 0.2s ease;
+  transition: $transition;
 
   &:hover {
     background: #f8f9fa;
@@ -323,40 +286,5 @@
 
   &.active {
     opacity: 1;
-  }
-}
-
-// Mobile responsive styles
-@media (max-width: 1024px) {
-  .faq-container {
-    margin-left: 0;
-    margin-right: 0;
-    padding: 16px 20px;
-  }
-
-  .faq-sidebar {
-    transform: translateX(-100%);
-    z-index: 100;
-
-    &.mobile-open {
-      transform: translateX(0);
-    }
-
-    ~ .faq-container {
-      margin-left: 0;
-      margin-right: 0;
-    }
-
-    ~ .faq-toc {
-      display: none;
-    }
-  }
-
-  .mobile-sidebar-toggle {
-    display: flex;
-  }
-
-  .sidebar-overlay {
-    display: block;
   }
 }

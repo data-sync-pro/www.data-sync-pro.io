@@ -7,6 +7,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 
+import { FaqRoutingModule } from './faq-routing.module';
 import { FaqComponent } from './faq.component';
 import { SearchOverlayComponent } from '../search-overlay/search-overlay.component';
 import { ZoomableDirective } from 'src/app/zoomable.directive';
@@ -21,6 +22,7 @@ import { SharedModule } from '../shared/shared.module';
   ],
   imports: [
     CommonModule,
+    FaqRoutingModule,
     HttpClientModule,
     FormsModule,
     MatExpansionModule,
