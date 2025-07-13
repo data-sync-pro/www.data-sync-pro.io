@@ -144,7 +144,42 @@
     </aside>
 
 <!-- Main content area with proper container -->
-<div class="faq-container">
+<div class="faq-container" [class.toc-hidden]="ui.tocHidden">
+  <!-- Breadcrumb Navigation -->
+  <nav class="breadcrumb-nav" *ngIf="current.category || current.subCategory">
+    <div class="breadcrumb">
+      <button class="breadcrumb-item" (click)="goHome()" title="Go to Home">
+        <lightning-icon iconName="utility:home" size="xx-small" alternativeText="Home"></lightning-icon>
+        <span>All FAQs</span>
+      </button>
+      
+      <span class="breadcrumb-separator" *ngIf="current.category">
+        <lightning-icon iconName="utility:chevronright" size="xx-small" alternativeText="Next"></lightning-icon>
+      </span>
+      
+      <button 
+        *ngIf="current.category"
+        class="breadcrumb-item"
+        [class.active]="!current.subCategory"
+        (click)="goCategory(current.category)"
+        [title]="'Go to ' + current.category"
+      >
+        <span>{{ current.category }}</span>
+      </button>
+      
+      <span class="breadcrumb-separator" *ngIf="current.subCategory">
+        <lightning-icon iconName="utility:chevronright" size="xx-small" alternativeText="Next"></lightning-icon>
+      </span>
+      
+      <span 
+        *ngIf="current.subCategory"
+        class="breadcrumb-item active"
+      >
+        <span>{{ current.subCategory }}</span>
+      </span>
+    </div>
+  </nav>
+
   <main class="faq-main">
       <!-- 首页：显示所有FAQ -->
       <div *ngIf="showHome" class="all-faqs">
@@ -374,11 +409,26 @@
   </main>
 </div>
 
+<!-- TOC Toggle Button -->
+<button
+  class="toc-toggle-btn"
+  *ngIf="!ui.isMobile"
+  (click)="toggleTOC()"
+  [title]="ui.tocHidden ? 'Show Table of Contents' : 'Hide Table of Contents'"
+>
+  <lightning-icon
+    [iconName]="ui.tocHidden ? 'utility:chevronleft' : 'utility:chevronright'"
+    size="xx-small"
+    [alternativeText]="ui.tocHidden ? 'Show TOC' : 'Hide TOC'"
+  ></lightning-icon>
+</button>
+
 <!-- Desktop TOC - Only show on desktop -->
 <aside
   class="faq-toc desktop-toc"
   *ngIf="shouldShowTOC && !ui.isMobile"
   [class.collapsed]="isSidebarCollapsed"
+  [class.hidden]="ui.tocHidden"
 >
   <div class="toc-content">
     <!-- Trending Questions for Home Page -->
@@ -404,7 +454,10 @@
     <!-- Category TOC for Category Pages -->
     <div *ngIf="!showHome" class="category-toc">
       <div class="toc-header">
-        <h3 class="toc-title">{{ currentTOCTitle }}</h3>
+        <h3 class="toc-title">
+          <span class="toc-category-name">{{ current.subCategory || current.category }}</span>
+          <span class="toc-subtitle">FAQs</span>
+        </h3>
         <span class="toc-count">{{ tocItemCount }} items</span>
       </div>
 

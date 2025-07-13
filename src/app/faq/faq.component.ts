@@ -59,6 +59,7 @@ interface UIState {
   mobileSidebarOpen: boolean;
   mobileTOCOpen: boolean;
   isMobile: boolean;
+  tocHidden: boolean;
 }
 
 @Component({
@@ -104,7 +105,8 @@ export class FaqComponent implements OnInit, OnDestroy {
     sidebarCollapsed: false,
     mobileSidebarOpen: false,
     mobileTOCOpen: false,
-    isMobile: false
+    isMobile: false,
+    tocHidden: false
   };
 
   faqList: FAQItem[] = [];
@@ -135,6 +137,7 @@ export class FaqComponent implements OnInit, OnDestroy {
     this.loadSidebarState();
     this.checkMobileView();
     this.setupScrollListener();
+    this.setupFooterObserver();
 
     this.route.paramMap.pipe(
       takeUntil(this.destroy$)
@@ -180,6 +183,9 @@ export class FaqComponent implements OnInit, OnDestroy {
         }
       });
     }
+    
+    // Clean up footer observer
+    this.cleanupFooterObserver();
   }
 
   private initFaqData(): void {
@@ -227,6 +233,16 @@ export class FaqComponent implements OnInit, OnDestroy {
   goCategory(cat: string): void {
     this.resetState();
     this.router.navigate(['/faq', this.encode(cat)]);
+  }
+
+  goBack(): void {
+    if (this.current.subCategory) {
+      // If in subcategory, go back to category
+      this.goCategory(this.current.category);
+    } else if (this.current.category) {
+      // If in category, go back to home
+      this.goHome();
+    }
   }
 
   goSub(cat: string, sub: string): void {
@@ -1378,11 +1394,23 @@ export class FaqComponent implements OnInit, OnDestroy {
     localStorage.setItem('faq-sidebar-collapsed', collapsed.toString());
   }
 
-  // Load sidebar state from localStorage
+  toggleTOC(): void {
+    const hidden = !this.ui.tocHidden;
+    this.updateUIState({ tocHidden: hidden });
+    // Save state to localStorage for persistence
+    localStorage.setItem('faq-toc-hidden', hidden.toString());
+  }
+
+  // Load sidebar and TOC state from localStorage
   private loadSidebarState(): void {
     const savedState = localStorage.getItem('faq-sidebar-collapsed');
     if (savedState !== null) {
       this.updateUIState({ sidebarCollapsed: savedState === 'true' });
+    }
+    
+    const tocState = localStorage.getItem('faq-toc-hidden');
+    if (tocState !== null) {
+      this.updateUIState({ tocHidden: tocState === 'true' });
     }
   }
 
@@ -1644,6 +1672,215 @@ export class FaqComponent implements OnInit, OnDestroy {
    */
   trackByFAQ(_index: number, item: FAQItem): string {
     return item.question;
+  }
+
+  // ==================== Footer Interaction Methods ====================
+
+  private footerObserver?: IntersectionObserver;
+  private footerAnimationFrame?: number;
+  private scrollListener?: () => void;
+
+  /**
+   * Setup footer intersection observer for dynamic sidebar/TOC height adjustment
+   */
+  private setupFooterObserver(): void {
+    if (typeof window === 'undefined' || typeof IntersectionObserver === 'undefined') {
+      return;
+    }
+
+    // Clean up existing observer
+    if (this.footerObserver) {
+      this.footerObserver.disconnect();
+    }
+
+    this.footerObserver = new IntersectionObserver(
+      (entries) => {
+        // Use requestAnimationFrame to optimize performance
+        if (this.footerAnimationFrame) {
+          cancelAnimationFrame(this.footerAnimationFrame);
+        }
+        
+        this.footerAnimationFrame = requestAnimationFrame(() => {
+          entries.forEach(entry => {
+            this.handleFooterVisibility(entry);
+          });
+        });
+      },
+      {
+        root: null,
+        rootMargin: '100px 0px 0px 0px', // Start detecting 100px before footer enters viewport
+        threshold: Array.from({ length: 101 }, (_, i) => i * 0.01) // 0, 0.01, 0.02, ..., 1.0 for ultra-smooth animation
+      }
+    );
+
+    // Observe footer element with retry logic
+    this.observeFooterWithRetry();
+    
+    // Add scroll listener for immediate response
+    this.setupFooterScrollListener();
+    
+    // Initial check for footer position
+    setTimeout(() => {
+      this.checkFooterPositionDirectly();
+    }, 50);
+  }
+
+  /**
+   * Handle footer visibility changes with smooth upward movement
+   */
+  private handleFooterVisibility(entry: IntersectionObserverEntry): void {
+    const footerRect = entry.boundingClientRect;
+    const viewportHeight = window.innerHeight;
+    
+    // Calculate how much footer is visible from the bottom of viewport
+    let footerOffset = 0;
+    
+    if (entry.isIntersecting) {
+      // Footer is intersecting with viewport
+      const footerTopInViewport = footerRect.top;
+      
+      if (footerTopInViewport < viewportHeight) {
+        // Footer is visible, calculate how much space it needs
+        footerOffset = Math.max(0, viewportHeight - footerTopInViewport);
+        // Cap the offset to prevent excessive movement
+        footerOffset = Math.min(footerOffset, footerRect.height);
+      }
+    }
+    
+    // Use the unified update method for consistency
+    this.updateFooterOffset(footerOffset, footerRect.height);
+  }
+
+  /**
+   * Easing function for smooth animation
+   */
+  private easeInOutCubic(t: number): number {
+    return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  }
+
+  /**
+   * Setup scroll listener for immediate footer detection
+   */
+  private setupFooterScrollListener(): void {
+    if (typeof window === 'undefined') return;
+    
+    let ticking = false;
+    
+    this.scrollListener = () => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          this.checkFooterPositionDirectly();
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+    
+    window.addEventListener('scroll', this.scrollListener, { passive: true });
+  }
+
+  /**
+   * Direct footer position check for immediate response
+   */
+  private checkFooterPositionDirectly(): void {
+    const footerElement = document.querySelector('app-footer');
+    if (!footerElement) return;
+    
+    const footerRect = footerElement.getBoundingClientRect();
+    const viewportHeight = window.innerHeight;
+    
+    let footerOffset = 0;
+    
+    if (footerRect.top < viewportHeight) {
+      // Footer is visible, calculate offset
+      footerOffset = Math.max(0, viewportHeight - footerRect.top);
+      footerOffset = Math.min(footerOffset, footerRect.height);
+    }
+    
+    // Apply immediate offset update
+    this.updateFooterOffset(footerOffset, footerRect.height);
+  }
+
+  /**
+   * Update footer offset with optimized performance
+   */
+  private updateFooterOffset(footerOffset: number, footerHeight: number): void {
+    // Apply smooth easing but with faster response
+    const normalizedOffset = footerOffset / footerHeight;
+    const easedOffset = normalizedOffset; // Remove easing for immediate response
+    const finalOffset = easedOffset * footerOffset;
+    
+    // Set CSS custom property
+    document.documentElement.style.setProperty('--footer-offset', `${Math.round(finalOffset)}px`);
+    
+    // Toggle classes
+    const hasOffset = finalOffset > 0.5;
+    const sidebar = document.querySelector('.faq-sidebar');
+    const toc = document.querySelector('.faq-toc.desktop-toc');
+    
+    if (sidebar) {
+      sidebar.classList.toggle('footer-visible', hasOffset);
+    }
+    if (toc) {
+      toc.classList.toggle('footer-visible', hasOffset);
+    }
+  }
+
+  /**
+   * Observe footer with retry logic to ensure it's found
+   */
+  private observeFooterWithRetry(retries: number = 0): void {
+    const maxRetries = 10;
+    const delay = 200;
+    
+    const tryObserve = () => {
+      const footerElement = document.querySelector('app-footer');
+      if (footerElement && this.footerObserver) {
+        this.footerObserver.observe(footerElement);
+        return;
+      }
+      
+      if (retries < maxRetries) {
+        setTimeout(() => {
+          this.observeFooterWithRetry(retries + 1);
+        }, delay);
+      }
+    };
+    
+    tryObserve();
+  }
+
+  /**
+   * Clean up footer observer
+   */
+  private cleanupFooterObserver(): void {
+    if (this.footerObserver) {
+      this.footerObserver.disconnect();
+      this.footerObserver = undefined;
+    }
+    
+    if (this.footerAnimationFrame) {
+      cancelAnimationFrame(this.footerAnimationFrame);
+      this.footerAnimationFrame = undefined;
+    }
+    
+    if (this.scrollListener) {
+      window.removeEventListener('scroll', this.scrollListener);
+      this.scrollListener = undefined;
+    }
+    
+    // Reset CSS variables and classes
+    document.documentElement.style.removeProperty('--footer-offset');
+    
+    // Remove footer-visible classes
+    const sidebar = document.querySelector('.faq-sidebar');
+    const toc = document.querySelector('.faq-toc.desktop-toc');
+    if (sidebar) {
+      sidebar.classList.remove('footer-visible');
+    }
+    if (toc) {
+      toc.classList.remove('footer-visible');
+    }
   }
 
 }

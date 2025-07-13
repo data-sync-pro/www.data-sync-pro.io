@@ -14,9 +14,14 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   background: #ffffff;
   border-right: 1px solid #e1e5e9;
   overflow: hidden;
-  transition: $transition;
+  transition: $transition, transform 0.15s cubic-bezier(0.25, 0.8, 0.25, 1);
   z-index: 100;
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05);
+  
+  // Move up when footer is visible instead of changing height
+  &.footer-visible {
+    transform: translateY(calc(-1 * var(--footer-offset, 0px)));
+  }
 
   &.collapsed {
     width: $sidebar-collapsed;
@@ -100,10 +105,16 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   .sidebar-body {
     flex: 1;
     overflow-y: auto;
+    overflow-x: hidden;
     padding: 8px 0;
 
     &::-webkit-scrollbar {
       width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 3px;
     }
 
     &::-webkit-scrollbar-thumb {
@@ -226,22 +237,40 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .subcategory-container {
-      margin-left: 20px;
+      margin-left: 12px;
       border-left: 1px solid #f1f3f4;
-      padding-left: 16px;
+      padding-left: 8px;
 
       .nav-item {
-        padding: 6px 16px;
+        padding: 6px 12px 6px 0;
         font-size: 0.8125rem;
         margin-right: 0;
         border-radius: 4px;
 
+        .nav-content {
+          display: flex;
+          align-items: center;
+          width: 100%;
+          padding-left: 12px;
+        }
+
         .nav-indent {
-          width: 8px;
-          margin-right: 4px;
+          width: 6px;
+          margin-right: 3px;
         }
 
         .nav-icon {
+          margin-right: 6px;
+        }
+
+        .nav-text {
+          flex: 1;
+          min-width: 0;
+        }
+
+        .nav-count {
+          margin-left: auto;
+          flex-shrink: 0;
           margin-right: 8px;
         }
       }

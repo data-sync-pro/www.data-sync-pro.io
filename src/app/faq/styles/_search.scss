@@ -63,11 +63,34 @@
 
   &.desktop-toc {
     position: fixed;
-    top: 80px;
-    right: 40px;
-    width: 280px;
-    height: calc(100vh - 100px);
+    top: 60px;
+    right: 0;
+    width: 320px;
+    height: calc(100vh - 60px);
     z-index: 50;
+    border-radius: 0;
+    border-right: none;
+    border-top: none;
+    border-bottom: none;
+    box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.15s cubic-bezier(0.25, 0.8, 0.25, 1);
+    
+    &.hidden {
+      transform: translateX(100%);
+      
+      &.footer-visible {
+        transform: translateX(100%) translateY(calc(-1 * var(--footer-offset, 0px)));
+      }
+    }
+    
+    // Move up when footer is visible instead of changing height
+    &.footer-visible:not(.hidden) {
+      transform: translateY(calc(-1 * var(--footer-offset, 0px)));
+    }
+    
+    .toc-content {
+      padding-left: 20px;
+    }
   }
 
   &.mobile-toc {
@@ -103,6 +126,10 @@
   background: linear-gradient(135deg, #f8f9fa, #ffffff);
 }
 
+.desktop-toc .toc-header {
+  padding-top: 24px;
+}
+
 .mobile-toc-header {
   display: flex;
   justify-content: space-between;
@@ -115,6 +142,24 @@
   font-weight: 600;
   color: #202124;
   margin: 0;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.toc-category-name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1a73e8;
+  margin-bottom: 2px;
+}
+
+.toc-subtitle {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #5f6368;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .mobile-toc-close {
@@ -139,7 +184,6 @@
   overflow-y: auto;
   overflow-x: hidden;
   padding: 8px 0;
-  max-height: calc(100vh - 200px); // 确保有固定的最大高度
   
   // 自定义滚动条样式
   &::-webkit-scrollbar {
@@ -159,6 +203,10 @@
       background: #bdc1c6;
     }
   }
+}
+
+.desktop-toc .toc-list {
+  padding-bottom: 20px;
 }
 
 .toc-item,
