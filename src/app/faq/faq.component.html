@@ -58,8 +58,8 @@
           <div class="sidebar-search" *ngIf="!ui.sidebarCollapsed">
             <button
               class="sidebar-search-btn"
-              (click)="openSearchOverlay()"
-              title="Search FAQs"
+              (click)="openSearchOverlay(search.query)"
+              title="Search FAQs (Press / or Ctrl+K for quick access)"
             >
               <lightning-icon
                 iconName="utility:search"
@@ -67,6 +67,7 @@
                 alternativeText="Search"
               ></lightning-icon>
               <span class="search-text">Search...</span>
+              <span class="search-shortcut">/</span>
             </button>
           </div>
 
@@ -194,7 +195,7 @@
         <app-faq-skeleton 
           *ngIf="isLoadingState" 
           type="list" 
-          [count]="8">
+          [count]="10">
         </app-faq-skeleton>
         
         <!-- FAQ content -->
@@ -718,6 +719,7 @@
 <app-search-overlay
   *ngIf="search.isOpen"
   [isOpen]="search.isOpen"
-  (closed)="search.isOpen = false"
+  [initialQuery]="searchOverlayInitialQuery"
+  (closed)="closeSearchOverlay()"
   (selectedResult)="handleSearchSelect($event)"
 ></app-search-overlay>

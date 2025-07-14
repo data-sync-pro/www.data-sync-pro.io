@@ -102,6 +102,9 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     isOpen: false
   };
 
+  // 用于传递给search overlay的初始查询
+  searchOverlayInitialQuery = '';
+
   current: CurrentState = {
     category: '',
     subCategory: '',
@@ -164,6 +167,10 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     ).subscribe(params => {
       this.current.category = params.get('cat') ? this.safeDecodeURIComponent(params.get('cat')!) : '';
       this.current.subCategory = params.get('subCat') ? this.safeDecodeURIComponent(params.get('subCat')!) : '';
+      
+      // Update TOC pagination when navigation changes
+      this.updateTOCPaginationIndices();
+      this.cdr.detectChanges();
       
       this.updatePageMetadata();
     });
@@ -307,15 +314,15 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
       faqItem: null
     });
     
+    // Reset TOC pagination to first page
+    this.tocPagination.currentPage = 1;
+    
     // Clear active scroll element to prevent incorrect highlighting
     this.activeScrollElement = '';
     
     // Reset user interaction flag when navigating between categories
     // This ensures TOC doesn't auto-highlight when switching categories
     this.userHasScrolled = false;
-    
-    // Reset TOC pagination when navigating
-    this.tocPagination.currentPage = 1;
     this.updateTOCPaginationIndices();
     
     this.cdr.markForCheck();
@@ -1060,11 +1067,14 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
   toRegistryKey(answer: string): string {
     return answer.replace(/\.html$/, '').toLowerCase();
   }
-  openSearchOverlay(): void {
+  openSearchOverlay(initialQuery?: string): void {
+    // 设置初始查询
+    this.searchOverlayInitialQuery = initialQuery || '';
     this.updateSearchState({ isOpen: true });
   }
 
   closeSearchOverlay(): void {
+    this.searchOverlayInitialQuery = ''; // 清空初始查询
     this.updateSearchState({ isOpen: false });
   }
   @ViewChild('faqSearchBox') faqSearchBox!: ElementRef<HTMLInputElement>;
@@ -1511,8 +1521,22 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
   // Keyboard shortcut for search overlay
   @HostListener('document:keydown', ['$event'])
   onKeydown(event: KeyboardEvent): void {
+    // 检查是否在输入框中，如果是则跳过处理
+    const activeElement = document.activeElement;
+    const isInputActive = activeElement && (
+      activeElement.tagName === 'INPUT' || 
+      activeElement.tagName === 'TEXTAREA' || 
+      activeElement.getAttribute('contenteditable') === 'true'
+    );
+
     // Ctrl+K or Cmd+K to open search overlay
     if ((event.ctrlKey || event.metaKey) && event.key === 'k') {
+      event.preventDefault();
+      this.openSearchOverlay();
+    }
+
+    // / 键打开搜索（仅当不在输入框中时）
+    if (event.key === '/' && !isInputActive) {
       event.preventDefault();
       this.openSearchOverlay();
     }
