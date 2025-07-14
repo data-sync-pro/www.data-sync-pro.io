@@ -1,6 +1,6 @@
 {
   "configVersion": 1,
-  "timestamp": 1752372686088,
+  "timestamp": 1752462728593,
   "index": "/www.data-sync-pro.io/index.html",
   "assetGroups": [
     {
@@ -12,13 +12,13 @@
       },
       "urls": [
         "/www.data-sync-pro.io/529.9bdfae4c8b6fd813.js",
-        "/www.data-sync-pro.io/768.485a192c369828e9.js",
+        "/www.data-sync-pro.io/768.6d5da25a80a60ba8.js",
         "/www.data-sync-pro.io/favicon.ico",
         "/www.data-sync-pro.io/index.html",
-        "/www.data-sync-pro.io/main.1d315b4725fe95de.js",
+        "/www.data-sync-pro.io/main.5f8ef2681dd405f0.js",
         "/www.data-sync-pro.io/manifest.webmanifest",
         "/www.data-sync-pro.io/polyfills.9c47dc30ec57ae3f.js",
-        "/www.data-sync-pro.io/runtime.102dc2b447262ab6.js",
+        "/www.data-sync-pro.io/runtime.b1e699519cbb8ce8.js",
         "/www.data-sync-pro.io/styles.27800a5b827c25cc.css"
       ],
       "patterns": []
@@ -355,7 +355,7 @@
   ],
   "hashTable": {
     "/www.data-sync-pro.io/529.9bdfae4c8b6fd813.js": "18303d726190d900ff43132a06a2ab52bdcc4230",
-    "/www.data-sync-pro.io/768.485a192c369828e9.js": "22b3258c4704acabff51068108d54fca189c690f",
+    "/www.data-sync-pro.io/768.6d5da25a80a60ba8.js": "95d4d87fbcb519c800641bdf6dfe0bbc4f459a1f",
     "/www.data-sync-pro.io/assets/arrow-up.png": "8a9c20f0ddc54624f926552187b6686f61a09fdd",
     "/www.data-sync-pro.io/assets/data/designer-sidebar.json": "488457ae53a5b4fb92008e249309e5f186b5d8c8",
     "/www.data-sync-pro.io/assets/data/faqs.json": "dc045cd9f2fe0ff2074a5730124d7459ae568781",
@@ -636,11 +636,11 @@
     "/www.data-sync-pro.io/assets/logo.png": "e7e0c560dcf6c1c2806cea78c95ad27771848dcd",
     "/www.data-sync-pro.io/assets/youtube.png": "c059a7daf8e15567642f818063145f58fb2259b2",
     "/www.data-sync-pro.io/favicon.ico": "22f6a4a3bcaafafb0254e0f2fa4ceb89e505e8b2",
-    "/www.data-sync-pro.io/index.html": "efa679487fe92856b82f2ecf949c82275fe0357a",
-    "/www.data-sync-pro.io/main.1d315b4725fe95de.js": "e373edeedf4db24d1b1ed8af7ee4c60661a9f175",
+    "/www.data-sync-pro.io/index.html": "708b8a9225165b8a3b06a6cc80c058a5658649b2",
+    "/www.data-sync-pro.io/main.5f8ef2681dd405f0.js": "256270934f39b2d3aba0bac8c9087e133c96f6cb",
     "/www.data-sync-pro.io/manifest.webmanifest": "4b769da4fc371a4e0af981e723071e724c29c96a",
     "/www.data-sync-pro.io/polyfills.9c47dc30ec57ae3f.js": "ee216b56f250677bf65792fd9866f1616b65b584",
-    "/www.data-sync-pro.io/runtime.102dc2b447262ab6.js": "ae1012741d518aef3b2f20209ef369574272b1a5",
+    "/www.data-sync-pro.io/runtime.b1e699519cbb8ce8.js": "e0ceaa5a14cc3b5040dafb9b3a2a82fdcc80ebf0",
     "/www.data-sync-pro.io/styles.27800a5b827c25cc.css": "91aa64a8d5dfc6003339b9f5f47fdf70d6b65c6d"
   },
   "navigationUrls": [

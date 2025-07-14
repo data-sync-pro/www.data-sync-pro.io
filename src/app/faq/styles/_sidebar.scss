@@ -5,23 +5,35 @@ $sidebar-width: 280px;
 $sidebar-collapsed: 56px;
 $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
+// W3Schools风格的侧边栏：Grid定位 + Sticky行为
 .faq-sidebar {
-  position: fixed;
-  left: 0;
-  top: 60px;
-  width: $sidebar-width;
-  height: calc(100vh - 60px);
+  grid-area: sidebar;
   background: #ffffff;
   border-right: 1px solid #e1e5e9;
-  overflow: hidden;
-  transition: $transition, transform 0.15s cubic-bezier(0.25, 0.8, 0.25, 1);
-  z-index: 100;
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05);
+  transition: $transition;
+  z-index: 90; // 降低z-index，避免层级冲突
   
-  // Move up when footer is visible instead of changing height
-  &.footer-visible {
-    transform: translateY(calc(-1 * var(--footer-offset, 0px)));
+  // W3Schools风格的sticky定位
+  position: sticky;
+  top: $header-height;
+  height: calc(100vh - $header-height);
+  overflow: hidden;
+  
+  // 响应式隐藏：采用W3Schools的断点策略
+  @media (max-width: $breakpoint-desktop) {
+    position: fixed;
+    left: 0;
+    top: $header-height;
+    transform: translateX(-100%);
+    z-index: 1000;
+    
+    &.mobile-open {
+      transform: translateX(0);
+    }
   }
+  
+  // 移除复杂的footer-visible逻辑
+  // 让页脚自然流动，无需JavaScript干预
 
   &.collapsed {
     width: $sidebar-collapsed;
@@ -194,6 +206,8 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         background-color: #e8f0fe;
         color: #1a73e8;
         font-weight: 500;
+        // 添加平滑过渡效果
+        transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
 
         &::before {
           content: '';
@@ -203,6 +217,8 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           bottom: 0;
           width: 3px;
           background-color: #1a73e8;
+          // 添加指示器过渡效果
+          transition: width 0.2s ease-out, background-color 0.15s ease;
         }
       }
 

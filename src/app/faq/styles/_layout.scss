@@ -4,20 +4,42 @@
   scroll-behavior: smooth;
 }
 
-// 共用变量
+// W3Schools启发的现代布局变量
 $header-height: 60px;
 $sidebar-width: 280px;
 $sidebar-collapsed: 56px;
 $toc-width: 320px;
 
-.faq-container {
-  margin: $header-height $toc-width 0 $sidebar-width;
-  padding: 20px 40px 20px 40px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+// W3Schools风格的断点系统
+$breakpoint-desktop: 992px;
+$breakpoint-mobile: 500px;
 
+// 主容器：采用W3Schools的自然流动布局
+.faq-layout-container {
+  display: grid;
+  grid-template-areas: 
+    "sidebar main toc";
+  grid-template-columns: $sidebar-width 1fr $toc-width;
+  min-height: calc(100vh - $header-height);
+  margin-top: $header-height;
+  
+  // W3Schools风格的响应式处理
+  @media (max-width: $breakpoint-desktop) {
+    grid-template-areas: "main main main";
+    grid-template-columns: 1fr;
+  }
+}
+
+// 内容区域：简化边距处理
+.faq-container {
+  grid-area: main;
+  padding: 20px 40px;
+  min-height: calc(100vh - $header-height - 200px); // 为页脚留出自然空间
+  background: #ffffff;
+  
+  // 移除复杂的margin计算
   &.toc-hidden {
-    margin-right: 0;
-    padding-right: 60px; // Space for toggle button
+    // TOC隐藏时不需要复杂的margin调整
   }
 
   .visually-hidden {
@@ -92,9 +114,14 @@ $toc-width: 320px;
   flex: 1;
   min-width: 0;
   padding: 20px 40px;
-  margin-bottom: 100px;
+  margin-bottom: 120px; // 增加底部边距确保footer可见
   background: #ffffff;
   min-height: calc(100vh - 120px);
+  
+  // 当检测到footer时增加额外的底部空间
+  &.footer-aware {
+    margin-bottom: calc(120px + var(--footer-offset, 0px));
+  }
 }
 
 // 标题样式

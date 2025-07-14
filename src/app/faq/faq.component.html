@@ -23,12 +23,14 @@
   (click)="closeMobileSidebar()"
 ></div>
 
-<!-- Left Sidebar - Always visible, independent of container -->
-<aside
-  class="faq-sidebar"
-  [class.mobile-open]="ui.mobileSidebarOpen"
-  [class.collapsed]="ui.sidebarCollapsed"
->
+<!-- W3Schools风格的网格布局容器 -->
+<div class="faq-layout-container">
+  <!-- Left Sidebar - Grid定位 -->
+  <aside
+    class="faq-sidebar"
+    [class.mobile-open]="ui.mobileSidebarOpen"
+    [class.collapsed]="ui.sidebarCollapsed"
+  >
       <div class="sidebar-content">
         <!-- Sidebar Header -->
         <div class="sidebar-header">
@@ -73,7 +75,7 @@
               <div class="nav-content">
                 <lightning-icon
                   iconName="utility:home"
-                  size="xx-small"
+                  size="x-small"
                   alternativeText="Home"
                   class="nav-icon"
                 ></lightning-icon>
@@ -143,8 +145,8 @@
       </div>
     </aside>
 
-<!-- Main content area with proper container -->
-<div class="faq-container" [class.toc-hidden]="ui.tocHidden">
+  <!-- Main content area with proper container -->
+  <div class="faq-container" [class.toc-hidden]="ui.tocHidden">
   <!-- Breadcrumb Navigation -->
   <nav class="breadcrumb-nav" *ngIf="current.category || current.subCategory">
     <div class="breadcrumb">
@@ -407,6 +409,60 @@
         </div>
       </ng-container>
   </main>
+  </div>
+
+  <!-- Desktop TOC - Grid定位 -->
+  <aside
+    class="faq-toc desktop-toc"
+    *ngIf="shouldShowTOC && !ui.isMobile"
+    [class.collapsed]="isSidebarCollapsed"
+    [class.hidden]="ui.tocHidden"
+  >
+    <div class="toc-content">
+      <!-- Trending Questions for Home Page -->
+      <div *ngIf="showHome" class="trending-toc">
+        <div class="toc-header">
+          <h3 class="toc-title">Trending Questions</h3>
+          <span class="toc-count">{{ tocItemCount }} items</span>
+        </div>
+
+        <div class="toc-list">
+          <div
+            class="toc-item trending-item"
+            *ngFor="let item of trendingQuestions; trackBy: trackByFAQ"
+            [class.active]="isCurrentFAQ(item)"
+            (click)="selectTrendingQuestion(item)"
+          >
+            <div class="toc-item-title">{{ item.question }}</div>
+            <div class="toc-item-indicator" *ngIf="isCurrentFAQ(item)"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Category TOC for Category Pages -->
+      <div *ngIf="!showHome" class="category-toc">
+        <div class="toc-header">
+          <h3 class="toc-title">
+            <span class="toc-category-name">{{ current.subCategory || current.category }}</span>
+            <span class="toc-subtitle">FAQs</span>
+          </h3>
+          <span class="toc-count">{{ tocItemCount }} items</span>
+        </div>
+
+        <div class="toc-list">
+          <div
+            class="toc-item"
+            *ngFor="let item of currentFAQList; trackBy: trackByFAQ"
+            [class.active]="isCurrentFAQ(item)"
+            (click)="scrollToFAQ(item)"
+          >
+            <div class="toc-item-title">{{ item.question }}</div>
+            <div class="toc-item-indicator" *ngIf="isCurrentFAQ(item)"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
 </div>
 
 <!-- TOC Toggle Button -->
@@ -423,58 +479,7 @@
   ></lightning-icon>
 </button>
 
-<!-- Desktop TOC - Only show on desktop -->
-<aside
-  class="faq-toc desktop-toc"
-  *ngIf="shouldShowTOC && !ui.isMobile"
-  [class.collapsed]="isSidebarCollapsed"
-  [class.hidden]="ui.tocHidden"
->
-  <div class="toc-content">
-    <!-- Trending Questions for Home Page -->
-    <div *ngIf="showHome" class="trending-toc">
-      <div class="toc-header">
-        <h3 class="toc-title">Trending Questions</h3>
-        <span class="toc-count">{{ tocItemCount }} items</span>
-      </div>
-
-      <div class="toc-list">
-        <div
-          class="toc-item trending-item"
-          *ngFor="let item of trendingQuestions; trackBy: trackByFAQ"
-          [class.active]="isCurrentFAQ(item)"
-          (click)="selectTrendingQuestion(item)"
-        >
-          <div class="toc-item-title">{{ item.question }}</div>
-          <div class="toc-item-indicator" *ngIf="isCurrentFAQ(item)"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Category TOC for Category Pages -->
-    <div *ngIf="!showHome" class="category-toc">
-      <div class="toc-header">
-        <h3 class="toc-title">
-          <span class="toc-category-name">{{ current.subCategory || current.category }}</span>
-          <span class="toc-subtitle">FAQs</span>
-        </h3>
-        <span class="toc-count">{{ tocItemCount }} items</span>
-      </div>
-
-      <div class="toc-list">
-        <div
-          class="toc-item"
-          *ngFor="let item of currentFAQList; trackBy: trackByFAQ"
-          [class.active]="isCurrentFAQ(item)"
-          (click)="scrollToFAQ(item)"
-        >
-          <div class="toc-item-title">{{ item.question }}</div>
-          <div class="toc-item-indicator" *ngIf="isCurrentFAQ(item)"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-</aside>
+<!-- Removed duplicate TOC - now using grid-positioned version above -->
 
 <!-- Mobile TOC Drawer -->
 <div class="mobile-toc-overlay" 

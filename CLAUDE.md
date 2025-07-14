@@ -4,125 +4,111 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is an Angular 15 website for Data Sync Pro, a Salesforce data management platform. The site features a comprehensive FAQ system, dynamic routing, and performance-optimized content loading.
+This is an Angular 15 website for Data Sync Pro (DSP), a Salesforce data synchronization platform. The site features comprehensive documentation including FAQ sections, designer guides, and product information. The project uses Angular with Angular Material, Bootstrap, and includes service worker support for offline functionality.
 
 ## Development Commands
 
-```bash
-# Development server
-ng serve
+- **Start development server**: `ng serve` or `npm start` (runs on http://localhost:4200)
+- **Build for production**: `ng build` (outputs to dist/website)
+- **Build for development**: `ng build --configuration development`
+- **Watch mode**: `ng build --watch --configuration development`
+- **Run tests**: `ng test` (uses Karma + Jasmine)
+- **Generate components**: `ng generate component component-name` (uses SCSS styling by default)
+- **Install dependencies**: `npm install`
+- **Generate FAQ components**: `node src/tools/generate-faq-components.js`
+- **Generate Designer Guide pages**: `node src/tools/generate-designer-pages.js`
+- **Extract i18n**: `ng extract-i18n` (Angular i18n extraction)
 
-# Build for production
-ng build
+### Testing Commands
+- **Run specific test**: `ng test --include='**/component-name.spec.ts'`
+- **Run tests in watch mode**: `ng test --watch`
+- **Run tests once**: `ng test --watch=false`
 
-# Run unit tests
-ng test
-
-# Install dependencies
-npm install
-
-# Start development with live reload
-npm start
-```
-
-## Architecture
+## Architecture Overview
 
 ### Core Structure
-- **Angular 15** with Material Design and Bootstrap 5
-- **Lazy loading** for FAQ and designer-guide modules
-- **Service Worker** enabled for PWA functionality
-- **SCSS** preprocessing with modular stylesheets
+- **Main modules**: App, FAQ (lazy-loaded), Designer Guide (lazy-loaded), Shared
+- **Key components**: Home, Header, Footer, Pricing, Solutions, Rules Engines, Support
+- **Routing**: Uses lazy loading for FAQ and Designer Guide modules with preload strategy
+- **State management**: Uses Angular services for data management
+- **UI framework**: Angular Material + Bootstrap for styling
 
-### Key Components
-- **FAQ System**: Complex search, filtering, and content management with lazy loading
-- **Search Overlay**: Global search functionality with keyboard shortcuts (Ctrl+K)
-- **Responsive Design**: Mobile-first with collapsible sidebars and adaptive layouts
+### Content Management System
+The site features a sophisticated content generation system:
 
-### FAQ System Architecture
-The FAQ system is the most complex part of the application:
+- **FAQ system**: JSON-driven FAQ content (`src/assets/data/faqs.json`) with auto-generated components
+- **Designer Guide**: Hierarchical documentation system with sidebar navigation (`src/assets/data/designer-sidebar.json`)
+- **Content generation**: Node.js scripts in `src/tools/` for generating FAQ components from JSON data
+- **HTML content**: Static HTML files stored in `src/assets/faq-item/` for FAQ answers
 
-- **Data Structure**: FAQ items loaded from JSON with lazy HTML content loading
-- **Smart Search**: Multi-field search with relevance scoring and highlighting
-- **State Management**: Immutable state updates optimized for OnPush change detection
-- **URL Routing**: Deep linking support with fragment-based navigation
-- **Performance**: Preloading observers, caching, and virtual scrolling considerations
+### Special Features
+- **Image zoom directives**: `zoomable.directive.ts` and `simple-zoomable.directive.ts` for image interactions
+- **Scroll management**: Custom scroll-to-top component with footer-aware positioning
+- **Search functionality**: Search overlay component for content discovery
+- **Offline support**: Service worker implementation with Angular PWA features
+- **Analytics integration**: Google Analytics service for tracking
+- **Cookie consent**: GDPR-compliant cookie consent component
 
-### Services
-- `FAQService`: Centralized FAQ data management with caching
-- `AnalyticsService`: User interaction tracking with consent management
-- `PerformanceService`: Performance monitoring and optimization
-- `ApiService`: HTTP client wrapper for API communications
+### Key Services
+- **API Service**: `api.service.ts` for backend communication
+- **FAQ Service**: `shared/services/faq.service.ts` for FAQ data management
+- **Performance Service**: `shared/services/performance.service.ts` for optimization
+- **Offline Service**: `shared/services/offline.service.ts` for PWA functionality
 
-### Routing Structure
-```
-/                    -> HomeComponent
-/faq                 -> FAQ Module (lazy loaded)
-/faq/:category       -> Category view
-/faq/:cat/:subcat    -> Subcategory view
-/designer-guide      -> Designer Guide Module (lazy loaded)
-/pricing             -> PricingComponent
-/solutions           -> SolutionsComponent
-/support             -> SupportComponent
-/rules-engines       -> RulesEnginesComponent
-```
+## Content Generation Workflow
 
-## Development Guidelines
+To generate new FAQ components:
+1. Update `src/assets/data/faqs.json` with new FAQ entries
+2. Run `node src/tools/generate-faq-components.js` to auto-generate Angular components
+3. Add corresponding HTML content files to `src/assets/faq-item/`
 
-### FAQ Component Development
-- Use immutable state updates via helper methods (`updateSearchState`, `updateUIState`)
-- Leverage OnPush change detection - always call `this.cdr.markForCheck()` after async operations
-- Content loading is lazy - check `item.safeAnswer` before displaying content
-- URL fragments are automatically handled for deep linking
+## Build Configuration
 
-### Performance Considerations
-- FAQ content is loaded on-demand via intersection observers
-- Search operations are debounced and performance-measured
-- Popular FAQ content is pre-cached on component initialization
-- Use trackBy functions for ngFor loops in performance-critical areas
+- **Production builds**: Optimized with budget limits (1.5mb warning, 2mb error)
+- **Asset handling**: Custom asset copying for designer guide HTML files
+- **Styling**: SCSS with Material Design theme and Bootstrap integration
+- **Bundle optimization**: Supports differential loading and tree shaking
 
-### State Management Patterns
-The FAQ component uses a structured state approach:
-```typescript
-interface SearchState { /* search-related state */ }
-interface CurrentState { /* navigation state */ }
-interface UIState { /* UI visibility state */ }
-```
+## TypeScript Configuration
 
-### Responsive Design
-- Mobile breakpoint: 768px
-- Collapsible sidebars with localStorage persistence
-- Mobile-specific navigation patterns (drawer-style)
-- Touch-friendly interactions on mobile devices
+- **Main config**: `tsconfig.json` with Angular-specific settings and strict mode enabled
+- **App config**: `tsconfig.app.json` for application builds
+- **Test config**: `tsconfig.spec.json` for unit testing
 
-## Content Management
+## Key Data Files
 
-### FAQ Content
-- FAQ metadata in `/src/assets/data/faqs.json`
-- HTML content files in `/src/assets/faq-item/`
-- Images in `/src/assets/image/` with organized subdirectories
-- Content is sanitized via DomSanitizer for security
+- **FAQ content**: `src/assets/data/faqs.json` - drives FAQ section generation
+- **Designer Guide nav**: `src/assets/data/designer-sidebar.json` - sidebar navigation structure
+- **FAQ HTML content**: `src/assets/faq-item/*.html` - static HTML content for FAQ answers
+- **Service Worker config**: `ngsw-config.json` - PWA caching configuration
 
-### Asset Structure
-```
-/src/assets/
-├── data/              # JSON configuration files
-├── faq-item/          # Individual FAQ HTML content
-├── image/             # FAQ-related images
-└── [static assets]    # Images, icons, etc.
-```
+## Content Generation Tools
 
-## Code Style Notes
+- **FAQ Component Generator**: `src/tools/generate-faq-components.js` - creates Angular components from FAQ JSON
+- **Designer Page Generator**: `src/tools/generate-designer-pages.js` - processes designer guide content
+- Both tools use Angular CLI internally to scaffold components
 
-- Use English for all code comments and documentation
-- Leverage Angular Material and Bootstrap classes for consistent styling
-- Follow OnPush optimization patterns for better performance
-- Implement proper error handling for async content loading
-- Use TypeScript strict mode and maintain proper typing
+## Performance and Optimization
 
-## Special Features
+- **Bundle budgets**: Warning at 1.5MB, error at 2MB for initial bundles
+- **Component style budget**: Warning at 30KB, error at 40KB per component
+- **Lazy loading**: FAQ and Designer Guide modules are lazy-loaded
+- **Preloading strategy**: Uses `PreloadAllModules` for improved UX
+- **Service Worker**: Configured with custom caching strategies for FAQ content
+- **PWA features**: Offline support with manifest.webmanifest
 
-- **Search functionality**: Supports fuzzy search, suggestions, and auto-complete
-- **Social sharing**: Built-in sharing capabilities for FAQ items
-- **Analytics integration**: User interaction tracking with privacy compliance
-- **SEO optimization**: Dynamic meta tags and structured URLs
-- **Keyboard navigation**: Full keyboard support including search shortcuts
+## Routing Configuration
+
+- **Scroll behavior**: Custom scroll restoration disabled, managed by components
+- **Anchor scrolling**: Disabled to prevent conflicts
+- **Scroll offset**: 80px offset for fixed header
+- **Lazy modules**: FAQ (`/faq`) and Designer Guide (`/designer-guide`) are lazy-loaded
+- **Fallback**: All unknown routes redirect to home (`''`)
+
+## Styling Architecture
+
+- **SCSS**: Default component styling with `includePaths: ["src/styles"]` 
+- **Angular Material**: Uses `indigo-pink` prebuilt theme
+- **Bootstrap**: v5.3.3 integrated alongside Material Design
+- **Style organization**: Component-specific SCSS files with shared style includes
+- **Chinese comments**: Use Chinese for code comments as per project convention

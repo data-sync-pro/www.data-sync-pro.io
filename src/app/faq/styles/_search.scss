@@ -62,30 +62,81 @@
   transition: all 0.3s ease;
 
   &.desktop-toc {
-    position: fixed;
-    top: 60px;
-    right: 0;
-    width: 320px;
-    height: calc(100vh - 60px);
-    z-index: 50;
+    grid-area: toc;
+    position: sticky;
+    top: $header-height;
+    height: calc(100vh - $header-height);
+    z-index: 80; // 降低z-index
     border-radius: 0;
     border-right: none;
     border-top: none;
     border-bottom: none;
     box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
-    transition: transform 0.15s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transition: transform 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+    
+    // W3Schools风格的响应式隐藏
+    @media (max-width: $breakpoint-desktop) {
+      display: none;
+    }
     
     &.hidden {
-      transform: translateX(100%);
+      transform: translate3d(100%, 0, 0);
+    }
+    
+    // 页脚感知：当接近页脚时调整TOC高度
+    &.footer-approaching {
+      height: calc(100vh - $header-height - var(--footer-overlap, 0px));
+      transition: height 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
       
-      &.footer-visible {
-        transform: translateX(100%) translateY(calc(-1 * var(--footer-offset, 0px)));
+      // 添加微妙的视觉提示
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, #e8f0fe, transparent);
+        opacity: 0.6;
+        transition: opacity 0.3s ease;
       }
     }
     
-    // Move up when footer is visible instead of changing height
-    &.footer-visible:not(.hidden) {
-      transform: translateY(calc(-1 * var(--footer-offset, 0px)));
+    // 页脚区域：TOC进入非活跃状态，提供视觉反馈
+    &.in-footer-zone {
+      // 整体容器的淡化效果
+      opacity: 0.85;
+      transition: opacity 0.3s ease;
+      
+      .toc-item {
+        // 所有项目都变为非活跃外观
+        &.active {
+          background: #f8f9fa;
+          border-left-color: #dadce0;
+          
+          .toc-item-title {
+            color: #5f6368;
+          }
+          
+          .toc-item-indicator {
+            opacity: 0.5;
+          }
+        }
+        
+        // 添加微妙的过渡效果
+        transition: all 0.2s ease;
+      }
+      
+      // 添加页脚区域的视觉指示器
+      .toc-header::after {
+        content: 'End of content';
+        display: block;
+        font-size: 0.75rem;
+        color: #9aa0a6;
+        text-align: center;
+        margin-top: 8px;
+        font-style: italic;
+      }
     }
     
     .toc-content {
@@ -117,6 +168,7 @@
   height: 100%;
   display: flex;
   flex-direction: column;
+  overflow: hidden; // 确保内容不会溢出父容器
 }
 
 .toc-header,
@@ -181,32 +233,66 @@
 .toc-list,
 .mobile-toc-list {
   flex: 1;
+  min-height: 0; // 关键：允许收缩并启用滚动
   overflow-y: auto;
   overflow-x: hidden;
   padding: 8px 0;
   
-  // 自定义滚动条样式
+  // 改进的滚动条样式
   &::-webkit-scrollbar {
-    width: 6px;
+    width: 8px; // 稍微增大以提高可用性
   }
 
   &::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 3px;
+    background: #f8f9fa;
+    border-radius: 4px;
+    margin: 4px 0; // 添加边距
   }
 
   &::-webkit-scrollbar-thumb {
     background: #dadce0;
-    border-radius: 3px;
+    border-radius: 4px;
+    border: 1px solid #f8f9fa; // 添加边框提高视觉效果
     
     &:hover {
       background: #bdc1c6;
     }
+    
+    &:active {
+      background: #9aa0a6;
+    }
   }
 }
 
+// TOC容器：确保正确的flexbox行为
+.trending-toc,
+.category-toc,
+.mobile-toc-content > div { // 也适用于移动端TOC内容
+  display: flex;
+  flex-direction: column;
+  flex: 1; // 占用toc-content的剩余空间
+  min-height: 0; // 允许flex子项收缩
+}
+
+// TOC列表：启用滚动
 .desktop-toc .toc-list {
   padding-bottom: 20px;
+  flex: 1; // 占用trending-toc/category-toc的剩余空间
+  min-height: 0; // 关键：允许flex子项收缩并启用滚动
+  overflow-y: auto; // 确保滚动启用
+  overflow-x: hidden;
+  scroll-behavior: smooth; // 平滑滚动
+  scrollbar-gutter: stable; // 稳定滚动条空间
+}
+
+// 移动端TOC列表滚动
+.mobile-toc-list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+  scrollbar-gutter: stable;
 }
 
 .toc-item,
@@ -227,6 +313,12 @@
   &.active {
     background: linear-gradient(90deg, rgba(26, 115, 232, 0.08), transparent);
     border-left-color: #1a73e8;
+    // 优化过渡效果与侧边栏保持一致
+    transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    // 确保active项目在滚动时可见
+    scroll-margin-top: 20px;
+    scroll-margin-bottom: 20px;
 
     .toc-item-title,
     .mobile-toc-item-title {

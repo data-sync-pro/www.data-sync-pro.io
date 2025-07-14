@@ -11,6 +11,9 @@ $footer-border: #2d2d4a;
   color: $footer-text;
   border-top: 1px solid $footer-border;
   margin-top: auto;
+  position: relative;
+  z-index: 10;
+  // 确保footer始终可见且不被其他固定元素覆盖
 }
 
 .footer-content {
