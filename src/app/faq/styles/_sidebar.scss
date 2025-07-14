@@ -4,6 +4,7 @@
 $sidebar-width: 280px;
 $sidebar-collapsed: 56px;
 $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+$breakpoint-desktop: 992px;
 
 // W3Schools风格的侧边栏：Grid定位 + Sticky行为
 .faq-sidebar {
@@ -258,7 +259,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       padding-left: 8px;
 
       .nav-item {
-        padding: 6px 12px 6px 0;
+        padding: 6px 20px 6px 3px;
         font-size: 0.8125rem;
         margin-right: 0;
         border-radius: 4px;

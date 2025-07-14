@@ -24,7 +24,9 @@
 ></div>
 
 <!-- W3Schools风格的网格布局容器 -->
-<div class="faq-layout-container">
+<div class="faq-layout-container"
+     [class.toc-hidden]="ui.tocHidden"
+     [class.sidebar-collapsed]="ui.sidebarCollapsed">
   <!-- Left Sidebar - Grid定位 -->
   <aside
     class="faq-sidebar"
@@ -147,6 +149,7 @@
 
   <!-- Main content area with proper container -->
   <div class="faq-container" [class.toc-hidden]="ui.tocHidden">
+  
   <!-- Breadcrumb Navigation -->
   <nav class="breadcrumb-nav" *ngIf="current.category || current.subCategory">
     <div class="breadcrumb">
@@ -442,10 +445,7 @@
       <!-- Category TOC for Category Pages -->
       <div *ngIf="!showHome" class="category-toc">
         <div class="toc-header">
-          <h3 class="toc-title">
-            <span class="toc-category-name">{{ current.subCategory || current.category }}</span>
-            <span class="toc-subtitle">FAQs</span>
-          </h3>
+          <h3 class="toc-title">{{ (current.subCategory || current.category) + ' FAQs' }}</h3>
           <span class="toc-count">{{ tocItemCount }} items</span>
         </div>
 
@@ -465,12 +465,12 @@
   </aside>
 </div>
 
-<!-- TOC Toggle Button -->
+<!-- TOC Toggle Button - 独立的固定定位按钮 -->
 <button
   class="toc-toggle-btn"
-  *ngIf="!ui.isMobile"
   (click)="toggleTOC()"
   [title]="ui.tocHidden ? 'Show Table of Contents' : 'Hide Table of Contents'"
+  *ngIf="shouldShowTOC && !ui.isMobile"
 >
   <lightning-icon
     [iconName]="ui.tocHidden ? 'utility:chevronleft' : 'utility:chevronright'"

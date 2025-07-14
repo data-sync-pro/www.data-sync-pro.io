@@ -285,6 +285,10 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
       faqItem: null
     });
     
+    // Clear active scroll element to prevent incorrect highlighting
+    this.activeScrollElement = '';
+    this.cdr.markForCheck();
+    
     // Clear cached FAQ elements when state changes
     this.cachedFaqElements = null;
     
@@ -492,10 +496,10 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
 
   get currentTOCTitle(): string {
     if (this.current.subCategory) {
-      return this.current.subCategory;
+      return this.current.subCategory + ' FAQs';
     }
     if (this.current.category) {
-      return this.current.category;
+      return this.current.category + ' FAQs';
     }
     return 'Contents';
   }
@@ -1672,8 +1676,13 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     // 展开对应的FAQ面板
     this.expandFAQPanel(item);
 
-    // 平滑滚动到FAQ项目
-    this.smoothScrollToFAQElement(item);
+    // 在"All FAQs"页面上，滚动到顶部而不是特定元素
+    if (this.showHome) {
+      this.scrollToTop();
+    } else {
+      // 在分类页面上，滚动到FAQ项目
+      this.smoothScrollToFAQElement(item);
+    }
 
     // 加载FAQ内容（如果尚未加载）
     if (!item.safeAnswer && item.answerPath) {
@@ -1697,6 +1706,16 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
         }
       });
     }
+  }
+
+  /**
+   * 快速滚动到页面顶部
+   */
+  private scrollToTop(): void {
+    window.scrollTo({
+      top: 0,
+      behavior: 'auto' // 快速滚动，不使用平滑动画
+    });
   }
 
   /**
@@ -1757,8 +1776,8 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     // 展开对应的FAQ面板
     this.expandFAQPanel(item);
 
-    // 平滑滚动到FAQ项目
-    this.smoothScrollToFAQElement(item);
+    // 在"All FAQs"页面上，滚动到顶部
+    this.scrollToTop();
   }
 
   /**

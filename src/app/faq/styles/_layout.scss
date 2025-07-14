@@ -36,11 +36,6 @@ $breakpoint-mobile: 500px;
   padding: 20px 40px;
   min-height: calc(100vh - $header-height - 200px); // 为页脚留出自然空间
   background: #ffffff;
-  
-  // 移除复杂的margin计算
-  &.toc-hidden {
-    // TOC隐藏时不需要复杂的margin调整
-  }
 
   .visually-hidden {
     position: absolute !important;
