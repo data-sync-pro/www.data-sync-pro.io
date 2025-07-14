@@ -63,6 +63,14 @@ interface UIState {
   tocHidden: boolean;
 }
 
+interface TOCPaginationState {
+  currentPage: number;
+  itemsPerPage: number;
+  totalPages: number;
+  startIndex: number;
+  endIndex: number;
+}
+
 @Component({
   selector: 'app-faq',
   templateUrl: './faq.component.html',
@@ -110,6 +118,15 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     tocHidden: false
   };
 
+  // TOC Pagination state
+  tocPagination: TOCPaginationState = {
+    currentPage: 1,
+    itemsPerPage: 10, // Show 8 items per page
+    totalPages: 1,
+    startIndex: 0,
+    endIndex: 8
+  };
+
   faqList: FAQItem[] = [];
   categories: FAQCategory[] = [];
 
@@ -118,6 +135,7 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
   private pendingFragment?: string;
   private scrollTimeout: any;
   private activeScrollElement: string = '';
+  private userHasScrolled: boolean = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -172,8 +190,9 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     setTimeout(() => {
       this.refreshFaqElementsCache();
       
-      // 立即执行一次同步检查
-      if (window.pageYOffset > 0) {
+      // Only highlight if user has actually scrolled AND there's a scroll position
+      // This prevents auto-highlighting the first item on page load
+      if (this.userHasScrolled && window.pageYOffset > 0) {
         this.updateActiveScrollElementOptimized(window.pageYOffset);
       }
     }, 100);
@@ -212,6 +231,9 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
       next: (faqs) => {
         this.faqList = faqs;
         this.updateUIState({ isLoading: false });
+        
+        // Initialize TOC pagination when data is loaded
+        this.updateTOCPaginationIndices();
         
         // Clear cached elements when FAQ data changes
         this.cachedFaqElements = null;
@@ -287,6 +309,15 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     
     // Clear active scroll element to prevent incorrect highlighting
     this.activeScrollElement = '';
+    
+    // Reset user interaction flag when navigating between categories
+    // This ensures TOC doesn't auto-highlight when switching categories
+    this.userHasScrolled = false;
+    
+    // Reset TOC pagination when navigating
+    this.tocPagination.currentPage = 1;
+    this.updateTOCPaginationIndices();
+    
     this.cdr.markForCheck();
     
     // Clear cached FAQ elements when state changes
@@ -696,6 +727,9 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   navigateToFAQ(item: FAQItem): void {
+    // Mark that user has interacted - this enables TOC highlighting
+    this.userHasScrolled = true;
+    
     // 增加查看次数
     if (!item.viewCount) {
       item.viewCount = 0;
@@ -717,14 +751,8 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     // 跟踪FAQ查看
     this.trackFAQView(item);
 
-    // 确保总是滚动到页面顶部
-    // 使用 setTimeout 确保在所有其他操作完成后执行
-    setTimeout(() => {
-      window.scrollTo({
-        top: 0,
-        behavior: 'auto' // 改为立即跳转，避免慢动画
-      });
-    }, 0);
+    // Auto-scroll to the clicked FAQ item for better reading experience
+    this.autoScrollToFAQItem(item);
   }
 
   onFaqClosed(): void {
@@ -1078,9 +1106,6 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
-  @ViewChildren(MatExpansionPanel) panels!: QueryList<MatExpansionPanel>;
-  @ViewChildren(MatExpansionPanel, { read: ElementRef })
-  panelEls!: QueryList<ElementRef<HTMLElement>>;
 
   
   get showHome(): boolean {
@@ -1100,10 +1125,14 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     setTimeout(() => {
       const idx = this.filteredFAQ.findIndex(f => f.question === question);
       if (idx >= 0) {
-        const panel  = this.panels.toArray()[idx];
-        // const panelEl= this.panelEls.toArray()[idx].nativeElement;
-
+        const faqItem = this.filteredFAQ[idx];
+        const panel = this.expansionPanels.toArray()[idx];
+        
+        // Open the panel
         panel.open();
+        
+        // Auto-scroll to the opened FAQ item for better reading experience
+        this.autoScrollToFAQItem(faqItem);
       }
     });
   }
@@ -1428,7 +1457,10 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     this.updateUIState({ tocHidden: hidden });
     // Save state to localStorage for persistence
     localStorage.setItem('faq-toc-hidden', hidden.toString());
+    // Force change detection to ensure icon updates immediately
+    this.cdr.detectChanges();
   }
+
 
   // Load sidebar and TOC state from localStorage
   private loadSidebarState(): void {
@@ -1489,6 +1521,98 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     if (event.key === 'Escape' && this.search.isOpen) {
       this.updateSearchState({ isOpen: false });
     }
+  }
+
+  // ==================== TOC Pagination Methods ====================
+
+  /**
+   * Calculate pagination state for TOC
+   */
+  private calculateTOCPagination(totalItems: number): void {
+    this.tocPagination.totalPages = Math.ceil(totalItems / this.tocPagination.itemsPerPage);
+    
+    // Ensure current page is within bounds
+    if (this.tocPagination.currentPage > this.tocPagination.totalPages) {
+      this.tocPagination.currentPage = 1;
+    }
+    
+    this.updateTOCPaginationIndices();
+  }
+
+
+  /**
+   * Check if previous page is available
+   */
+  get hasPreviousTOCPage(): boolean {
+    return this.tocPagination.currentPage > 1;
+  }
+
+  /**
+   * Check if next page is available
+   */
+  get hasNextTOCPage(): boolean {
+    return this.tocPagination.currentPage < this.tocPagination.totalPages;
+  }
+
+  /**
+   * Get current pagination info text
+   */
+  get tocPaginationInfo(): string {
+    const totalItems = this.showHome ? this.trendingQuestions.length : this.currentFAQList.length;
+    if (totalItems === 0) return '';
+    
+    const start = this.tocPagination.startIndex + 1;
+    const end = Math.min(this.tocPagination.endIndex, totalItems);
+    return `${start}-${end} of ${totalItems}`;
+  }
+
+  // ==================== TOC Pagination Methods ====================
+  
+  /**
+   * Navigate to previous page in TOC pagination
+   */
+  goToPreviousTOCPage(): void {
+    if (this.tocPagination.currentPage > 1) {
+      this.tocPagination.currentPage--;
+      this.updateTOCPaginationIndices();
+      this.cdr.markForCheck();
+    }
+  }
+
+  /**
+   * Navigate to next page in TOC pagination
+   */
+  goToNextTOCPage(): void {
+    if (this.tocPagination.currentPage < this.tocPagination.totalPages) {
+      this.tocPagination.currentPage++;
+      this.updateTOCPaginationIndices();
+      this.cdr.markForCheck();
+    }
+  }
+
+  /**
+   * Update TOC pagination indices and total pages
+   */
+  private updateTOCPaginationIndices(): void {
+    const totalItems = this.showHome ? this.trendingQuestions.length : this.currentFAQList.length;
+    
+    this.tocPagination.totalPages = Math.ceil(totalItems / this.tocPagination.itemsPerPage);
+    this.tocPagination.startIndex = (this.tocPagination.currentPage - 1) * this.tocPagination.itemsPerPage;
+    this.tocPagination.endIndex = this.tocPagination.startIndex + this.tocPagination.itemsPerPage;
+  }
+
+  /**
+   * Get paginated trending questions for current page
+   */
+  get paginatedTrendingQuestions(): FAQItem[] {
+    return this.trendingQuestions.slice(this.tocPagination.startIndex, this.tocPagination.endIndex);
+  }
+
+  /**
+   * Get paginated current FAQ list for current page
+   */
+  get paginatedCurrentFAQList(): FAQItem[] {
+    return this.currentFAQList.slice(this.tocPagination.startIndex, this.tocPagination.endIndex);
   }
 
   // ==================== Debug Methods ====================
@@ -1625,10 +1749,13 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
       }
     });
     
-    // 立即执行一次活跃元素检查，确保同步状态
-    requestAnimationFrame(() => {
-      this.updateActiveScrollElementOptimized(window.pageYOffset);
-    });
+    // Only check for active element if user has scrolled
+    // This prevents auto-highlighting on initial page load
+    if (this.userHasScrolled) {
+      requestAnimationFrame(() => {
+        this.updateActiveScrollElementOptimized(window.pageYOffset);
+      });
+    }
   }
 
   // Cache FAQ elements to avoid repeated queries
@@ -1662,6 +1789,9 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
    * 选择并显示指定FAQ项目（从右侧目录点击）
    */
   scrollToFAQ(item: FAQItem): void {
+    // Mark that user has interacted - this enables TOC highlighting
+    this.userHasScrolled = true;
+    
     // 设置当前FAQ项目
     this.current.faqItem = item;
     this.current.faqTitle = item.question;
@@ -1676,13 +1806,8 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     // 展开对应的FAQ面板
     this.expandFAQPanel(item);
 
-    // 在"All FAQs"页面上，滚动到顶部而不是特定元素
-    if (this.showHome) {
-      this.scrollToTop();
-    } else {
-      // 在分类页面上，滚动到FAQ项目
-      this.smoothScrollToFAQElement(item);
-    }
+    // Auto-scroll to clicked FAQ item for better reading experience
+    this.autoScrollToFAQItem(item);
 
     // 加载FAQ内容（如果尚未加载）
     if (!item.safeAnswer && item.answerPath) {
@@ -1716,6 +1841,108 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
       top: 0,
       behavior: 'auto' // 快速滚动，不使用平滑动画
     });
+  }
+
+  /**
+   * Auto-scroll to the clicked FAQ item for better reading experience
+   * This method intelligently chooses the best scroll target based on the context
+   */
+  private autoScrollToFAQItem(item: FAQItem): void {
+    // Use a short delay to ensure DOM updates are complete
+    setTimeout(() => {
+      // Strategy 1: Try to find the FAQ item by its ID (slugified question)
+      const slugifiedId = this.slugify(item.question);
+      let targetElement = document.getElementById(slugifiedId);
+      
+      // Strategy 2: If not found by ID, try to find by question text in FAQ items
+      if (!targetElement) {
+        const faqItems = document.querySelectorAll('.faq-item');
+        for (let i = 0; i < faqItems.length; i++) {
+          const questionElement = faqItems[i].querySelector('.faq-question');
+          if (questionElement && questionElement.textContent?.trim() === item.question) {
+            targetElement = faqItems[i] as HTMLElement;
+            break;
+          }
+        }
+      }
+      
+      // Strategy 3: If still not found, look for the question header specifically
+      if (!targetElement) {
+        const questionHeaders = document.querySelectorAll('h3.faq-question');
+        for (let i = 0; i < questionHeaders.length; i++) {
+          if (questionHeaders[i].textContent?.trim() === item.question) {
+            targetElement = questionHeaders[i] as HTMLElement;
+            break;
+          }
+        }
+      }
+      
+      // Strategy 4: Try to find by data attributes if available
+      if (!targetElement) {
+        const elementsWithDataId = document.querySelectorAll(`[data-faq-id="${item.id}"]`);
+        if (elementsWithDataId.length > 0) {
+          targetElement = elementsWithDataId[0] as HTMLElement;
+        }
+      }
+      
+      if (targetElement) {
+        // Calculate optimal scroll position with header offset
+        const headerOffset = 100; // Account for fixed header
+        const elementRect = targetElement.getBoundingClientRect();
+        const elementPosition = elementRect.top + window.pageYOffset;
+        const optimalScrollPosition = Math.max(0, elementPosition - headerOffset);
+        
+        // Smooth scroll to the FAQ item
+        window.scrollTo({
+          top: optimalScrollPosition,
+          behavior: 'smooth'
+        });
+        
+        // Optional: Add visual feedback by briefly highlighting the target
+        this.addVisualScrollFeedback(targetElement);
+        
+        console.log(`Auto-scrolled to FAQ: "${item.question}" at position ${optimalScrollPosition}`);
+      } else {
+        // Fallback: If no specific element found, scroll to top of FAQ section
+        const faqMain = document.querySelector('.faq-main');
+        if (faqMain) {
+          const headerOffset = 80;
+          const elementRect = faqMain.getBoundingClientRect();
+          const elementPosition = elementRect.top + window.pageYOffset;
+          const scrollPosition = Math.max(0, elementPosition - headerOffset);
+          
+          window.scrollTo({
+            top: scrollPosition,
+            behavior: 'smooth'
+          });
+          
+          console.log(`Fallback: Auto-scrolled to FAQ section at position ${scrollPosition}`);
+        } else {
+          // Final fallback: scroll to top
+          this.scrollToTop();
+          console.log('Final fallback: Scrolled to top of page');
+        }
+      }
+    }, 150); // Small delay to ensure DOM is ready
+  }
+
+  /**
+   * Add brief visual feedback to indicate successful scroll target
+   */
+  private addVisualScrollFeedback(element: HTMLElement): void {
+    // Add a brief highlight effect to show the user which FAQ was targeted
+    const originalBoxShadow = element.style.boxShadow;
+    element.style.transition = 'box-shadow 0.3s ease';
+    element.style.boxShadow = '0 0 0 3px rgba(26, 115, 232, 0.3)';
+    
+    // Remove the highlight after a short duration
+    setTimeout(() => {
+      element.style.boxShadow = originalBoxShadow;
+      // Remove transition after effect is complete
+      setTimeout(() => {
+        element.style.transition = '';
+      }, 300);
+    }, 1000);
   }
 
   /**
@@ -1762,6 +1989,9 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
    * 选择热门问题
    */
   selectTrendingQuestion(item: FAQItem): void {
+    // Mark that user has interacted - this enables TOC highlighting
+    this.userHasScrolled = true;
+    
     // 设置当前FAQ
     this.current.faqTitle = item.question;
     this.current.faqItem = item;
@@ -1776,8 +2006,8 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     // 展开对应的FAQ面板
     this.expandFAQPanel(item);
 
-    // 在"All FAQs"页面上，滚动到顶部
-    this.scrollToTop();
+    // Auto-scroll to the selected trending question for better reading experience
+    this.autoScrollToFAQItem(item);
   }
 
   /**
@@ -1880,6 +2110,11 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     if (typeof window === 'undefined') return;
     
     this.optimizedScrollListener = () => {
+      // Mark that user has scrolled - this enables TOC highlighting
+      if (!this.userHasScrolled) {
+        this.userHasScrolled = true;
+      }
+      
       if (!this.scrollTicking) {
         requestAnimationFrame(() => {
           const currentScrollPosition = window.pageYOffset;
@@ -1917,9 +2152,28 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     // 更新TOC状态基于页脚位置
     this.updateTOCFooterState(footerStatus);
     
+    // Update breadcrumb sticky behavior
+    this.updateBreadcrumbScrollState(scrollPosition);
+    
     // 简化的页脚偏移更新（减少频率以提高性能）
     if (scrollPosition % 3 === 0) {
       this.updateFooterOffsetOptimized(footerStatus.footerOffset);
+    }
+  }
+
+  /**
+   * Update breadcrumb navigation scroll state for sticky behavior
+   */
+  private updateBreadcrumbScrollState(scrollPosition: number): void {
+    const breadcrumbNav = document.querySelector('.breadcrumb-nav');
+    if (breadcrumbNav) {
+      // Add 'scrolled' class when user has scrolled down
+      const scrollThreshold = 20; // Small threshold to avoid flickering
+      if (scrollPosition > scrollThreshold) {
+        breadcrumbNav.classList.add('scrolled');
+      } else {
+        breadcrumbNav.classList.remove('scrolled');
+      }
     }
   }
 

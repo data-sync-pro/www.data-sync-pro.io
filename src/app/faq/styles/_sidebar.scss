@@ -33,8 +33,6 @@ $breakpoint-desktop: 992px;
     }
   }
   
-  // 移除复杂的footer-visible逻辑
-  // 让页脚自然流动，无需JavaScript干预
 
   &.collapsed {
     width: $sidebar-collapsed;

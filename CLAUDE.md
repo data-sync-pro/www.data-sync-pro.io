@@ -23,6 +23,8 @@ This is an Angular 15 website for Data Sync Pro (DSP), a Salesforce data synchro
 - **Run specific test**: `ng test --include='**/component-name.spec.ts'`
 - **Run tests in watch mode**: `ng test --watch`
 - **Run tests once**: `ng test --watch=false`
+- **Run tests headless**: `ng test --watch=false --browsers=ChromeHeadless`
+- **TypeScript compilation check**: `npx tsc --noEmit`
 
 ## Architecture Overview
 
@@ -48,12 +50,15 @@ The site features a sophisticated content generation system:
 - **Offline support**: Service worker implementation with Angular PWA features
 - **Analytics integration**: Google Analytics service for tracking
 - **Cookie consent**: GDPR-compliant cookie consent component
+- **TOC (Table of Contents)**: Intelligent highlighting system that only activates on user scroll/interaction
+- **Modular styling**: Component styles organized in separate SCSS files under `styles/` directories
 
 ### Key Services
 - **API Service**: `api.service.ts` for backend communication
-- **FAQ Service**: `shared/services/faq.service.ts` for FAQ data management
+- **FAQ Service**: `shared/services/faq.service.ts` for FAQ data management with caching and preloading
 - **Performance Service**: `shared/services/performance.service.ts` for optimization
 - **Offline Service**: `shared/services/offline.service.ts` for PWA functionality
+- **Analytics Service**: `analytics.service.ts` for Google Analytics integration
 
 ## Content Generation Workflow
 
@@ -111,4 +116,22 @@ To generate new FAQ components:
 - **Angular Material**: Uses `indigo-pink` prebuilt theme
 - **Bootstrap**: v5.3.3 integrated alongside Material Design
 - **Style organization**: Component-specific SCSS files with shared style includes
-- **Chinese comments**: Use Chinese for code comments as per project convention
+- **Modular styles**: Complex components like FAQ use modular SCSS structure (e.g., `faq/styles/_layout.scss`, `_sidebar.scss`, etc.)
+- **English comments**: Use English for code comments as per project convention
+
+## Important Implementation Details
+
+### FAQ Component Architecture
+- **Change Detection**: Uses `OnPush` strategy for performance optimization
+- **User Interaction Tracking**: TOC highlighting only activates after user scrolls or clicks
+- **Wheel Event Isolation**: Mouse wheel events in TOC are isolated to prevent unintended interactions
+- **Scroll Synchronization**: Sophisticated scroll position tracking with footer-aware positioning
+- **Content Caching**: FAQ content is cached and preloaded using Intersection Observer API
+- **State Management**: Complex UI state tracking for mobile/desktop layouts and TOC visibility
+
+### Event Handling Best Practices
+- **Scroll Events**: Optimized with `requestAnimationFrame` and throttling
+- **Wheel Events**: Complete isolation in TOC - uses `preventDefault()` and manual scroll handling
+- **TOC Wheel Isolation**: Mouse wheel in TOC only scrolls TOC content, never triggers FAQ state changes
+- **Performance**: Extensive use of caching and memoization for scroll position calculations
+- **User Selection**: TOC items use `user-select: none` to prevent text selection during scroll

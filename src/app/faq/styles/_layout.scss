@@ -36,6 +36,16 @@ $breakpoint-mobile: 500px;
   padding: 20px 40px;
   min-height: calc(100vh - $header-height - 200px); // 为页脚留出自然空间
   background: #ffffff;
+  transition: margin 0.3s ease; // Smooth transition for margin changes
+
+  // When TOC is hidden, add right margin similar to sidebar collapse
+  &.toc-hidden {
+    margin-right: 60px; // Add right margin when TOC is hidden, similar to sidebar collapsed margin
+    
+    @media (max-width: $breakpoint-desktop) {
+      margin-right: 0; // Remove margin on smaller screens where TOC is already hidden
+    }
+  }
 
   .visually-hidden {
     position: absolute !important;
@@ -47,11 +57,36 @@ $breakpoint-mobile: 500px;
   }
 }
 
-// Compact breadcrumb navigation
+// Compact breadcrumb navigation - sticky positioning
 .breadcrumb-nav {
-  padding: 8px 0;
+  position: sticky;
+  top: $header-height; // Stick below the main header
+  z-index: 90; // Higher than TOC but below main header
+  padding: 8px 16px;
   margin-bottom: 12px;
   border-bottom: 1px solid #f1f3f4;
+  background: rgba(255, 255, 255, 0.95); // Semi-transparent white background
+  backdrop-filter: blur(8px); // Modern blur effect for better visibility
+  -webkit-backdrop-filter: blur(8px); // Safari support
+  transition: all 0.2s ease;
+  
+  // Add subtle shadow when scrolled
+  &.scrolled {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-bottom-color: #e1e5e9;
+  }
+  
+  // Mobile responsive adjustments
+  @media (max-width: 768px) {
+    padding: 6px 12px;
+    font-size: 0.9rem;
+    
+    // Adjust for mobile header height if different
+    top: $header-height;
+  }
+  
+  // Ensure proper stacking context
+  isolation: isolate;
 }
 
 .breadcrumb {
@@ -94,6 +129,15 @@ $breakpoint-mobile: 500px;
     max-width: 120px;
     overflow: hidden;
     text-overflow: ellipsis;
+    
+    // Mobile responsive text truncation
+    @media (max-width: 768px) {
+      max-width: 80px;
+    }
+    
+    @media (max-width: 480px) {
+      max-width: 60px;
+    }
   }
 }
 
@@ -134,9 +178,9 @@ $breakpoint-mobile: 500px;
 // FAQ列表容器
 .all-faqs,
 .category-intro {
-  margin: 0 auto 100px auto;
+  margin: 0 auto 0 auto;
   padding-top: 40px;
-  max-width: 800px;
+  max-width: 100%;
   text-align: center;
 
   .faq-list {
@@ -146,7 +190,7 @@ $breakpoint-mobile: 500px;
 
 // FAQ详情页面
 .faq-detail {
-  max-width: 800px;
+  max-width: 90%;
   margin: 0 auto;
   padding: 40px 0;
 
@@ -319,32 +363,89 @@ $breakpoint-mobile: 500px;
   }
 }
 
-// TOC Toggle Button
+// TOC Toggle Button - positioned to the left of TOC or right edge when hidden
 .toc-toggle-btn {
   position: fixed;
   top: 50%;
-  right: 10px;
   transform: translateY(-50%);
   width: 32px;
   height: 32px;
   background: #ffffff;
   border: 1px solid #e1e5e9;
-  border-radius: 6px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 60;
+  z-index: 85; // Higher than TOC but lower than modals
+  
+  // Default: hidden by default, only show on hover (when TOC is visible)
+  opacity: 0;
+  visibility: hidden;
   transition: all 0.3s ease;
+  
+  // When TOC is hidden, always show the button
+  .faq-layout-container.toc-hidden & {
+    opacity: 1;
+    visibility: visible;
+  }
+  
+  // Default: when TOC is visible, button is at the left edge of TOC
+  right: 320px; // TOC width
+  border-radius: 6px 0 0 6px; // Rounded only on the left side
+  box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
+  
+  // When TOC is hidden, move button to the right edge of screen and keep it visible
+  .faq-layout-container.toc-hidden & {
+    right: 0; // Completely flush with right edge
+    border-radius: 6px 0 0 6px; // Rounded only on the left side when at edge
+    box-shadow: -2px 0 8px rgba(0, 0, 0, 0.15);
+    opacity: 1; // Always visible when TOC is hidden
+    visibility: visible;
+  }
 
+  // Show button when hovering button itself
   &:hover {
+    opacity: 1;
+    visibility: visible;
     background: #f8f9fa;
     border-color: #1a73e8;
-    box-shadow: 0 4px 12px rgba(26, 115, 232, 0.15);
+    
+    // Default hover shadow (TOC visible)
+    box-shadow: -4px 0 12px rgba(26, 115, 232, 0.15);
+    
+    // When TOC is hidden, use left shadow since button is at right edge
+    .faq-layout-container.toc-hidden & {
+      box-shadow: -4px 0 12px rgba(26, 115, 232, 0.15);
+    }
   }
 
   &:active {
     transform: translateY(-50%) scale(0.95);
   }
+
+  // Hide on mobile and tablet
+  @media (max-width: $breakpoint-desktop) {
+    display: none;
+  }
 }
+
+// Show TOC toggle button when hovering TOC area
+.faq-toc:hover + .toc-toggle-btn {
+  opacity: 1;
+  visibility: visible;
+}
+
+// When TOC is hidden, expand the button's hover area slightly
+.faq-layout-container.toc-hidden .toc-toggle-btn {
+  // Expand hover area when TOC is hidden
+  &::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    bottom: -10px;
+    left: -15px;
+    right: -5px;
+    z-index: -1;
+  }
+}
+
