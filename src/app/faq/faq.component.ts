@@ -124,7 +124,7 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
   // TOC Pagination state
   tocPagination: TOCPaginationState = {
     currentPage: 1,
-    itemsPerPage: 10, // Show 8 items per page
+    itemsPerPage: 8, // Show 8 items per page
     totalPages: 1,
     startIndex: 0,
     endIndex: 8
@@ -368,8 +368,7 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
       'a0oEc000005JohNIAS',
       'a0oEc000005JohOIAS',
       'a0oEc000005JohSIAS',
-      'a0oEc000005JohTIAS',
-      'a0oEc000005JohUIAS'
+      'a0oEc000005JohTIAS'
     ];
     
     this.faqService.warmCacheForPopularFAQs(popularFaqIds);
@@ -518,8 +517,7 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
         'a0oEc000005JohUIAS',
         'a0oEc000005JohVIAS',
         'a0oEc000005JohWIAS',
-        'a0oEc000005JohXIAS',
-        'a0oEc000005JohYIAS'
+        'a0oEc000005JohXIAS'
       ];
 
       this._cachedTrendingQuestions = trendingIds

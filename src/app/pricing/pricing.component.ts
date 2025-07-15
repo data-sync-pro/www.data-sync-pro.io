@@ -1,68 +1,180 @@
-import { Component, AfterViewInit } from '@angular/core';
+import { Component } from '@angular/core';
+
+interface TierConfig {
+  name: string;
+  cost: number;
+  connections: number;
+  executables: number;
+  batchCapacity: string;
+}
 
 @Component({
   selector: 'app-pricing',
   templateUrl: './pricing.component.html',
   styleUrls: ['./pricing.component.scss']
 })
-export class PricingComponent implements AfterViewInit {
+export class PricingComponent {
 
-  // Pricing calculator properties
-  connections: number = 3;
-  executables: number = 150;
-  totalCost: number = 0;
-  freeExecutables: number = 0;
-  billableExecutables: number = 0;
+  selectedTier: string = 'standard';
+  bundleTotal: number = 4000;
+  showBundleOverlay: boolean = false;
+
+  addons = {
+    connections: 0,
+    executables: 0,
+    batchUpgrade: 'none'
+  };
+
+  private tierConfigs: { [key: string]: TierConfig } = {
+    'starter': {
+      name: 'Starter',
+      cost: 1600,
+      connections: 1,
+      executables: 100,
+      batchCapacity: '20k records/day'
+    },
+    'standard': {
+      name: 'Standard',
+      cost: 4000,
+      connections: 5,
+      executables: 100,
+      batchCapacity: '20k records/day'
+    },
+    'batch-premium': {
+      name: 'Batch Premium',
+      cost: 6000,
+      connections: 5,
+      executables: 100,
+      batchCapacity: '1M records/day'
+    },
+    'batch-unlimited': {
+      name: 'Batch Unlimited',
+      cost: 9000,
+      connections: 5,
+      executables: 100,
+      batchCapacity: 'Unlimited records'
+    }
+  };
 
   constructor() {
     this.calculateTotal();
   }
 
-  ngAfterViewInit(): void {
-    this.updateSliderBackgrounds();
-  }
-
-  calculateTotal(): void {
-    // Calculate free executables (50 per connection)
-    this.freeExecutables = this.connections * 50;
-
-    // All executables are billable, but we show how many are included free
-    this.billableExecutables = this.executables;
-
-    // Calculate total cost - all executables are charged
-    this.totalCost = (this.connections * 1000) + (this.executables * 10);
-
-    // Update slider backgrounds
-    this.updateSliderBackgrounds();
-  }
-
-  updateSliderBackgrounds(): void {
-    setTimeout(() => {
-      // Update connections slider
-      const connectionsSlider = document.querySelector('.connections-slider') as HTMLInputElement;
-      if (connectionsSlider) {
-        const connectionsPercent = ((this.connections - 1) / (10 - 1)) * 100;
-        connectionsSlider.style.background = `linear-gradient(to right, #48bb78 0%, #48bb78 ${connectionsPercent}%, #e2e8f0 ${connectionsPercent}%, #e2e8f0 100%)`;
-      }
-
-      // Update executables slider
-      const executablesSlider = document.querySelector('.executables-slider') as HTMLInputElement;
-      if (executablesSlider) {
-        const executablesPercent = ((this.executables - 0) / (1000 - 0)) * 100;
-        executablesSlider.style.background = `linear-gradient(to right, #ed8936 0%, #ed8936 ${executablesPercent}%, #e2e8f0 ${executablesPercent}%, #e2e8f0 100%)`;
-      }
-    }, 0);
-  }
-
-  setPreset(connections: number, executables: number): void {
-    this.connections = connections;
-    this.executables = executables;
+  selectTier(tier: string): void {
+    this.selectedTier = tier;
     this.calculateTotal();
   }
 
+  updateAddon(type: 'connections' | 'executables', change: number): void {
+    if (type === 'connections') {
+      this.addons.connections = Math.max(0, this.addons.connections + change);
+    } else if (type === 'executables') {
+      this.addons.executables = Math.max(0, this.addons.executables + change);
+    }
+    this.calculateTotal();
+  }
+
+  calculateTotal(): void {
+    const baseCost = this.getBaseTierCost();
+    const connectionsCost = this.addons.connections * 600;
+    const executablesCost = this.addons.executables * 10;
+    const batchCost = this.getBatchUpgradeCost();
+    
+    this.bundleTotal = baseCost + connectionsCost + executablesCost + batchCost;
+  }
+
+  getSelectedTierName(): string {
+    return this.tierConfigs[this.selectedTier]?.name || 'Standard';
+  }
+
+  getBaseTierCost(): number {
+    return this.tierConfigs[this.selectedTier]?.cost || 4000;
+  }
+
+  getBatchUpgradeCost(): number {
+    switch (this.addons.batchUpgrade) {
+      case '1m': return 2000;
+      case 'unlimited': return 5000;
+      default: return 0;
+    }
+  }
+
+  getBatchUpgradeName(): string {
+    switch (this.addons.batchUpgrade) {
+      case '1m': return '1M records/day';
+      case 'unlimited': return 'Salesforce limit';
+      default: return 'Included capacity';
+    }
+  }
+
+  getTotalConnections(): number {
+    const baseConnections = this.tierConfigs[this.selectedTier]?.connections || 5;
+    return baseConnections + this.addons.connections;
+  }
+
+  getTotalExecutables(): number {
+    const baseExecutables = this.tierConfigs[this.selectedTier]?.executables || 100;
+    return baseExecutables + this.addons.executables;
+  }
+
+  getBatchCapacity(): string {
+    if (this.addons.batchUpgrade !== 'none') {
+      return this.getBatchUpgradeName();
+    }
+    return this.tierConfigs[this.selectedTier]?.batchCapacity || '20k records/day';
+  }
+
+  openBundleOverlay(tier: string): void {
+    this.selectedTier = tier;
+    this.resetBundleAddons();
+    this.showBundleOverlay = true;
+    document.body.style.overflow = 'hidden'; // Prevent background scrolling
+  }
+
+  closeBundleOverlay(): void {
+    this.showBundleOverlay = false;
+    document.body.style.overflow = 'auto'; // Restore scrolling
+  }
+
+  resetBundle(): void {
+    this.resetBundleAddons();
+  }
+
+  resetBundleAddons(): void {
+    this.addons = {
+      connections: 0,
+      executables: 0,
+      batchUpgrade: 'none'
+    };
+    this.calculateTotal();
+  }
+
+  getBaseTierBaseIncludes(): string {
+    const config = this.tierConfigs[this.selectedTier];
+    if (!config) return '';
+    
+    return `${config.connections} connection${config.connections > 1 ? 's' : ''}, ${config.executables} executables, ${config.batchCapacity}`;
+  }
+
   contactSales(): void {
-    // You can customize this to open a contact form, email, or redirect to a contact page
-    window.open('mailto:sales@data-sync-pro.io?subject=Enterprise Pricing Inquiry', '_blank');
+    const bundleDetails = `
+Bundle Configuration:
+- Base Tier: ${this.getSelectedTierName()} ($${this.getBaseTierCost()}/month)
+- Total Connections: ${this.getTotalConnections()}
+- Total Executables: ${this.getTotalExecutables()}
+- Batch Capacity: ${this.getBatchCapacity()}
+- Total Monthly Cost: $${this.bundleTotal}
+
+Additional Add-ons:
+- Extra Connections: ${this.addons.connections} ($${this.addons.connections * 600}/month)
+- Extra Executables: ${this.addons.executables} ($${this.addons.executables * 10}/month)
+- Batch Upgrade: ${this.getBatchUpgradeName()} ($${this.getBatchUpgradeCost()}/month)
+    `;
+    
+    const subject = `Custom Bundle Inquiry - $${this.bundleTotal}/month`;
+    const body = encodeURIComponent(`Hi, I'm interested in the following custom bundle:${bundleDetails}`);
+    
+    window.open(`mailto:sales@data-sync-pro.io?subject=${encodeURIComponent(subject)}&body=${body}`, '_blank');
   }
 
 }
