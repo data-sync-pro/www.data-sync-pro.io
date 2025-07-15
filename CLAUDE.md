@@ -30,7 +30,7 @@ This is an Angular 15 website for Data Sync Pro (DSP), a Salesforce data synchro
 
 ### Core Structure
 - **Main modules**: App, FAQ (lazy-loaded), Designer Guide (lazy-loaded), Shared
-- **Key components**: Home, Header, Footer, Pricing, Solutions, Rules Engines, Support
+- **Key components**: Home, Header, Footer, Pricing (with interactive bundle configurator), Solutions, Rules Engines, Support
 - **Routing**: Uses lazy loading for FAQ and Designer Guide modules with preload strategy
 - **State management**: Uses Angular services for data management
 - **UI framework**: Angular Material + Bootstrap for styling
@@ -47,6 +47,7 @@ The site features a sophisticated content generation system:
 - **Image zoom directives**: `zoomable.directive.ts` and `simple-zoomable.directive.ts` for image interactions
 - **Scroll management**: Custom scroll-to-top component with footer-aware positioning
 - **Search functionality**: Search overlay component for content discovery
+- **Interactive pricing configurator**: Modal overlay system for customizing subscription bundles with real-time calculations
 - **Offline support**: Service worker implementation with Angular PWA features
 - **Analytics integration**: Google Analytics service for tracking
 - **Cookie consent**: GDPR-compliant cookie consent component
@@ -135,3 +136,14 @@ To generate new FAQ components:
 - **TOC Wheel Isolation**: Mouse wheel in TOC only scrolls TOC content, never triggers FAQ state changes
 - **Performance**: Extensive use of caching and memoization for scroll position calculations
 - **User Selection**: TOC items use `user-select: none` to prevent text selection during scroll
+
+### Pricing Component Architecture
+- **Interactive Bundle Configuration**: Modal overlay system for customizing subscription tiers
+- **Click-to-Configure**: All pricing tier cards are clickable with hover hints for intuitive UX
+- **Real-time Calculation**: Dynamic pricing updates based on addon selections (connections, executables, batch capacity)
+- **Responsive Layout**: 4-column desktop layout that adapts to 2-column tablet and single-column mobile
+- **Modal Management**: Overlay system with backdrop blur, body scroll prevention, and smooth animations
+- **Bundle Customization**: Three pricing components - Additional Connections ($600/month), Additional Executables ($10/month), Batch Processing Upgrades ($2k-5k/month)
+- **Email Integration**: Automatic generation of detailed sales inquiry emails with bundle configuration
+- **Sticky Summary**: Right sidebar summary panel that stays visible during configuration
+- **Form State Management**: Uses Angular reactive forms with real-time validation and state updates
