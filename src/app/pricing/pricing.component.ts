@@ -17,13 +17,19 @@ export class PricingComponent {
 
   selectedTier: string = 'standard';
   bundleTotal: number = 4000;
-  showBundleOverlay: boolean = false;
 
   addons = {
     connections: 0,
     executables: 0,
     batchUpgrade: 'none'
   };
+
+  // Temporary values for user input
+  tempConnections: number = 0;
+  tempExecutables: number = 0;
+
+  // FAQ states for accordion
+  faqStates: boolean[] = [false, false, false, false, false, false];
 
   private tierConfigs: { [key: string]: TierConfig } = {
     'starter': {
@@ -52,12 +58,14 @@ export class PricingComponent {
       cost: 9000,
       connections: 5,
       executables: 100,
-      batchCapacity: 'Unlimited records'
+      batchCapacity: 'No DSP limit(Salesforce limit applies)'
     }
   };
 
   constructor() {
-    this.calculateTotal();
+    this.resetBundleAddons();
+    this.tempConnections = this.addons.connections;
+    this.tempExecutables = this.addons.executables;
   }
 
   selectTier(tier: string): void {
@@ -67,20 +75,22 @@ export class PricingComponent {
 
   updateAddon(type: 'connections' | 'executables', change: number): void {
     if (type === 'connections') {
-      this.addons.connections = Math.max(0, this.addons.connections + change);
+      this.addons.connections = Math.max(1, this.addons.connections + change);
+      this.tempConnections = this.addons.connections;
     } else if (type === 'executables') {
-      this.addons.executables = Math.max(0, this.addons.executables + change);
+      this.addons.executables = Math.max(50, this.addons.executables + change);
+      this.tempExecutables = this.addons.executables;
     }
     this.calculateTotal();
   }
 
   calculateTotal(): void {
-    const baseCost = this.getBaseTierCost();
+    // Calculate total costs based on actual usage
     const connectionsCost = this.addons.connections * 600;
     const executablesCost = this.addons.executables * 10;
     const batchCost = this.getBatchUpgradeCost();
     
-    this.bundleTotal = baseCost + connectionsCost + executablesCost + batchCost;
+    this.bundleTotal = connectionsCost + executablesCost + batchCost;
   }
 
   getSelectedTierName(): string {
@@ -92,30 +102,92 @@ export class PricingComponent {
   }
 
   getBatchUpgradeCost(): number {
-    switch (this.addons.batchUpgrade) {
-      case '1m': return 2000;
-      case 'unlimited': return 5000;
-      default: return 0;
+    return this.getBatchOptionCost(this.addons.batchUpgrade);
+  }
+
+  getBatchOptionCost(option: string): number {
+    const config = this.tierConfigs[this.selectedTier];
+    let baseBatchCost = 0;
+    
+    // Determine base batch cost for current tier
+    switch (this.selectedTier) {
+      case 'starter':
+      case 'standard':
+        baseBatchCost = 0; // 20k is free
+        break;
+      case 'batch-premium':
+        baseBatchCost = 2000; // 1M is included
+        break;
+      case 'batch-unlimited':
+        baseBatchCost = 5000; // Unlimited is included
+        break;
     }
+    
+    // Calculate cost difference
+    let optionCost = 0;
+    switch (option) {
+      case '20k':
+        optionCost = 0;
+        break;
+      case '1m':
+        optionCost = 2000;
+        break;
+      case 'unlimited':
+        optionCost = 5000;
+        break;
+    }
+    
+    return optionCost - baseBatchCost;
   }
 
   getBatchUpgradeName(): string {
     switch (this.addons.batchUpgrade) {
+      case '20k': return '20k records/day';
       case '1m': return '1M records/day';
       case 'unlimited': return 'Salesforce limit';
       default: return 'Included capacity';
     }
   }
 
+  shouldShowBatchOption(option: string): boolean {
+    switch (this.selectedTier) {
+      case 'starter':
+      case 'standard':
+        // Show all options for basic tiers
+        return true;
+      case 'batch-premium':
+        // Hide 20k (downgrade), show 1m (included) and unlimited (upgrade)
+        return option !== '20k';
+      case 'batch-unlimited':
+        // Only show unlimited (included), hide downgrades
+        return option === 'unlimited';
+      default:
+        return true;
+    }
+  }
+
+  getDefaultBatchOption(): string {
+    switch (this.selectedTier) {
+      case 'starter':
+      case 'standard':
+        return '20k';
+      case 'batch-premium':
+        return '1m';
+      case 'batch-unlimited':
+        return 'unlimited';
+      default:
+        return '20k';
+    }
+  }
+
   getTotalConnections(): number {
-    const baseConnections = this.tierConfigs[this.selectedTier]?.connections || 5;
-    return baseConnections + this.addons.connections;
+    return this.addons.connections;
   }
 
   getTotalExecutables(): number {
-    const baseExecutables = this.tierConfigs[this.selectedTier]?.executables || 100;
-    return baseExecutables + this.addons.executables;
+    return this.addons.executables;
   }
+
 
   getBatchCapacity(): string {
     if (this.addons.batchUpgrade !== 'none') {
@@ -124,16 +196,17 @@ export class PricingComponent {
     return this.tierConfigs[this.selectedTier]?.batchCapacity || '20k records/day';
   }
 
-  openBundleOverlay(tier: string): void {
+  selectTierAndScroll(tier: string): void {
     this.selectedTier = tier;
     this.resetBundleAddons();
-    this.showBundleOverlay = true;
-    document.body.style.overflow = 'hidden'; // Prevent background scrolling
-  }
-
-  closeBundleOverlay(): void {
-    this.showBundleOverlay = false;
-    document.body.style.overflow = 'auto'; // Restore scrolling
+    
+    // Scroll to configurator section
+    setTimeout(() => {
+      const element = document.querySelector('.bundle-configurator-section');
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 100);
   }
 
   resetBundle(): void {
@@ -141,11 +214,28 @@ export class PricingComponent {
   }
 
   resetBundleAddons(): void {
+    // Set default batch option based on tier
+    let defaultBatchOption = '20k';
+    switch (this.selectedTier) {
+      case 'starter':
+      case 'standard':
+        defaultBatchOption = '20k';
+        break;
+      case 'batch-premium':
+        defaultBatchOption = '1m';
+        break;
+      case 'batch-unlimited':
+        defaultBatchOption = 'unlimited';
+        break;
+    }
+    
     this.addons = {
-      connections: 0,
-      executables: 0,
-      batchUpgrade: 'none'
+      connections: 1,
+      executables: 100,
+      batchUpgrade: defaultBatchOption
     };
+    this.tempConnections = this.addons.connections;
+    this.tempExecutables = this.addons.executables;
     this.calculateTotal();
   }
 
@@ -156,19 +246,42 @@ export class PricingComponent {
     return `${config.connections} connection${config.connections > 1 ? 's' : ''}, ${config.executables} executables, ${config.batchCapacity}`;
   }
 
+  onConnectionsInput(event: any): void {
+    // Just update the temp value, don't calculate
+    this.tempConnections = event.target.value;
+  }
+
+  onConnectionsBlur(event: any): void {
+    const value = parseInt(event.target.value);
+    this.addons.connections = Math.max(1, Math.floor(value) || 1);
+    this.tempConnections = this.addons.connections;
+    this.calculateTotal();
+  }
+
+  onExecutablesInput(event: any): void {
+    // Just update the temp value, don't calculate
+    this.tempExecutables = event.target.value;
+  }
+
+  onExecutablesBlur(event: any): void {
+    const value = parseInt(event.target.value);
+    const rounded = Math.round((value || 50) / 50) * 50;
+    this.addons.executables = Math.max(50, rounded);
+    this.tempExecutables = this.addons.executables;
+    this.calculateTotal();
+  }
+
+  toggleFaq(index: number): void {
+    this.faqStates[index] = !this.faqStates[index];
+  }
+
   contactSales(): void {
     const bundleDetails = `
 Bundle Configuration:
-- Base Tier: ${this.getSelectedTierName()} ($${this.getBaseTierCost()}/month)
-- Total Connections: ${this.getTotalConnections()}
-- Total Executables: ${this.getTotalExecutables()}
-- Batch Capacity: ${this.getBatchCapacity()}
+- Connections: ${this.getTotalConnections()} ($${this.addons.connections * 600}/month)
+- Executables: ${this.getTotalExecutables()} ($${this.addons.executables * 10}/month)
+- Batch Capacity: ${this.getBatchCapacity()} ($${this.getBatchUpgradeCost()}/month)
 - Total Monthly Cost: $${this.bundleTotal}
-
-Additional Add-ons:
-- Extra Connections: ${this.addons.connections} ($${this.addons.connections * 600}/month)
-- Extra Executables: ${this.addons.executables} ($${this.addons.executables * 10}/month)
-- Batch Upgrade: ${this.getBatchUpgradeName()} ($${this.getBatchUpgradeCost()}/month)
     `;
     
     const subject = `Custom Bundle Inquiry - $${this.bundleTotal}/month`;

@@ -68,24 +68,8 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         color: $primary-color;
         transform: translateX(4px);
       }
-
-      &::before {
-        opacity: 1;
-      }
     }
 
-    // 顶部装饰条
-    &::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 3px;
-      background: linear-gradient(90deg, $primary-color, #4285f4);
-      opacity: 0;
-      transition: opacity 0.3s ease;
-    }
 
     .faq-header {
       padding: 24px 28px;

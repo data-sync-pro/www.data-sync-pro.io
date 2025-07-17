@@ -1,414 +1,427 @@
 ﻿<div class="pricing-page">
   <!-- Hero Section -->
   <div class="hero-section">
-    <h1>Simple, Transparent Pricing</h1>
-    <p class="hero-subtitle">
-      Core subscription tiers with usage-based add-ons. No per-user fees, unlimited users included.
-    </p>
+    <div class="hero-content">
+      <h1>Pricing</h1>
+      <p class="pricing-subtitle">See pricing for our Starter, Standard, Batch Premium, Batch Unlimited plans.</p>
+    </div>
   </div>
 
   <!-- Core Subscription Tiers -->
   <div class="subscription-tiers-section">
-    <h2>Core Subscription Tiers</h2>
     <div class="tiers-grid">
-      <div class="tier-card clickable" (click)="openBundleOverlay('starter')">
+      <div class="tier-card">
         <div class="tier-header">
           <h3>Starter</h3>
-          <div class="tier-price">$1,600<span class="price-period">/month</span></div>
+          <div class="tier-price">
+            <span class="price-amount">$1,600</span>
+            <span class="price-period">/month</span>
+          </div>
+          <p class="tier-description">Perfect for small teams getting started</p>
         </div>
         <div class="tier-features">
-          <p class="tier-description">Data enrichment, deduplication, masking/archival, batch jobs, validation, actionable lists & buttons, transformable data loader</p>
-          <div class="tier-benefits">
-            <div class="benefit-item">Up to <strong>80% less dev effort & tech-debt</strong></div>
-            <div class="benefit-item">20× faster batch processing</div>
-            <div class="benefit-item">Secure local processing</div>
-          </div>
           <div class="tier-limits">
-            <div class="limit-item">1 connection</div>
-            <div class="limit-item">100 executables</div>
-            <div class="limit-item">20k records/day batch limit</div>
-          </div>
-        </div>
-        <div class="click-hint">Click to configure</div>
-      </div>
-
-      <div class="tier-card clickable" (click)="openBundleOverlay('standard')">
-        <div class="tier-header">
-          <h3>Standard</h3>
-          <div class="tier-price">$4,000<span class="price-period">/month</span></div>
-        </div>
-        <div class="tier-features">
-          <p class="tier-description">Everything in Starter <strong>plus</strong> record-based config deployments, sandbox seeding & cross-org data migration/mash-up</p>
-          <div class="tier-limits">
-            <div class="limit-item">5 connections (4 SB + 1 prod)</div>
-            <div class="limit-item">100 executables</div>
-            <div class="limit-item">20k records/day batch</div>
-            <div class="limit-item">Unlimited users</div>
-          </div>
-        </div>
-        <div class="click-hint">Click to configure</div>
-      </div>
-
-      <div class="tier-card clickable" (click)="openBundleOverlay('batch-premium')">
-        <div class="tier-header">
-          <h3>Batch Premium</h3>
-          <div class="tier-price">$6,000<span class="price-period">/month</span></div>
-        </div>
-        <div class="tier-features">
-          <p class="tier-description">Standard capabilities with significantly higher batch processing capacity</p>
-          <div class="tier-limits">
-            <div class="limit-item">5 connections</div>
-            <div class="limit-item">100 executables</div>
-            <div class="limit-item"><strong>1 million records/day</strong> batch ceiling</div>
-          </div>
-        </div>
-        <div class="click-hint">Click to configure</div>
-      </div>
-
-      <div class="tier-card clickable" (click)="openBundleOverlay('batch-unlimited')">
-        <div class="tier-header">
-          <h3>Batch Unlimited</h3>
-          <div class="tier-price">$9,000<span class="price-period">/month</span></div>
-        </div>
-        <div class="tier-features">
-          <p class="tier-description">Lifts DSP batch cap entirely (subject only to Salesforce limits)</p>
-          <div class="tier-limits">
-            <div class="limit-item">5 connections</div>
-            <div class="limit-item">100 executables</div>
-            <div class="limit-item"><strong>Unlimited batch records</strong></div>
-          </div>
-        </div>
-        <div class="click-hint">Click to configure</div>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- Usage-Based Add-ons -->
-  <div class="addons-section">
-    <h2>Usage-Based Add-ons</h2>
-    <div class="addons-grid">
-      <div class="addon-card">
-        <div class="addon-icon">🔗</div>
-        <h3>Connections</h3>
-        <p class="addon-price">$600/month</p>
-        <p class="addon-description">
-          Additional Salesforce org or environment connections
-        </p>
-      </div>
-
-      <div class="addon-card">
-        <div class="addon-icon">⚙️</div>
-        <h3>Executables</h3>
-        <p class="addon-price">$10/month</p>
-        <p class="addon-description">
-          Additional rules or automations (ETL, Batch Job, Data Loader, etc.)
-        </p>
-      </div>
-
-      <div class="addon-card">
-        <div class="addon-icon">📊</div>
-        <h3>Daily Batch Options</h3>
-        <div class="batch-options">
-          <div class="batch-option">
-            <span class="batch-limit">20k records</span>
-            <span class="batch-price">Included</span>
-          </div>
-          <div class="batch-option">
-            <span class="batch-limit">1M records</span>
-            <span class="batch-price">$2,000/month</span>
-          </div>
-          <div class="batch-option">
-            <span class="batch-limit">Salesforce limit</span>
-            <span class="batch-price">$5,000/month</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- What's Included -->
-  <div class="whats-included-section">
-    <h2>What's Included in All Plans</h2>
-    <div class="included-grid">
-      <div class="included-item">
-        <div class="check-icon">✓</div>
-        <div>
-          <h4>Unlimited Users</h4>
-          <p>Site-wide license for your entire Salesforce org with no per-user fees</p>
-        </div>
-      </div>
-      <div class="included-item">
-        <div class="check-icon">✓</div>
-        <div>
-          <h4>100 Executables</h4>
-          <p>Every plan includes 100 executables out-of-the-box</p>
-        </div>
-      </div>
-      <div class="included-item">
-        <div class="check-icon">✓</div>
-        <div>
-          <h4>All Engine Types</h4>
-          <p>Batch, Triggers, Data List, Data Loader, and Record Action engines</p>
-        </div>
-      </div>
-      <div class="included-item">
-        <div class="check-icon">✓</div>
-        <div>
-          <h4>High Performance</h4>
-          <p>20× faster batch processing than regular APEX batch jobs</p>
-        </div>
-      </div>
-      <div class="included-item">
-        <div class="check-icon">✓</div>
-        <div>
-          <h4>Reduced Development Effort</h4>
-          <p>Up to 80% less dev effort and tech debt</p>
-        </div>
-      </div>
-      <div class="included-item">
-        <div class="check-icon">✓</div>
-        <div>
-          <h4>Secure Processing</h4>
-          <p>Local data processing with enterprise-grade security</p>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Bundle Configuration Overlay -->
-  <div class="bundle-overlay" [class.show]="showBundleOverlay" (click)="closeBundleOverlay()">
-    <div class="bundle-modal" (click)="$event.stopPropagation()">
-      <div class="bundle-modal-header">
-        <div class="modal-tier-info">
-          <h2>Configure {{ getSelectedTierName() }} Bundle</h2>
-          <div class="base-tier-summary">
-            <span class="base-price">${{ getBaseTierCost() | number:'1.0-0' }}/month</span>
-            <span class="base-includes">{{ getBaseTierBaseIncludes() }}</span>
-          </div>
-        </div>
-        <button class="close-btn" (click)="closeBundleOverlay()">×</button>
-      </div>
-
-      <div class="bundle-modal-content">
-        <div class="addons-configuration">
-          <h3>Add Usage-Based Components</h3>
-          
-          <!-- Additional Connections -->
-          <div class="addon-config">
-            <div class="addon-header">
-              <div class="addon-icon">🔗</div>
-              <div class="addon-info">
-                <h4>Additional Connections</h4>
-                <p>$600/month per connection</p>
-              </div>
-              <div class="addon-controls">
-                <button class="qty-btn" (click)="updateAddon('connections', -1)">-</button>
-                <span class="qty-value">{{ addons.connections }}</span>
-                <button class="qty-btn" (click)="updateAddon('connections', 1)">+</button>
-              </div>
-            </div>
-            <div class="addon-cost">${{ addons.connections * 600 | number:'1.0-0' }}/month</div>
-          </div>
-
-          <!-- Additional Executables -->
-          <div class="addon-config">
-            <div class="addon-header">
-              <div class="addon-icon">⚙️</div>
-              <div class="addon-info">
-                <h4>Additional Executables</h4>
-                <p>$10/month per executable</p>
-              </div>
-              <div class="addon-controls">
-                <button class="qty-btn" (click)="updateAddon('executables', -10)">-10</button>
-                <button class="qty-btn" (click)="updateAddon('executables', -1)">-1</button>
-                <span class="qty-value">{{ addons.executables }}</span>
-                <button class="qty-btn" (click)="updateAddon('executables', 1)">+1</button>
-                <button class="qty-btn" (click)="updateAddon('executables', 10)">+10</button>
-              </div>
-            </div>
-            <div class="addon-cost">${{ addons.executables * 10 | number:'1.0-0' }}/month</div>
-          </div>
-
-          <!-- Batch Processing Upgrade -->
-          <div class="addon-config">
-            <div class="addon-header">
-              <div class="addon-icon">📊</div>
-              <div class="addon-info">
-                <h4>Batch Processing Upgrade</h4>
-                <p>Enhanced daily batch capacity</p>
-              </div>
-              <div class="batch-upgrade-options">
-                <label class="batch-radio">
-                  <input type="radio" 
-                         name="batchUpgrade" 
-                         value="none" 
-                         [(ngModel)]="addons.batchUpgrade"
-                         (change)="calculateTotal()">
-                  <span>No upgrade (included capacity)</span>
-                  <span class="batch-cost">$0</span>
-                </label>
-                <label class="batch-radio">
-                  <input type="radio" 
-                         name="batchUpgrade" 
-                         value="1m" 
-                         [(ngModel)]="addons.batchUpgrade"
-                         (change)="calculateTotal()">
-                  <span>1M records/day</span>
-                  <span class="batch-cost">$2,000/month</span>
-                </label>
-                <label class="batch-radio">
-                  <input type="radio" 
-                         name="batchUpgrade" 
-                         value="unlimited" 
-                         [(ngModel)]="addons.batchUpgrade"
-                         (change)="calculateTotal()">
-                  <span>Salesforce limit</span>
-                  <span class="batch-cost">$5,000/month</span>
-                </label>
-              </div>
-            </div>
-            <div class="addon-cost">${{ getBatchUpgradeCost() | number:'1.0-0' }}/month</div>
-          </div>
-        </div>
-
-        <div class="bundle-summary">
-          <h3>Your Custom Bundle</h3>
-          
-          <div class="summary-breakdown">
-            <div class="summary-item base-tier">
-              <span class="item-name">{{ getSelectedTierName() }}</span>
-              <span class="item-cost">${{ getBaseTierCost() | number:'1.0-0' }}</span>
-            </div>
-            
-            <div class="summary-item" *ngIf="addons.connections > 0">
-              <span class="item-name">{{ addons.connections }} Additional Connection{{ addons.connections > 1 ? 's' : '' }}</span>
-              <span class="item-cost">${{ addons.connections * 600 | number:'1.0-0' }}</span>
-            </div>
-            
-            <div class="summary-item" *ngIf="addons.executables > 0">
-              <span class="item-name">{{ addons.executables }} Additional Executable{{ addons.executables > 1 ? 's' : '' }}</span>
-              <span class="item-cost">${{ addons.executables * 10 | number:'1.0-0' }}</span>
-            </div>
-            
-            <div class="summary-item" *ngIf="addons.batchUpgrade !== 'none'">
-              <span class="item-name">Batch Upgrade ({{ getBatchUpgradeName() }})</span>
-              <span class="item-cost">${{ getBatchUpgradeCost() | number:'1.0-0' }}</span>
-            </div>
-          </div>
-
-          <div class="summary-total">
-            <span class="total-label">Total Monthly Cost</span>
-            <span class="total-amount">${{ bundleTotal | number:'1.0-0' }}</span>
-          </div>
-
-          <div class="bundle-includes">
-            <h4>Your Bundle Includes:</h4>
-            <ul>
-              <li>{{ getTotalConnections() }} Connection{{ getTotalConnections() > 1 ? 's' : '' }}</li>
-              <li>{{ getTotalExecutables() }} Executable{{ getTotalExecutables() > 1 ? 's' : '' }}</li>
-              <li>{{ getBatchCapacity() }} batch processing</li>
+            <ul class="limit-list">
+              <li>1 connection</li>
+              <li>100 executables</li>
+              <li>20k records/day</li>
+              <li>Data Enrichment, Deduplication, Masking,Archival</li>
+              <li>Automation & Validation</li>
+              <li>Actionable Data Lists</li>
+              <li>Action Buttons</li>
+              <li>Transformable Data Loader</li>
               <li>Unlimited users</li>
-              <li>All engine types</li>
             </ul>
           </div>
+        </div>
+        <button class="click-hint" (click)="selectTierAndScroll('starter')">Configure</button>
+      </div>
 
-          <div class="bundle-actions">
-            <button class="bundle-cta primary" (click)="contactSales()">Get This Bundle</button>
-            <button class="bundle-cta secondary" (click)="resetBundle()">Reset Configuration</button>
+      <div class="tier-card">
+        <div class="tier-header">
+          <h3>Standard</h3>
+          <div class="tier-price">
+            <span class="price-amount">$4,000</span>
+            <span class="price-period">/month</span>
+          </div>
+          <p class="tier-description">Most popular for growing teams</p>
+        </div>
+        <div class="tier-features">
+          <div class="tier-limits">
+            <h4 class="tier-inherit">Everything in Starter, plus:</h4>
+            <ul class="limit-list">
+              <li>5 connections (4 SB + 1 prod)</li>
+              <li>Streamlined Deployments of Record-Based Configurations(DSP & other solutions)</li>
+              <li>Sandbox Seeding</li>
+              <li>Cross-Org Data Migration/Mash-up</li>
+            </ul>
           </div>
         </div>
+        <button class="click-hint" (click)="selectTierAndScroll('standard')">Configure</button>
+      </div>
+
+      <div class="tier-card">
+        <div class="tier-header">
+          <h3>Batch Premium</h3>
+          <div class="tier-price">
+            <span class="price-amount">$6,000</span>
+            <span class="price-period">/month</span>
+          </div>
+          <p class="tier-description">For teams with high-volume data processing</p>
+        </div>
+        <div class="tier-features">
+          <div class="tier-limits">
+            <h4 class="tier-inherit">Everything in Standard, plus:</h4>
+            <ul class="limit-list">
+              <li>1 million records/day</li>
+            </ul>
+          </div>
+        </div>
+        <button class="click-hint" (click)="selectTierAndScroll('batch-premium')">Configure</button>
+      </div>
+
+      <div class="tier-card">
+        <div class="tier-header">
+          <h3>Batch Unlimited</h3>
+          <div class="tier-price">
+            <span class="price-amount">$9,000</span>
+            <span class="price-period">/month</span>
+          </div>
+          <p class="tier-description">Enterprise-scale unlimited processing</p>
+        </div>
+        <div class="tier-features">
+          <div class="tier-limits">
+            <h4 class="tier-inherit">Everything in Batch Premium, plus:</h4>
+            <ul class="limit-list">
+              <li>No DSP limit (Salesforce limit applies)</li> 
+            </ul>
+          </div>
+        </div>
+        <button class="click-hint" (click)="selectTierAndScroll('batch-unlimited')">Configure</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- All Plans Include - Simple Version -->
+  <div class="features-highlight">
+    <h2>Why Data Sync Pro?</h2>
+    <div class="features-list">
+      <span class="feature-item">✓ Modular, no-code rules engines & powerful transformation</span>
+      <span class="feature-item">✓ Secure local processing</span>
+      <span class="feature-item">✓ Handles up to 80% of custom implementations</span>
+      <span class="feature-item">✓ Cuts dev effort by up to 80%</span>
+      <span class="feature-item">✓ Processes batch data up to 20x faster</span>
+      <span class="feature-item">✓ Reduces tech debt significantly</span>
+    </div>
+  </div>
+
+  <!-- Bundle Configurator -->
+  <div class="bundle-configurator-section">
+    <h2>Configure Your Plan</h2>
+    <div class="configurator-container">
+      <div class="bundle-summary">
+        <div class="config-breakdown">
+          <!-- Connections Configuration -->
+          <div class="config-item configurable">
+            <div class="item-info">
+              <span class="item-name">Connections</span>
+              <span class="item-description">$600/month each</span>
+            </div>
+            <div class="config-controls">
+              <button class="qty-btn" (click)="updateAddon('connections', -1)">-</button>
+              <input type="number" 
+                     class="qty-input" 
+                     [ngModel]="tempConnections" 
+                     (input)="onConnectionsInput($event)"
+                     (blur)="onConnectionsBlur($event)"
+                     min="1">
+              <button class="qty-btn" (click)="updateAddon('connections', 1)">+</button>
+            </div>
+          </div>
+          
+          <!-- Executables Configuration -->
+          <div class="config-item configurable">
+            <div class="item-info">
+              <span class="item-name">Executables</span>
+              <span class="item-description">$10/month each</span>
+            </div>
+            <div class="config-controls">
+              <button class="qty-btn" (click)="updateAddon('executables', -50)">-50</button>
+              <input type="number" 
+                     class="qty-input" 
+                     [ngModel]="tempExecutables" 
+                     (input)="onExecutablesInput($event)"
+                     (blur)="onExecutablesBlur($event)"
+                     min="50"
+                     step="50">
+              <button class="qty-btn" (click)="updateAddon('executables', 50)">+50</button>
+            </div>
+          </div>
+          
+          <!-- Batch Processing Configuration -->
+          <div class="config-item batch-tree">
+            <div class="batch-title">
+              <span class="item-name">Batch Processing Usage</span>
+            </div>
+            <div class="batch-options-tree">
+              <label class="batch-option" 
+                     [class.selected]="addons.batchUpgrade === '20k'"
+                     *ngIf="shouldShowBatchOption('20k')">
+                <input type="radio" 
+                       name="batchUpgrade" 
+                       value="20k" 
+                       [(ngModel)]="addons.batchUpgrade"
+                       (change)="calculateTotal()">
+                <span class="batch-text">20k/day<br><small>(Free)</small></span>
+              </label>
+              <label class="batch-option" 
+                     [class.selected]="addons.batchUpgrade === '1m'"
+                     *ngIf="shouldShowBatchOption('1m')">
+                <input type="radio" 
+                       name="batchUpgrade" 
+                       value="1m" 
+                       [(ngModel)]="addons.batchUpgrade"
+                       (change)="calculateTotal()">
+                <span class="batch-text">1M/day<br><small>($2,000/month)</small></span>
+              </label>
+              <label class="batch-option" 
+                     [class.selected]="addons.batchUpgrade === 'unlimited'"
+                     *ngIf="shouldShowBatchOption('unlimited')">
+                <input type="radio" 
+                       name="batchUpgrade" 
+                       value="unlimited" 
+                       [(ngModel)]="addons.batchUpgrade"
+                       (change)="calculateTotal()">
+                <span class="batch-text">Salesforce Limit <br><small>($5,000/month)</small></span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="summary-total">
+          <div class="invoice-table">
+            <div class="invoice-header">
+              <span class="item-column">Item</span>
+              <span class="qty-column">Qty</span>
+              <span class="rate-column">Rate</span>
+              <span class="amount-column">Amount</span>
+            </div>
+            <div class="invoice-row">
+              <span class="item-column">Connections</span>
+              <span class="qty-column">{{ addons.connections }}</span>
+              <span class="rate-column">$600</span>
+              <span class="amount-column">${{ addons.connections * 600 | number:'1.0-0' }}</span>
+            </div>
+            <div class="invoice-row">
+              <span class="item-column">Executables</span>
+              <span class="qty-column">{{ addons.executables }}</span>
+              <span class="rate-column">$10</span>
+              <span class="amount-column">${{ addons.executables * 10 | number:'1.0-0' }}</span>
+            </div>
+            <div class="invoice-row" *ngIf="getBatchUpgradeCost() > 0">
+              <span class="item-column">{{ getBatchUpgradeName() }}</span>
+              <span class="qty-column">1</span>
+              <span class="rate-column">${{ getBatchUpgradeCost() | number:'1.0-0' }}</span>
+              <span class="amount-column">${{ getBatchUpgradeCost() | number:'1.0-0' }}</span>
+            </div>
+            <div class="invoice-total">
+              <span class="total-label">Total Monthly Cost</span>
+              <span class="total-amount">${{ bundleTotal | number:'1.0-0' }}</span>
+            </div>
+          </div>
+        </div>
+
+
+        <div class="bundle-actions">
+          <button class="bundle-cta primary" (click)="contactSales()">Get This Bundle</button>
+          <button class="bundle-cta secondary" (click)="resetBundle()">Reset Configuration</button>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- Take-aways Section -->
-  <div class="takeaways-section">
-    <h2>Key Take-aways</h2>
-    <div class="takeaways-grid">
-      <div class="takeaway-item">
-        <div class="takeaway-icon">👥</div>
-        <div>
-          <h4>All plans include unlimited users</h4>
-          <p>No per-user fees — everyone in your org can use Data Sync Pro</p>
-        </div>
-      </div>
-      <div class="takeaway-item">
-        <div class="takeaway-icon">🚀</div>
-        <div>
-          <h4>100 executables out-of-the-box</h4>
-          <p>Every plan comes with 100 executables included</p>
-        </div>
-      </div>
-      <div class="takeaway-item">
-        <div class="takeaway-icon">🎯</div>
-        <div>
-          <h4>Starter targets single-org use cases</h4>
-          <p>Perfect for moderate-volume, single organization deployments</p>
-        </div>
-      </div>
-      <div class="takeaway-item">
-        <div class="takeaway-icon">🏢</div>
-        <div>
-          <h4>Standard adds multi-org tooling</h4>
-          <p>Cross-org data migration, sandbox seeding, and deployment tools</p>
-        </div>
-      </div>
-      <div class="takeaway-item">
-        <div class="takeaway-icon">⚡</div>
-        <div>
-          <h4>Batch tiers scale processing power</h4>
-          <p>Higher throughput options from 1M to unlimited records per day</p>
-        </div>
-      </div>
-      <div class="takeaway-item">
-        <div class="takeaway-icon">🔧</div>
-        <div>
-          <h4>À-la-carte add-ons for flexibility</h4>
-          <p>Scale connections, executables, or batch capacity without tier jumping</p>
-        </div>
-      </div>
-    </div>
-  </div>
+
 
   <!-- CTA Section -->
   <div class="cta-section">
-    <h2>Ready to Get Started?</h2>
-    <p>Let's discuss your specific use case and show you how Data Sync Pro can solve your data management challenges.</p>
-    <div class="cta-buttons">
-      <button class="primary-cta">Schedule a Demo</button>
-      <button class="secondary-cta">Contact Sales</button>
+    <div class="cta-content">
+      <h2>Ready to Get Started?</h2>
+      <p class="cta-description">See Data Sync Pro in action and discover how it can transform your Salesforce data management.</p>
+      <div class="cta-buttons">
+        <div class="cta-button-wrapper primary-wrapper">
+          <button class="cta-btn primary" id="demo-button">
+            <span class="btn-icon">📅</span>
+            <span class="btn-text">Schedule a Demo</span>
+          </button>
+          <p class="btn-subtitle">15-minute personalized demo</p>
+        </div>
+        <div class="cta-button-wrapper secondary-wrapper">
+          <button class="cta-btn secondary">
+            <span class="btn-icon">💬</span>
+            <span class="btn-text">Contact Us</span>
+          </button>
+          <p class="btn-subtitle">Get answers to your questions</p>
+        </div>
+      </div>
     </div>
   </div>
 
   <!-- FAQ Section -->
-  <div class="pricing-faq-section">
-    <h2>Frequently Asked Questions</h2>
-    <div class="faq-grid">
-      <div class="faq-item">
-        <h4>How do the subscription tiers work?</h4>
-        <p>Choose a core tier based on your org structure and batch processing needs. Starter for single-org, Standard for multi-org, and Batch tiers for high-volume processing. Add usage-based add-ons as needed.</p>
-      </div>
-      <div class="faq-item">
-        <h4>What counts as a Connection?</h4>
-        <p>A Connection represents each Salesforce org or environment that Data Sync Pro connects to. The Standard tier includes 5 connections (4 sandboxes + 1 production), while additional connections cost $600/month each.</p>
-      </div>
-      <div class="faq-item">
-        <h4>What is an Executable?</h4>
-        <p>An Executable is a modular rule for your data management process, such as ETL operations, Batch Jobs, Automations, Data Lists, Action Buttons, or Data Loaders. All plans include 100 executables, with additional ones at $10/month each.</p>
-      </div>
-      <div class="faq-item">
-        <h4>Are there any user limits?</h4>
-        <p>No! All Data Sync Pro plans use a site-wide license model with unlimited users. Everyone in your Salesforce org can access and use the platform at no additional cost.</p>
-      </div>
-      <div class="faq-item">
-        <h4>How does batch processing pricing work?</h4>
-        <p>All plans include 20k records/day batch processing. Upgrade to Batch Premium (1M records/day) or Batch Unlimited for higher volumes, or add batch capacity à-la-carte for $2,000-$5,000/month.</p>
-      </div>
-      <div class="faq-item">
-        <h4>Can I scale up or down?</h4>
-        <p>Yes! You can change your subscription tier or add/remove usage-based add-ons as your needs evolve. Billing adjusts monthly based on your active configuration.</p>
+  <section class="faq-section" aria-labelledby="faq-heading">
+    <div class="faq-container">
+      <h2 id="faq-heading" class="faq-title">FAQ</h2>
+      <div class="faq-accordion" role="tablist" aria-multiselectable="true">
+        
+        <div class="faq-item" [class.is-expanded]="faqStates[0]">
+          <h3>
+            <button 
+              type="button"
+              class="faq-question"
+              [attr.aria-expanded]="faqStates[0]"
+              [attr.aria-controls]="'faq-answer-0'"
+              [attr.id]="'faq-question-0'"
+              (click)="toggleFaq(0)"
+              (keydown.enter)="toggleFaq(0)"
+              (keydown.space)="$event.preventDefault(); toggleFaq(0)">
+              <span class="question-text">What is a Connection?</span>
+              <svg class="faq-icon" [class.is-expanded]="faqStates[0]" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M8 3.5a.5.5 0 0 1 .5.5v4h4a.5.5 0 0 1 0 1h-4v4a.5.5 0 0 1-1 0v-4h-4a.5.5 0 0 1 0-1h4v-4a.5.5 0 0 1 .5-.5z"/>
+              </svg>
+            </button>
+          </h3>
+          <div 
+            class="faq-answer"
+            [attr.id]="'faq-answer-0'"
+            [attr.aria-labelledby]="'faq-question-0'"
+            [class.is-expanded]="faqStates[0]"
+            role="region">
+            <div class="answer-content">
+              <p>A Connection represents each Salesforce org or environment that Data Sync Pro connects to. The Standard tier includes 5 connections (4 sandboxes + 1 production), while additional connections cost $600/month each.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item" [class.is-expanded]="faqStates[1]">
+          <h3>
+            <button 
+              type="button"
+              class="faq-question"
+              [attr.aria-expanded]="faqStates[1]"
+              [attr.aria-controls]="'faq-answer-1'"
+              [attr.id]="'faq-question-1'"
+              (click)="toggleFaq(1)"
+              (keydown.enter)="toggleFaq(1)"
+              (keydown.space)="$event.preventDefault(); toggleFaq(1)">
+              <span class="question-text">What is an Executable?</span>
+              <svg class="faq-icon" [class.is-expanded]="faqStates[1]" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M8 3.5a.5.5 0 0 1 .5.5v4h4a.5.5 0 0 1 0 1h-4v4a.5.5 0 0 1-1 0v-4h-4a.5.5 0 0 1 0-1h4v-4a.5.5 0 0 1 .5-.5z"/>
+              </svg>
+            </button>
+          </h3>
+          <div 
+            class="faq-answer"
+            [attr.id]="'faq-answer-1'"
+            [attr.aria-labelledby]="'faq-question-1'"
+            [class.is-expanded]="faqStates[1]"
+            role="region">
+            <div class="answer-content">
+              <p>An Executable is a modular rule for your data management process, such as ETL operations, Batch Jobs, Automations, Data Lists, Action Buttons, or Data Loaders. All plans include 100 executables, with additional ones at $10/month each.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item" [class.is-expanded]="faqStates[2]">
+          <h3>
+            <button 
+              type="button"
+              class="faq-question"
+              [attr.aria-expanded]="faqStates[2]"
+              [attr.aria-controls]="'faq-answer-2'"
+              [attr.id]="'faq-question-2'"
+              (click)="toggleFaq(2)"
+              (keydown.enter)="toggleFaq(2)"
+              (keydown.space)="$event.preventDefault(); toggleFaq(2)">
+              <span class="question-text">What is Batch Processing Usage?</span>
+              <svg class="faq-icon" [class.is-expanded]="faqStates[2]" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M8 3.5a.5.5 0 0 1 .5.5v4h4a.5.5 0 0 1 0 1h-4v4a.5.5 0 0 1-1 0v-4h-4a.5.5 0 0 1 0-1h4v-4a.5.5 0 0 1 .5-.5z"/>
+              </svg>
+            </button>
+          </h3>
+          <div 
+            class="faq-answer"
+            [attr.id]="'faq-answer-2'"
+            [attr.aria-labelledby]="'faq-question-2'"
+            [class.is-expanded]="faqStates[2]"
+            role="region">
+            <div class="answer-content">
+              <p>All plans include 20k records/day batch processing. Upgrade to Batch Premium (1M records/day) or Batch Unlimited for higher volumes, or add batch capacity à-la-carte for $2,000-$5,000/month.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item" [class.is-expanded]="faqStates[3]">
+          <h3>
+            <button 
+              type="button"
+              class="faq-question"
+              [attr.aria-expanded]="faqStates[3]"
+              [attr.aria-controls]="'faq-answer-3'"
+              [attr.id]="'faq-question-3'"
+              (click)="toggleFaq(3)"
+              (keydown.enter)="toggleFaq(3)"
+              (keydown.space)="$event.preventDefault(); toggleFaq(3)">
+              <span class="question-text">Are there any hidden fees?</span>
+              <svg class="faq-icon" [class.is-expanded]="faqStates[3]" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M8 3.5a.5.5 0 0 1 .5.5v4h4a.5.5 0 0 1 0 1h-4v4a.5.5 0 0 1-1 0v-4h-4a.5.5 0 0 1 0-1h4v-4a.5.5 0 0 1 .5-.5z"/>
+              </svg>
+            </button>
+          </h3>
+          <div 
+            class="faq-answer"
+            [attr.id]="'faq-answer-3'"
+            [attr.aria-labelledby]="'faq-question-3'"
+            [class.is-expanded]="faqStates[3]"
+            role="region">
+            <div class="answer-content">
+              <p>No setup fees or hidden costs. All pricing is transparent and subscription-based.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item" [class.is-expanded]="faqStates[4]">
+          <h3>
+            <button 
+              type="button"
+              class="faq-question"
+              [attr.aria-expanded]="faqStates[4]"
+              [attr.aria-controls]="'faq-answer-4'"
+              [attr.id]="'faq-question-4'"
+              (click)="toggleFaq(4)"
+              (keydown.enter)="toggleFaq(4)"
+              (keydown.space)="$event.preventDefault(); toggleFaq(4)">
+              <span class="question-text">Why DSP?</span>
+              <svg class="faq-icon" [class.is-expanded]="faqStates[4]" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M8 3.5a.5.5 0 0 1 .5.5v4h4a.5.5 0 0 1 0 1h-4v4a.5.5 0 0 1-1 0v-4h-4a.5.5 0 0 1 0-1h4v-4a.5.5 0 0 1 .5-.5z"/>
+              </svg>
+            </button>
+          </h3>
+          <div 
+            class="faq-answer"
+            [attr.id]="'faq-answer-4'"
+            [attr.aria-labelledby]="'faq-question-4'"
+            [class.is-expanded]="faqStates[4]"
+            role="region">
+            <div class="answer-content">
+              <p>Yes, you can upgrade or downgrade your plan at any time. Changes take effect at the next billing cycle.</p>
+            </div>
+          </div>
+        </div>
+
+
       </div>
     </div>
-  </div>
+  </section>
+
+
 </div>

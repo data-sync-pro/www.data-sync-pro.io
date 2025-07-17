@@ -120,6 +120,21 @@ To generate new FAQ components:
 - **Modular styles**: Complex components like FAQ use modular SCSS structure (e.g., `faq/styles/_layout.scss`, `_sidebar.scss`, etc.)
 - **English comments**: Use English for code comments as per project convention
 
+## Code Style Guidelines
+
+### Editor Configuration (.editorconfig)
+- **Indentation**: Use spaces (not tabs) with 2-space indentation
+- **Character encoding**: UTF-8 for all files
+- **Line endings**: Insert final newline, trim trailing whitespace (except in Markdown)
+- **TypeScript quotes**: Use single quotes for strings in TypeScript files
+- **Markdown files**: No max line length limit, preserve trailing whitespace
+
+### General Development Practices
+- **Comments**: Always use English for code comments and documentation
+- **File naming**: Use kebab-case for component files (e.g., `my-component.ts`)
+- **Component structure**: Follow Angular style guide for component organization
+- **Imports**: Organize imports with Angular core first, then third-party, then local imports
+
 ## Important Implementation Details
 
 ### FAQ Component Architecture
@@ -147,3 +162,18 @@ To generate new FAQ components:
 - **Email Integration**: Automatic generation of detailed sales inquiry emails with bundle configuration
 - **Sticky Summary**: Right sidebar summary panel that stays visible during configuration
 - **Form State Management**: Uses Angular reactive forms with real-time validation and state updates
+
+## Code Style Guidelines
+
+### Editor Configuration (.editorconfig)
+- **Indentation**: 2 spaces (not tabs) for all files
+- **Character encoding**: UTF-8 for all files
+- **Line endings**: Insert final newline, trim trailing whitespace (except Markdown)
+- **TypeScript quotes**: Use single quotes in TypeScript files
+- **Markdown files**: No max line length, preserve trailing spaces
+
+### Development Practices
+- **Comments**: Always use English for code comments and documentation
+- **File naming**: Use kebab-case for component files (e.g., `my-component.ts`)
+- **Component structure**: Follow Angular style guide for component organization
+- **Imports**: Organize imports - Angular core first, then third-party libraries, then local imports
