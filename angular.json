@@ -26,6 +26,8 @@
             "assets": [
               "src/favicon.ico",
               "src/assets",
+              "src/404.html",
+              "src/.nojekyll",
               {
                 "glob": "**/*.html",
                 "input": "src/app/designer-guide/designer-guide-item",

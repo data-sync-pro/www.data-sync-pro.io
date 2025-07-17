@@ -166,7 +166,7 @@
       <button 
         *ngIf="current.category"
         class="breadcrumb-item"
-        [class.active]="!current.subCategory"
+        [class.active]="!current.subCategory && !current.faqItem"
         (click)="goCategory(current.category)"
         [title]="'Go to ' + current.category"
       >
@@ -177,12 +177,15 @@
         <lightning-icon iconName="utility:chevronright" size="xx-small" alternativeText="Next"></lightning-icon>
       </span>
       
-      <span 
+      <button 
         *ngIf="current.subCategory"
-        class="breadcrumb-item active"
+        class="breadcrumb-item"
+        [class.active]="!current.faqItem"
+        (click)="goSubCategory(current.category, current.subCategory)"
+        [title]="'Go to ' + current.subCategory"
       >
         <span>{{ current.subCategory }}</span>
-      </span>
+      </button>
     </div>
   </nav>
 

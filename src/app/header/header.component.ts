@@ -22,13 +22,13 @@ export class HeaderComponent implements OnInit, OnDestroy {
   navOpen = false;
 
   navItems: NavItem[] = [
-    { label: 'Home', link: '/home', isOpen: false },
+    //{ label: 'Home', link: '/home', isOpen: false },
     //{ label: 'Rules Engines', link: '/rules-engines', hasMegaMenu: true, isOpen: false },
     //{ label: 'Solutions', link: '/solutions', hasMegaMenu: true, isOpen: false },
     { label: 'FAQ', link: '/faq', isOpen: false },
     //{ label: 'Support', link: '/support', hasMegaMenu: true, isOpen: false },
     { label: 'Pricing', link: '/pricing', isOpen: false },
-    { label: 'Designer Guide', link:'/designer-guide', isOpen: false}
+    //{ label: 'Designer Guide', link:'/designer-guide', isOpen: false}
   ];
 
   private orientationQuery!: MediaQueryList;

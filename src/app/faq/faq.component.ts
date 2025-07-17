@@ -283,6 +283,11 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     this.router.navigate(['/faq', this.encode(cat)]);
   }
 
+  goSubCategory(categoryName: string, subCategoryName: string): void {
+    this.resetState();
+    this.router.navigate(['/faq', this.encode(categoryName), this.encode(subCategoryName)]);
+  }
+
   goBack(): void {
     if (this.current.subCategory) {
       // If in subcategory, go back to category
@@ -756,8 +761,8 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     // 跟踪FAQ查看
     this.trackFAQView(item);
 
-    // Auto-scroll to the clicked FAQ item for better reading experience
-    this.autoScrollToFAQItem(item);
+    // Scroll to top instead of FAQ item for better navigation experience
+    this.scrollToTop();
   }
 
   onFaqClosed(): void {
@@ -1139,8 +1144,8 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
         // Open the panel
         panel.open();
         
-        // Auto-scroll to the opened FAQ item for better reading experience
-        this.autoScrollToFAQItem(faqItem);
+        // Scroll to top instead of FAQ item for better navigation experience
+        this.scrollToTop();
       }
     });
   }
@@ -1828,8 +1833,8 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     // 展开对应的FAQ面板
     this.expandFAQPanel(item);
 
-    // Auto-scroll to clicked FAQ item for better reading experience
-    this.autoScrollToFAQItem(item);
+    // Scroll to top instead of FAQ item for better navigation experience
+    this.scrollToTop();
 
     // 加载FAQ内容（如果尚未加载）
     if (!item.safeAnswer && item.answerPath) {
@@ -2028,8 +2033,8 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     // 展开对应的FAQ面板
     this.expandFAQPanel(item);
 
-    // Auto-scroll to the selected trending question for better reading experience
-    this.autoScrollToFAQItem(item);
+    // Scroll to top instead of FAQ item for better navigation experience
+    this.scrollToTop();
   }
 
   /**
