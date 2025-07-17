@@ -1,6 +1,6 @@
 {
   "configVersion": 1,
-  "timestamp": 1752715876546,
+  "timestamp": 1752774019193,
   "index": "/index.html",
   "assetGroups": [
     {
@@ -11,13 +11,13 @@
         "ignoreVary": true
       },
       "urls": [
-        "/768.7d35a0ce3acaf61f.js",
+        "/768.4874458d2b739497.js",
         "/favicon.ico",
         "/index.html",
-        "/main.4ea5330766f046b4.js",
+        "/main.6d949f8687271fae.js",
         "/manifest.webmanifest",
         "/polyfills.9c47dc30ec57ae3f.js",
-        "/runtime.831b7e313643f473.js",
+        "/runtime.1bcaa99c432ca4a1.js",
         "/styles.27800a5b827c25cc.css"
       ],
       "patterns": []
@@ -353,10 +353,10 @@
     }
   ],
   "hashTable": {
-    "/768.7d35a0ce3acaf61f.js": "eabe80acd9a6060eba764293bcf129244601d798",
+    "/768.4874458d2b739497.js": "62c2bbfc4b570e1eeb8c1e9ac7fa3ea4641e84b9",
     "/assets/arrow-up.png": "8a9c20f0ddc54624f926552187b6686f61a09fdd",
     "/assets/data/designer-sidebar.json": "488457ae53a5b4fb92008e249309e5f186b5d8c8",
-    "/assets/data/faqs.json": "dc045cd9f2fe0ff2074a5730124d7459ae568781",
+    "/assets/data/faqs.json": "7f7be05366485cbf24886af4614f27532fb50a30",
     "/assets/faq-item/general-dsp-adheres-sdlc.html": "18536f88bacdac35f28638692d1d2b9aa9cea20d",
     "/assets/faq-item/general-dsp-external-data.html": "686b01bc37c2a0388b79329806e7ef37f7235525",
     "/assets/faq-item/general-dsp-governor-limits.html": "a7268fcea4d81e1347981e35827875cabac73beb",
@@ -505,12 +505,12 @@
     "/assets/faq-item/rules-engines-triggers-self-adaptive-trigger.html": "3b25936d0a06ec2031b06aaa0182918f147f9310",
     "/assets/faq-item/rules-engines-triggers-setup-self-adaptive-trigger.html": "d7c43f8d01338ab33dc3cd76cb0780d1f42e091b",
     "/assets/faq-item/rules-engines-triggers-setup-trigger-action.html": "237731f877a404ded5b3825463fe25c5f37db1c6",
-    "/assets/faq-item/rules-engines-triggers-test-coverage-trigger.html": "412bf0da3064e700361c5d2705719ae18b4f4dd4",
+    "/assets/faq-item/rules-engines-triggers-test-coverage-trigger.html": "b9fc9af0b774773555eb53394b6b7f0dbee10f42",
     "/assets/faq-item/rules-engines-triggers-trigger-access.html": "57f94a922d50f4eb7582bdce4bea215e6d082217",
     "/assets/faq-item/rules-engines-triggers-trigger-events-supported.html": "b48080075a94bcfaefc3a31355d2990ee7a1f034",
     "/assets/faq-item/rules-engines-triggers-trigger-execution-order.html": "2119013c75f22abecb7a3203b9ff625bbad6a0f5",
     "/assets/faq-item/rules-engines-triggers-trigger-flipper.html": "ce43b414a397a901b59fababee3fd11f0bb35618",
-    "/assets/faq-item/rules-engines-triggers-trigger-rules-engine.html": "a5006672ed9edde94277b44570aa4544a2abe394",
+    "/assets/faq-item/rules-engines-triggers-trigger-rules-engine.html": "d88c58849a59f443251b72ff09b9f05e5e31cc3d",
     "/assets/faq-item/rules-engines-triggers-validation-self-adaptive.html": "810e77d3edf8fad8369f9b14207d3e9c305c11ff",
     "/assets/faq-item/rules-engines-triggers-what-is-trigger-action.html": "1095396d73da09daa23ee81be9e3be2c8f8c0116",
     "/assets/faq-item/rules-engines-triggers-why-dsp-trigger.html": "7e6acbc795cf288eabe26ac69f714d9a510efc29",
@@ -634,11 +634,11 @@
     "/assets/logo.png": "e7e0c560dcf6c1c2806cea78c95ad27771848dcd",
     "/assets/youtube.png": "c059a7daf8e15567642f818063145f58fb2259b2",
     "/favicon.ico": "22f6a4a3bcaafafb0254e0f2fa4ceb89e505e8b2",
-    "/index.html": "51c3ed44d6d4fa2dca2d3f79fb4b7b7b908ee118",
-    "/main.4ea5330766f046b4.js": "d8ad43e85b63b6b6b43875d8603eebea19f9e76f",
+    "/index.html": "60cb02e73a37766e6f38562e3ab5dae192193d39",
+    "/main.6d949f8687271fae.js": "6e1b6d6b5502ea1f9955587d9ab4bc3836d0ff3f",
     "/manifest.webmanifest": "4b769da4fc371a4e0af981e723071e724c29c96a",
     "/polyfills.9c47dc30ec57ae3f.js": "ee216b56f250677bf65792fd9866f1616b65b584",
-    "/runtime.831b7e313643f473.js": "e6edd936d0f860329240f6c5bf5f2ee845d67c58",
+    "/runtime.1bcaa99c432ca4a1.js": "dfed2c96ef9fdc7c5ba659f1d2090ba04c95f378",
     "/styles.27800a5b827c25cc.css": "91aa64a8d5dfc6003339b9f5f47fdf70d6b65c6d"
   },
   "navigationUrls": [
