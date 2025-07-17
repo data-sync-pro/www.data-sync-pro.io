@@ -401,7 +401,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Data List",
     "SeqNo__c": null,
-    "Question__c": "How can I customize the Label, Variant, and Icon of an action in Actionable Data List?",
+    "Question__c": "How can I customize the Label, Variant, and Icon of an action?",
     "Answer__c": "rules-engines-data-list-customize-action-ui.html"
   },
   {
@@ -410,7 +410,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Data List",
     "SeqNo__c": null,
-    "Question__c": "Can I prompt users for confirmation before executing an action after they click the action button in Actionable Data List?",
+    "Question__c": "Can I prompt users for confirmation before executing an action after they click the action button?",
     "Answer__c": "rules-engines-data-list-action-confirmation-prompt.html"
   },
   {
@@ -563,7 +563,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Action Button",
     "SeqNo__c": null,
-    "Question__c": "How can I customize the Label, Variant, and Icon of an action in Action Button?",
+    "Question__c": "How can I customize the Label, Variant, and Icon of an action?",
     "Answer__c": "rules-engines-action-button-customize-action-ui.html"
   },
   {
@@ -572,7 +572,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Action Button",
     "SeqNo__c": null,
-    "Question__c": "Can I prompt users for confirmation before executing an action after they click the action button in Action Button?",
+    "Question__c": "Can I prompt users for confirmation before executing an action after they click the action button?",
     "Answer__c": "rules-engines-action-button-action-confirmation-prompt.html"
   },
   {
@@ -1103,7 +1103,7 @@
     "Category__c": "Process",
     "SubCategory__c": "Mapping",
     "SeqNo__c": null,
-    "Question__c": "How does DSP simplify managing data relationships in Mapping?",
+    "Question__c": "How does DSP simplify managing data relationships?",
     "Answer__c": "process-steps-mapping-dsp-relationship-management.html"
   },
   {
@@ -1319,7 +1319,7 @@
     "Category__c": "Transformation",
     "SubCategory__c": null,
     "SeqNo__c": null,
-    "Question__c": "How does DSP simplify managing data relationships in Transformation?",
+    "Question__c": "How does DSP simplify managing data relationships",
     "Answer__c": "transformation-dsp-relationship-management.html"
   },
   {
