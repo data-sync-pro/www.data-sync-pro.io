@@ -4,6 +4,7 @@ import { Observable, BehaviorSubject, of, throwError } from 'rxjs';
 import { map, catchError, shareReplay, tap, finalize } from 'rxjs/operators';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { PerformanceService } from './performance.service';
+import { getFAQUrlByKey } from '../config/faq-urls.config';
 
 import {
   SourceFAQRecord,
@@ -22,11 +23,14 @@ import {
 export class FAQService {
   private readonly FAQ_DATA_URL = 'assets/data/faqs.json';
   private readonly FAQ_CONTENT_BASE = 'assets/faq-item/';
+  private readonly AUTO_LINK_TERMS_URL = 'assets/data/auto-link-terms.json';
   
   // Cache
   private faqsCache$ = new BehaviorSubject<FAQItem[]>([]);
   private contentCache = new Map<string, SafeHtml>();
   private categoriesCache: FAQCategory[] = [];
+  private autoLinkTerms: { [key: string]: any } = {};
+  private autoLinkTermsLoaded = false;
   
   // Local Storage Cache Keys
   private readonly STORAGE_KEY_FAQ_CONTENT = 'faq_content_cache';
@@ -59,8 +63,28 @@ export class FAQService {
   private initializeService(): void {
     if (!this.isInitialized) {
       this.loadFAQs();
+      this.loadAutoLinkTerms();
       this.isInitialized = true;
     }
+  }
+
+  /**
+   * Load auto-link terms configuration
+   */
+  private loadAutoLinkTerms(): void {
+    console.log('Loading auto-link terms from:', this.AUTO_LINK_TERMS_URL);
+    this.http.get<any>(this.AUTO_LINK_TERMS_URL).pipe(
+      catchError(error => {
+        console.warn('Could not load auto-link terms configuration:', error);
+        return of({ terms: {} });
+      })
+    ).subscribe(config => {
+      this.autoLinkTerms = config.terms || {};
+      this.autoLinkTermsLoaded = true;
+      console.log('Auto-link terms loaded successfully:', this.autoLinkTerms);
+      console.log('Number of terms loaded:', Object.keys(this.autoLinkTerms).length);
+      console.log('Auto-link terms loading complete, flag set to:', this.autoLinkTermsLoaded);
+    });
   }
 
   /**
@@ -73,6 +97,7 @@ export class FAQService {
         const parsedCache = JSON.parse(cachedContent);
         Object.entries(parsedCache).forEach(([key, value]: [string, any]) => {
           if (this.isCacheValid(value.timestamp)) {
+            // Store raw content - processing will happen in getFAQContent when needed
             this.contentCache.set(key, this.sanitizer.bypassSecurityTrustHtml(value.content));
           }
         });
@@ -345,25 +370,51 @@ export class FAQService {
       return of(this.sanitizer.bypassSecurityTrustHtml('<p class="error-message">Content path not specified</p>'));
     }
 
-    // Check memory cache first
+    // Check memory cache first - but always reprocess for auto-links if terms are loaded
     if (this.contentCache.has(answerPath)) {
       console.log('FAQ content loaded from cache:', answerPath);
+      
+      // If auto-link terms are loaded, we need to reprocess the cached content
+      if (this.autoLinkTermsLoaded && Object.keys(this.autoLinkTerms).length > 0) {
+        console.log('Auto-link terms are loaded, reprocessing cached content for:', answerPath);
+        
+        // Get the raw content from local storage to reprocess
+        try {
+          const cachedContent = localStorage.getItem(this.STORAGE_KEY_FAQ_CONTENT);
+          if (cachedContent) {
+            const parsedCache = JSON.parse(cachedContent);
+            const cacheEntry = parsedCache[answerPath];
+            
+            if (cacheEntry && this.isCacheValid(cacheEntry.timestamp)) {
+              console.log('Reprocessing cached content with auto-links');
+              const processedContent = this.processContent(cacheEntry.content);
+              const safeContent = this.sanitizer.bypassSecurityTrustHtml(processedContent);
+              
+              // Update memory cache with processed content
+              this.contentCache.set(answerPath, safeContent);
+              return of(safeContent);
+            }
+          }
+        } catch (error) {
+          console.warn('Failed to reprocess cached content:', error);
+        }
+      }
+      
+      // Return cached content if no reprocessing needed
       return of(this.contentCache.get(answerPath)!);
     }
 
     const startTime = performance.now();
     const fullPath = `${this.FAQ_CONTENT_BASE}${answerPath}`;
-    console.log('Loading FAQ content from:', fullPath);
     
     return this.http.get(fullPath, { responseType: 'text' }).pipe(
       map(content => {
-        console.log('FAQ content loaded successfully:', answerPath, 'Length:', content.length);
         const processedContent = this.processContent(content);
         const safeContent = this.sanitizer.bypassSecurityTrustHtml(processedContent);
 
         // Cache content in memory and local storage
         this.contentCache.set(answerPath, safeContent);
-        this.saveToLocalStorage(answerPath, processedContent);
+        this.saveToLocalStorage(answerPath, content); // Save raw content to local storage
         
         // Track performance
         const loadTime = performance.now() - startTime;
@@ -488,6 +539,13 @@ export class FAQService {
    */
   clearContentCache(): void {
     this.contentCache.clear();
+    // Also clear localStorage cache
+    try {
+      localStorage.removeItem(this.STORAGE_KEY_FAQ_CONTENT);
+      console.log('FAQ content cache cleared from localStorage');
+    } catch (error) {
+      console.warn('Failed to clear FAQ content from localStorage:', error);
+    }
   }
 
   /**
@@ -629,12 +687,36 @@ export class FAQService {
    * Private method: Processes FAQ content
    */
   private processContent(content: string): string {
-    return content
+    
+    let processedContent = content
       // Remove empty p tags but preserve content structure
       .replace(/<p[^>]*>\s*<\/p>/g, '')
       // Improve content formatting
       .replace(/<section[^>]*>/g, '<div class="faq-section">')
       .replace(/<\/section>/g, '</div>')
+      // Process FAQ internal links with centralized URL management
+      .replace(/<a([^>]*?)href="([^"]*)"([^>]*?)>/g, (match, beforeHref, href, afterHref) => {
+        // Check if this is an internal FAQ link
+        if (href.startsWith('/') && !href.startsWith('http')) {
+          // Check if there's a data-faq-link attribute
+          const faqLinkMatch = match.match(/data-faq-link="([^"]*)"/);
+          if (faqLinkMatch) {
+            const linkKey = faqLinkMatch[1];
+            const resolvedUrl = getFAQUrlByKey(linkKey);
+            if (resolvedUrl) {
+              // Replace the href with the resolved URL, preserve existing classes
+              return `<a${beforeHref}href="${resolvedUrl}"${afterHref}>`;
+            }
+          }
+          
+          // Only add faq-internal-link class if no existing class is present
+          const hasClass = beforeHref.includes('class=') || afterHref.includes('class=');
+          if (!hasClass) {
+            return `<a${beforeHref}href="${href}"${afterHref} class="faq-internal-link">`;
+          }
+        }
+        return match;
+      })
       // Enhanced image processing with better URL handling
       .replace(/<img([^>]*?)>/g, (match, attrs) => {
         const srcMatch = attrs.match(/src="([^"]*)"/);
@@ -656,10 +738,116 @@ export class FAQService {
         }
 
         return this.createResponsiveImage(originalSrc, attrs);
-      })
-      // Clean up extra whitespace but preserve line breaks in content
-      .replace(/[ \t]+/g, ' ')
+      });
+      
+    // Apply auto-link terms after all other processing
+    processedContent = this.applyAutoLinkTerms(processedContent);
+    
+    // Clean up extra whitespace but preserve line breaks in content
+    // Be careful not to break HTML attributes
+    return processedContent
       .replace(/\n\s*\n/g, '\n')
       .trim();
+  }
+
+  /**
+   * Apply auto-link terms to content
+   */
+  private applyAutoLinkTerms(content: string): string {
+    if (!this.autoLinkTerms || Object.keys(this.autoLinkTerms).length === 0) {
+      return content;
+    }
+    
+    console.log('🔗 Applying auto-links for', Object.keys(this.autoLinkTerms).length, 'terms');
+
+    // Sort terms by length (longest first) to avoid conflicts
+    const sortedTerms = Object.keys(this.autoLinkTerms).sort((a, b) => b.length - a.length);
+    
+    let processedContent = content;
+    
+    sortedTerms.forEach(term => {
+      const termConfig = this.autoLinkTerms[term];
+      const faqLink = termConfig.faqLink;
+      const resolvedUrl = getFAQUrlByKey(faqLink);
+      
+      if (!resolvedUrl) {
+        console.warn(`❌ No URL found for term: ${term}`);
+        return;
+      }
+
+      // Create regex pattern for the term
+      const flags = termConfig.caseSensitive ? 'g' : 'gi';
+      const escapedTerm = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      
+      // Simple word boundary pattern - avoid complex lookbehinds
+      const pattern = new RegExp(`\\b(${escapedTerm})\\b`, flags);
+      
+      processedContent = processedContent.replace(pattern, (match, capturedTerm, offset, fullString) => {
+        // Check if this match is inside an existing link or HTML tag
+        const beforeMatch = fullString.substring(0, offset);
+        const afterMatch = fullString.substring(offset + match.length);
+        
+        // Improved link detection - check if we're actually inside a link element
+        const beforeText = fullString.substring(0, offset);
+        const afterText = fullString.substring(offset);
+        
+        // Find the last <a> tag before this position
+        const lastOpenLink = beforeText.lastIndexOf('<a');
+        const lastCloseLink = beforeText.lastIndexOf('</a>');
+        
+        // Only skip if we're actually between an unclosed <a> and its corresponding </a>
+        if (lastOpenLink > lastCloseLink && lastOpenLink !== -1) {
+          // Check if there's a closing </a> after this position
+          const nextCloseLink = afterText.indexOf('</a>');
+          if (nextCloseLink !== -1) {
+            return match; // Skip - genuinely inside existing link
+          }
+        }
+        
+        // Skip if inside an HTML tag
+        const lastTagStart = beforeMatch.lastIndexOf('<');
+        const lastTagEnd = beforeMatch.lastIndexOf('>');
+        if (lastTagStart > lastTagEnd && lastTagStart !== -1) {
+          return match; // Keep original, we're inside a tag
+        }
+        
+        // Skip if this term is already part of a link attribute
+        if (beforeMatch.includes('href="') && !beforeMatch.includes('"', beforeMatch.lastIndexOf('href="') + 6)) {
+          return match;
+        }
+        
+        // Create the link
+        const replacement = `<a href="${resolvedUrl}" data-faq-link="${faqLink}" class="rules-engine-link" target="_blank" rel="noopener noreferrer">${capturedTerm}<span class="new-window-icon"></span></a>`;
+        console.log(`✅ Created link: ${capturedTerm}`);
+        return replacement;
+      });
+      
+      // Count successful replacements
+      const matches = processedContent.match(new RegExp(`<a[^>]*>${escapedTerm}<span`, 'gi'));
+      if (matches && matches.length > 0) {
+        console.log(`🔗 ${term}: ${matches.length} link(s) created`);
+      }
+    });
+    
+    return processedContent;
+  }
+
+  /**
+   * Debug method to test URL resolution manually
+   */
+  public testUrlResolution(): void {
+    console.log('=== Testing URL Resolution ===');
+    console.log('Auto-link terms:', this.autoLinkTerms);
+    
+    const testTerms = ['batch', 'triggers', 'input', 'preview'];
+    testTerms.forEach(term => {
+      const config = this.autoLinkTerms[term];
+      if (config) {
+        const url = getFAQUrlByKey(config.faqLink);
+        console.log(`${term} -> ${config.faqLink} -> ${url}`);
+      } else {
+        console.log(`${term} -> NOT FOUND in auto-link terms`);
+      }
+    });
   }
 }

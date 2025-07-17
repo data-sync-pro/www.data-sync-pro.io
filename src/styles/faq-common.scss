@@ -141,6 +141,46 @@ img:not([noZoom]), .faq-image {
   }
 }
 
+// Auto-generated FAQ links styling
+.rules-engine-link {
+  color: black !important;
+  text-decoration: none !important;
+  border-bottom: none !important;
+  transition: all 0.3s ease;
+
+  &:hover,
+  &:visited,
+  &:focus,
+  &:active {
+    color: black !important;
+    text-decoration: none !important;
+    border-bottom: none !important;
+  }
+}
+
+// New window icon for auto-generated links
+.new-window-icon {
+  display: inline-block;
+  margin-left: 4px;
+  width: 16px;
+  height: 16px;
+  background-image: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23666"><path d="M19 19H5V5h7V3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.6l-9.8 9.8 1.4 1.4L19 6.4V10h2V3h-7z"/></svg>');
+  background-size: contain;
+  background-repeat: no-repeat;
+  vertical-align: middle;
+  opacity: 0.7;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+// Hover effect for auto-generated links
+a:hover .new-window-icon {
+  opacity: 1;
+  transform: translateY(-1px);
+  background-image: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23333"><path d="M19 19H5V5h7V3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.6l-9.8 9.8 1.4 1.4L19 6.4V10h2V3h-7z"/></svg>');
+}
+
   
   
 

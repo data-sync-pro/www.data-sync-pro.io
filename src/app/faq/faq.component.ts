@@ -304,6 +304,8 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
 
   private navLinkHandler = (event: MouseEvent) => {
     const target = event.target as HTMLElement;
+    
+    // Handle FAQ navigation links in sidebar
     if (target && target.classList.contains('faq-nav-link')) {
       event.preventDefault();
       const category = target.getAttribute('data-category');
@@ -311,6 +313,33 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
       
       if (category && subcategory) {
         this.goSubCategory(category, subcategory);
+      }
+    }
+    
+    // Handle auto-generated FAQ content links
+    if (target && target.classList.contains('rules-engine-link')) {
+      event.preventDefault();
+      const href = target.getAttribute('href');
+      
+      if (href) {
+        console.log('Navigating to auto-generated link:', href);
+        // Navigate using Angular router to maintain state
+        this.router.navigateByUrl(href);
+      }
+    }
+    
+    // Handle clicks on new-window-icon inside rules-engine-link
+    if (target && target.classList.contains('new-window-icon')) {
+      const linkElement = target.closest('a.rules-engine-link') as HTMLElement;
+      if (linkElement) {
+        event.preventDefault();
+        const href = linkElement.getAttribute('href');
+        
+        if (href) {
+          console.log('Navigating to auto-generated link via icon:', href);
+          // Navigate using Angular router to maintain state
+          this.router.navigateByUrl(href);
+        }
       }
     }
   };

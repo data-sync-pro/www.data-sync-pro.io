@@ -97,7 +97,7 @@ To generate new FAQ components:
 ## Performance and Optimization
 
 - **Bundle budgets**: Warning at 1.5MB, error at 2MB for initial bundles
-- **Component style budget**: Warning at 30KB, error at 40KB per component
+- **Component style budget**: Warning at 60KB, error at 80KB per component
 - **Lazy loading**: FAQ and Designer Guide modules are lazy-loaded
 - **Preloading strategy**: Uses `PreloadAllModules` for improved UX
 - **Service Worker**: Configured with custom caching strategies for FAQ content
@@ -110,6 +110,8 @@ To generate new FAQ components:
 - **Scroll offset**: 80px offset for fixed header
 - **Lazy modules**: FAQ (`/faq`) and Designer Guide (`/designer-guide`) are lazy-loaded
 - **Fallback**: All unknown routes redirect to home (`''`)
+- **Current routing**: Most routes are commented out in app-routing.module.ts - only FAQ (root path) and pricing are active
+- **Module preloading**: Uses `PreloadAllModules` strategy for better performance
 
 ## Styling Architecture
 
@@ -118,22 +120,8 @@ To generate new FAQ components:
 - **Bootstrap**: v5.3.3 integrated alongside Material Design
 - **Style organization**: Component-specific SCSS files with shared style includes
 - **Modular styles**: Complex components like FAQ use modular SCSS structure (e.g., `faq/styles/_layout.scss`, `_sidebar.scss`, etc.)
-- **English comments**: Use English for code comments as per project convention
+- **English comments**: Use English for code comments as per project convention (note: some Chinese comments exist in routing file and should be translated)
 
-## Code Style Guidelines
-
-### Editor Configuration (.editorconfig)
-- **Indentation**: Use spaces (not tabs) with 2-space indentation
-- **Character encoding**: UTF-8 for all files
-- **Line endings**: Insert final newline, trim trailing whitespace (except in Markdown)
-- **TypeScript quotes**: Use single quotes for strings in TypeScript files
-- **Markdown files**: No max line length limit, preserve trailing whitespace
-
-### General Development Practices
-- **Comments**: Always use English for code comments and documentation
-- **File naming**: Use kebab-case for component files (e.g., `my-component.ts`)
-- **Component structure**: Follow Angular style guide for component organization
-- **Imports**: Organize imports with Angular core first, then third-party, then local imports
 
 ## Important Implementation Details
 
@@ -177,3 +165,17 @@ To generate new FAQ components:
 - **File naming**: Use kebab-case for component files (e.g., `my-component.ts`)
 - **Component structure**: Follow Angular style guide for component organization
 - **Imports**: Organize imports - Angular core first, then third-party libraries, then local imports
+
+## TypeScript Configuration Details
+
+- **Strict mode**: Enabled with comprehensive type checking
+- **Target**: ES2022 with modern JavaScript features
+- **Experimental decorators**: Enabled for Angular dependency injection
+- **JSON module resolution**: Supported for data file imports
+- **Angular compiler options**: Strict templates and injection parameters enabled
+
+# important-instruction-reminders
+Do what has been asked; nothing more, nothing less.
+NEVER create files unless they're absolutely necessary for achieving your goal.
+ALWAYS prefer editing an existing file to creating a new one.
+NEVER proactively create documentation files (*.md) or README files. Only create documentation files if explicitly requested by the User.
