@@ -857,7 +857,7 @@
   {
     "Id": "a0oEc000005JoiuIAC",
     "Name": "DSPFAQ-1410",
-    "Category__c": "Process",
+    "Category__c": "Processes",
     "SubCategory__c": "Retrieve",
     "SeqNo__c": null,
     "Question__c": "What does Retrieve do?",
@@ -866,7 +866,7 @@
   {
     "Id": "a0oEc000005JoivIAC",
     "Name": "DSPFAQ-1411",
-    "Category__c": "Process",
+    "Category__c": "Processes",
     "SubCategory__c": "Retrieve",
     "SeqNo__c": null,
     "Question__c": "Am I required to select all fields used in Scoping and Mapping within the Retrieve query?",
@@ -875,7 +875,7 @@
   {
     "Id": "a0oEc000005JoiwIAC",
     "Name": "DSPFAQ-1412",
-    "Category__c": "Process",
+    "Category__c": "Processes",
     "SubCategory__c": "Retrieve",
     "SeqNo__c": null,
     "Question__c": "How can I preview a source record and its transformed values before execution?",
@@ -884,7 +884,7 @@
   {
     "Id": "a0oEc000005JoixIAC",
     "Name": "DSPFAQ-1413",
-    "Category__c": "Process",
+    "Category__c": "Processes",
     "SubCategory__c": "Retrieve",
     "SeqNo__c": null,
     "Question__c": "What is the purpose of the 'Additional Retrieve Criteria' field on Pipeline?",
@@ -893,7 +893,7 @@
   {
     "Id": "a0oEc000005JoiyIAC",
     "Name": "DSPFAQ-1414",
-    "Category__c": "Process",
+    "Category__c": "Processes",
     "SubCategory__c": "Preview",
     "SeqNo__c": null,
     "Question__c": "What does Preview do?",
@@ -902,7 +902,7 @@
   {
     "Id": "a0oEc000005JoizIAC",
     "Name": "DSPFAQ-1415",
-    "Category__c": "Process",
+    "Category__c": "Processes",
     "SubCategory__c": "Preview",
     "SeqNo__c": null,
     "Question__c": "How can I preview a source record and its transformed values before execution?",
@@ -911,7 +911,7 @@
   {
     "Id": "a0oEc000005Joj0IAC",
     "Name": "DSPFAQ-1416",
-    "Category__c": "Process",
+    "Category__c": "Processes",
     "SubCategory__c": "Preview",
     "SeqNo__c": null,
     "Question__c": "What is the difference between Preview and Retrieve?",
@@ -920,7 +920,7 @@
   {
     "Id": "a0oEc000005Joj1IAC",
     "Name": "DSPFAQ-1417",
-    "Category__c": "Process",
+    "Category__c": "Processes",
     "SubCategory__c": "Input",
     "SeqNo__c": null,
     "Question__c": "What does Input do?",
@@ -929,7 +929,7 @@
   {
     "Id": "a0oEc000005Joj2IAC",
     "Name": "DSPFAQ-1418",
-    "Category__c": "Process",
+    "Category__c": "Processes",
     "SubCategory__c": "Input",
     "SeqNo__c": null,
     "Question__c": "How do I define an input data profile in Data Loader?",
@@ -938,7 +938,7 @@
   {
     "Id": "a0oEc000005Joj3IAC",
     "Name": "DSPFAQ-1419",
-    "Category__c": "Process",
+    "Category__c": "Processes",
     "SubCategory__c": "Input",
     "SeqNo__c": null,
     "Question__c": "What are the formatting requirements for column names in Data Loader?",
@@ -947,7 +947,7 @@
   {
     "Id": "a0oEc000005Joj4IAC",
     "Name": "DSPFAQ-1420",
-    "Category__c": "Process",
+    "Category__c": "Processes",
     "SubCategory__c": "Input",
     "SeqNo__c": null,
     "Question__c": "What is the purpose of the 'Input Data Key Field'?",
@@ -956,7 +956,7 @@
   {
     "Id": "a0oEc000005Joj5IAC",
     "Name": "DSPFAQ-1421",
-    "Category__c": "Process",
+    "Category__c": "Processes",
     "SubCategory__c": "Scoping",
     "SeqNo__c": null,
     "Question__c": "What does Scoping do?",
@@ -965,7 +965,7 @@
   {
     "Id": "a0oEc000005Joj6IAC",
     "Name": "DSPFAQ-1422",
-    "Category__c": "Process",
+    "Category__c": "Processes",
     "SubCategory__c": "Scoping",
     "SeqNo__c": null,
     "Question__c": "What is a Scope Filter?",
@@ -974,7 +974,7 @@
   {
     "Id": "a0oEc000005Joj7IAC",
     "Name": "DSPFAQ-1423",
-    "Category__c": "Process",
+    "Category__c": "Processes",
     "SubCategory__c": "Scoping",
     "SeqNo__c": null,
     "Question__c": "How can I avoid duplicate source records based on specific conditions?",
@@ -983,7 +983,7 @@
   {
     "Id": "a0oEc000005Joj8IAC",
     "Name": "DSPFAQ-1424",
-    "Category__c": "Process",
+    "Category__c": "Processes",
     "SubCategory__c": "Scoping",
     "SeqNo__c": null,
     "Question__c": "How can I join the source data with an additional data set?",
@@ -992,7 +992,7 @@
   {
     "Id": "a0oEc000005Joj9IAC",
     "Name": "DSPFAQ-1425",
-    "Category__c": "Process",
+    "Category__c": "Processes",
     "SubCategory__c": "Match",
     "SeqNo__c": null,
     "Question__c": "What does Match do?",
@@ -1001,7 +1001,7 @@
   {
     "Id": "a0oEc000005JojAIAS",
     "Name": "DSPFAQ-1426",
-    "Category__c": "Process",
+    "Category__c": "Processes",
     "SubCategory__c": "Match",
     "SeqNo__c": null,
     "Question__c": "What happens if a source record matches multiple target records in the Update process?",
@@ -1010,7 +1010,7 @@
   {
     "Id": "a0oEc000005JojBIAS",
     "Name": "DSPFAQ-1427",
-    "Category__c": "Process",
+    "Category__c": "Processes",
     "SubCategory__c": "Match",
     "SeqNo__c": null,
     "Question__c": "In the Insert process, what happens if a source record matches existing target records?",
@@ -1019,7 +1019,7 @@
   {
     "Id": "a0oEc000005JojCIAS",
     "Name": "DSPFAQ-1428",
-    "Category__c": "Process",
+    "Category__c": "Processes",
     "SubCategory__c": "Match",
     "SeqNo__c": null,
     "Question__c": "In an Upsert process, when \"Use Salesforce Upsert API\" is enabled, will the Match process be performed?",
@@ -1028,7 +1028,7 @@
   {
     "Id": "a0oEc000005JojDIAS",
     "Name": "DSPFAQ-1429",
-    "Category__c": "Process",
+    "Category__c": "Processes",
     "SubCategory__c": "Match",
     "SeqNo__c": null,
     "Question__c": "How can I match with target records using multiple fields, such as in PermissionSetAssignment?",
@@ -1037,7 +1037,7 @@
   {
     "Id": "a0oEc000005JojEIAS",
     "Name": "DSPFAQ-1430",
-    "Category__c": "Process",
+    "Category__c": "Processes",
     "SubCategory__c": "Match",
     "SeqNo__c": null,
     "Question__c": "What happens if multiple source records match the same target record within a single transaction?",
@@ -1046,7 +1046,7 @@
   {
     "Id": "a0oEc000005JojFIAS",
     "Name": "DSPFAQ-1431",
-    "Category__c": "Process",
+    "Category__c": "Processes",
     "SubCategory__c": "Match",
     "SeqNo__c": null,
     "Question__c": "How does Match determine the principal(master) record in the Merge process?",
@@ -1055,7 +1055,7 @@
   {
     "Id": "a0oEc000005JojGIAS",
     "Name": "DSPFAQ-1432",
-    "Category__c": "Process",
+    "Category__c": "Processes",
     "SubCategory__c": "Match",
     "SeqNo__c": null,
     "Question__c": "Can I match target records based on a relational field?",
@@ -1064,7 +1064,7 @@
   {
     "Id": "a0oEc000005JojHIAS",
     "Name": "DSPFAQ-1433",
-    "Category__c": "Process",
+    "Category__c": "Processes",
     "SubCategory__c": "Match",
     "SeqNo__c": null,
     "Question__c": "What is the purpose of the 'Additional Target Matching Criteria' field?",
@@ -1073,7 +1073,7 @@
   {
     "Id": "a0oEc000005JojIIAS",
     "Name": "DSPFAQ-1434",
-    "Category__c": "Process",
+    "Category__c": "Processes",
     "SubCategory__c": "Match",
     "SeqNo__c": null,
     "Question__c": "What is the purpose of the 'Matched Records Sorting Components' field?",
@@ -1082,7 +1082,7 @@
   {
     "Id": "a0oEc000005JojJIAS",
     "Name": "DSPFAQ-1435",
-    "Category__c": "Process",
+    "Category__c": "Processes",
     "SubCategory__c": "Mapping",
     "SeqNo__c": null,
     "Question__c": "What does Mapping do?",
@@ -1091,7 +1091,7 @@
   {
     "Id": "a0oEc000005JojKIAS",
     "Name": "DSPFAQ-1436",
-    "Category__c": "Process",
+    "Category__c": "Processes",
     "SubCategory__c": "Mapping",
     "SeqNo__c": null,
     "Question__c": "How can I reference a field from a parent relationship of the source object in the Mapping?",
@@ -1100,7 +1100,7 @@
   {
     "Id": "a0oEc000005JojLIAS",
     "Name": "DSPFAQ-1437",
-    "Category__c": "Process",
+    "Category__c": "Processes",
     "SubCategory__c": "Mapping",
     "SeqNo__c": null,
     "Question__c": "How does DSP simplify managing data relationships?",
@@ -1109,7 +1109,7 @@
   {
     "Id": "a0oEc000005JojMIAS",
     "Name": "DSPFAQ-1438",
-    "Category__c": "Process",
+    "Category__c": "Processes",
     "SubCategory__c": "Mapping",
     "SeqNo__c": null,
     "Question__c": "How can I enforce the sequence of target field transformations when order is required?",
@@ -1118,7 +1118,7 @@
   {
     "Id": "a0oEc000005JojNIAS",
     "Name": "DSPFAQ-1439",
-    "Category__c": "Process",
+    "Category__c": "Processes",
     "SubCategory__c": "Mapping",
     "SeqNo__c": null,
     "Question__c": "What is the purpose of the 'Add Default' button?",
@@ -1127,7 +1127,7 @@
   {
     "Id": "a0oEc000005JojOIAS",
     "Name": "DSPFAQ-1440",
-    "Category__c": "Process",
+    "Category__c": "Processes",
     "SubCategory__c": "Mapping",
     "SeqNo__c": null,
     "Question__c": "What is the purpose of the 'Clear Mappings' button?",
@@ -1136,7 +1136,7 @@
   {
     "Id": "a0oEc000005JojPIAS",
     "Name": "DSPFAQ-1441",
-    "Category__c": "Process",
+    "Category__c": "Processes",
     "SubCategory__c": "Mapping",
     "SeqNo__c": null,
     "Question__c": "What is the purpose of the 'Unmapped Source Fields' button?",
@@ -1145,7 +1145,7 @@
   {
     "Id": "a0oEc000005JojQIAS",
     "Name": "DSPFAQ-1442",
-    "Category__c": "Process",
+    "Category__c": "Processes",
     "SubCategory__c": "Mapping",
     "SeqNo__c": null,
     "Question__c": "What is the purpose of the 'Refresh' button?",
@@ -1154,7 +1154,7 @@
   {
     "Id": "a0oEc000005JojRIAS",
     "Name": "DSPFAQ-1443",
-    "Category__c": "Process",
+    "Category__c": "Processes",
     "SubCategory__c": "Mapping",
     "SeqNo__c": null,
     "Question__c": "What is the purpose of the 'Save' button?",
@@ -1163,7 +1163,7 @@
   {
     "Id": "a0oEc000005JojSIAS",
     "Name": "DSPFAQ-1444",
-    "Category__c": "Process",
+    "Category__c": "Processes",
     "SubCategory__c": "Action",
     "SeqNo__c": null,
     "Question__c": "What does Action do?",
@@ -1172,7 +1172,7 @@
   {
     "Id": "a0oEc000005JojTIAS",
     "Name": "DSPFAQ-1445",
-    "Category__c": "Process",
+    "Category__c": "Processes",
     "SubCategory__c": "Action",
     "SeqNo__c": null,
     "Question__c": "Which actions are supported?",
@@ -1181,7 +1181,7 @@
   {
     "Id": "a0oEc000005JojUIAS",
     "Name": "DSPFAQ-1446",
-    "Category__c": "Process",
+    "Category__c": "Processes",
     "SubCategory__c": "Action",
     "SeqNo__c": null,
     "Question__c": "How can I avoid creating duplicate records if the target record already exists?",
@@ -1190,7 +1190,7 @@
   {
     "Id": "a0oEc000005JojVIAS",
     "Name": "DSPFAQ-1447",
-    "Category__c": "Process",
+    "Category__c": "Processes",
     "SubCategory__c": "Action",
     "SeqNo__c": null,
     "Question__c": "How can I implement delta update?",
@@ -1199,7 +1199,7 @@
   {
     "Id": "a0oEc000005JojWIAS",
     "Name": "DSPFAQ-1448",
-    "Category__c": "Process",
+    "Category__c": "Processes",
     "SubCategory__c": "Action",
     "SeqNo__c": null,
     "Question__c": "Can I skip a field update if the target field already has an existing value?",
@@ -1208,7 +1208,7 @@
   {
     "Id": "a0oEc000005JojXIAS",
     "Name": "DSPFAQ-1449",
-    "Category__c": "Process",
+    "Category__c": "Processes",
     "SubCategory__c": "Action",
     "SeqNo__c": null,
     "Question__c": "Can I skip a field update if the transformed value is blank?",
@@ -1217,7 +1217,7 @@
   {
     "Id": "a0oEc000005JojYIAS",
     "Name": "DSPFAQ-1450",
-    "Category__c": "Process",
+    "Category__c": "Processes",
     "SubCategory__c": "Action",
     "SeqNo__c": null,
     "Question__c": "What is the purpose of Source Object Writeback?",
@@ -1226,7 +1226,7 @@
   {
     "Id": "a0oEc000005JojZIAS",
     "Name": "DSPFAQ-1451",
-    "Category__c": "Process",
+    "Category__c": "Processes",
     "SubCategory__c": "Action",
     "SeqNo__c": null,
     "Question__c": "What is the purpose of the field 'Use Salesforce Upsert API'?",
@@ -1235,7 +1235,7 @@
   {
     "Id": "a0oEc000005JojaIAC",
     "Name": "DSPFAQ-1452",
-    "Category__c": "Process",
+    "Category__c": "Processes",
     "SubCategory__c": "Action",
     "SeqNo__c": null,
     "Question__c": "How does Action support Salesforce Big Objects?",
@@ -1244,7 +1244,7 @@
   {
     "Id": "a0oEc000005JojbIAC",
     "Name": "DSPFAQ-1453",
-    "Category__c": "Process",
+    "Category__c": "Processes",
     "SubCategory__c": "Action",
     "SeqNo__c": null,
     "Question__c": "How does Action support Platform Events?",
@@ -1253,7 +1253,7 @@
   {
     "Id": "a0oEc000005JojcIAC",
     "Name": "DSPFAQ-1454",
-    "Category__c": "Process",
+    "Category__c": "Processes",
     "SubCategory__c": "Verify",
     "SeqNo__c": null,
     "Question__c": "What does Verify do?",
@@ -1262,7 +1262,7 @@
   {
     "Id": "a0oEc000005JojdIAC",
     "Name": "DSPFAQ-1455",
-    "Category__c": "Process",
+    "Category__c": "Processes",
     "SubCategory__c": "Verify",
     "SeqNo__c": null,
     "Question__c": "Does Verify apply only to the Batch rules engine?",
@@ -1271,7 +1271,7 @@
   {
     "Id": "a0oEc000005JojeIAC",
     "Name": "DSPFAQ-1456",
-    "Category__c": "Process",
+    "Category__c": "Processes",
     "SubCategory__c": "Verify",
     "SeqNo__c": null,
     "Question__c": "What are the considerations when using Verify with 'Action to Bulk API' enabled?",

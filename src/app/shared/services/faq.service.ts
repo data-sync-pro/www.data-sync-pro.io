@@ -626,7 +626,7 @@ export class FAQService {
   }
 
   /**
-   * Private method: Process FAQ content
+   * Private method: Processes FAQ content
    */
   private processContent(content: string): string {
     return content

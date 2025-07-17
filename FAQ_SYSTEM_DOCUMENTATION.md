@@ -281,7 +281,7 @@ searchFAQs(query: string, options: SearchOptions = {}): Observable<FAQItem[]> {
 #### Content Management
 The system uses a sophisticated content loading and caching strategy:
 
-**Content Loading Process:**
+**Content Loading Processes:**
 1. **Initial Load**: FAQ metadata loaded from JSON file
 2. **Lazy Content**: FAQ answers loaded on-demand when expanded
 3. **Content Processing**: HTML content sanitized and processed for security

@@ -161,6 +161,7 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     this.setupScrollListener();
     this.setupFooterObserver();
     this.setupOptimizedScrollListener();
+    this.setupNavLinkHandler();
 
     this.route.paramMap.pipe(
       takeUntil(this.destroy$)
@@ -226,6 +227,9 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     
     // Clean up footer observer
     this.cleanupFooterObserver();
+    
+    // Clean up nav link handler
+    this.cleanupNavLinkHandler();
   }
 
   private initFaqData(): void {
@@ -296,6 +300,30 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
       // If in category, go back to home
       this.goHome();
     }
+  }
+
+  private navLinkHandler = (event: MouseEvent) => {
+    const target = event.target as HTMLElement;
+    if (target && target.classList.contains('faq-nav-link')) {
+      event.preventDefault();
+      const category = target.getAttribute('data-category');
+      const subcategory = target.getAttribute('data-subcategory');
+      
+      if (category && subcategory) {
+        this.goSubCategory(category, subcategory);
+      }
+    }
+  };
+
+  private setupNavLinkHandler(): void {
+    // Use setTimeout to ensure the DOM is ready
+    setTimeout(() => {
+      document.addEventListener('click', this.navLinkHandler);
+    }, 100);
+  }
+
+  private cleanupNavLinkHandler(): void {
+    document.removeEventListener('click', this.navLinkHandler);
   }
 
   goSub(cat: string, sub: string): void {
