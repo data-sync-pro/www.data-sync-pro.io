@@ -131,7 +131,7 @@
                     <div class="nav-content">
                       <span class="nav-indent"></span>
                       <lightning-icon
-                        iconName="utility:tag"
+                        iconName="utility:folder"
                         size="xx-small"
                         [alternativeText]="subCategory.name + ' subcategory'"
                         class="nav-icon"
@@ -657,11 +657,6 @@
                 <span class="subcategory-badge" *ngIf="item.subCategory">{{ item.subCategory }}</span>
               </div>
             </div>
-            <div class="faq-badges" *ngIf="item.viewCount">
-              <span class="view-count">
-                👁 {{ item.viewCount || 0 }}
-              </span>
-            </div>
           </div>
 
           <div class="faq-actions">
@@ -696,11 +691,6 @@
                 <span class="category-badge">{{ item.category }}</span>
                 <span class="subcategory-badge" *ngIf="item.subCategory">{{ item.subCategory }}</span>
               </div>
-            </div>
-            <div class="faq-badges" *ngIf="item.viewCount">
-              <span class="view-count">
-                👁 {{ item.viewCount || 0 }}
-              </span>
             </div>
           </div>
 

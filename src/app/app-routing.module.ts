@@ -6,21 +6,20 @@ import { RulesEnginesComponent } from './rules-engines/rules-engines.component';
 import { SolutionsComponent } from './solutions/solutions.component';
 import { SupportComponent } from './support/support.component';
 const routes: Routes = [
-  { path: '', redirectTo: '/faq', pathMatch: 'full' },
+  { 
+    path: '', 
+    loadChildren: () => import('./faq/faq.module').then(m => m.FaqModule)
+  },
   //{ path: 'home', component: HomeComponent },
   //{ path: 'rules-engines', component: RulesEnginesComponent },
   //{ path: 'solutions', component: SolutionsComponent },
   //{ path: 'support', component: SupportComponent },
   { path: 'pricing', component: PricingComponent },
-  { 
-    path: 'faq', 
-    loadChildren: () => import('./faq/faq.module').then(m => m.FaqModule)
-  },
   //{
   //  path: 'designer-guide',
   //  loadChildren: () => import('./designer-guide/designer-guide.module').then(m => m.DesignerGuideModule)
   //},
-  { path: '**', redirectTo: '/faq' },
+  { path: '**', redirectTo: '' },
 ];
 
 @NgModule({

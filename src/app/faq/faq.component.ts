@@ -275,17 +275,17 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
   
   goHome(): void {
     this.resetState();
-    this.router.navigate(['/faq']);
+    this.router.navigate(['/']);
   }
   
   goCategory(cat: string): void {
     this.resetState();
-    this.router.navigate(['/faq', this.encode(cat)]);
+    this.router.navigate(['/', this.encode(cat)]);
   }
 
   goSubCategory(categoryName: string, subCategoryName: string): void {
     this.resetState();
-    this.router.navigate(['/faq', this.encode(categoryName), this.encode(subCategoryName)]);
+    this.router.navigate(['/', this.encode(categoryName), this.encode(subCategoryName)]);
   }
 
   goBack(): void {
@@ -300,7 +300,7 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
 
   goSub(cat: string, sub: string): void {
     this.resetState();
-    this.router.navigate(['/faq', this.encode(cat), this.encode(sub)]);
+    this.router.navigate(['/', this.encode(cat), this.encode(sub)]);
   }
 
   private resetState(): void {
@@ -794,7 +794,11 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
 
   private updateBrowserURL(item: FAQItem): void {
     const fragment = this.slugify(item.question);
-    const url = this.buildFAQUrl(item.category, item.subCategory);
+    // Use current category/subcategory if already in a specific subcategory view
+    // This ensures clicking a FAQ in Preview subcategory stays in Preview
+    const category = this.current.category || item.category;
+    const subCategory = this.current.subCategory || item.subCategory;
+    const url = this.buildFAQUrl(category, subCategory);
     
     this.router.navigate([url], {
       fragment: fragment,
@@ -808,7 +812,7 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   private buildFAQUrl(category?: string | null, subCategory?: string | null): string {
-    let url = '/faq';
+    let url = '/';
     if (category) {
       url += `/${encodeURIComponent(category)}`;
       if (subCategory) {
@@ -981,8 +985,8 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     this.current.faqTitle = faqItem.question;
 
     const url = faqItem.subCategory 
-      ? ['/faq', this.encode(faqItem.category), this.encode(faqItem.subCategory)]
-      : ['/faq', this.encode(faqItem.category)];
+      ? ['/', this.encode(faqItem.category), this.encode(faqItem.subCategory)]
+      : ['/', this.encode(faqItem.category)];
 
     this.router.navigate(url, { fragment: this.slugify(faqItem.question) });
     setTimeout(() => this.expandFAQPanel(faqItem), 500);
@@ -1150,7 +1154,7 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     });
   }
   
-  trackBySlug(_: number, item: FAQItem) { return this.slugify(item.question); }
+  trackBySlug(_: number, item: FAQItem) { return item.id; }
 
   handleSearchSelect(sel: {
     question: string;
@@ -1164,7 +1168,7 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     const frag= this.slugify(sel.question);
   
     this.router.navigate(
-      sub ? ['/faq', cat, sub] : ['/faq', cat],
+      sub ? ['/', cat, sub] : ['/', cat],
       { fragment: frag }
     );
   
@@ -1182,7 +1186,7 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
 
     const frag = this.slugify(sel.question);
 
-    this.router.navigate(['/faq', sel.category], { fragment: frag });
+    this.router.navigate(['/', sel.category], { fragment: frag });
 
     setTimeout(() => this.openAndScroll(sel.question));
   }
@@ -1236,19 +1240,27 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
 
 
   private scrollToAndExpandFAQ(fragment: string): void {
-    // Try to find FAQ by slugified question
-    let faqItem = this.faqList.find(item => this.slugify(item.question) === fragment);
+    // When in a specific subcategory, search within filtered FAQ first to avoid confusion with duplicate questions
+    const searchList = this.current.category ? this.filteredFAQ : this.faqList;
+    
+    // Try to find FAQ by slugified question in the current context
+    let faqItem = searchList.find(item => this.slugify(item.question) === fragment);
     
     // If not found, try with the original fragment (might be already decoded)
     if (!faqItem) {
-      faqItem = this.faqList.find(item => this.slugify(item.question) === this.slugify(fragment));
+      faqItem = searchList.find(item => this.slugify(item.question) === this.slugify(fragment));
     }
     
     // If still not found, try finding by question text directly
     if (!faqItem) {
-      faqItem = this.faqList.find(item => 
+      faqItem = searchList.find(item => 
         item.question.toLowerCase().replace(/[^a-z0-9]+/g, '-') === fragment.toLowerCase().replace(/[^a-z0-9]+/g, '-')
       );
+    }
+    
+    // If still not found and we were searching in filtered list, try in the full list as fallback
+    if (!faqItem && this.current.category) {
+      faqItem = this.faqList.find(item => this.slugify(item.question) === fragment);
     }
     
     if (!faqItem) {
@@ -1428,12 +1440,8 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
 
   // Sidebar navigation methods
   selectCategory(categoryName: string): void {
-    if (this.current.category === categoryName && !this.current.subCategory) {
-      this.goHome();
-    } else {
-      this.resetState();
-      this.router.navigate(['/faq', this.encode(categoryName)]);
-    }
+    this.resetState();
+    this.router.navigate(['/', this.encode(categoryName)]);
     
     if (this.ui.isMobile) {
       this.closeMobileSidebar();
@@ -1444,7 +1452,7 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     this.resetState();
     
     if (this.current.category) {
-      this.router.navigate(['/faq', this.encode(this.current.category), this.encode(subCategoryName)]);
+      this.router.navigate(['/', this.encode(this.current.category), this.encode(subCategoryName)]);
     }
     
     if (this.ui.isMobile) {
@@ -2039,9 +2047,10 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
 
   /**
    * TrackBy函数用于优化ngFor性能
+   * 使用唯一的ID而不是问题文本，以支持相同问题在不同子类别中的正确显示
    */
   trackByFAQ(_index: number, item: FAQItem): string {
-    return item.question;
+    return item.id;
   }
 
   // ==================== Footer Interaction Methods ====================
