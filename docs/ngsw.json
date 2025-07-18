@@ -1,6 +1,6 @@
 {
   "configVersion": 1,
-  "timestamp": 1752774019193,
+  "timestamp": 1752802530532,
   "index": "/index.html",
   "assetGroups": [
     {
@@ -11,14 +11,14 @@
         "ignoreVary": true
       },
       "urls": [
-        "/768.4874458d2b739497.js",
+        "/941.15c06591d618749b.js",
         "/favicon.ico",
         "/index.html",
-        "/main.6d949f8687271fae.js",
+        "/main.c2d63002a1468124.js",
         "/manifest.webmanifest",
         "/polyfills.9c47dc30ec57ae3f.js",
-        "/runtime.1bcaa99c432ca4a1.js",
-        "/styles.27800a5b827c25cc.css"
+        "/runtime.90ec1896bf5e2d4f.js",
+        "/styles.7c410db0e322d18f.css"
       ],
       "patterns": []
     },
@@ -31,6 +31,7 @@
       },
       "urls": [
         "/assets/arrow-up.png",
+        "/assets/data/auto-link-terms.json",
         "/assets/data/designer-sidebar.json",
         "/assets/data/faqs.json",
         "/assets/faq-item/general-dsp-adheres-sdlc.html",
@@ -353,10 +354,11 @@
     }
   ],
   "hashTable": {
-    "/768.4874458d2b739497.js": "62c2bbfc4b570e1eeb8c1e9ac7fa3ea4641e84b9",
+    "/941.15c06591d618749b.js": "e5dea7d92df7e5645c2b6a5cae0292597cba117e",
     "/assets/arrow-up.png": "8a9c20f0ddc54624f926552187b6686f61a09fdd",
+    "/assets/data/auto-link-terms.json": "1153cc571ce7205f0681c4acfe750e267c2245ba",
     "/assets/data/designer-sidebar.json": "488457ae53a5b4fb92008e249309e5f186b5d8c8",
-    "/assets/data/faqs.json": "7f7be05366485cbf24886af4614f27532fb50a30",
+    "/assets/data/faqs.json": "d5e3020b3ea91cfba117fdfac44880b176ac8ce8",
     "/assets/faq-item/general-dsp-adheres-sdlc.html": "18536f88bacdac35f28638692d1d2b9aa9cea20d",
     "/assets/faq-item/general-dsp-external-data.html": "686b01bc37c2a0388b79329806e7ef37f7235525",
     "/assets/faq-item/general-dsp-governor-limits.html": "a7268fcea4d81e1347981e35827875cabac73beb",
@@ -364,10 +366,10 @@
     "/assets/faq-item/general-dsp-rules-engines-compare.html": "f12f341f3192515618e16b9d25e4df2695c9533d",
     "/assets/faq-item/general-dsp-security-privacy.html": "2f46b083632d979966bf8a51e93f967425de91aa",
     "/assets/faq-item/general-dsp-training-needed.html": "907f1f3f4dc8458252747c063873054b5545cd92",
-    "/assets/faq-item/general-five-dsp-engines.html": "94dfda937499c5e0896980810186b60e9f53fe97",
+    "/assets/faq-item/general-five-dsp-engines.html": "7e4ec7197e2b504262808d3973c5d99ee7872767",
     "/assets/faq-item/general-no-code-rules-transform.html": "daa210dd671fef3e2e9e1ccb0e896df308324be6",
     "/assets/faq-item/general-three-user-personas.html": "d0a2a1659ef513403f40ab929ab1c024bfcc794e",
-    "/assets/faq-item/general-what-is-dsp.html": "8ffebf760c45239f3b6be403271cdd1f530df9f4",
+    "/assets/faq-item/general-what-is-dsp.html": "837f226d33f1b2cb417b778e2b0152b9c80842c4",
     "/assets/faq-item/general-why-dsp.html": "01b27f4f5e42ba8f2464faebdbbb38f42be1b99b",
     "/assets/faq-item/process-steps-action-action-big-objects.html": "a7f398a272e087a987f3a5d8d24247ed924617a2",
     "/assets/faq-item/process-steps-action-action-phase.html": "c753009786e03c35adbe4ea98e9c2db54a8f7dbb",
@@ -634,12 +636,12 @@
     "/assets/logo.png": "e7e0c560dcf6c1c2806cea78c95ad27771848dcd",
     "/assets/youtube.png": "c059a7daf8e15567642f818063145f58fb2259b2",
     "/favicon.ico": "22f6a4a3bcaafafb0254e0f2fa4ceb89e505e8b2",
-    "/index.html": "60cb02e73a37766e6f38562e3ab5dae192193d39",
-    "/main.6d949f8687271fae.js": "6e1b6d6b5502ea1f9955587d9ab4bc3836d0ff3f",
+    "/index.html": "7d496f56889c10fc8fb174beddb34924d167af2a",
+    "/main.c2d63002a1468124.js": "b8555a01a500c587e43776434c23500dfec1f957",
     "/manifest.webmanifest": "4b769da4fc371a4e0af981e723071e724c29c96a",
     "/polyfills.9c47dc30ec57ae3f.js": "ee216b56f250677bf65792fd9866f1616b65b584",
-    "/runtime.1bcaa99c432ca4a1.js": "dfed2c96ef9fdc7c5ba659f1d2090ba04c95f378",
-    "/styles.27800a5b827c25cc.css": "91aa64a8d5dfc6003339b9f5f47fdf70d6b65c6d"
+    "/runtime.90ec1896bf5e2d4f.js": "90c1db535ea9cf4ac592aa3c0cb473d4ae4d8438",
+    "/styles.7c410db0e322d18f.css": "2463c6d5ce6e0eb8d47326142fec6375f9ec491b"
   },
   "navigationUrls": [
     {
