@@ -1,146 +1,718 @@
-<div class="faq-container">
-  <div class="faq-search">
-    <div class="search-wrapper">
-      <input
-        #faqSearchBox
-        id="faqSearchInput"
-        type="text"
-        placeholder="Search FAQs..."
-        (focus)="openSearchOverlay()"
-        role="combobox"
-      />
+<!-- Mobile sidebar toggle button -->
+<button
+  class="mobile-sidebar-toggle"
+  (click)="toggleMobileSidebar()"
+  *ngIf="ui.isMobile"
+>
+  ☰
+</button>
 
-      <span
-        class="shortcut-hint shortcut-clickable"
-        (click)="isSearchOpen = true"
-        >/</span
-      >
-    </div>
-  </div>
+<!-- Mobile TOC toggle button -->
+<button
+  class="mobile-toc-toggle"
+  (click)="toggleMobileTOC()"
+  *ngIf="ui.isMobile && shouldShowTOC"
+>
+  📋
+</button>
 
-  <div class="faq-layout">
-    <!-- <aside class="faq-sidebar">
-      <h3 class="sidebar-title">Categories</h3>
-      <ul class="category-list">
-        <li
-          class="category-item"
-          [class.active]="!currentCategory"
-          (click)="clearCategory()"
-        >
-          All
-        </li>
+<!-- Mobile sidebar overlay -->
+<div
+  class="sidebar-overlay"
+  [class.active]="ui.mobileSidebarOpen"
+  (click)="closeMobileSidebar()"
+></div>
 
-        <li
-          *ngFor="let cat of categories"
-          class="category-item"
-          [class.active]="cat === currentCategory"
-          (click)="pickCategory(cat)"
-        >
-          {{ cat }}
-        </li>
-      </ul>
-
-      <div
-        class="subcategory-container"
-        *ngIf="currentCategory && subCategories[currentCategory]?.length"
-      >
-        <h4 class="sidebar-title">Subcategories</h4>
-        <ul class="subcategory-list">
-          <li
-            *ngFor="let subCat of subCategories[currentCategory]"
-            class="subcategory-item"
-            [class.active]="subCat === currentSubCategory"
-            (click)="pickSubCategory(subCat)"
+<!-- W3Schools风格的网格布局容器 -->
+<div class="faq-layout-container"
+     [class.toc-hidden]="ui.tocHidden"
+     [class.sidebar-collapsed]="ui.sidebarCollapsed">
+  <!-- Left Sidebar - Grid定位 -->
+  <aside
+    class="faq-sidebar"
+    [class.mobile-open]="ui.mobileSidebarOpen"
+    [class.collapsed]="ui.sidebarCollapsed"
+  >
+      <div class="sidebar-content">
+        <!-- Sidebar Header -->
+        <div class="sidebar-header">
+          <div class="sidebar-title-section" *ngIf="!ui.sidebarCollapsed">
+            <h2 class="sidebar-main-title">FAQ</h2>
+            <span class="sidebar-subtitle">{{ faqList.length }} articles</span>
+          </div>
+          <button
+            class="sidebar-toggle-btn"
+            (click)="toggleSidebar()"
+            title="Toggle sidebar"
           >
-            {{ subCat }}
-          </li>
-        </ul>
-      </div>
-    </aside> -->
+            <lightning-icon
+              [iconName]="ui.sidebarCollapsed ? 'utility:chevronright' : 'utility:chevronleft'"
+              size="xx-small"
+              [alternativeText]="ui.sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'"
+            ></lightning-icon>
+          </button>
+        </div>
 
-    <main class="faq-main">
-      <app-faq-home *ngIf="showHome" (selectedTrending)="handleTrendingSelect($event)" ></app-faq-home>
+        <div class="sidebar-body">
+          <!-- Search in sidebar -->
+          <div class="sidebar-search" *ngIf="!ui.sidebarCollapsed">
+            <button
+              class="sidebar-search-btn"
+              (click)="openSearchOverlay(search.query)"
+              title="Search FAQs (Press / or Ctrl+K for quick access)"
+            >
+              <lightning-icon
+                iconName="utility:search"
+                size="xx-small"
+                alternativeText="Search"
+              ></lightning-icon>
+              <span class="search-text">Search...</span>
+              <span class="search-shortcut">/</span>
+            </button>
+          </div>
+
+          <!-- Navigation Tree -->
+          <div class="sidebar-nav">
+            <!-- Home -->
+            <div class="nav-item home-nav" [class.active]="showHome" (click)="goHome()">
+              <div class="nav-content">
+                <lightning-icon
+                  iconName="utility:home"
+                  size="x-small"
+                  alternativeText="Home"
+                  class="nav-icon"
+                ></lightning-icon>
+                <span class="nav-text" *ngIf="!ui.sidebarCollapsed">All FAQs</span>
+                <span class="nav-count" *ngIf="!ui.sidebarCollapsed">{{ faqList.length }}</span>
+              </div>
+            </div>
+
+            <!-- Categories -->
+            <div class="nav-section" *ngIf="!ui.sidebarCollapsed">
+              <div class="section-divider"></div>
+              <div class="section-label">Categories</div>
+            </div>
+
+            <div class="nav-tree">
+              <div
+                *ngFor="let category of categories"
+                class="nav-category"
+              >
+                <!-- Category Item -->
+                <div
+                  class="nav-item category-nav"
+                  [class.active]="current.category === category.name && !current.subCategory"
+                  [class.expanded]="current.category === category.name"
+                  (click)="selectCategory(category.name)"
+                >
+                  <div class="nav-content">
+                    <lightning-icon
+                      iconName="utility:folder"
+                      size="xx-small"
+                      [alternativeText]="category.name + ' category'"
+                      class="nav-icon"
+                    ></lightning-icon>
+                    <span class="nav-text" *ngIf="!ui.sidebarCollapsed">{{ category.name }}</span>
+                    <span class="nav-count" *ngIf="!ui.sidebarCollapsed">{{ category.count }}</span>
+                  </div>
+                </div>
+
+                <!-- Subcategories -->
+                <div
+                  class="subcategory-container"
+                  *ngIf="current.category === category.name && category.subCategories.length > 0 && !ui.sidebarCollapsed"
+                >
+                  <div
+                    *ngFor="let subCategory of category.subCategories"
+                    class="nav-item subcategory-nav"
+                    [class.active]="current.subCategory === subCategory.name"
+                    (click)="selectSubCategory(subCategory.name)"
+                  >
+                    <div class="nav-content">
+                      <span class="nav-indent"></span>
+                      <lightning-icon
+                        iconName="utility:folder"
+                        size="xx-small"
+                        [alternativeText]="subCategory.name + ' subcategory'"
+                        class="nav-icon"
+                      ></lightning-icon>
+                      <span class="nav-text">{{ subCategory.name }}</span>
+                      <span class="nav-count">{{ subCategory.count }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+  <!-- Main content area with proper container -->
+  <div class="faq-container" [class.toc-hidden]="ui.tocHidden">
+  
+  <!-- Breadcrumb Navigation -->
+  <nav class="breadcrumb-nav" *ngIf="current.category || current.subCategory">
+    <div class="breadcrumb">
+      <button class="breadcrumb-item" (click)="goHome()" title="Go to Home">
+        <lightning-icon iconName="utility:home" size="xx-small" alternativeText="Home"></lightning-icon>
+        <span>All FAQs</span>
+      </button>
+      
+      <span class="breadcrumb-separator" *ngIf="current.category">
+        <lightning-icon iconName="utility:chevronright" size="xx-small" alternativeText="Next"></lightning-icon>
+      </span>
+      
+      <button 
+        *ngIf="current.category"
+        class="breadcrumb-item"
+        [class.active]="!current.subCategory && !current.faqItem"
+        (click)="goCategory(current.category)"
+        [title]="'Go to ' + current.category"
+      >
+        <span>{{ current.category }}</span>
+      </button>
+      
+      <span class="breadcrumb-separator" *ngIf="current.subCategory">
+        <lightning-icon iconName="utility:chevronright" size="xx-small" alternativeText="Next"></lightning-icon>
+      </span>
+      
+      <button 
+        *ngIf="current.subCategory"
+        class="breadcrumb-item"
+        [class.active]="!current.faqItem"
+        (click)="goSubCategory(current.category, current.subCategory)"
+        [title]="'Go to ' + current.subCategory"
+      >
+        <span>{{ current.subCategory }}</span>
+      </button>
+    </div>
+  </nav>
+
+  <main class="faq-main">
+      <!-- 首页：显示所有FAQ -->
       <div *ngIf="showHome" class="all-faqs">
         <h2 class="section-title">All FAQs</h2>
-        <mat-accordion>
-          <mat-expansion-panel
-            class="faq-panel" 
-            *ngFor="let item of allFaqList"
-            (opened)="onFaqOpened(item)"
-          >
-            <mat-expansion-panel-header>
-              <mat-panel-title class="faq-title">
-                {{ item.question }}
-              </mat-panel-title>
-            </mat-expansion-panel-header>
-            <ng-container
-              *ngComponentOutlet="
-                FaqComponentRegistry[toRegistryKey(item.answer)]
-              "
-            ></ng-container>
-          </mat-expansion-panel>
-        </mat-accordion>
+        
+        <!-- Loading skeleton for initial load -->
+        <app-faq-skeleton 
+          *ngIf="isLoadingState" 
+          type="list" 
+          [count]="10">
+        </app-faq-skeleton>
+        
+        <!-- FAQ content -->
+        <ng-container 
+          *ngIf="!isLoadingState"
+          [ngTemplateOutlet]="faqListTemplate" 
+          [ngTemplateOutletContext]="{ faqItems: allFaqList }">
+        </ng-container>
       </div>
-      <ng-container *ngIf="!showHome">
-        <nav class="breadcrumb" *ngIf="currentCategory || currentSubCategory">
-          <span
-            class="breadcrumb-link"
-            (click)="clearCategory()"
-            [class.clickable]="currentCategory || currentSubCategory"
-          >
-          FAQ Home
-          </span>
-          <ng-container *ngIf="currentCategory">
-            <span class="breadcrumb-separator">/</span>
-            <span
-              class="breadcrumb-link"
-              (click)="pickCategory(currentCategory)"
-              [class.clickable]="true"
-            >
-              {{ currentCategory }}
-            </span>
-          </ng-container>
-          <ng-container *ngIf="currentSubCategory">
-            <span class="breadcrumb-separator">/</span>
-            <span
-              class="breadcrumb-link"
-              (click)="pickSubCategory(currentSubCategory)"
-              [class.clickable]="true"
-            >
-              {{ currentSubCategory }}
-            </span>
-          </ng-container>
-        </nav>
 
-      <mat-accordion>
-        <mat-expansion-panel
-          class="faq-panel" 
-          *ngFor="let item of filteredFAQ"
-          (opened)="onFaqOpened(item)"
-        >
-          <mat-expansion-panel-header>
-            <mat-panel-title class="faq-title">
-              {{ item.question }}
-            </mat-panel-title>
-          </mat-expansion-panel-header>
-          <ng-container
-            *ngComponentOutlet="
-              FaqComponentRegistry[toRegistryKey(item.answer)]
-            "
-          ></ng-container>
-        </mat-expansion-panel>
-      </mat-accordion>
+      <!-- 分类页面：显示分类介绍 -->
+      <div *ngIf="!showHome && !current.faqItem && !search.isActive" class="category-intro">
+        <div class="category-header">
+          <h2 class="category-title">
+            {{ current.subCategory || current.category }}
+          </h2>
+        </div>
+      </div>
 
+      <!-- 单个FAQ详情显示 -->
+      <div *ngIf="current.faqItem && !search.isActive && !search.query.trim()" class="faq-detail">
+        <div class="faq-detail-content">
+          <h2 class="faq-question">{{ current.faqItem.question }}</h2>
+          
+          <!-- Loading skeleton for FAQ content -->
+          <app-faq-skeleton 
+            *ngIf="current.faqItem.isLoading" 
+            type="detail">
+          </app-faq-skeleton>
+          
+          <!-- FAQ content -->
+          <div 
+            *ngIf="!current.faqItem.isLoading && current.faqItem.safeAnswer"
+            class="faq-answer" 
+            [innerHTML]="current.faqItem.safeAnswer" 
+            appSimpleZoomable>
+          </div>
+
+          <!-- FAQ Feedback and Share Section -->
+          <div class="faq-feedback-section">
+            <div class="feedback-container">
+              <!-- Single line rating and sharing -->
+              <div class="rating-share-inline">
+                <!-- Empty left spacer -->
+                <div class="content-spacer"></div>
+
+                <!-- Rating and Share combined section on the right -->
+                <div class="rating-share-section">
+                  <span class="rating-title">Is this helpful?</span>
+                  <div class="rating-buttons">
+                    <button
+                      class="rating-btn rating-btn-yes"
+                      (click)="rateFAQ(current.faqItem, true)"
+                      [class.active]="current.faqItem.userRating === true"
+                      [attr.aria-pressed]="current.faqItem.userRating === true"
+                      title="Yes, this was helpful"
+                    >
+                      <span class="rating-icon">👍</span>
+                    </button>
+                    <button
+                      class="rating-btn rating-btn-no"
+                      (click)="rateFAQ(current.faqItem, false)"
+                      [class.active]="current.faqItem.userRating === false"
+                      [attr.aria-pressed]="current.faqItem.userRating === false"
+                      title="No, this was not helpful"
+                    >
+                      <span class="rating-icon">👎</span>
+                    </button>
+                  </div>
+                  
+                  <!-- Share Options -->
+                  <div class="share-buttons">
+                    <button
+                      class="share-btn copy-btn"
+                      (click)="copyFAQLink(current.faqItem)"
+                      title="Copy link to clipboard"
+                    >
+                      <lightning-icon 
+                        iconName="utility:link" 
+                        size="x-small" 
+                        alternativeText="Copy link">
+                      </lightning-icon>
+                    </button>
+                    
+                    <div class="social-share-dropdown">
+                      <button
+                        class="share-btn share-btn-main"
+                        (click)="toggleSocialShare(current.faqItem)"
+                        title="Share this FAQ"
+                        [class.active]="current.faqItem.showSocialShare"
+                      >
+                        <lightning-icon 
+                          iconName="utility:share" 
+                          size="x-small" 
+                          alternativeText="Share">
+                        </lightning-icon>
+                      </button>
+                      
+                      <div class="social-menu" *ngIf="current.faqItem.showSocialShare" [@slideInOut]>
+                        <button
+                          class="social-btn twitter"
+                          (click)="shareToSocial('twitter', current.faqItem)"
+                          title="Share on Twitter"
+                        >
+                          <lightning-icon 
+                            iconName="utility:twitter" 
+                            size="x-small" 
+                            alternativeText="Twitter">
+                          </lightning-icon>
+                        </button>
+                        <button
+                          class="social-btn facebook"
+                          (click)="shareToSocial('facebook', current.faqItem)"
+                          title="Share on Facebook"
+                        >
+                          <lightning-icon 
+                            iconName="utility:facebook" 
+                            size="x-small" 
+                            alternativeText="Facebook">
+                          </lightning-icon>
+                        </button>
+                        <button
+                          class="social-btn linkedin"
+                          (click)="shareToSocial('linkedin', current.faqItem)"
+                          title="Share on LinkedIn"
+                        >
+                          <lightning-icon 
+                            iconName="utility:linkedin" 
+                            size="x-small" 
+                            alternativeText="LinkedIn">
+                          </lightning-icon>
+                        </button>
+                        <button
+                          class="social-btn email"
+                          (click)="shareToSocial('email', current.faqItem)"
+                          title="Share via Email"
+                        >
+                          <lightning-icon 
+                            iconName="utility:email" 
+                            size="x-small" 
+                            alternativeText="Email">
+                          </lightning-icon>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Thank you message -->
+              <div class="rating-feedback" *ngIf="current.faqItem.userRating !== null">
+                <div class="feedback-message" [class.positive]="current.faqItem.userRating" [class.negative]="!current.faqItem.userRating">
+                  <lightning-icon 
+                    [iconName]="current.faqItem.userRating ? 'utility:success' : 'utility:info'"
+                    size="xx-small" 
+                    [alternativeText]="current.faqItem.userRating ? 'Success' : 'Info'">
+                  </lightning-icon>
+                  <span class="feedback-text">
+                    {{ current.faqItem.userRating ? 'Thank you for your feedback!' : 'Thanks! We\'ll work on improving this.' }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- 搜索结果和分类浏览的FAQ列表 -->
+      <ng-container *ngIf="!showHome && (!current.faqItem || search.isActive || search.query.trim())">
+        <!-- Loading skeleton for search/category filtering -->
+        <app-faq-skeleton 
+          *ngIf="isLoadingState" 
+          type="search" 
+          [count]="6">
+        </app-faq-skeleton>
+        
+        <!-- FAQ list content -->
+        <ng-container 
+          *ngIf="!isLoadingState"
+          [ngTemplateOutlet]="faqListTemplate" 
+          [ngTemplateOutletContext]="{ faqItems: filteredFAQ }">
+        </ng-container>
+
+        <!-- 搜索无结果时的优化显示 -->
         <div class="no-results" *ngIf="filteredFAQ.length === 0">
-          No FAQs found. Try a different search or reset the filters.
+          <div *ngIf="search.query.trim(); else noSearchResults" class="search-no-results">
+            <div class="no-results-icon">
+              <lightning-icon
+                iconName="utility:search"
+                size="medium"
+                alternativeText="No search results"
+              ></lightning-icon>
+            </div>
+            <h3>没有找到相关结果</h3>
+            <p>没有找到包含 "<strong>{{ search.query }}</strong>" 的FAQ。</p>
+
+            <div class="search-suggestions">
+              <h4>建议：</h4>
+              <ul>
+                <li>检查拼写是否正确</li>
+                <li>尝试使用更简单的关键词</li>
+                <li>使用同义词或相关词汇</li>
+                <li>减少搜索词的数量</li>
+              </ul>
+            </div>
+
+            <div class="popular-faqs">
+              <h4>热门FAQ：</h4>
+              <div class="popular-faq-list">
+                <button
+                  class="popular-faq-item"
+                  *ngFor="let faq of popularFAQs"
+                  (click)="selectPopularFAQ(faq)"
+                >
+                  {{ faq.question }}
+                </button>
+              </div>
+            </div>
+
+            <div class="contact-support">
+              <h4>仍然需要帮助？</h4>
+              <p>如果您没有找到所需的信息，请联系我们的支持团队。</p>
+              <button class="contact-button" (click)="contactSupport()">
+                联系支持
+              </button>
+            </div>
+          </div>
+
+          <ng-template #noSearchResults>
+            <div class="category-no-results">
+              <p>此分类下暂无FAQ。</p>
+            </div>
+          </ng-template>
         </div>
       </ng-container>
-    </main>
+  </main>
   </div>
-  <app-search-overlay
-    *ngIf="isSearchOpen"
-    [isOpen]="isSearchOpen"
-    (closed)="isSearchOpen = false"
-    (selectedResult)="handleSearchSelect($event)"
-  ></app-search-overlay>
+
+  <!-- Desktop TOC - Grid定位 -->
+  <aside
+    class="faq-toc desktop-toc"
+    *ngIf="shouldShowTOC && !ui.isMobile"
+    [class.collapsed]="isSidebarCollapsed"
+    [class.hidden]="ui.tocHidden"
+  >
+    <div class="toc-content">
+      <!-- Trending Questions for Home Page -->
+      <div *ngIf="showHome" class="trending-toc">
+        <div class="toc-header">
+          <div class="toc-header-content">
+            <div class="toc-title-section">
+              <h3 class="toc-title">Trending Questions</h3>
+              <span class="toc-count">{{ tocItemCount }} items</span>
+            </div>
+            <div class="toc-pagination-controls" *ngIf="tocPagination.totalPages > 1">
+              <div class="pagination-info">{{ tocPaginationInfo }}</div>
+              <div class="pagination-buttons">
+                <button 
+                  class="pagination-btn prev-btn"
+                  [disabled]="!hasPreviousTOCPage"
+                  (click)="goToPreviousTOCPage()"
+                  title="Previous page">
+                  <lightning-icon iconName="utility:chevronleft" size="xx-small" alternativeText="Previous"></lightning-icon>
+                </button>
+                <button 
+                  class="pagination-btn next-btn"
+                  [disabled]="!hasNextTOCPage"
+                  (click)="goToNextTOCPage()"
+                  title="Next page">
+                  <lightning-icon iconName="utility:chevronright" size="xx-small" alternativeText="Next"></lightning-icon>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="toc-list">
+          <div
+            class="toc-item trending-item"
+            *ngFor="let item of paginatedTrendingQuestions; trackBy: trackByFAQ"
+            [class.active]="isCurrentFAQ(item)"
+            (click)="selectTrendingQuestion(item)"
+          >
+            <div class="toc-item-title">{{ item.question }}</div>
+            <div class="toc-item-indicator" *ngIf="isCurrentFAQ(item)"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Category TOC for Category Pages -->
+      <div *ngIf="!showHome" class="category-toc">
+        <div class="toc-header">
+          <div class="toc-header-content">
+            <div class="toc-title-section">
+              <h3 class="toc-title">{{ (current.subCategory || current.category) + ' FAQs' }}</h3>
+              <span class="toc-count">{{ tocItemCount }} items</span>
+            </div>
+            <div class="toc-pagination-controls" *ngIf="tocPagination.totalPages > 1">
+              <div class="pagination-info">{{ tocPaginationInfo }}</div>
+              <div class="pagination-buttons">
+                <button 
+                  class="pagination-btn prev-btn"
+                  [disabled]="!hasPreviousTOCPage"
+                  (click)="goToPreviousTOCPage()"
+                  title="Previous page">
+                  <lightning-icon iconName="utility:chevronleft" size="xx-small" alternativeText="Previous"></lightning-icon>
+                </button>
+                <button 
+                  class="pagination-btn next-btn"
+                  [disabled]="!hasNextTOCPage"
+                  (click)="goToNextTOCPage()"
+                  title="Next page">
+                  <lightning-icon iconName="utility:chevronright" size="xx-small" alternativeText="Next"></lightning-icon>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="toc-list">
+          <div
+            class="toc-item"
+            *ngFor="let item of paginatedCurrentFAQList; trackBy: trackByFAQ"
+            [class.active]="isCurrentFAQ(item)"
+            (click)="scrollToFAQ(item)"
+          >
+            <div class="toc-item-title">{{ item.question }}</div>
+            <div class="toc-item-indicator" *ngIf="isCurrentFAQ(item)"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- TOC Toggle Button - positioned to the left of TOC -->
+  <button
+    class="toc-toggle-btn"
+    (click)="toggleTOC()"
+    [title]="ui.tocHidden ? 'Show Table of Contents' : 'Hide Table of Contents'"
+    *ngIf="shouldShowTOC && !ui.isMobile"
+  >
+    <lightning-icon
+      [iconName]="ui.tocHidden ? 'utility:chevronleft' : 'utility:chevronright'"
+      size="xx-small"
+      [alternativeText]="ui.tocHidden ? 'Show TOC' : 'Hide TOC'"
+    ></lightning-icon>
+  </button>
 </div>
+
+
+<!-- Removed duplicate TOC - now using grid-positioned version above -->
+
+<!-- Mobile TOC Drawer -->
+<div class="mobile-toc-overlay" 
+     [class.active]="ui.mobileTOCOpen" 
+     (click)="closeMobileTOC()"
+     *ngIf="ui.isMobile"></div>
+
+<aside
+  class="faq-toc mobile-toc"
+  *ngIf="shouldShowTOC && ui.isMobile"
+  [class.open]="ui.mobileTOCOpen"
+>
+  <div class="mobile-toc-content">
+    <!-- Mobile TOC Header -->
+    <div class="mobile-toc-header">
+      <div class="mobile-toc-header-content">
+        <h3 class="mobile-toc-title">
+          {{ showHome ? 'Trending Questions' : currentTOCTitle }}
+        </h3>
+        <button 
+          class="mobile-toc-close" 
+          (click)="closeMobileTOC()"
+          aria-label="Close Table of Contents">
+          ✕
+        </button>
+      </div>
+      
+      <!-- Mobile Pagination Controls -->
+      <div class="mobile-toc-pagination" *ngIf="tocPagination.totalPages > 1">
+        <div class="pagination-info">{{ tocPaginationInfo }}</div>
+        <div class="pagination-buttons">
+          <button 
+            class="pagination-btn prev-btn"
+            [disabled]="!hasPreviousTOCPage"
+            (click)="goToPreviousTOCPage()"
+            title="Previous page">
+            <lightning-icon iconName="utility:chevronleft" size="xx-small" alternativeText="Previous"></lightning-icon>
+          </button>
+          <button 
+            class="pagination-btn next-btn"
+            [disabled]="!hasNextTOCPage"
+            (click)="goToNextTOCPage()"
+            title="Next page">
+            <lightning-icon iconName="utility:chevronright" size="xx-small" alternativeText="Next"></lightning-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile TOC List -->
+    <div class="mobile-toc-list">
+      <!-- Trending Questions for Home Page -->
+      <ng-container *ngIf="showHome">
+        <div
+          class="mobile-toc-item trending-item"
+          *ngFor="let item of paginatedTrendingQuestions; trackBy: trackByFAQ"
+          [class.active]="isCurrentFAQ(item)"
+          (click)="selectTrendingQuestion(item); closeMobileTOC()"
+        >
+          <div class="mobile-toc-item-title">{{ item.question }}</div>
+          <div class="mobile-toc-item-indicator" *ngIf="isCurrentFAQ(item)">🔥</div>
+        </div>
+      </ng-container>
+
+      <!-- Category TOC for Category Pages -->
+      <ng-container *ngIf="!showHome">
+        <div
+          class="mobile-toc-item"
+          *ngFor="let item of paginatedCurrentFAQList; trackBy: trackByFAQ"
+          [class.active]="isCurrentFAQ(item)"
+          (click)="scrollToFAQ(item); closeMobileTOC()"
+        >
+          <div class="mobile-toc-item-title">{{ item.question }}</div>
+          <div class="mobile-toc-item-indicator" *ngIf="isCurrentFAQ(item)">📍</div>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</aside>
+
+<!-- 共用FAQ列表模板 -->
+<ng-template #faqListTemplate let-faqItems="faqItems">
+  <div class="faq-list">
+    <!-- Virtual scrolling for large lists (more than 20 items) -->
+    <cdk-virtual-scroll-viewport 
+      *ngIf="faqItems.length > 20" 
+      itemSize="120" 
+      class="faq-virtual-viewport"
+    >
+      <div
+        class="faq-item"
+        *cdkVirtualFor="let item of faqItems; trackBy: trackByFAQ"
+        (click)="navigateToFAQ(item)"
+        [attr.aria-label]="'Navigate to FAQ: ' + item.question"
+        role="button"
+        tabindex="0"
+        (keydown.enter)="navigateToFAQ(item)"
+        (keydown.space)="$event.preventDefault(); navigateToFAQ(item)"
+      >
+        <div class="faq-header">
+          <div class="faq-title-section">
+            <div class="faq-question-row">
+              <h3 class="faq-question" [id]="slugify(item.question)">{{ item.question }}</h3>
+              <div class="category-badges">
+                <span class="category-badge">{{ item.category }}</span>
+                <span class="subcategory-badge" *ngIf="item.subCategory">{{ item.subCategory }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="faq-actions">
+            <lightning-icon
+              iconName="utility:chevronright"
+              size="xx-small"
+              alternativeText="Navigate to FAQ"
+              class="navigate-icon"
+            ></lightning-icon>
+          </div>
+        </div>
+      </div>
+    </cdk-virtual-scroll-viewport>
+
+    <!-- Regular scrolling for smaller lists -->
+    <div *ngIf="faqItems.length <= 20" class="faq-regular-list">
+      <div
+        class="faq-item"
+        *ngFor="let item of faqItems; trackBy: trackByFAQ"
+        (click)="navigateToFAQ(item)"
+        [attr.aria-label]="'Navigate to FAQ: ' + item.question"
+        role="button"
+        tabindex="0"
+        (keydown.enter)="navigateToFAQ(item)"
+        (keydown.space)="$event.preventDefault(); navigateToFAQ(item)"
+      >
+        <div class="faq-header">
+          <div class="faq-title-section">
+            <div class="faq-question-row">
+              <h3 class="faq-question" [id]="slugify(item.question)">{{ item.question }}</h3>
+              <div class="category-badges">
+                <span class="category-badge">{{ item.category }}</span>
+                <span class="subcategory-badge" *ngIf="item.subCategory">{{ item.subCategory }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="faq-actions">
+            <lightning-icon
+              iconName="utility:chevronright"
+              size="xx-small"
+              alternativeText="Navigate to FAQ"
+              class="navigate-icon"
+            ></lightning-icon>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<!-- Search overlay -->
+<app-search-overlay
+  *ngIf="search.isOpen"
+  [isOpen]="search.isOpen"
+  [initialQuery]="searchOverlayInitialQuery"
+  (closed)="closeSearchOverlay()"
+  (selectedResult)="handleSearchSelect($event)"
+></app-search-overlay>

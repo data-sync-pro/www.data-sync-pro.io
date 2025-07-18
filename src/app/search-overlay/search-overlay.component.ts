@@ -9,6 +9,7 @@ import {
   OnChanges,
   SimpleChanges,
   HostListener,
+  ChangeDetectorRef,
 } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
@@ -40,6 +41,7 @@ export interface SelectedSuggestion extends FaqItem {
 })
 export class SearchOverlayComponent implements OnInit, OnChanges {
   @Input() isOpen = false;
+  @Input() initialQuery = ''; // 初始搜索查询
   @Output() closed = new EventEmitter<void>();
   @Output() selectedResult = new EventEmitter<FaqItem>();
   @ViewChild('searchInput') searchInputRef!: ElementRef<HTMLInputElement>;
@@ -51,27 +53,43 @@ export class SearchOverlayComponent implements OnInit, OnChanges {
 
   categories: string[] = [];
   subCategories: string[] = [];
+  isLoading = true;
+  loadError = false;
 
   suggestions: FaqItem[] = [];
   filteredSuggestions: FaqItem[] = [];
 
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(
+    private http: HttpClient, 
+    private router: Router,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit() {
-    this.http.get<RawFaq[]>('assets/data/faqs.json').subscribe((data) => {
-      this.suggestions = data.map((r) => ({
-        id: r.Id,
-        question: r.Question__c,
-        route: r.Answer__c.replace('.html', ''),
-        category: r.Category__c,
-        subCategory: r.SubCategory__c,
-        tags: r.SubCategory__c
-          ? [r.Category__c, r.SubCategory__c]
-          : [r.Category__c],
-      }));
-      this.categories = [...new Set(this.suggestions.map((i) => i.category))];
-      this.filterSubCategoryList();
-      this.filterSuggestions();
+    this.http.get<RawFaq[]>('assets/data/faqs.json').subscribe({
+      next: (data) => {
+        this.suggestions = data.map((r) => ({
+          id: r.Id,
+          question: r.Question__c,
+          route: r.Answer__c.replace('.html', ''),
+          category: r.Category__c,
+          subCategory: r.SubCategory__c,
+          tags: r.SubCategory__c
+            ? [r.Category__c, r.SubCategory__c]
+            : [r.Category__c],
+        }));
+        this.categories = [...new Set(this.suggestions.map((i) => i.category))];
+        this.filterSubCategoryList();
+        this.filterSuggestions();
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      },
+      error: (error) => {
+        console.error('Error loading FAQs:', error);
+        this.loadError = true;
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      }
     });
   }
 
@@ -130,7 +148,29 @@ export class SearchOverlayComponent implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['isOpen']?.currentValue) {
-      setTimeout(() => this.searchInputRef?.nativeElement?.focus(), 0);
+      // 设置初始搜索查询
+      if (changes['initialQuery'] || this.initialQuery) {
+        this.searchQuery = this.initialQuery;
+        // 触发搜索结果过滤
+        setTimeout(() => {
+          this.filterSuggestions();
+        }, 0);
+      }
+      
+      // Immediate focus without delay to improve responsiveness
+      setTimeout(() => {
+        this.searchInputRef?.nativeElement?.focus();
+        // 如果有初始查询，选中所有文本
+        if (this.searchQuery) {
+          this.searchInputRef?.nativeElement?.select();
+        }
+      }, 0);
+    }
+    
+    // 处理 initialQuery 变化
+    if (changes['initialQuery'] && !changes['isOpen']) {
+      this.searchQuery = this.initialQuery;
+      this.filterSuggestions();
     }
   }
 

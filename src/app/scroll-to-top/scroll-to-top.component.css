@@ -16,9 +16,8 @@
   z-index: 1000;
 }
 
-.arrow-icon {           
-  width: 24px;        
-  height: 24px;
+lightning-icon {
+  color: white;
 }
 
 .scroll-to-top:hover {

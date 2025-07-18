@@ -37,6 +37,8 @@
   border-radius: 6px;
   height: 44px;
   font-size: 1rem;
+  line-height: 1.2;
+  text-indent: 0px;
 }
 
 .overlay-search-box:focus {
@@ -197,4 +199,25 @@
 
 .clear-filters-btn:hover {
   background-color: #b95252;
+}
+
+.loading-placeholder {
+  color: #999;
+  font-size: 0.9rem;
+  padding: 8px 12px;
+  font-style: italic;
+}
+
+.error-placeholder {
+  color: #d32f2f;
+  font-size: 0.9rem;
+  padding: 8px 12px;
+  font-style: italic;
+}
+
+.empty-placeholder {
+  color: #999;
+  font-size: 0.9rem;
+  padding: 8px 12px;
+  font-style: italic;
 }

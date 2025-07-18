@@ -1,0 +1,50 @@
+<article>
+  <p><strong>Data Sync Pro ensures security and privacy in two key ways:</strong></p>
+  <ol>
+    <li>
+      <strong>Data Processing within the Subscriber's Org</strong>
+      <p>
+        All data processing is performed entirely within the subscriber's Salesforce org where DSP
+        is installed, using <strong>native Apex</strong>. DSP operates fully within the <strong>subscriber's environment</strong> and
+        does not rely on any external data processing.
+      </p>
+    </li>
+    <li>
+      <strong>Enforcement of Salesforce's Standard Security Model</strong>
+      <p>
+        DSP fully adheres to Salesforce's object, field, and record-level security. Only users with
+        the <strong>appropriate permissions</strong> can access or invoke DSP rules: </p>
+      <ul>
+        <li>
+          Users with the "<strong>DSP: Data Sync Pro Starter</strong>" permission set can access
+          real-time (synchronous) rules—such as <strong>Data Lists</strong>, <strong>Triggers</strong>,
+          and <strong>Action Buttons</strong>—only if they have <strong>read access</strong> to the associated
+          Executable records.
+        </li>
+        <li>
+          They <strong>cannot</strong> execute asynchronous rules, like <strong>Batch jobs</strong> or
+          <strong>Data Loaders</strong>, as this permission set does not include insert access to
+          <strong>Pipeline Execution</strong>, <strong>Execution</strong>, or
+          <strong>Batch Execution</strong> objects required for logging.
+        </li>
+        <li>
+          To run asynchronous rules, users must have the "<strong>DSP: Data Sync Pro App User</strong>"
+          permission set and must be granted explicit access to the relevant Executable records.
+        </li>
+        <li>
+          Full administrative control is reserved for users with the
+          "<strong>DSP: Data Sync Pro Administrator</strong>" permission set, which includes access to
+          all configuration records.
+        </li>
+      </ul>
+     
+    </li>
+  </ol>
+
+  <hr />
+
+  <p>
+    These safeguards ensure that all DSP operations strictly follow the subscriber's
+    security settings while maintaining full control within the Salesforce platform.
+  </p>
+</article>

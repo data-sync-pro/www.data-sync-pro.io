@@ -1,0 +1,356 @@
+// ==================== FAQ Sidebar Styles ====================
+
+// 共用变量
+$sidebar-width: 280px;
+$sidebar-collapsed: 56px;
+$transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+$breakpoint-desktop: 992px;
+
+// W3Schools风格的侧边栏：Grid定位 + Sticky行为
+.faq-sidebar {
+  grid-area: sidebar;
+  background: #ffffff;
+  border-right: 1px solid #e1e5e9;
+  transition: $transition;
+  z-index: 90; // 降低z-index，避免层级冲突
+  
+  // W3Schools风格的sticky定位
+  position: sticky;
+  top: $header-height;
+  height: calc(100vh - $header-height);
+  overflow: hidden;
+  
+  // 响应式隐藏：采用W3Schools的断点策略
+  @media (max-width: $breakpoint-desktop) {
+    position: fixed;
+    left: 0;
+    top: $header-height;
+    transform: translateX(-100%);
+    z-index: 1000;
+    
+    &.mobile-open {
+      transform: translateX(0);
+    }
+  }
+  
+
+  &.collapsed {
+    width: $sidebar-collapsed;
+
+    ~ .faq-container {
+      margin-left: $sidebar-collapsed;
+    }
+
+    .sidebar-title-section {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .sidebar-search {
+      display: none;
+    }
+
+    .nav-item {
+      justify-content: center;
+      padding: 12px 8px;
+      margin-right: 0;
+      border-radius: 4px;
+
+      .nav-text,
+      .nav-count {
+        display: none;
+      }
+
+      .nav-icon {
+        margin: 0;
+      }
+    }
+  }
+
+  .sidebar-content {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid #f1f3f4;
+    min-height: 64px;
+
+    .sidebar-main-title {
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: #202124;
+      margin: 0;
+    }
+
+    .sidebar-subtitle {
+      font-size: 0.75rem;
+      color: #5f6368;
+    }
+
+    .sidebar-toggle-btn {
+      background: transparent;
+      border: none;
+      border-radius: 4px;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: $transition;
+      color: #5f6368;
+
+      &:hover {
+        background-color: #f1f3f4;
+        color: #202124;
+      }
+    }
+  }
+
+  .sidebar-body {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 8px 0;
+
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 3px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: #dadce0;
+      border-radius: 3px;
+
+      &:hover {
+        background: #bdc1c6;
+      }
+    }
+  }
+
+  .sidebar-search {
+    padding: 12px 16px;
+    border-bottom: 1px solid #f1f3f4;
+
+    .sidebar-search-btn {
+      width: 100%;
+      padding: 10px 16px;
+      border: 1px solid #dadce0;
+      border-radius: 8px;
+      background: #f8f9fa;
+      color: #5f6368;
+      font-size: 0.875rem;
+      cursor: pointer;
+      transition: $transition;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      .search-text {
+        flex: 1; // 让搜索文本占据剩余空间
+        text-align: left; // 确保文本左对齐
+      }
+
+      .search-shortcut {
+        background: rgba(95, 99, 104, 0.1);
+        border: 1px solid rgba(95, 99, 104, 0.2);
+        border-radius: 4px;
+        padding: 2px 6px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        color: #5f6368;
+        font-family: monospace;
+        line-height: 1;
+      }
+
+      &:hover {
+        background: #f1f3f4;
+        border-color: #bdc1c6;
+
+        .search-shortcut {
+          background: rgba(95, 99, 104, 0.15);
+          border-color: rgba(95, 99, 104, 0.3);
+        }
+      }
+
+      &:focus {
+        outline: 2px solid #1a73e8;
+        outline-offset: 2px;
+      }
+    }
+  }
+
+  .sidebar-nav {
+    .section-divider {
+      height: 1px;
+      background: #f1f3f4;
+      margin: 16px 20px 8px;
+    }
+
+    .section-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #5f6368;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 0 20px 8px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      padding: 8px 20px;
+      color: #5f6368;
+      font-size: 0.875rem;
+      transition: $transition;
+      cursor: pointer;
+      border-radius: 0 20px 20px 0;
+      margin-right: 8px;
+      position: relative;
+
+      &:hover {
+        background-color: #f1f3f4;
+        color: #202124;
+      }
+
+      &.active {
+        background-color: #e8f0fe;
+        color: #1a73e8;
+        font-weight: 500;
+        // 添加平滑过渡效果
+        transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+
+        &::before {
+          content: '';
+          position: absolute;
+          left: 0;
+          top: 0;
+          bottom: 0;
+          width: 3px;
+          background-color: #1a73e8;
+          // 添加指示器过渡效果
+          transition: width 0.2s ease-out, background-color 0.15s ease;
+        }
+      }
+
+      .nav-content {
+        display: flex;
+        align-items: center;
+        width: 100%;
+      }
+
+      .nav-icon {
+        margin-right: 12px;
+        opacity: 0.7;
+        flex-shrink: 0;
+      }
+
+      .nav-text {
+        flex: 1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .nav-count {
+        background: #f1f3f4;
+        color: #5f6368;
+        font-size: 0.75rem;
+        padding: 2px 6px;
+        border-radius: 10px;
+        margin-left: 8px;
+        font-weight: 500;
+      }
+    }
+
+    .subcategory-container {
+      margin-left: 12px;
+      border-left: 1px solid #f1f3f4;
+      padding-left: 8px;
+
+      .nav-item {
+        padding: 6px 20px 6px 3px;
+        font-size: 0.8125rem;
+        margin-right: 0;
+        border-radius: 4px;
+
+        .nav-content {
+          display: flex;
+          align-items: center;
+          width: 100%;
+          padding-left: 12px;
+        }
+
+        .nav-indent {
+          width: 6px;
+          margin-right: 3px;
+        }
+
+        .nav-icon {
+          margin-right: 6px;
+        }
+
+        .nav-text {
+          flex: 1;
+          min-width: 0;
+        }
+
+        .nav-count {
+          margin-left: auto;
+          flex-shrink: 0;
+          margin-right: 8px;
+        }
+      }
+    }
+  }
+}
+
+// 移动端侧边栏
+.mobile-sidebar-toggle {
+  display: none;
+  position: fixed;
+  top: 70px;
+  left: 16px;
+  z-index: 1001;
+  background: #ffffff;
+  border: 1px solid #e1e5e9;
+  border-radius: 8px;
+  width: 44px;
+  height: 44px;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  color: #5f6368;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: $transition;
+
+  &:hover {
+    background: #f8f9fa;
+    color: #202124;
+  }
+}
+
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 99;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+
+  &.active {
+    opacity: 1;
+  }
+}
