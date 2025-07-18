@@ -775,50 +775,45 @@ export class FAQService {
         return;
       }
 
-      // Create regex pattern for the term
-      const flags = termConfig.caseSensitive ? 'g' : 'gi';
+      // Create regex pattern for the term - only match if every first letter is uppercase and exact match
       const escapedTerm = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       
-      // Simple word boundary pattern - avoid complex lookbehinds
-      const pattern = new RegExp(`\\b(${escapedTerm})\\b`, flags);
+      // Check if term has proper capitalization (each word starts with uppercase)
+      const words = term.split(/\s+/);
+      const isProperlyCapitalized = words.every(word => 
+        word.length > 0 && word[0] === word[0].toUpperCase()
+      );
       
-      processedContent = processedContent.replace(pattern, (match, capturedTerm, offset, fullString) => {
-        // Check if this match is inside an existing link or HTML tag
-        const beforeMatch = fullString.substring(0, offset);
-        const afterMatch = fullString.substring(offset + match.length);
-        
-        // Improved link detection - check if we're actually inside a link element
-        const beforeText = fullString.substring(0, offset);
-        const afterText = fullString.substring(offset);
-        
-        // Find the last <a> tag before this position
-        const lastOpenLink = beforeText.lastIndexOf('<a');
-        const lastCloseLink = beforeText.lastIndexOf('</a>');
-        
-        // Only skip if we're actually between an unclosed <a> and its corresponding </a>
-        if (lastOpenLink > lastCloseLink && lastOpenLink !== -1) {
-          // Check if there's a closing </a> after this position
-          const nextCloseLink = afterText.indexOf('</a>');
-          if (nextCloseLink !== -1) {
-            return match; // Skip - genuinely inside existing link
-          }
+      if (!isProperlyCapitalized) {
+        console.log(`⚠️ Skipping term "${term}" - not properly capitalized`);
+        return; // Skip terms that don't have proper capitalization
+      }
+      
+      // Pattern to match the exact term within <strong> tags, case-sensitive
+      const pattern = new RegExp(`<strong>([^<]*?)\\b(${escapedTerm})\\b([^<]*?)</strong>`, 'g');
+      
+      processedContent = processedContent.replace(pattern, (fullMatch, beforeTerm, capturedTerm, afterTerm, offset, fullString) => {
+        // Check if the captured term exactly matches the expected term (case-sensitive)
+        if (capturedTerm !== term) {
+          return fullMatch; // Return unchanged if not exact match
         }
         
-        // Skip if inside an HTML tag
-        const lastTagStart = beforeMatch.lastIndexOf('<');
-        const lastTagEnd = beforeMatch.lastIndexOf('>');
-        if (lastTagStart > lastTagEnd && lastTagStart !== -1) {
-          return match; // Keep original, we're inside a tag
+        // Check if this is the complete content of the <strong> tag (no extra text)
+        const strongContent = beforeTerm + capturedTerm + afterTerm;
+        if (strongContent.trim() !== term.trim()) {
+          return fullMatch; // Return unchanged if strong tag contains more than just the term
         }
         
-        // Skip if this term is already part of a link attribute
-        if (beforeMatch.includes('href="') && !beforeMatch.includes('"', beforeMatch.lastIndexOf('href="') + 6)) {
-          return match;
-        }
-        
-        // Create the link
-        const replacement = `<a href="${resolvedUrl}" data-faq-link="${faqLink}" class="rules-engine-link" target="_blank" rel="noopener noreferrer">${capturedTerm}<span class="new-window-icon"></span></a>`;
-        console.log(`✅ Created link: ${capturedTerm}`);
+        // Replace the entire <strong>term</strong> with <strong><a>term</a></strong>
+        // Using Lightning new_window utility icon with larger size
+        const lightningIcon = `<span style="margin-left: -3px; vertical-align: text-top; opacity: 0.7;">
+          <svg viewBox="0 0 24 24" fill="currentColor" style="width: 16px; height: 16px;">
+            <path d="M19 19H5V5h7V3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.6l-9.8 9.8 1.4 1.4L19 6.4V10h2V3h-7z"/>
+          </svg>
+        </span>`;
+        const linkElement = `<a href="${resolvedUrl}" data-faq-link="${faqLink}" class="rules-engine-link" target="_blank" rel="noopener noreferrer">${capturedTerm}${lightningIcon}</a>`;
+        const replacement = `<strong>${linkElement}</strong>`;
+        console.log(`✅ Created link: ${capturedTerm} (exact match in <strong>) with Lightning new_window icon`);
         return replacement;
       });
       

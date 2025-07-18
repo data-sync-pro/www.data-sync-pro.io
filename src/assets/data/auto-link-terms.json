@@ -1,68 +1,68 @@
 {
   "terms": {
-    "batch": {
+    "Batch": {
       "faqLink": "batch.what-is-batch",
-      "caseSensitive": false,
+      "caseSensitive": true,
       "description": "Batch Rules Engine"
     },
-    "triggers": {
+    "Triggers": {
       "faqLink": "triggers.how-it-works", 
-      "caseSensitive": false,
+      "caseSensitive": true,
       "description": "Triggers Rules Engine"
     },
-    "data list": {
+    "Data List": {
       "faqLink": "data-list.what-is-data-list",
-      "caseSensitive": false,
+      "caseSensitive": true,
       "description": "Data List Rules Engine"
     },
-    "action button": {
+    "Action Button": {
       "faqLink": "action-button.what-is-action-button",
-      "caseSensitive": false,
+      "caseSensitive": true,
       "description": "Action Button Rules Engine"
     },
-    "data loader": {
+    "Data Loader": {
       "faqLink": "data-loader.how-it-works",
-      "caseSensitive": false,
+      "caseSensitive": true,
       "description": "Data Loader Rules Engine"
     },
-    "input": {
+    "Input": {
       "faqLink": "input.what-does-input-do",
-      "caseSensitive": false,
+      "caseSensitive": true,
       "description": "Input Process Step"
     },
-    "preview": {
+    "Preview": {
       "faqLink": "preview.what-does-preview-do",
-      "caseSensitive": false,
+      "caseSensitive": true,
       "description": "Preview Process Step"
     },
-    "retrieve": {
+    "Retrieve": {
       "faqLink": "retrieve.what-does-retrieve-do",
-      "caseSensitive": false,
+      "caseSensitive": true,
       "description": "Retrieve Process Step"
     },
-    "scoping": {
+    "Scoping": {
       "faqLink": "scoping.what-does-scoping-do",
-      "caseSensitive": false,
+      "caseSensitive": true,
       "description": "Scoping Process Step"
     },
-    "match": {
+    "Match": {
       "faqLink": "match.what-does-match-do",
-      "caseSensitive": false,
+      "caseSensitive": true,
       "description": "Match Process Step"
     },
-    "mapping": {
+    "Mapping": {
       "faqLink": "mapping.what-does-mapping-do",
-      "caseSensitive": false,
+      "caseSensitive": true,
       "description": "Mapping Process Step"
     },
-    "action": {
+    "Action": {
       "faqLink": "action.what-does-action-do",
-      "caseSensitive": false,
+      "caseSensitive": true,
       "description": "Action Process Step"
     },
-    "verify": {
+    "Verify": {
       "faqLink": "verify.what-does-verify-do",
-      "caseSensitive": false,
+      "caseSensitive": true,
       "description": "Verify Process Step"
     }
   }

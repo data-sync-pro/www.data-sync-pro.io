@@ -316,29 +316,29 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
       }
     }
     
-    // Handle auto-generated FAQ content links
+    // Handle auto-generated FAQ content links - open in new window
     if (target && target.classList.contains('rules-engine-link')) {
-      event.preventDefault();
       const href = target.getAttribute('href');
       
       if (href) {
-        console.log('Navigating to auto-generated link:', href);
-        // Navigate using Angular router to maintain state
-        this.router.navigateByUrl(href);
+        console.log('Opening auto-generated link in new window:', href);
+        // Open in new window/tab instead of same window navigation
+        window.open(href, '_blank', 'noopener,noreferrer');
+        event.preventDefault();
       }
     }
     
-    // Handle clicks on new-window-icon inside rules-engine-link
-    if (target && target.classList.contains('new-window-icon')) {
+    // Handle clicks on Lightning icon inside rules-engine-link
+    if (target && (target.classList.contains('slds-icon') || target.closest('.slds-icon'))) {
       const linkElement = target.closest('a.rules-engine-link') as HTMLElement;
       if (linkElement) {
-        event.preventDefault();
         const href = linkElement.getAttribute('href');
         
         if (href) {
-          console.log('Navigating to auto-generated link via icon:', href);
-          // Navigate using Angular router to maintain state
-          this.router.navigateByUrl(href);
+          console.log('Opening auto-generated link via Lightning icon in new window:', href);
+          // Open in new window/tab
+          window.open(href, '_blank', 'noopener,noreferrer');
+          event.preventDefault();
         }
       }
     }
