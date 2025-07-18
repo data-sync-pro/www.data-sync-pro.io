@@ -656,8 +656,6 @@ export class FAQService {
     
     // Enhanced error handling with better visual feedback
     const onErrorHandler = `
-      console.error('Failed to load image:', this.src);
-      console.error('Image absolute URL:', new URL(this.src, window.location.href).href);
       this.parentElement.style.display = 'block';
       this.parentElement.style.padding = '20px';
       this.parentElement.style.backgroundColor = '#fff3cd';
