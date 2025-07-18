@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject, of, throwError } from 'rxjs';
 import { map, catchError, shareReplay, tap, finalize } from 'rxjs/operators';
@@ -20,7 +20,7 @@ import {
 @Injectable({
   providedIn: 'root'
 })
-export class FAQService {
+export class FAQService implements OnDestroy {
   private readonly FAQ_DATA_URL = 'assets/data/faqs.json';
   private readonly FAQ_CONTENT_BASE = 'assets/faq-item/';
   private readonly AUTO_LINK_TERMS_URL = 'assets/data/auto-link-terms.json';
@@ -47,6 +47,10 @@ export class FAQService {
   private intersectionObserver?: IntersectionObserver;
   private readonly PRELOAD_THRESHOLD = 0.1; // Start preloading when item is 10% visible
 
+  // Auto cache cleanup
+  private cacheCleanupInterval?: number;
+  private readonly CLEANUP_INTERVAL = 60 * 60 * 1000; // Check every hour
+
   constructor(
     private http: HttpClient,
     private sanitizer: DomSanitizer,
@@ -55,6 +59,7 @@ export class FAQService {
     this.initializeService();
     this.initializeIntersectionObserver();
     this.loadFromLocalStorage();
+    this.initializeAutoCleanup();
   }
 
   /**
@@ -65,6 +70,72 @@ export class FAQService {
       this.loadFAQs();
       this.loadAutoLinkTerms();
       this.isInitialized = true;
+    }
+  }
+
+  /**
+   * Initialize automatic cache cleanup
+   */
+  private initializeAutoCleanup(): void {
+    // Run initial cleanup
+    this.cleanExpiredCache();
+    
+    // Set up periodic cleanup every hour
+    if (typeof window !== 'undefined') {
+      this.cacheCleanupInterval = window.setInterval(() => {
+        console.log('Running automatic cache cleanup...');
+        this.cleanExpiredCache();
+        this.cleanExpiredMemoryCache();
+      }, this.CLEANUP_INTERVAL);
+    }
+  }
+
+  /**
+   * Clean expired entries from memory cache
+   */
+  private cleanExpiredMemoryCache(): void {
+    const now = Date.now();
+    let cleanedCount = 0;
+    
+    // Check each entry in memory cache
+    this.contentCache.forEach((value, key) => {
+      // Check if corresponding localStorage entry is expired
+      try {
+        const cachedContent = localStorage.getItem(this.STORAGE_KEY_FAQ_CONTENT);
+        if (cachedContent) {
+          const parsedCache = JSON.parse(cachedContent);
+          const cacheEntry = parsedCache[key];
+          
+          if (!cacheEntry || !this.isCacheValid(cacheEntry.timestamp)) {
+            // Remove from memory cache if localStorage entry is expired or missing
+            this.contentCache.delete(key);
+            cleanedCount++;
+          }
+        }
+      } catch (error) {
+        // If there's an error, remove from memory cache to be safe
+        this.contentCache.delete(key);
+        cleanedCount++;
+      }
+    });
+    
+    if (cleanedCount > 0) {
+      console.log(`Cleaned ${cleanedCount} expired entries from memory cache`);
+    }
+  }
+
+  /**
+   * Clean up resources on service destroy
+   */
+  ngOnDestroy(): void {
+    // Clear the cleanup interval
+    if (this.cacheCleanupInterval) {
+      clearInterval(this.cacheCleanupInterval);
+    }
+    
+    // Clean up intersection observer
+    if (this.intersectionObserver) {
+      this.intersectionObserver.disconnect();
     }
   }
 
@@ -142,14 +213,22 @@ export class FAQService {
       if (cachedContent) {
         const cache = JSON.parse(cachedContent);
         const cleanedCache: any = {};
+        let originalCount = 0;
+        let cleanedCount = 0;
         
         Object.entries(cache).forEach(([key, value]: [string, any]) => {
+          originalCount++;
           if (this.isCacheValid(value.timestamp)) {
             cleanedCache[key] = value;
+          } else {
+            cleanedCount++;
           }
         });
         
-        localStorage.setItem(this.STORAGE_KEY_FAQ_CONTENT, JSON.stringify(cleanedCache));
+        if (cleanedCount > 0) {
+          console.log(`Cache cleanup: Removed ${cleanedCount} expired entries out of ${originalCount} total entries`);
+          localStorage.setItem(this.STORAGE_KEY_FAQ_CONTENT, JSON.stringify(cleanedCache));
+        }
       }
     } catch (error) {
       console.warn('Failed to clean expired cache:', error);
@@ -546,6 +625,50 @@ export class FAQService {
     } catch (error) {
       console.warn('Failed to clear FAQ content from localStorage:', error);
     }
+  }
+
+  /**
+   * Get cache statistics
+   */
+  getCacheStats(): { memoryCount: number, localStorageCount: number, totalSize: number, expiredCount: number } {
+    let localStorageCount = 0;
+    let totalSize = 0;
+    let expiredCount = 0;
+    
+    try {
+      const cachedContent = localStorage.getItem(this.STORAGE_KEY_FAQ_CONTENT);
+      if (cachedContent) {
+        totalSize = cachedContent.length;
+        const cache = JSON.parse(cachedContent);
+        
+        Object.entries(cache).forEach(([key, value]: [string, any]) => {
+          localStorageCount++;
+          if (!this.isCacheValid(value.timestamp)) {
+            expiredCount++;
+          }
+        });
+      }
+    } catch (error) {
+      console.warn('Failed to get cache stats:', error);
+    }
+    
+    return {
+      memoryCount: this.contentCache.size,
+      localStorageCount,
+      totalSize,
+      expiredCount
+    };
+  }
+
+  /**
+   * Force cache cleanup
+   */
+  forceCleanup(): void {
+    console.log('Forcing cache cleanup...');
+    this.cleanExpiredCache();
+    this.cleanExpiredMemoryCache();
+    const stats = this.getCacheStats();
+    console.log('Cache stats after cleanup:', stats);
   }
 
   /**
