@@ -26,6 +26,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     //{ label: 'Rules Engines', link: '/rules-engines', hasMegaMenu: true, isOpen: false },
     //{ label: 'Solutions', link: '/solutions', hasMegaMenu: true, isOpen: false },
     { label: 'FAQ', link: '/', isOpen: false },
+    { label: 'Recipes', link: '/recipes', isOpen: false },
     //{ label: 'Support', link: '/support', hasMegaMenu: true, isOpen: false },
     //{ label: 'Pricing', link: '/pricing', isOpen: false },
     //{ label: 'Designer Guide', link:'/designer-guide', isOpen: false}

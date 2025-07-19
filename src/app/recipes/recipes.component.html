@@ -1,0 +1,191 @@
+<!-- Recipe Page Container -->
+<div class="recipe-container" [class.sidebar-collapsed]="ui.sidebarCollapsed" [class.mobile-view]="ui.isMobile">
+  
+  <!-- Header with Breadcrumbs -->
+  <div class="recipe-header">
+    <div class="breadcrumb-nav">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item" *ngFor="let crumb of breadcrumbPath; let last = last" 
+              [class.active]="last">
+            <a *ngIf="!last" [routerLink]="crumb.url">{{ crumb.name }}</a>
+            <span *ngIf="last">{{ crumb.name }}</span>
+          </li>
+        </ol>
+      </nav>
+    </div>
+    
+    <!-- Mobile Navigation Toggle -->
+    <button *ngIf="ui.isMobile" 
+            class="mobile-nav-toggle" 
+            mat-icon-button 
+            (click)="toggleMobileSidebar()"
+            aria-label="Toggle navigation">
+      <mat-icon>menu</mat-icon>
+    </button>
+  </div>
+
+  <!-- Main Content Area -->
+  <div class="recipe-content">
+    
+    <!-- Sidebar Navigation -->
+    <aside class="recipe-sidebar" 
+           [class.collapsed]="ui.sidebarCollapsed"
+           [class.mobile-open]="ui.mobileSidebarOpen">
+      
+      <!-- Sidebar Header -->
+      <div class="sidebar-header">
+        <h2>Recipe Categories</h2>
+        <button class="sidebar-toggle" 
+                mat-icon-button 
+                (click)="toggleSidebar()"
+                *ngIf="!ui.isMobile"
+                aria-label="Toggle sidebar">
+          <mat-icon>{{ ui.sidebarCollapsed ? 'chevron_right' : 'chevron_left' }}</mat-icon>
+        </button>
+      </div>
+
+      <!-- Category Navigation -->
+      <nav class="category-nav">
+        <ul class="category-list">
+          <li class="category-item" 
+              [class.active]="!navigation.category">
+            <a (click)="goHome()" class="category-link">
+              <mat-icon>home</mat-icon>
+              <span class="category-name">All Recipes</span>
+            </a>
+          </li>
+          
+          <li class="category-item" 
+              *ngFor="let category of categories"
+              [class.active]="navigation.category === category.name">
+            <a (click)="goToCategory(category.name)" class="category-link">
+              <mat-icon>{{ getCategoryIcon(category.name) }}</mat-icon>
+              <span class="category-name">{{ category.displayName }}</span>
+              <span class="category-count">{{ category.count }}</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </aside>
+
+    <!-- Mobile Sidebar Overlay -->
+    <div class="mobile-sidebar-overlay" 
+         *ngIf="ui.isMobile && ui.mobileSidebarOpen"
+         (click)="closeMobileSidebar()"></div>
+
+    <!-- Main Content -->
+    <main class="recipe-main">
+      
+      <!-- Search Bar -->
+      <div class="recipe-search-bar">
+        <app-recipe-search 
+          [searchQuery]="search.query"
+          (searchChange)="searchRecipes($event)"
+          (searchClear)="clearSearch()">
+        </app-recipe-search>
+      </div>
+
+      <!-- Loading State -->
+      <div *ngIf="ui.isLoading" class="loading-container">
+        <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+        <p>Loading recipes...</p>
+      </div>
+
+      <!-- Home View - All Categories -->
+      <div *ngIf="showHome && !ui.isLoading" class="recipe-home">
+        <div class="home-header">
+          <h1>Data Sync Pro Recipes</h1>
+          <p class="home-description">
+            Step-by-step guides for implementing Data Sync Pro solutions. 
+            Choose a category below or search for specific recipes.
+          </p>
+        </div>
+
+        <!-- Category Cards -->
+        <div class="category-grid">
+          <app-recipe-category 
+            *ngFor="let category of categories"
+            [category]="category"
+            (categorySelect)="goToCategory($event)">
+          </app-recipe-category>
+        </div>
+
+        <!-- Popular Recipes -->
+        <div class="popular-recipes" *ngIf="currentRecipes.length > 0">
+          <h2>Popular Recipes</h2>
+          <div class="recipe-grid">
+            <app-recipe-card 
+              *ngFor="let recipe of currentRecipes.slice(0, 6)"
+              [recipe]="recipe"
+              (recipeSelect)="goToRecipe($event)">
+            </app-recipe-card>
+          </div>
+        </div>
+      </div>
+
+      <!-- Category View - Recipes in Category -->
+      <div *ngIf="showCategory && !ui.isLoading" class="recipe-category-view">
+        <div class="category-header" *ngIf="currentCategory">
+          <h1>{{ currentCategory.displayName }} Recipes</h1>
+          <p class="category-description">{{ currentCategory.description }}</p>
+        </div>
+
+        <!-- Recipe Grid -->
+        <div class="recipe-grid" *ngIf="currentRecipes.length > 0">
+          <app-recipe-card 
+            *ngFor="let recipe of currentRecipes"
+            [recipe]="recipe"
+            (recipeSelect)="goToRecipe($event)">
+          </app-recipe-card>
+        </div>
+
+        <!-- No Results -->
+        <div class="no-results" *ngIf="currentRecipes.length === 0">
+          <mat-icon>search_off</mat-icon>
+          <h3>No recipes found</h3>
+          <p>No recipes match your current search criteria.</p>
+        </div>
+      </div>
+
+      <!-- Recipe Detail View -->
+      <div *ngIf="showRecipeDetails && !ui.isLoading" class="recipe-detail-view">
+        <app-recipe-detail 
+          [recipe]="currentRecipe!"
+          (stepComplete)="updateRecipeProgress(currentRecipe!, $event)"
+          (backToCategory)="goToCategory(navigation.category)">
+        </app-recipe-detail>
+      </div>
+
+      <!-- Search Results -->
+      <div *ngIf="search.isActive && !ui.isLoading" class="search-results">
+        <div class="search-header">
+          <h2>Search Results for "{{ search.query }}"</h2>
+          <p class="search-summary">
+            {{ search.results.length }} {{ search.results.length === 1 ? 'recipe' : 'recipes' }} found
+          </p>
+        </div>
+
+        <div class="recipe-grid" *ngIf="search.hasResults">
+          <app-recipe-card 
+            *ngFor="let recipe of search.results"
+            [recipe]="recipe"
+            [highlightSearchTerms]="true"
+            [searchQuery]="search.query"
+            (recipeSelect)="goToRecipe($event)">
+          </app-recipe-card>
+        </div>
+
+        <div class="no-results" *ngIf="!search.hasResults">
+          <mat-icon>search_off</mat-icon>
+          <h3>No recipes found</h3>
+          <p>Try adjusting your search terms or browse by category.</p>
+          <button mat-raised-button color="primary" (click)="clearSearch()">
+            Browse All Recipes
+          </button>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>

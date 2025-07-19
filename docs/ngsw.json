@@ -1,6 +1,6 @@
 {
   "configVersion": 1,
-  "timestamp": 1752802530532,
+  "timestamp": 1752808543026,
   "index": "/index.html",
   "assetGroups": [
     {
@@ -11,13 +11,13 @@
         "ignoreVary": true
       },
       "urls": [
-        "/941.15c06591d618749b.js",
+        "/941.81ee772d4c014ba2.js",
         "/favicon.ico",
         "/index.html",
         "/main.c2d63002a1468124.js",
         "/manifest.webmanifest",
         "/polyfills.9c47dc30ec57ae3f.js",
-        "/runtime.90ec1896bf5e2d4f.js",
+        "/runtime.6f879e5bf9c13c5b.js",
         "/styles.7c410db0e322d18f.css"
       ],
       "patterns": []
@@ -354,7 +354,7 @@
     }
   ],
   "hashTable": {
-    "/941.15c06591d618749b.js": "e5dea7d92df7e5645c2b6a5cae0292597cba117e",
+    "/941.81ee772d4c014ba2.js": "91cf33e8032788f258c22ba5b3b41e512b744483",
     "/assets/arrow-up.png": "8a9c20f0ddc54624f926552187b6686f61a09fdd",
     "/assets/data/auto-link-terms.json": "1153cc571ce7205f0681c4acfe750e267c2245ba",
     "/assets/data/designer-sidebar.json": "488457ae53a5b4fb92008e249309e5f186b5d8c8",
@@ -369,7 +369,7 @@
     "/assets/faq-item/general-five-dsp-engines.html": "7e4ec7197e2b504262808d3973c5d99ee7872767",
     "/assets/faq-item/general-no-code-rules-transform.html": "daa210dd671fef3e2e9e1ccb0e896df308324be6",
     "/assets/faq-item/general-three-user-personas.html": "d0a2a1659ef513403f40ab929ab1c024bfcc794e",
-    "/assets/faq-item/general-what-is-dsp.html": "837f226d33f1b2cb417b778e2b0152b9c80842c4",
+    "/assets/faq-item/general-what-is-dsp.html": "f77c1be31ec16fb79c15ae75a88f113c53ff86eb",
     "/assets/faq-item/general-why-dsp.html": "01b27f4f5e42ba8f2464faebdbbb38f42be1b99b",
     "/assets/faq-item/process-steps-action-action-big-objects.html": "a7f398a272e087a987f3a5d8d24247ed924617a2",
     "/assets/faq-item/process-steps-action-action-phase.html": "c753009786e03c35adbe4ea98e9c2db54a8f7dbb",
@@ -378,7 +378,7 @@
     "/assets/faq-item/process-steps-action-implement-delta-update.html": "d187b17467d56d91e4e21b9fc84d8698dd8f1cc8",
     "/assets/faq-item/process-steps-action-skip-update-if-blank.html": "923ea99d4c4fab8888bb9153a657764773ae9a2d",
     "/assets/faq-item/process-steps-action-skip-update-if-exists.html": "8ce7708203b4c85e5689abd6881fe18bcd945a8f",
-    "/assets/faq-item/process-steps-action-source-object-writeback.html": "9da37e3d95a05625bfa772b11277b45528b3ea23",
+    "/assets/faq-item/process-steps-action-source-object-writeback.html": "5e03ec8ca42f8a1bc029b3fe4723b1810109c302",
     "/assets/faq-item/process-steps-action-use-upsert-api-field.html": "cf032d0dfd9b0e901550c954a0e3cc40d86398b1",
     "/assets/faq-item/process-steps-action-which-actions-supported.html": "54414a8dec56e04e041807885606646ea2448d62",
     "/assets/faq-item/process-steps-input-data-loader-column-format.html": "70a40cb326ac5b72dae9d528469913c95e27ff1c",
@@ -394,9 +394,9 @@
     "/assets/faq-item/process-steps-mapping-save-button.html": "8499083ad1d708d83dcd9d6593e61a70b1bf05a3",
     "/assets/faq-item/process-steps-mapping-sequence-of-transformations.html": "a2d004d85c6918389abc2292e25638f8cd717559",
     "/assets/faq-item/process-steps-mapping-unmapped-source-fields-button.html": "a36fbbcdce939e024c29a135f34684d789767659",
-    "/assets/faq-item/process-steps-match-additional-target-matching.html": "fb74dde97d8dda079cfa9323e979f61a98088d9d",
+    "/assets/faq-item/process-steps-match-additional-target-matching.html": "0933e585b1c46924d886aee5231df45fb123be4d",
     "/assets/faq-item/process-steps-match-insert-duplicate-check.html": "c77ab4c03fc33da42dd94231567fc1b2f7fd5d9c",
-    "/assets/faq-item/process-steps-match-match-action.html": "deabe6a25026fa6b3cbeb5a0f44d2aab537080a7",
+    "/assets/faq-item/process-steps-match-match-action.html": "90684203d87bb062cf56d258a353889b1a8d8b8c",
     "/assets/faq-item/process-steps-match-match-merge-principal.html": "854d36435b1d0a9d6c6f344d7b21bff501de4735",
     "/assets/faq-item/process-steps-match-matched-records-sorting.html": "bcd0dd476a5a275eba9c4cddada99d32574cc9ce",
     "/assets/faq-item/process-steps-match-multi-field-match.html": "afbfa3cce11154fce44ebf1126f9b34f43d709aa",
@@ -452,7 +452,7 @@
     "/assets/faq-item/rules-engines-batch-batch-permissions-needed.html": "ea3ef941c97e3143fa0821b9693926c07e377613",
     "/assets/faq-item/rules-engines-batch-batch-technologies-used.html": "5aea81f01097deb267d4d0482e8a00e55350f1eb",
     "/assets/faq-item/rules-engines-batch-batch-use-cases.html": "b3ac6e9aaca59d64cb7e456c4dcf04e221393971",
-    "/assets/faq-item/rules-engines-batch-blank-update-batch-advantages.html": "45f516844d3dd81c49e5d42601da0c6a3b15fde9",
+    "/assets/faq-item/rules-engines-batch-blank-update-batch-advantages.html": "a0eddad50fcfdaa583a65894a488743bc19fd1c6",
     "/assets/faq-item/rules-engines-batch-break-down-complex-batch.html": "36f1c4eec29b1feec36c45ccafe312a3ca53dcd8",
     "/assets/faq-item/rules-engines-batch-bulk-api-considerations.html": "08cde0567fd1e98602acfe121ebe1c3be94d9124",
     "/assets/faq-item/rules-engines-batch-chain-batch-executables.html": "cdd282ff52727af4465b8d2b9c6c6ecec2298611",
@@ -636,11 +636,11 @@
     "/assets/logo.png": "e7e0c560dcf6c1c2806cea78c95ad27771848dcd",
     "/assets/youtube.png": "c059a7daf8e15567642f818063145f58fb2259b2",
     "/favicon.ico": "22f6a4a3bcaafafb0254e0f2fa4ceb89e505e8b2",
-    "/index.html": "7d496f56889c10fc8fb174beddb34924d167af2a",
+    "/index.html": "a4cd7e73750e19efb1ba793645f11b128643ccd9",
     "/main.c2d63002a1468124.js": "b8555a01a500c587e43776434c23500dfec1f957",
     "/manifest.webmanifest": "4b769da4fc371a4e0af981e723071e724c29c96a",
     "/polyfills.9c47dc30ec57ae3f.js": "ee216b56f250677bf65792fd9866f1616b65b584",
-    "/runtime.90ec1896bf5e2d4f.js": "90c1db535ea9cf4ac592aa3c0cb473d4ae4d8438",
+    "/runtime.6f879e5bf9c13c5b.js": "bdf848d5c0ffedeae1c18fed6cc76b9ae863f7bb",
     "/styles.7c410db0e322d18f.css": "2463c6d5ce6e0eb8d47326142fec6375f9ec491b"
   },
   "navigationUrls": [
