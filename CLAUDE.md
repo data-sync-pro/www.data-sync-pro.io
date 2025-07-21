@@ -29,9 +29,9 @@ This is an Angular 15 website for Data Sync Pro (DSP), a Salesforce data synchro
 ## Architecture Overview
 
 ### Core Structure
-- **Main modules**: App, FAQ (lazy-loaded), Designer Guide (lazy-loaded), Shared
+- **Main modules**: App, FAQ (lazy-loaded), Designer Guide (lazy-loaded), Recipes (lazy-loaded), Shared
 - **Key components**: Home, Header, Footer, Pricing (with interactive bundle configurator), Solutions, Rules Engines, Support
-- **Routing**: Uses lazy loading for FAQ and Designer Guide modules with preload strategy
+- **Routing**: Uses lazy loading for FAQ, Designer Guide, and Recipes modules with preload strategy
 - **State management**: Uses Angular services for data management
 - **UI framework**: Angular Material + Bootstrap for styling
 
@@ -40,6 +40,7 @@ The site features a sophisticated content generation system:
 
 - **FAQ system**: JSON-driven FAQ content (`src/assets/data/faqs.json`) with auto-generated components
 - **Designer Guide**: Hierarchical documentation system with sidebar navigation (`src/assets/data/designer-sidebar.json`)
+- **Recipe system**: Step-by-step guide system (`src/assets/data/recipes.json`) with progress tracking, categories, and downloadable content
 - **Content generation**: Node.js scripts in `src/tools/` for generating FAQ components from JSON data
 - **HTML content**: Static HTML files stored in `src/assets/faq-item/` for FAQ answers
 
@@ -57,6 +58,7 @@ The site features a sophisticated content generation system:
 ### Key Services
 - **API Service**: `api.service.ts` for backend communication
 - **FAQ Service**: `shared/services/faq.service.ts` for FAQ data management with caching and preloading
+- **Recipe Service**: `shared/services/recipe.service.ts` for recipe data management and progress tracking
 - **Performance Service**: `shared/services/performance.service.ts` for optimization
 - **Offline Service**: `shared/services/offline.service.ts` for PWA functionality
 - **Analytics Service**: `analytics.service.ts` for Google Analytics integration
@@ -85,6 +87,7 @@ To generate new FAQ components:
 
 - **FAQ content**: `src/assets/data/faqs.json` - drives FAQ section generation
 - **Designer Guide nav**: `src/assets/data/designer-sidebar.json` - sidebar navigation structure
+- **Recipe content**: `src/assets/data/recipes.json` - step-by-step recipe data with categories and metadata
 - **FAQ HTML content**: `src/assets/faq-item/*.html` - static HTML content for FAQ answers
 - **Service Worker config**: `ngsw-config.json` - PWA caching configuration
 
@@ -98,7 +101,7 @@ To generate new FAQ components:
 
 - **Bundle budgets**: Warning at 1.5MB, error at 2MB for initial bundles
 - **Component style budget**: Warning at 60KB, error at 80KB per component
-- **Lazy loading**: FAQ and Designer Guide modules are lazy-loaded
+- **Lazy loading**: FAQ, Designer Guide, and Recipes modules are lazy-loaded
 - **Preloading strategy**: Uses `PreloadAllModules` for improved UX
 - **Service Worker**: Configured with custom caching strategies for FAQ content
 - **PWA features**: Offline support with manifest.webmanifest
@@ -108,7 +111,7 @@ To generate new FAQ components:
 - **Scroll behavior**: Custom scroll restoration disabled, managed by components
 - **Anchor scrolling**: Disabled to prevent conflicts
 - **Scroll offset**: 80px offset for fixed header
-- **Lazy modules**: FAQ (`/faq`) and Designer Guide (`/designer-guide`) are lazy-loaded
+- **Lazy modules**: FAQ (`/faq`), Designer Guide (`/designer-guide`), and Recipes (`/recipes`) are lazy-loaded
 - **Fallback**: All unknown routes redirect to home (`''`)
 - **Current routing**: Most routes are commented out in app-routing.module.ts - only FAQ (root path) and pricing are active
 - **Module preloading**: Uses `PreloadAllModules` strategy for better performance
@@ -150,6 +153,15 @@ To generate new FAQ components:
 - **Email Integration**: Automatic generation of detailed sales inquiry emails with bundle configuration
 - **Sticky Summary**: Right sidebar summary panel that stays visible during configuration
 - **Form State Management**: Uses Angular reactive forms with real-time validation and state updates
+
+### Recipe Module Architecture
+- **Step-by-step Guides**: Structured recipe system for Data Sync Pro configuration tutorials
+- **Progress Tracking**: Individual step completion tracking with visual progress indicators
+- **Category Organization**: Recipe filtering and organization by categories (e.g., "Getting Started", "Advanced Configuration")
+- **Download Functionality**: Recipe download component for offline access to configuration guides
+- **Search and Navigation**: Recipe search component with advanced filtering and step-by-step navigation
+- **Modular Components**: Separate components for recipe cards, details, steps, categories, and progress tracking
+- **JSON-driven Content**: Recipe data stored in `src/assets/data/recipes.json` with structured metadata
 
 ## Code Style Guidelines
 

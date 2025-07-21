@@ -83,7 +83,6 @@ export class FAQService implements OnDestroy {
     // Set up periodic cleanup every hour
     if (typeof window !== 'undefined') {
       this.cacheCleanupInterval = window.setInterval(() => {
-        console.log('Running automatic cache cleanup...');
         this.cleanExpiredCache();
         this.cleanExpiredMemoryCache();
       }, this.CLEANUP_INTERVAL);
@@ -118,10 +117,7 @@ export class FAQService implements OnDestroy {
         cleanedCount++;
       }
     });
-    
-    if (cleanedCount > 0) {
-      console.log(`Cleaned ${cleanedCount} expired entries from memory cache`);
-    }
+
   }
 
   /**
@@ -143,7 +139,6 @@ export class FAQService implements OnDestroy {
    * Load auto-link terms configuration
    */
   private loadAutoLinkTerms(): void {
-    console.log('Loading auto-link terms from:', this.AUTO_LINK_TERMS_URL);
     this.http.get<any>(this.AUTO_LINK_TERMS_URL).pipe(
       catchError(error => {
         console.warn('Could not load auto-link terms configuration:', error);
@@ -152,10 +147,7 @@ export class FAQService implements OnDestroy {
     ).subscribe(config => {
       this.autoLinkTerms = config.terms || {};
       this.autoLinkTermsLoaded = true;
-      console.log('Auto-link terms loaded successfully:', this.autoLinkTerms);
-      console.log('Number of terms loaded:', Object.keys(this.autoLinkTerms).length);
-      console.log('Auto-link terms loading complete, flag set to:', this.autoLinkTermsLoaded);
-    });
+      });
   }
 
   /**
@@ -226,8 +218,7 @@ export class FAQService implements OnDestroy {
         });
         
         if (cleanedCount > 0) {
-          console.log(`Cache cleanup: Removed ${cleanedCount} expired entries out of ${originalCount} total entries`);
-          localStorage.setItem(this.STORAGE_KEY_FAQ_CONTENT, JSON.stringify(cleanedCache));
+       localStorage.setItem(this.STORAGE_KEY_FAQ_CONTENT, JSON.stringify(cleanedCache));
         }
       }
     } catch (error) {
@@ -451,12 +442,9 @@ export class FAQService implements OnDestroy {
 
     // Check memory cache first - but always reprocess for auto-links if terms are loaded
     if (this.contentCache.has(answerPath)) {
-      console.log('FAQ content loaded from cache:', answerPath);
-      
+
       // If auto-link terms are loaded, we need to reprocess the cached content
       if (this.autoLinkTermsLoaded && Object.keys(this.autoLinkTerms).length > 0) {
-        console.log('Auto-link terms are loaded, reprocessing cached content for:', answerPath);
-        
         // Get the raw content from local storage to reprocess
         try {
           const cachedContent = localStorage.getItem(this.STORAGE_KEY_FAQ_CONTENT);
@@ -465,7 +453,6 @@ export class FAQService implements OnDestroy {
             const cacheEntry = parsedCache[answerPath];
             
             if (cacheEntry && this.isCacheValid(cacheEntry.timestamp)) {
-              console.log('Reprocessing cached content with auto-links');
               const processedContent = this.processContent(cacheEntry.content);
               const safeContent = this.sanitizer.bypassSecurityTrustHtml(processedContent);
               
@@ -621,7 +608,6 @@ export class FAQService implements OnDestroy {
     // Also clear localStorage cache
     try {
       localStorage.removeItem(this.STORAGE_KEY_FAQ_CONTENT);
-      console.log('FAQ content cache cleared from localStorage');
     } catch (error) {
       console.warn('Failed to clear FAQ content from localStorage:', error);
     }
@@ -664,11 +650,9 @@ export class FAQService implements OnDestroy {
    * Force cache cleanup
    */
   forceCleanup(): void {
-    console.log('Forcing cache cleanup...');
     this.cleanExpiredCache();
     this.cleanExpiredMemoryCache();
     const stats = this.getCacheStats();
-    console.log('Cache stats after cleanup:', stats);
   }
 
   /**
@@ -774,9 +758,7 @@ export class FAQService implements OnDestroy {
       // Relative path - ensure it starts with assets/
       normalizedSrc = `assets/${src}`;
     }
-    
-    console.log(`Processing image: ${src} -> ${normalizedSrc}`);
-    
+
     // Enhanced error handling with better visual feedback
     const onErrorHandler = `
       this.parentElement.style.display = 'block';
@@ -799,7 +781,7 @@ export class FAQService implements OnDestroy {
         style="display: block; margin: 20px auto; max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); transition: transform 0.3s ease;"
         loading="lazy"
         onerror="${onErrorHandler}"
-        onload="console.log('Image loaded successfully:', this.src); this.parentElement.classList.add('image-loaded');"
+        onload="this.parentElement.classList.add('image-loaded')"
       >
     </div>`;
   }
@@ -879,8 +861,6 @@ export class FAQService implements OnDestroy {
       return content;
     }
     
-    console.log('🔗 Applying auto-links for', Object.keys(this.autoLinkTerms).length, 'terms');
-
     // Sort terms by length (longest first) to avoid conflicts
     const sortedTerms = Object.keys(this.autoLinkTerms).sort((a, b) => b.length - a.length);
     
@@ -906,7 +886,7 @@ export class FAQService implements OnDestroy {
       );
       
       if (!isProperlyCapitalized) {
-        console.log(`⚠️ Skipping term "${term}" - not properly capitalized`);
+        console.warn(`❌ Skipping term "${term}" - not properly capitalized`);
         return; // Skip terms that don't have proper capitalization
       }
       
@@ -934,15 +914,11 @@ export class FAQService implements OnDestroy {
         </span>`;
         const linkElement = `<a href="${resolvedUrl}" data-faq-link="${faqLink}" class="rules-engine-link" target="_blank" rel="noopener noreferrer">${capturedTerm}${lightningIcon}</a>`;
         const replacement = `<strong>${linkElement}</strong>`;
-        console.log(`✅ Created link: ${capturedTerm} (exact match in <strong>) with Lightning new_window icon`);
-        return replacement;
+       return replacement;
       });
       
       // Count successful replacements
       const matches = processedContent.match(new RegExp(`<a[^>]*>${escapedTerm}<span`, 'gi'));
-      if (matches && matches.length > 0) {
-        console.log(`🔗 ${term}: ${matches.length} link(s) created`);
-      }
     });
     
     return processedContent;
@@ -952,18 +928,9 @@ export class FAQService implements OnDestroy {
    * Debug method to test URL resolution manually
    */
   public testUrlResolution(): void {
-    console.log('=== Testing URL Resolution ===');
-    console.log('Auto-link terms:', this.autoLinkTerms);
-    
     const testTerms = ['batch', 'triggers', 'input', 'preview'];
     testTerms.forEach(term => {
       const config = this.autoLinkTerms[term];
-      if (config) {
-        const url = getFAQUrlByKey(config.faqLink);
-        console.log(`${term} -> ${config.faqLink} -> ${url}`);
-      } else {
-        console.log(`${term} -> NOT FOUND in auto-link terms`);
-      }
     });
   }
 }
