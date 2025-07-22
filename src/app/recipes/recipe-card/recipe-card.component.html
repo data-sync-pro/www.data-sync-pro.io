@@ -1,96 +1,19 @@
-<mat-card class="recipe-card" 
-          [class.has-progress]="recipe.currentStep && recipe.currentStep > 0"
-          (click)="onRecipeClick()">
-  
-  <!-- Card Header -->
-  <mat-card-header>
-    <div mat-card-avatar class="recipe-avatar">
-      <mat-icon [color]="getDifficultyColor()">{{ getCategoryIcon() }}</mat-icon>
-    </div>
-    
-    <mat-card-title [innerHTML]="getDisplayTitle()"></mat-card-title>
-    
-    <mat-card-subtitle>
-      <div class="recipe-meta">
-        <span class="category-tag">{{ recipe.category | titlecase }}</span>
-        <mat-chip class="difficulty-chip" [color]="getDifficultyColor()" selected>
-          {{ recipe.difficulty | titlecase }}
-        </mat-chip>
-      </div>
-    </mat-card-subtitle>
-  </mat-card-header>
-
-  <!-- Card Content -->
-  <mat-card-content>
-    <p class="recipe-description" [innerHTML]="getDisplayDescription()"></p>
-    
-    <!-- Recipe Stats -->
-    <div class="recipe-stats">
-      <div class="stat-item">
-        <mat-icon>schedule</mat-icon>
-        <span>{{ getTimeDisplay() }}</span>
-      </div>
-      
-      <div class="stat-item" *ngIf="recipe.viewCount && recipe.viewCount > 0">
-        <mat-icon>visibility</mat-icon>
-        <span>{{ recipe.viewCount }} views</span>
-      </div>
-      
-      <div class="stat-item" *ngIf="recipe.downloadableExecutable">
-        <mat-icon>download</mat-icon>
-        <span>Executable</span>
-      </div>
-    </div>
-
-    <!-- Progress Bar -->
-    <div class="recipe-progress" *ngIf="recipe.currentStep && recipe.currentStep > 0">
-      <div class="progress-info">
-        <span class="progress-label">Progress</span>
-        <span class="progress-value">{{ getProgressPercentage() }}%</span>
-      </div>
-      <mat-progress-bar 
-        mode="determinate" 
-        [value]="getProgressPercentage()"
-        color="accent">
-      </mat-progress-bar>
-    </div>
-
-    <!-- Tags -->
-    <div class="recipe-tags" *ngIf="recipe.tags.length > 0">
-      <mat-chip-listbox class="tag-list">
-        <mat-chip-option 
-          *ngFor="let tag of recipe.tags.slice(0, 3)" 
-          class="recipe-tag"
-          disabled>
-          {{ tag }}
-        </mat-chip-option>
-        <span *ngIf="recipe.tags.length > 3" class="more-tags">
-          +{{ recipe.tags.length - 3 }} more
-        </span>
-      </mat-chip-listbox>
-    </div>
-  </mat-card-content>
-
-  <!-- Card Actions -->
-  <mat-card-actions align="end">
-    <button mat-button color="primary" (click)="onRecipeClick(); $event.stopPropagation()">
-      <mat-icon>arrow_forward</mat-icon>
-      Start Recipe
-    </button>
-    
+<mat-card class="recipe-card" (click)="onRecipeClick()">
+  <!-- 顶部行：category + download按钮 -->
+  <div class="card-header">
+    <span class="category-tag" [class]="recipe.category">{{ recipe.category | titlecase }}</span>
     <button mat-icon-button 
             *ngIf="recipe.downloadableExecutable"
+            class="download-button"
             matTooltip="Download Executable"
-            (click)="$event.stopPropagation()"
+            (click)="onDownload($event)"
             aria-label="Download executable">
       <mat-icon>download</mat-icon>
     </button>
-  </mat-card-actions>
-
-  <!-- Popular Badge -->
-  <div class="popular-badge" *ngIf="recipe.isPopular">
-    <mat-icon>star</mat-icon>
-    <span>Popular</span>
   </div>
-
+  
+  <!-- 主要内容：标题 -->
+  <div class="card-body">
+    <h3 class="recipe-title" [title]="recipe.title">{{ recipe.title }}</h3>
+  </div>
 </mat-card>

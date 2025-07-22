@@ -10,14 +10,14 @@ $breakpoint-desktop: 992px;
 $breakpoint-tablet: 768px;
 $breakpoint-mobile: 576px;
 
-// W3Schools风格的主容器布局 - 三栏设计
+// FAQ-inspired主容器布局 - 三栏设计
 .recipe-layout-container {
   display: grid;
   grid-template-areas: "sidebar main toc";
   grid-template-columns: $sidebar-width 1fr $toc-width;
   min-height: calc(100vh - $header-height);
   margin-top: $header-height;
-  background-color: #f8f9fa;
+  background-color: #ffffff;
   transition: grid-template-columns 0.3s ease;
 
   &.sidebar-collapsed {
@@ -82,7 +82,7 @@ $breakpoint-mobile: 576px;
 
 .recipe-main {
   grid-area: main;
-  padding: 2rem;
+  padding: 80px 40px 120px 40px;
   overflow-x: hidden;
   overflow-y: auto;
   background: #ffffff;
@@ -92,11 +92,11 @@ $breakpoint-mobile: 576px;
   max-height: calc(100vh - $header-height);
 
   @media (max-width: $breakpoint-tablet) {
-    padding: 1.5rem;
+    padding: 20px 20px 120px 20px;
   }
 
   @media (max-width: $breakpoint-mobile) {
-    padding: 1rem;
+    padding: 15px 15px 80px 15px;
     // On mobile, full height since container has margin-top
     min-height: calc(100vh - $header-height);
     max-height: calc(100vh - $header-height);
@@ -173,15 +173,16 @@ $breakpoint-mobile: 576px;
   }
 }
 
-// Home header
+// Header sections - FAQ-inspired spacing
 .home-header,
-.category-header {
+.category-header,
+.search-header {
   text-align: center;
-  margin-bottom: 3rem;
+  margin-bottom: 40px;
 
-  h1 {
+  h1, h2 {
     font-size: 2.5rem;
-    font-weight: 700;
+    font-weight: 600;
     color: #202124;
     margin-bottom: 1rem;
 
@@ -190,6 +191,20 @@ $breakpoint-mobile: 576px;
     }
   }
 
+  // Specific title classes for consistent styling
+  .section-title,
+  .category-title,
+  .search-title {
+    font-size: 2.5rem;
+    font-weight: 600;
+    color: #202124;
+    margin-bottom: 1rem;
+
+    @media (max-width: $breakpoint-tablet) {
+      font-size: 2rem;
+    }
+  }
+  
   .home-description,
   .category-description {
     font-size: 1.125rem;
@@ -201,6 +216,19 @@ $breakpoint-mobile: 576px;
     @media (max-width: $breakpoint-tablet) {
       font-size: 1rem;
     }
+  }
+}
+
+// Recipe count styling (separate from header nesting)
+.recipe-count {
+  font-size: 1rem;
+  color: #5f6368;
+  margin: 0;
+  font-weight: 500;
+  text-align: center;
+
+  @media (max-width: $breakpoint-tablet) {
+    font-size: 0.9rem;
   }
 }
 
@@ -220,11 +248,16 @@ $breakpoint-mobile: 576px;
 // Recipe grid
 .recipe-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 1.5rem;
 
+  @media (max-width: $breakpoint-desktop) {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.25rem;
+  }
+
   @media (max-width: $breakpoint-tablet) {
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
     gap: 1.25rem;
   }
 

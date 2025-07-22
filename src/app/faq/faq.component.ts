@@ -182,10 +182,10 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     ).subscribe(fragment => {
       if (fragment) {
         this.pendingFragment = fragment;
-        // 立即处理fragment，不等待路由器滚动
+        // Process fragment immediately, don't wait for router scroll
         this.handlePendingFragment();
       } else {
-        // 如果没有fragment，确保页面滚动到顶部
+        // If no fragment, ensure page scrolls to top
         setTimeout(() => {
           window.scrollTo({ top: 0, behavior: 'auto' });
         }, 50);
@@ -643,7 +643,7 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
       return this.performSmartSearch(q);
     }
 
-    // 如果没有搜索查询，则应用分类过滤
+    // If no search query, apply category filter
     return this.faqList.filter(item => {
       if (this.current.category && item.category !== this.current.category) return false;
       if (this.current.subCategory && item.subCategory !== this.current.subCategory) return false;
@@ -823,9 +823,9 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     setTimeout(() => {
       const hasOpenPanels = this.expansionPanels?.some(panel => panel.expanded);
       if (!hasOpenPanels) {
-        // 如果没有展开的FAQ，移除URL中的fragment
+        // If no expanded FAQ, remove fragment from URL
         this.clearBrowserURLFragment();
-        // 清除当前FAQ标题
+        // Clear current FAQ title
         this.current.faqTitle = '';
         this.current.faqItem = null;
       }

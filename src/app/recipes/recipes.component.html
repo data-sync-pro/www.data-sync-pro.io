@@ -132,38 +132,34 @@
         <p>Loading recipes...</p>
       </div>
 
-      <!-- Home View - All Categories -->
+      <!-- Home View - All Recipes -->
       <div *ngIf="showHome && !ui.isLoading" class="recipe-home">
         <div class="home-header">
-          <h1>All Recipes</h1>
+          <h2 class="section-title">All Recipes</h2>
+         </div>
+
+        <!-- Recipe Grid -->
+        <div class="recipe-grid" *ngIf="currentRecipes.length > 0">
+          <app-recipe-card 
+            *ngFor="let recipe of currentRecipes"
+            [recipe]="recipe"
+            (recipeSelect)="goToRecipe($event)">
+          </app-recipe-card>
         </div>
 
-        <!-- Category Cards -->
-        <div class="category-grid">
-          <app-recipe-category 
-            *ngFor="let category of categories"
-            [category]="category"
-            (categorySelect)="goToCategory($event)">
-          </app-recipe-category>
+        <!-- No Results -->
+        <div class="no-results" *ngIf="currentRecipes.length === 0">
+          <mat-icon>search_off</mat-icon>
+          <h3>No recipes found</h3>
+          <p>No recipes are currently available.</p>
         </div>
 
-        <!-- Popular Recipes -->
-        <div class="popular-recipes" *ngIf="currentRecipes.length > 0">
-          <h2>Popular Recipes</h2>
-          <div class="recipe-grid">
-            <app-recipe-card 
-              *ngFor="let recipe of currentRecipes.slice(0, 6)"
-              [recipe]="recipe"
-              (recipeSelect)="goToRecipe($event)">
-            </app-recipe-card>
-          </div>
-        </div>
       </div>
 
       <!-- Category View - Recipes in Category -->
       <div *ngIf="showCategory && !ui.isLoading" class="recipe-category-view">
         <div class="category-header" *ngIf="currentCategory">
-          <h1>{{ currentCategory.displayName }} Recipes</h1>
+          <h2 class="category-title">{{ currentCategory.displayName }} Recipes</h2>
           <p class="category-description">{{ currentCategory.description }}</p>
         </div>
 
@@ -196,7 +192,7 @@
       <!-- Search Results -->
       <div *ngIf="search.isActive && !ui.isLoading" class="search-results">
         <div class="search-header">
-          <h2>Search Results for "{{ search.query }}"</h2>
+          <h2 class="search-title">Search Results for "{{ search.query }}"</h2>
           <p class="search-summary">
             {{ search.results.length }} {{ search.results.length === 1 ? 'recipe' : 'recipes' }} found
           </p>
@@ -206,8 +202,6 @@
           <app-recipe-card 
             *ngFor="let recipe of search.results"
             [recipe]="recipe"
-            [highlightSearchTerms]="true"
-            [searchQuery]="search.query"
             (recipeSelect)="goToRecipe($event)">
           </app-recipe-card>
         </div>
