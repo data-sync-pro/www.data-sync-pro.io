@@ -17,6 +17,7 @@ import { MatBadgeModule } from '@angular/material/badge';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 // Routing
 import { RecipesRoutingModule } from './recipes-routing.module';
@@ -32,6 +33,7 @@ import { RecipeDownloadComponent } from './recipe-download/recipe-download.compo
 import { RecipeProgressComponent } from './recipe-progress/recipe-progress.component';
 import { RecipeCategoryComponent } from './recipe-category/recipe-category.component';
 import { CodeHighlightComponent } from './code-highlight/code-highlight.component';
+import { RecipeSearchOverlayComponent } from './recipe-search-overlay/recipe-search-overlay.component';
 
 // Shared Modules and Components
 import { SharedModule } from '../shared/shared.module';
@@ -47,7 +49,8 @@ import { SharedModule } from '../shared/shared.module';
     RecipeDownloadComponent,
     RecipeProgressComponent,
     RecipeCategoryComponent,
-    CodeHighlightComponent
+    CodeHighlightComponent,
+    RecipeSearchOverlayComponent
   ],
   imports: [
     CommonModule,
@@ -69,6 +72,7 @@ import { SharedModule } from '../shared/shared.module';
     MatTooltipModule,
     MatFormFieldModule,
     MatInputModule,
+    MatProgressSpinnerModule,
     
     // Routing
     RecipesRoutingModule,

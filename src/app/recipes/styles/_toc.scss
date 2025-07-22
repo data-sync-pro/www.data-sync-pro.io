@@ -1,0 +1,379 @@
+// ==================== Recipe TOC Styles ====================
+
+// TOC Desktop Styles
+.recipe-toc.desktop-toc {
+  background: var(--surface-color);
+  border-left: 1px solid var(--border-color);
+  box-shadow: -2px 0 8px var(--shadow-light);
+  overflow: hidden;
+  
+  .toc-content {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .toc-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    background: var(--background-muted);
+    flex-shrink: 0;
+
+    .toc-title-section {
+      margin-bottom: 1rem;
+
+      .toc-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: var(--text-color);
+        margin: 0 0 0.25rem 0;
+      }
+
+      .toc-count {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 500;
+      }
+    }
+
+    .toc-pagination-controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 0.75rem;
+
+      .pagination-info {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        font-weight: 500;
+      }
+
+      .pagination-buttons {
+        display: flex;
+        gap: 0.25rem;
+
+        .pagination-btn {
+          width: 28px;
+          height: 28px;
+          min-width: 28px;
+          padding: 0;
+          
+          mat-icon {
+            font-size: 16px;
+            width: 16px;
+            height: 16px;
+          }
+          
+          &:disabled {
+            opacity: 0.3;
+          }
+        }
+      }
+    }
+  }
+
+  .toc-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0.5rem 0;
+
+    .toc-item {
+      display: flex;
+      align-items: flex-start;
+      padding: 0.75rem 1.5rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border-left: 3px solid transparent;
+      user-select: none;
+
+      &:hover {
+        background: var(--hover-bg);
+        border-left-color: var(--primary-light);
+        transition: all 0.2s ease;
+      }
+
+      &.active {
+        background: linear-gradient(90deg, var(--active-bg), transparent);
+        border-left-color: var(--primary-color);
+        box-shadow: inset 0 0 0 1px var(--active-bg);
+
+        .toc-item-title {
+          color: var(--primary-color);
+          font-weight: 600;
+        }
+
+        .toc-item-meta {
+          .toc-item-category,
+          .toc-item-difficulty {
+            color: var(--primary-color);
+          }
+        }
+      }
+
+      .toc-item-icon {
+        margin-right: 0.75rem;
+        margin-top: 0.125rem;
+        flex-shrink: 0;
+
+        mat-icon {
+          font-size: 18px;
+          width: 18px;
+          height: 18px;
+          color: var(--text-muted);
+          transition: color 0.2s ease;
+        }
+      }
+
+      .toc-item-content {
+        flex: 1;
+        min-width: 0;
+
+        .toc-item-title {
+          font-size: 0.875rem;
+          font-weight: 500;
+          color: #202124;
+          line-height: 1.4;
+          margin-bottom: 0.25rem;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+        }
+
+        .toc-item-meta {
+          display: flex;
+          gap: 0.5rem;
+          font-size: 0.75rem;
+          color: #5f6368;
+
+          .toc-item-category,
+          .toc-item-difficulty,
+          .toc-item-time {
+            background: var(--background-muted);
+            border-radius: 8px;
+            padding: 0.125rem 0.375rem;
+            font-weight: 500;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+          }
+
+          .toc-item-difficulty {
+            &.beginner {
+              background: var(--difficulty-beginner-bg);
+              color: var(--difficulty-beginner);
+            }
+
+            &.intermediate {
+              background: var(--difficulty-intermediate-bg);
+              color: var(--difficulty-intermediate);
+            }
+
+            &.advanced {
+              background: var(--difficulty-advanced-bg);
+              color: var(--difficulty-advanced);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Footer awareness states
+  &.footer-approaching {
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, #e8f0fe, transparent);
+      pointer-events: none;
+    }
+  }
+
+  &.in-footer-zone {
+    opacity: 0.85;
+    
+    .toc-item.active {
+      background: #f8f9fa;
+      border-left-color: #dadce0;
+
+      .toc-item-title {
+        color: #5f6368;
+        font-weight: 500;
+      }
+    }
+  }
+}
+
+// Mobile TOC Styles
+.recipe-toc.mobile-toc {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 300;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+
+  &.open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: all;
+  }
+
+  .mobile-toc-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1;
+  }
+
+  .mobile-toc-content {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 320px;
+    max-width: 85vw;
+    height: 100%;
+    background: #ffffff;
+    box-shadow: -2px 0 8px rgba(0, 0, 0, 0.15);
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+
+    .mobile-toc.open & {
+      transform: translateX(0);
+    }
+  }
+
+  .mobile-toc-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid #e1e5e9;
+    background: #f8f9fa;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+
+    h3 {
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: #202124;
+      margin: 0;
+    }
+
+    .mobile-toc-close {
+      width: 32px;
+      height: 32px;
+      min-width: 32px;
+      padding: 0;
+
+      mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+      }
+    }
+  }
+
+  .mobile-toc-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0.5rem 0;
+
+    .toc-item {
+      display: flex;
+      align-items: flex-start;
+      padding: 0.75rem 1.5rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border-left: 3px solid transparent;
+
+      &:hover,
+      &:active {
+        background: #f8f9fa;
+      }
+
+      &.active {
+        background: linear-gradient(90deg, rgba(26, 115, 232, 0.08), transparent);
+        border-left-color: #1a73e8;
+
+        .toc-item-title {
+          color: #1a73e8;
+          font-weight: 600;
+        }
+      }
+
+      .toc-item-icon {
+        margin-right: 0.75rem;
+        margin-top: 0.125rem;
+        flex-shrink: 0;
+
+        mat-icon {
+          font-size: 18px;
+          width: 18px;
+          height: 18px;
+          color: var(--text-muted);
+          transition: color 0.2s ease;
+        }
+      }
+
+      .toc-item-content {
+        flex: 1;
+        min-width: 0;
+
+        .toc-item-title {
+          font-size: 0.875rem;
+          font-weight: 500;
+          color: #202124;
+          line-height: 1.4;
+          margin-bottom: 0.25rem;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+        }
+
+        .toc-item-meta {
+          display: flex;
+          gap: 0.5rem;
+          font-size: 0.75rem;
+          color: #5f6368;
+
+          .toc-item-category,
+          .toc-item-difficulty,
+          .toc-item-time {
+            background: #f1f3f4;
+            border-radius: 8px;
+            padding: 0.125rem 0.375rem;
+            font-weight: 500;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 480px) {
+  .recipe-toc.mobile-toc .mobile-toc-content {
+    width: 100%;
+    max-width: 100%;
+  }
+}
