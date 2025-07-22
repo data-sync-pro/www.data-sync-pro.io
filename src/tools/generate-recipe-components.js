@@ -726,4 +726,4 @@ module.exports = {
   generateAllRecipeComponents,
   createRecipeDetailComponent,
   toKebabCase
-};`;
+};

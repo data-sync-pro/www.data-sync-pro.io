@@ -321,7 +321,6 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
       const href = target.getAttribute('href');
       
       if (href) {
-        console.log('Opening auto-generated link in new window:', href);
         // Open in new window/tab instead of same window navigation
         window.open(href, '_blank', 'noopener,noreferrer');
         event.preventDefault();
@@ -335,8 +334,6 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
         const href = linkElement.getAttribute('href');
         
         if (href) {
-          console.log('Opening auto-generated link via Lightning icon in new window:', href);
-          // Open in new window/tab
           window.open(href, '_blank', 'noopener,noreferrer');
           event.preventDefault();
         }
@@ -778,8 +775,7 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
         next: (content) => {
           item.safeAnswer = content;
           item.isLoading = false;
-          this.cdr.markForCheck(); // 触发变更检测显示内容
-          console.log('FAQ content loaded and UI updated for:', item.question);
+          this.cdr.markForCheck(); 
         },
         error: (error) => {
           console.error('Failed to load FAQ content:', error);
@@ -1713,18 +1709,6 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
    * 调试方法：检查FAQ加载状态
    */
   debugFAQStatus(): void {
-    console.log('=== FAQ Debug Status ===');
-    console.log('Total FAQs:', this.faqList.length);
-    console.log('Filtered FAQs:', this.filteredFAQ.length);
-    console.log('Categories:', this.categories.length);
-    
-    const loadedCount = this.faqList.filter(faq => faq.safeAnswer).length;
-    const loadingCount = this.faqList.filter(faq => faq.isLoading).length;
-    const errorCount = this.faqList.filter(faq => !faq.safeAnswer && !faq.isLoading && faq.answerPath).length;
-    
-    console.log('Loaded content:', loadedCount);
-    console.log('Currently loading:', loadingCount);
-    console.log('Failed to load:', errorCount);
     
     // 显示前5个有问题的FAQ
     const problematicFAQs = this.faqList
@@ -1993,7 +1977,6 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
         // Optional: Add visual feedback by briefly highlighting the target
         this.addVisualScrollFeedback(targetElement);
         
-        console.log(`Auto-scrolled to FAQ: "${item.question}" at position ${optimalScrollPosition}`);
       } else {
         // Fallback: If no specific element found, scroll to top of FAQ section
         const faqMain = document.querySelector('.faq-main');
@@ -2007,12 +1990,9 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
             top: scrollPosition,
             behavior: 'smooth'
           });
-          
-          console.log(`Fallback: Auto-scrolled to FAQ section at position ${scrollPosition}`);
-        } else {
+          } else {
           // Final fallback: scroll to top
           this.scrollToTop();
-          console.log('Final fallback: Scrolled to top of page');
         }
       }
     }, 150); // Small delay to ensure DOM is ready
