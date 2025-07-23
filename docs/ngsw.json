@@ -1,6 +1,6 @@
 {
   "configVersion": 1,
-  "timestamp": 1753242603604,
+  "timestamp": 1753285406590,
   "index": "/index.html",
   "assetGroups": [
     {
@@ -413,7 +413,7 @@
     "/assets/faq-item/general-five-dsp-engines.html": "7e4ec7197e2b504262808d3973c5d99ee7872767",
     "/assets/faq-item/general-no-code-rules-transform.html": "a3a11ad9c202033d5fd59ae58aa3bbf195f4329a",
     "/assets/faq-item/general-three-user-personas.html": "d0a2a1659ef513403f40ab929ab1c024bfcc794e",
-    "/assets/faq-item/general-what-is-dsp.html": "f77c1be31ec16fb79c15ae75a88f113c53ff86eb",
+    "/assets/faq-item/general-what-is-dsp.html": "dbf3cf422c8814711e47ba020919129476f646bc",
     "/assets/faq-item/general-why-dsp.html": "01b27f4f5e42ba8f2464faebdbbb38f42be1b99b",
     "/assets/faq-item/process-steps-action-action-big-objects.html": "a7f398a272e087a987f3a5d8d24247ed924617a2",
     "/assets/faq-item/process-steps-action-action-phase.html": "c753009786e03c35adbe4ea98e9c2db54a8f7dbb",
