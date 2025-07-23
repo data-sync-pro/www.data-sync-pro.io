@@ -1,6 +1,6 @@
 {
   "configVersion": 1,
-  "timestamp": 1753286044637,
+  "timestamp": 1753285406590,
   "index": "/index.html",
   "assetGroups": [
     {
@@ -401,7 +401,7 @@
     "/assets/arrow-up.png": "8a9c20f0ddc54624f926552187b6686f61a09fdd",
     "/assets/data/auto-link-terms.json": "1153cc571ce7205f0681c4acfe750e267c2245ba",
     "/assets/data/designer-sidebar.json": "488457ae53a5b4fb92008e249309e5f186b5d8c8",
-    "/assets/data/faqs.json": "4858c7c9ff1be2c9a7e023d0d40bd269e2e285d2",
+    "/assets/data/faqs.json": "98f24478c31952703f65a957a6024bac54142e33",
     "/assets/data/recipes.json": "2783cd323b0d74cb460267c527500d7395ed6a93",
     "/assets/faq-item/general-dsp-adheres-sdlc.html": "18536f88bacdac35f28638692d1d2b9aa9cea20d",
     "/assets/faq-item/general-dsp-external-data.html": "686b01bc37c2a0388b79329806e7ef37f7235525",
@@ -413,7 +413,7 @@
     "/assets/faq-item/general-five-dsp-engines.html": "7e4ec7197e2b504262808d3973c5d99ee7872767",
     "/assets/faq-item/general-no-code-rules-transform.html": "a3a11ad9c202033d5fd59ae58aa3bbf195f4329a",
     "/assets/faq-item/general-three-user-personas.html": "d0a2a1659ef513403f40ab929ab1c024bfcc794e",
-    "/assets/faq-item/general-what-is-dsp.html": "fbee0ec974f048707bff698a16fb40eba5569f5b",
+    "/assets/faq-item/general-what-is-dsp.html": "dbf3cf422c8814711e47ba020919129476f646bc",
     "/assets/faq-item/general-why-dsp.html": "01b27f4f5e42ba8f2464faebdbbb38f42be1b99b",
     "/assets/faq-item/process-steps-action-action-big-objects.html": "a7f398a272e087a987f3a5d8d24247ed924617a2",
     "/assets/faq-item/process-steps-action-action-phase.html": "c753009786e03c35adbe4ea98e9c2db54a8f7dbb",
@@ -502,7 +502,7 @@
     "/assets/faq-item/rules-engines-batch-chain-batch-executables.html": "cdd282ff52727af4465b8d2b9c6c6ecec2298611",
     "/assets/faq-item/rules-engines-batch-common-soql-pipeline.html": "fc2a040cd4baf4b66f1e8d354310e339df9b67b4",
     "/assets/faq-item/rules-engines-batch-create-batch-executable.html": "2081ece19a004b2b6add06cb58bba56755e77fd9",
-    "/assets/faq-item/rules-engines-batch-incremental-retrieval.html": "48039f3abfc9640d0109312fc851fc49122a13d5",
+    "/assets/faq-item/rules-engines-batch-incremental-retrieval.html": "c86a59236c6c29d0fd591c0dd48833547147fc30",
     "/assets/faq-item/rules-engines-batch-re-execute-failed-batches.html": "957d754e1c38676c3abf59338193e025f3639a94",
     "/assets/faq-item/rules-engines-batch-revert-batch-changes.html": "819e015aaafeb2ec6900796c787ea20e85b6c19a",
     "/assets/faq-item/rules-engines-batch-schedule-batch-jobs.html": "016a2f75636ec9fefe50a574bf4c8f8fc1c64383",
