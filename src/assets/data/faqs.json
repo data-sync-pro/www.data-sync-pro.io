@@ -275,8 +275,8 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Batch",
     "SeqNo__c": null,
-    "Question__c": "How can I implement delta retrieval?",
-    "Answer__c": "rules-engines-batch-delta-retrieval.html"
+    "Question__c": "How can I implement incremental retrieval?",
+    "Answer__c": "rules-engines-batch-incremental-retrieval.html"
   },
   {
     "Id": "a0oEc000005JohsIAC",

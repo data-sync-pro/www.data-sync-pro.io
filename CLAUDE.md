@@ -14,10 +14,14 @@ This is an Angular 15 website for Data Sync Pro (DSP), a Salesforce data synchro
 - **Watch mode**: `ng build --watch --configuration development`
 - **Run tests**: `ng test` (uses Karma + Jasmine)
 - **Generate components**: `ng generate component component-name` (uses SCSS styling by default)
+  - Shortcuts: `ng g c component-name`
+  - Other generators: `ng generate directive|pipe|service|class|guard|interface|enum|module`
 - **Install dependencies**: `npm install`
 - **Generate FAQ components**: `node src/tools/generate-faq-components.js`
 - **Generate Designer Guide pages**: `node src/tools/generate-designer-pages.js`
+- **Generate Recipe components**: `node src/tools/generate-recipe-components.js` (generates recipe detail components from recipes.json)
 - **Extract i18n**: `ng extract-i18n` (Angular i18n extraction)
+- **Angular CLI help**: `ng help` (view all available Angular CLI commands)
 
 ### Testing Commands
 - **Run specific test**: `ng test --include='**/component-name.spec.ts'`
@@ -29,9 +33,9 @@ This is an Angular 15 website for Data Sync Pro (DSP), a Salesforce data synchro
 ## Architecture Overview
 
 ### Core Structure
-- **Main modules**: App, FAQ (lazy-loaded), Designer Guide (lazy-loaded), Shared
+- **Main modules**: App, FAQ (lazy-loaded), Designer Guide (lazy-loaded), Recipes (lazy-loaded), Shared
 - **Key components**: Home, Header, Footer, Pricing (with interactive bundle configurator), Solutions, Rules Engines, Support
-- **Routing**: Uses lazy loading for FAQ and Designer Guide modules with preload strategy
+- **Routing**: Uses lazy loading for FAQ, Designer Guide, and Recipes modules with preload strategy
 - **State management**: Uses Angular services for data management
 - **UI framework**: Angular Material + Bootstrap for styling
 
@@ -40,7 +44,11 @@ The site features a sophisticated content generation system:
 
 - **FAQ system**: JSON-driven FAQ content (`src/assets/data/faqs.json`) with auto-generated components
 - **Designer Guide**: Hierarchical documentation system with sidebar navigation (`src/assets/data/designer-sidebar.json`)
-- **Content generation**: Node.js scripts in `src/tools/` for generating FAQ components from JSON data
+- **Recipe system**: 交互式配方/教程系统（`src/assets/data/recipes.json`），支持分步演练、进度跟踪、分类和内容下载
+- **Content generation**: Node.js 脚本位于 `src/tools/`，用于根据 JSON 数据自动生成组件：
+  - `generate-faq-components.js` - 生成 FAQ 组件
+  - `generate-designer-pages.js` - 生成 Designer Guide 页面
+  - `generate-recipe-components.js` - 生成带有交互式分步演练和进度跟踪的 Recipe 详情组件，并自动更新路由
 - **HTML content**: Static HTML files stored in `src/assets/faq-item/` for FAQ answers
 
 ### Special Features
@@ -57,16 +65,28 @@ The site features a sophisticated content generation system:
 ### Key Services
 - **API Service**: `api.service.ts` for backend communication
 - **FAQ Service**: `shared/services/faq.service.ts` for FAQ data management with caching and preloading
+- **Recipe Service**: `shared/services/recipe.service.ts` for recipe data management and progress tracking
 - **Performance Service**: `shared/services/performance.service.ts` for optimization
 - **Offline Service**: `shared/services/offline.service.ts` for PWA functionality
 - **Analytics Service**: `analytics.service.ts` for Google Analytics integration
 
 ## Content Generation Workflow
 
+### FAQ Components
 To generate new FAQ components:
 1. Update `src/assets/data/faqs.json` with new FAQ entries
 2. Run `node src/tools/generate-faq-components.js` to auto-generate Angular components
 3. Add corresponding HTML content files to `src/assets/faq-item/`
+
+### Recipe Components
+To generate new recipe components:
+1. Update `src/assets/data/recipes.json` with new recipe entries
+2. Run `node src/tools/generate-recipe-components.js` to auto-generate Angular components
+3. The script automatically:
+   - Creates component files (TypeScript, HTML, SCSS)
+   - Updates routing module with new recipe routes
+   - Generates interactive step-by-step walkthrough UI
+   - Includes progress tracking functionality
 
 ## Build Configuration
 
@@ -85,20 +105,28 @@ To generate new FAQ components:
 
 - **FAQ content**: `src/assets/data/faqs.json` - drives FAQ section generation
 - **Designer Guide nav**: `src/assets/data/designer-sidebar.json` - sidebar navigation structure
+- **Recipe content**: `src/assets/data/recipes.json` - step-by-step recipe data with categories and metadata
 - **FAQ HTML content**: `src/assets/faq-item/*.html` - static HTML content for FAQ answers
 - **Service Worker config**: `ngsw-config.json` - PWA caching configuration
+- **Recipe data**: `src/assets/data/recipes.json` - 配方/教程内容，包含分步演练、分类、元数据和进度跟踪
+- **Auto-link terms**: `src/assets/data/auto-link-terms.json` - FAQ 中自动转为链接的术语
 
 ## Content Generation Tools
 
 - **FAQ Component Generator**: `src/tools/generate-faq-components.js` - creates Angular components from FAQ JSON
 - **Designer Page Generator**: `src/tools/generate-designer-pages.js` - processes designer guide content
-- Both tools use Angular CLI internally to scaffold components
+- **Recipe Component Generator**: `src/tools/generate-recipe-components.js` - creates interactive recipe detail components with:
+  - Step-by-step walkthroughs using Angular Material Stepper
+  - Progress tracking stored in localStorage
+  - Dynamic route generation for each recipe
+  - Automatic component scaffolding with TypeScript, HTML, and SCSS templates
+- All tools use Angular CLI internally to scaffold components
 
 ## Performance and Optimization
 
 - **Bundle budgets**: Warning at 1.5MB, error at 2MB for initial bundles
 - **Component style budget**: Warning at 60KB, error at 80KB per component
-- **Lazy loading**: FAQ and Designer Guide modules are lazy-loaded
+- **Lazy loading**: FAQ, Designer Guide, and Recipes modules are lazy-loaded
 - **Preloading strategy**: Uses `PreloadAllModules` for improved UX
 - **Service Worker**: Configured with custom caching strategies for FAQ content
 - **PWA features**: Offline support with manifest.webmanifest
@@ -108,10 +136,15 @@ To generate new FAQ components:
 - **Scroll behavior**: Custom scroll restoration disabled, managed by components
 - **Anchor scrolling**: Disabled to prevent conflicts
 - **Scroll offset**: 80px offset for fixed header
-- **Lazy modules**: FAQ (`/faq`) and Designer Guide (`/designer-guide`) are lazy-loaded
+- **Lazy modules**: FAQ (`/faq`), Designer Guide (`/designer-guide`), and Recipes (`/recipes`) are lazy-loaded
 - **Fallback**: All unknown routes redirect to home (`''`)
 - **Current routing**: Most routes are commented out in app-routing.module.ts - only FAQ (root path) and pricing are active
 - **Module preloading**: Uses `PreloadAllModules` strategy for better performance
+
+## Active Development Tasks
+
+### Auto-Link System Issue (High Priority)
+The FAQ auto-link system that converts key terms (like "Batch", "Triggers") into clickable links has a detection logic issue. See `TODO.md` for detailed debugging information and fix instructions. The main issue is in `src/app/shared/services/faq.service.ts` lines 754-792 where the link detection algorithm incorrectly skips all matches.
 
 ## Styling Architecture
 
@@ -151,6 +184,15 @@ To generate new FAQ components:
 - **Sticky Summary**: Right sidebar summary panel that stays visible during configuration
 - **Form State Management**: Uses Angular reactive forms with real-time validation and state updates
 
+### Recipe Module Architecture
+- **Step-by-step Guides**: Structured recipe system for Data Sync Pro configuration tutorials
+- **Progress Tracking**: Individual step completion tracking with visual progress indicators
+- **Category Organization**: Recipe filtering and organization by categories (e.g., "Getting Started", "Advanced Configuration")
+- **Download Functionality**: Recipe download component for offline access to configuration guides
+- **Search and Navigation**: Recipe search component with advanced filtering and step-by-step navigation
+- **Modular Components**: Separate components for recipe cards, details, steps, categories, and progress tracking
+- **JSON-driven Content**: Recipe data stored in `src/assets/data/recipes.json` with structured metadata
+
 ## Code Style Guidelines
 
 ### Editor Configuration (.editorconfig)
@@ -173,6 +215,18 @@ To generate new FAQ components:
 - **Experimental decorators**: Enabled for Angular dependency injection
 - **JSON module resolution**: Supported for data file imports
 - **Angular compiler options**: Strict templates and injection parameters enabled
+
+## Active Development Issues
+
+### High Priority: Auto-linking System Fix
+There is a critical issue with the FAQ auto-linking system that needs immediate attention:
+- **Issue**: Auto-link detection logic is too strict, preventing all automatic term linking
+- **Location**: `src/app/shared/services/faq.service.ts` lines 754-792
+- **Symptoms**: Terms like "Batch", "Triggers" are found but incorrectly skipped as "inside existing link"
+- **Impact**: No automatic links are created in FAQ content
+- **Testing**: After fixing, clear browser cache and check console for "✅ Created link:" messages
+
+For detailed debugging steps and solution options, see TODO.md.
 
 # important-instruction-reminders
 Do what has been asked; nothing more, nothing less.

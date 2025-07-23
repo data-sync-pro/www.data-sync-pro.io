@@ -87,6 +87,21 @@
               </div>
             </div>
 
+            <!-- Search - Collapsed -->
+            <div class="nav-item search-nav" 
+                 *ngIf="ui.sidebarCollapsed"
+                 (click)="openSearchOverlay(search.query)"
+                 title="Search FAQs">
+              <div class="nav-content">
+                <lightning-icon
+                  iconName="utility:search"
+                  size="x-small"
+                  alternativeText="Search"
+                  class="nav-icon"
+                ></lightning-icon>
+              </div>
+            </div>
+
             <!-- Categories -->
             <div class="nav-section" *ngIf="!ui.sidebarCollapsed">
               <div class="section-divider"></div>

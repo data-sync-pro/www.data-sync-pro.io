@@ -206,8 +206,7 @@ export class PerformanceService {
     if (result instanceof Promise) {
       return result.finally(() => {
         const duration = performance.now() - startTime;
-        console.log(`Performance: ${name} took ${duration.toFixed(2)}ms`);
-        
+
         // Track specific FAQ operations
         if (name.includes('search')) {
           this.trackCustomMetric('searchResponseTime', duration);
