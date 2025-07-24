@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm start)",
+      "Bash(npx tsc:*)",
+      "Bash(rm:*)",
+      "Bash(find:*)",
+      "Bash(mkdir:*)",
+      "Bash(ng serve)",
+      "Bash(ng serve:*)",
+      "Bash(ng build:*)",
+      "mcp__ide__getDiagnostics",
+      "Bash(npx ng build:*)",
+      "Bash(pkill:*)",
+      "Bash(true)",
+      "Bash(move:*)",
+      "Bash(mv:*)",
+      "Bash(npm run build:*)",
+      "Bash(dir:*)",
+      "Bash(node:*)"
+    ],
+    "deny": []
+  }
+}
