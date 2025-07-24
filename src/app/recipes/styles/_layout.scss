@@ -80,9 +80,11 @@ $breakpoint-mobile: 576px;
   grid-area: sidebar;
 }
 
+// Breadcrumb navigation will be positioned within main area
+
 .recipe-main {
   grid-area: main;
-  padding: 80px 40px 120px 40px;
+  padding: 100px 40px 120px 40px; // Add top padding for breadcrumb space
   overflow-x: hidden;
   overflow-y: auto;
   background: #ffffff;
@@ -92,11 +94,11 @@ $breakpoint-mobile: 576px;
   max-height: calc(100vh - $header-height);
 
   @media (max-width: $breakpoint-tablet) {
-    padding: 20px 20px 120px 20px;
+    padding: 50px 20px 120px 20px;
   }
 
   @media (max-width: $breakpoint-mobile) {
-    padding: 15px 15px 80px 15px;
+    padding: 45px 15px 80px 15px;
     // On mobile, full height since container has margin-top
     min-height: calc(100vh - $header-height);
     max-height: calc(100vh - $header-height);
@@ -352,39 +354,104 @@ $breakpoint-mobile: 576px;
   }
 }
 
-// Breadcrumb navigation
+// Breadcrumb navigation - sticky positioning like FAQ
 .breadcrumb-nav {
-  .breadcrumb {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    margin: 0;
-    padding: 0;
-    background: transparent;
+  grid-area: main;
+  align-self: start; // Stick to top of main area
+  position: sticky;
+  top: $header-height; // Stick below the main header
+  z-index: 90; // Higher than TOC but below main header
+  padding: 8px 40px; // Match main content horizontal padding
+  margin-bottom: 0;
+  border-bottom: 1px solid #f1f3f4;
+  background: rgba(255, 255, 255, 0.95); // Semi-transparent white background
+  backdrop-filter: blur(8px); // Modern blur effect for better visibility
+  -webkit-backdrop-filter: blur(8px); // Safari support
+  transition: all 0.2s ease;
+  
+  // Add subtle shadow when scrolled
+  &.scrolled {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-bottom-color: #e1e5e9;
+  }
+  
+  // Mobile responsive adjustments
+  @media (max-width: $breakpoint-tablet) {
+    padding: 6px 20px;
+    font-size: 0.9rem;
+    
+    // Adjust for mobile header height if different
+    top: $header-height;
+  }
+  
+  @media (max-width: $breakpoint-mobile) {
+    padding: 6px 15px;
+  }
+  
+  // Ensure proper stacking context
+  isolation: isolate;
+}
 
-    .breadcrumb-item {
-      display: flex;
-      align-items: center;
-      color: #5f6368;
-      font-size: 0.875rem;
-      text-decoration: none;
-      transition: color 0.2s ease;
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
 
-      &:hover {
-        color: #1a73e8;
-      }
+.breadcrumb-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  color: #1a73e8;
+  font-size: 0.8rem;
+  font-weight: 400;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 3px;
+  text-decoration: none;
+  transition: all 0.15s ease;
 
-      &.active {
-        color: #202124;
-        font-weight: 500;
-      }
+  &:hover:not(.active) {
+    background-color: rgba(26, 115, 232, 0.08);
+    color: #1557b0;
+  }
 
-      &:not(:last-child)::after {
-        content: '/';
-        margin: 0 0.5rem;
-        color: #dadce0;
-      }
+  &.active {
+    color: #5f6368;
+    cursor: default;
+    font-weight: 500;
+  }
+
+  &:disabled {
+    cursor: default;
+  }
+
+  span {
+    white-space: nowrap;
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    
+    // Mobile responsive text truncation
+    @media (max-width: $breakpoint-tablet) {
+      max-width: 80px;
+    }
+    
+    @media (max-width: $breakpoint-mobile) {
+      max-width: 60px;
     }
   }
+}
+
+.breadcrumb-separator {
+  display: flex;
+  align-items: center;
+  color: #bdc1c6;
+  margin: 0 1px;
 }
 

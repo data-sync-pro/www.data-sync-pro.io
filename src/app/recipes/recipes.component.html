@@ -110,21 +110,28 @@
       </div>
   </aside>
 
+  <!-- Breadcrumb Navigation -->
+  <nav class="breadcrumb-nav" *ngIf="breadcrumbPath.length > 1" aria-label="breadcrumb">
+    <div class="breadcrumb">
+      <ng-container *ngFor="let crumb of breadcrumbPath; let last = last; let first = first">
+        <button class="breadcrumb-item" 
+                [class.active]="last"
+                [routerLink]="!last ? crumb.url : null"
+                [disabled]="last"
+                [title]="'Go to ' + crumb.name">
+          <lightning-icon *ngIf="first" iconName="utility:home" size="xx-small" alternativeText="Home"></lightning-icon>
+          <span>{{ crumb.name }}</span>
+        </button>
+        
+        <span class="breadcrumb-separator" *ngIf="!last">
+          <lightning-icon iconName="utility:chevronright" size="xx-small" alternativeText="Next"></lightning-icon>
+        </span>
+      </ng-container>
+    </div>
+  </nav>
+
   <!-- Main Content -->
   <main class="recipe-main">
-      
-      <!-- Breadcrumb Navigation -->
-      <nav class="breadcrumb-nav" *ngIf="breadcrumbPath.length > 1" aria-label="breadcrumb">
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item" 
-              *ngFor="let crumb of breadcrumbPath; let last = last" 
-              [class.active]="last">
-            <a *ngIf="!last" [routerLink]="crumb.url">{{ crumb.name }}</a>
-            <span *ngIf="last">{{ crumb.name }}</span>
-          </li>
-        </ol>
-      </nav>
-      
 
       <!-- Loading State -->
       <div *ngIf="ui.isLoading" class="loading-container">
