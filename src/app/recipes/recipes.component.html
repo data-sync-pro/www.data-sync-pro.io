@@ -191,6 +191,7 @@
       <div *ngIf="showRecipeDetails && !ui.isLoading" class="recipe-detail-view">
         <app-recipe-detail 
           [recipe]="currentRecipe!"
+          [activeTab]="ui.activeRecipeTab"
           (stepComplete)="updateRecipeProgress(currentRecipe!, $event)"
           (backToCategory)="goToCategory(navigation.category)">
         </app-recipe-detail>
@@ -235,8 +236,8 @@
       <!-- TOC Header -->
       <div class="toc-header">
         <div class="toc-title-section">
-          <h3 class="toc-title">{{ showHome ? 'Popular Recipes' : currentTOCTitle }}</h3>
-          <span class="toc-count">{{ tocItemCount }} {{ tocItemCount === 1 ? 'item' : 'items' }}</span>
+          <h3 class="toc-title">{{ showRecipeDetails ? 'Recipe Sections' : (showHome ? 'Popular Recipes' : currentTOCTitle) }}</h3>
+          <span class="toc-count">{{ showRecipeDetails ? getRecipeTabCount() : tocItemCount }} {{ (showRecipeDetails ? getRecipeTabCount() : tocItemCount) === 1 ? 'item' : 'items' }}</span>
         </div>
         
         <!-- TOC Pagination Controls -->
@@ -265,37 +266,82 @@
       
       <!-- TOC Items List -->
       <div class="toc-list">
-        <!-- Popular/Trending Recipes for Home -->
-        <div class="toc-item" 
-             *ngFor="let recipe of paginatedTrendingRecipes; let i = index"
-             [class.active]="recipe.id === currentRecipe?.id"
-             (click)="goToRecipe(recipe)">
+        <!-- Recipe Detail Tab Navigation -->
+        <div *ngIf="showRecipeDetails" class="toc-item"
+             [class.active]="ui.activeRecipeTab === 'overview'"
+             (click)="changeRecipeTab('overview')">
           <div class="toc-item-icon">
-            <mat-icon>{{ getCategoryIcon(recipe.category) }}</mat-icon>
+            <mat-icon>article</mat-icon>
           </div>
           <div class="toc-item-content">
-            <div class="toc-item-title">{{ recipe.title }}</div>
+            <div class="toc-item-title">Overview</div>
             <div class="toc-item-meta">
-              <span class="toc-item-category">{{ recipe.category | titlecase }}</span>
+              <span class="toc-item-category">Use Case & Prerequisites</span>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="showRecipeDetails" class="toc-item"
+             [class.active]="ui.activeRecipeTab === 'walkthrough'"
+             (click)="changeRecipeTab('walkthrough')">
+          <div class="toc-item-icon">
+            <mat-icon>timeline</mat-icon>
+          </div>
+          <div class="toc-item-content">
+            <div class="toc-item-title">Walkthrough</div>
+            <div class="toc-item-meta">
+              <span class="toc-item-category">Step-by-step Guide</span>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="showRecipeDetails && currentRecipe?.downloadableExecutable" class="toc-item"
+             [class.active]="ui.activeRecipeTab === 'download'"
+             (click)="changeRecipeTab('download')">
+          <div class="toc-item-icon">
+            <mat-icon>download</mat-icon>
+          </div>
+          <div class="toc-item-content">
+            <div class="toc-item-title">Download</div>
+            <div class="toc-item-meta">
+              <span class="toc-item-category">Executable Download</span>
             </div>
           </div>
         </div>
         
-        <!-- Category Recipes -->
-        <div class="toc-item" 
-             *ngFor="let recipe of paginatedCategoryRecipes; let i = index"
-             [class.active]="recipe.id === currentRecipe?.id"
-             (click)="goToRecipe(recipe)">
-          <div class="toc-item-icon">
-            <mat-icon>{{ getCategoryIcon(recipe.category) }}</mat-icon>
-          </div>
-          <div class="toc-item-content">
-            <div class="toc-item-title">{{ recipe.title }}</div>
-            <div class="toc-item-meta">
-              <span class="toc-item-category">{{ recipe.category | titlecase }}</span>
+        <!-- Popular/Trending Recipes for Home -->
+        <ng-container *ngIf="!showRecipeDetails">
+          <div class="toc-item" 
+               *ngFor="let recipe of paginatedTrendingRecipes; let i = index"
+               [class.active]="recipe.id === currentRecipe?.id"
+               (click)="goToRecipe(recipe)">
+            <div class="toc-item-icon">
+              <mat-icon>{{ getCategoryIcon(recipe.category) }}</mat-icon>
+            </div>
+            <div class="toc-item-content">
+              <div class="toc-item-title">{{ recipe.title }}</div>
+              <div class="toc-item-meta">
+                <span class="toc-item-category">{{ recipe.category | titlecase }}</span>
+              </div>
             </div>
           </div>
-        </div>
+          
+          <!-- Category Recipes -->
+          <div class="toc-item" 
+               *ngFor="let recipe of paginatedCategoryRecipes; let i = index"
+               [class.active]="recipe.id === currentRecipe?.id"
+               (click)="goToRecipe(recipe)">
+            <div class="toc-item-icon">
+              <mat-icon>{{ getCategoryIcon(recipe.category) }}</mat-icon>
+            </div>
+            <div class="toc-item-content">
+              <div class="toc-item-title">{{ recipe.title }}</div>
+              <div class="toc-item-meta">
+                <span class="toc-item-category">{{ recipe.category | titlecase }}</span>
+              </div>
+            </div>
+          </div>
+        </ng-container>
       </div>
     </div>
   </aside>
@@ -332,7 +378,7 @@
   
   <div class="mobile-toc-content">
     <div class="mobile-toc-header">
-      <h3>{{ showHome ? 'Popular Recipes' : currentTOCTitle }}</h3>
+      <h3>{{ showRecipeDetails ? 'Recipe Sections' : (showHome ? 'Popular Recipes' : currentTOCTitle) }}</h3>
       <button class="mobile-toc-close" 
               (click)="closeMobileTOC()"
               mat-icon-button>
@@ -341,21 +387,66 @@
     </div>
     
     <div class="mobile-toc-list">
-      <!-- Same content as desktop TOC -->
-      <div class="toc-item" 
-           *ngFor="let recipe of (showHome ? paginatedTrendingRecipes : paginatedCategoryRecipes)"
-           [class.active]="recipe.id === currentRecipe?.id"
-           (click)="goToRecipe(recipe); closeMobileTOC()">
+      <!-- Recipe Detail Tab Navigation -->
+      <div *ngIf="showRecipeDetails" class="toc-item"
+           [class.active]="ui.activeRecipeTab === 'overview'"
+           (click)="changeRecipeTab('overview'); closeMobileTOC()">
         <div class="toc-item-icon">
-          <mat-icon>{{ getCategoryIcon(recipe.category) }}</mat-icon>
+          <mat-icon>article</mat-icon>
         </div>
         <div class="toc-item-content">
-          <div class="toc-item-title">{{ recipe.title }}</div>
+          <div class="toc-item-title">Overview</div>
           <div class="toc-item-meta">
-            <span class="toc-item-category">{{ recipe.category | titlecase }}</span>
+            <span class="toc-item-category">Use Case & Prerequisites</span>
           </div>
         </div>
       </div>
+
+      <div *ngIf="showRecipeDetails" class="toc-item"
+           [class.active]="ui.activeRecipeTab === 'walkthrough'"
+           (click)="changeRecipeTab('walkthrough'); closeMobileTOC()">
+        <div class="toc-item-icon">
+          <mat-icon>timeline</mat-icon>
+        </div>
+        <div class="toc-item-content">
+          <div class="toc-item-title">Walkthrough</div>
+          <div class="toc-item-meta">
+            <span class="toc-item-category">Step-by-step Guide</span>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="showRecipeDetails && currentRecipe?.downloadableExecutable" class="toc-item"
+           [class.active]="ui.activeRecipeTab === 'download'"
+           (click)="changeRecipeTab('download'); closeMobileTOC()">
+        <div class="toc-item-icon">
+          <mat-icon>download</mat-icon>
+        </div>
+        <div class="toc-item-content">
+          <div class="toc-item-title">Download</div>
+          <div class="toc-item-meta">
+            <span class="toc-item-category">Executable Download</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Same content as desktop TOC -->
+      <ng-container *ngIf="!showRecipeDetails">
+        <div class="toc-item" 
+             *ngFor="let recipe of (showHome ? paginatedTrendingRecipes : paginatedCategoryRecipes)"
+             [class.active]="recipe.id === currentRecipe?.id"
+             (click)="goToRecipe(recipe); closeMobileTOC()">
+          <div class="toc-item-icon">
+            <mat-icon>{{ getCategoryIcon(recipe.category) }}</mat-icon>
+          </div>
+          <div class="toc-item-content">
+            <div class="toc-item-title">{{ recipe.title }}</div>
+            <div class="toc-item-meta">
+              <span class="toc-item-category">{{ recipe.category | titlecase }}</span>
+            </div>
+          </div>
+        </div>
+      </ng-container>
     </div>
   </div>
 </aside>

@@ -32,6 +32,7 @@ interface UIState {
   tocHidden: boolean;
   tocInFooterZone: boolean;
   tocFooterApproaching: boolean;
+  activeRecipeTab: string;
 }
 
 interface TOCPaginationState {
@@ -70,7 +71,8 @@ export class RecipesComponent implements OnInit, OnDestroy {
     currentView: 'home',
     tocHidden: false,
     tocInFooterZone: false,
-    tocFooterApproaching: false
+    tocFooterApproaching: false,
+    activeRecipeTab: 'overview'
   };
 
   // TOC pagination state
@@ -342,9 +344,20 @@ export class RecipesComponent implements OnInit, OnDestroy {
   goToRecipe(recipe: RecipeItem): void {
     this.router.navigate(['/recipes', recipe.category, recipe.name]);
     
+    // Reset to overview tab when navigating to a different recipe
+    this.ui.activeRecipeTab = 'overview';
+    
     if (this.ui.isMobile) {
       this.closeMobileSidebar();
     }
+  }
+
+  /**
+   * Change recipe tab
+   */
+  changeRecipeTab(tabName: string): void {
+    this.ui.activeRecipeTab = tabName;
+    this.cdr.markForCheck();
   }
 
   /**
@@ -669,6 +682,17 @@ export class RecipesComponent implements OnInit, OnDestroy {
   get tocItemCount(): number {
     if (this.showHome) return this.trendingRecipes.length;
     return this.currentRecipes.length;
+  }
+
+  /**
+   * Get recipe tab count for TOC
+   */
+  getRecipeTabCount(): number {
+    let count = 2; // Overview and Walkthrough are always available
+    if (this.currentRecipe?.downloadableExecutable) {
+      count++; // Add Download tab if available
+    }
+    return count;
   }
 
   /**

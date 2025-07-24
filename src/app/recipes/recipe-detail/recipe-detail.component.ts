@@ -12,66 +12,61 @@ import { RecipeItem } from '../../shared/models/recipe.model';
       </div>
 
       <div class="recipe-content">
-        <mat-tab-group>
-          <mat-tab label="Overview">
-            <div class="tab-content">
-              <h3>Use Case</h3>
-              <div [innerHTML]="recipe.safeUseCase"></div>
-              
-              <h3>Prerequisites</h3>
-              <div class="prerequisites">
-                <h4>Permission Sets for Building:</h4>
-                <ul>
-                  <li *ngFor="let permission of recipe.prerequisites.permissionSetsForBuilding">
-                    {{ permission }}
-                  </li>
-                </ul>
-                
-                <h4>Permission Sets for Using:</h4>
-                <ul>
-                  <li *ngFor="let permission of recipe.prerequisites.permissionSetsForUsing">
-                    {{ permission }}
-                  </li>
-                </ul>
-                
-                <h4>Setup Instructions:</h4>
-                <div [innerHTML]="recipe.prerequisites.safeDirections"></div>
-              </div>
-            </div>
-          </mat-tab>
+        <!-- Overview Content -->
+        <div class="tab-content" *ngIf="activeTab === 'overview'">
+          <h3>Use Case</h3>
+          <div [innerHTML]="recipe.safeUseCase"></div>
           
-          <mat-tab label="Walkthrough">
-            <div class="tab-content">
-              <mat-stepper orientation="vertical" #stepper>
-                <mat-step label="Create Executable">
-                  <app-recipe-step 
-                    [stepData]="recipe.walkthrough.createExecutable"
-                    stepType="createExecutable"
-                    (stepComplete)="onStepComplete(0)">
-                  </app-recipe-step>
-                </mat-step>
-                
-                <mat-step label="Retrieve Data">
-                  <app-recipe-step 
-                    [stepData]="recipe.walkthrough.retrieve"
-                    stepType="retrieve"
-                    (stepComplete)="onStepComplete(1)">
-                  </app-recipe-step>
-                </mat-step>
-                
-                <!-- Add more steps as needed -->
-              </mat-stepper>
-            </div>
-          </mat-tab>
-          
-          <mat-tab label="Download" *ngIf="recipe.downloadableExecutable">
-            <div class="tab-content">
-              <app-recipe-download 
-                [executable]="recipe.downloadableExecutable">
-              </app-recipe-download>
-            </div>
-          </mat-tab>
-        </mat-tab-group>
+          <h3>Prerequisites</h3>
+          <div class="prerequisites">
+            <h4>Permission Sets for Building:</h4>
+            <ul>
+              <li *ngFor="let permission of recipe.prerequisites.permissionSetsForBuilding">
+                {{ permission }}
+              </li>
+            </ul>
+            
+            <h4>Permission Sets for Using:</h4>
+            <ul>
+              <li *ngFor="let permission of recipe.prerequisites.permissionSetsForUsing">
+                {{ permission }}
+              </li>
+            </ul>
+            
+            <h4>Setup Instructions:</h4>
+            <div [innerHTML]="recipe.prerequisites.safeDirections"></div>
+          </div>
+        </div>
+        
+        <!-- Walkthrough Content -->
+        <div class="tab-content" *ngIf="activeTab === 'walkthrough'">
+          <mat-stepper orientation="vertical" #stepper>
+            <mat-step label="Create Executable">
+              <app-recipe-step 
+                [stepData]="recipe.walkthrough.createExecutable"
+                stepType="createExecutable"
+                (stepComplete)="onStepComplete(0)">
+              </app-recipe-step>
+            </mat-step>
+            
+            <mat-step label="Retrieve Data">
+              <app-recipe-step 
+                [stepData]="recipe.walkthrough.retrieve"
+                stepType="retrieve"
+                (stepComplete)="onStepComplete(1)">
+              </app-recipe-step>
+            </mat-step>
+            
+            <!-- Add more steps as needed -->
+          </mat-stepper>
+        </div>
+        
+        <!-- Download Content -->
+        <div class="tab-content" *ngIf="activeTab === 'download' && recipe.downloadableExecutable">
+          <app-recipe-download 
+            [executable]="recipe.downloadableExecutable">
+          </app-recipe-download>
+        </div>
       </div>
     </div>
   `,
@@ -120,6 +115,7 @@ import { RecipeItem } from '../../shared/models/recipe.model';
 })
 export class RecipeDetailComponent {
   @Input() recipe!: RecipeItem;
+  @Input() activeTab: string = 'overview';
   
   @Output() stepComplete = new EventEmitter<number>();
   @Output() backToCategory = new EventEmitter<void>();
