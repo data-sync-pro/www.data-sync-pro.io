@@ -5,10 +5,9 @@ import { AnalyticsService } from './analytics.service';
 
 @Component({
   selector: 'app-root',
-  templateUrl: './app.component.html'
+  templateUrl: './app.component.html',
 })
 export class AppComponent implements OnInit {
-
   constructor(
     private analyticsService: AnalyticsService,
     private router: Router
@@ -16,9 +15,7 @@ export class AppComponent implements OnInit {
 
   ngOnInit() {
     this.router.events
-      .pipe(
-        filter((event: RouterEvent): event is NavigationEnd => event instanceof NavigationEnd)
-      )
+      .pipe(filter((event: RouterEvent): event is NavigationEnd => event instanceof NavigationEnd))
       .subscribe((event: NavigationEnd) => {
         if (this.analyticsService.userConsented) {
           this.analyticsService.trackPageView(event.urlAfterRedirects);

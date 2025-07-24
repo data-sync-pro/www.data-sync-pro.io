@@ -1,0 +1,20 @@
+<mat-card class="recipe-card" (click)="onRecipeClick()">
+  <!-- 顶部行：category + download按钮 -->
+  <div class="card-header">
+    <span class="category-tag" [class]="recipe.category">{{ recipe.category | titlecase }}</span>
+    <button mat-icon-button 
+            *ngIf="recipe.downloadableExecutable"
+            class="download-button"
+            matTooltip="Download Executable"
+            (click)="onDownload($event)"
+            aria-label="Download executable"
+            type="button">
+      <mat-icon aria-hidden="true">download</mat-icon>
+    </button>
+  </div>
+  
+  <!-- 主要内容：标题 -->
+  <div class="card-body">
+    <h3 class="recipe-title" [title]="recipe.title">{{ recipe.title }}</h3>
+  </div>
+</mat-card>

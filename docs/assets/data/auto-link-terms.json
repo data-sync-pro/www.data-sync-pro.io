@@ -1,0 +1,69 @@
+{
+  "terms": {
+    "Batch": {
+      "faqLink": "batch.what-is-batch",
+      "caseSensitive": true,
+      "description": "Batch Rules Engine"
+    },
+    "Triggers": {
+      "faqLink": "triggers.how-it-works", 
+      "caseSensitive": true,
+      "description": "Triggers Rules Engine"
+    },
+    "Data List": {
+      "faqLink": "data-list.what-is-data-list",
+      "caseSensitive": true,
+      "description": "Data List Rules Engine"
+    },
+    "Action Button": {
+      "faqLink": "action-button.what-is-action-button",
+      "caseSensitive": true,
+      "description": "Action Button Rules Engine"
+    },
+    "Data Loader": {
+      "faqLink": "data-loader.how-it-works",
+      "caseSensitive": true,
+      "description": "Data Loader Rules Engine"
+    },
+    "Input": {
+      "faqLink": "input.what-does-input-do",
+      "caseSensitive": true,
+      "description": "Input Process Step"
+    },
+    "Preview": {
+      "faqLink": "preview.what-does-preview-do",
+      "caseSensitive": true,
+      "description": "Preview Process Step"
+    },
+    "Retrieve": {
+      "faqLink": "retrieve.what-does-retrieve-do",
+      "caseSensitive": true,
+      "description": "Retrieve Process Step"
+    },
+    "Scoping": {
+      "faqLink": "scoping.what-does-scoping-do",
+      "caseSensitive": true,
+      "description": "Scoping Process Step"
+    },
+    "Match": {
+      "faqLink": "match.what-does-match-do",
+      "caseSensitive": true,
+      "description": "Match Process Step"
+    },
+    "Mapping": {
+      "faqLink": "mapping.what-does-mapping-do",
+      "caseSensitive": true,
+      "description": "Mapping Process Step"
+    },
+    "Action": {
+      "faqLink": "action.what-does-action-do",
+      "caseSensitive": true,
+      "description": "Action Process Step"
+    },
+    "Verify": {
+      "faqLink": "verify.what-does-verify-do",
+      "caseSensitive": true,
+      "description": "Verify Process Step"
+    }
+  }
+}

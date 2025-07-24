@@ -1,0 +1,11 @@
+<span 
+  [class]="variant === 'container' ? containerClasses : ''"
+  [title]="title"
+>
+  <span 
+    [class]="iconClasses"
+    [innerHTML]="iconSvg"
+    [attr.aria-hidden]="alternativeText ? null : 'true'"
+  ></span>
+  <span class="slds-assistive-text" *ngIf="alternativeText">{{ alternativeText }}</span>
+</span>

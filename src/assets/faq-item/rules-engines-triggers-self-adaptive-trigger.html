@@ -1,0 +1,24 @@
+<article>
+    <p>
+      A <strong>Self-Adaptive Trigger</strong> in DSP is a trigger-based automation 
+      that transforms and validates fields within the same records before they are 
+      committed to the database. Unlike standard trigger actions that perform 
+      operations on related records, Self-Adaptive Triggers focus on making 
+      <strong>real-time modifications</strong> to the triggering records themselves.
+    </p>
+  
+    <p>
+      When a record is inserted or updated, DSP evaluates predefined formulas 
+      and transformations to dynamically update, validate, or re-calculate fields 
+      based on business logic. These operations occur <strong>before</strong> or <strong>after</strong> 
+      the DML event, ensuring that records are properly modified before being saved.
+    </p>
+  
+    <p>
+      Self-Adaptive Triggers are <strong>bulkified</strong>, meaning they efficiently process <strong>multiple 
+      records</strong> at once, reducing the need for custom Apex logic. They are commonly 
+      used for data standardization, field recalculations, validation rules, 
+      and enforcing business logic—all without writing code.
+    </p>
+  </article>
+  

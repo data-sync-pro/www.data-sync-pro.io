@@ -1,0 +1,87 @@
+// Import modular styles
+@import './styles/layout';
+@import './styles/sidebar';
+@import './styles/search-overlay';
+@import './styles/toc';
+@import './styles/responsive';
+
+// Component-specific overrides and adjustments
+// The main layout is handled by modular styles
+
+// Enhanced CSS Variables for theming
+:root {
+  // Base colors
+  --background-color: #ffffff;
+  --surface-color: #f8f9fa;
+  --background-muted: #e9ecef;
+  --text-color: #202124;
+  --text-muted: #5f6368;
+  --border-color: #e1e5e9;
+  --hover-color: #f1f3f4;
+  
+  // Brand colors - Google Material Design palette
+  --primary-color: #1a73e8;
+  --primary-light: #4285f4;
+  --primary-dark: #1557b0;
+  --secondary-color: #34a853;
+  --accent-color: #fbbc04;
+  
+  // Functional colors
+  --success-color: #137333;
+  --success-bg: #e8f5e8;
+  --warning-color: #f57c00;
+  --warning-bg: #fef7e0;
+  --error-color: #d93025;
+  --error-bg: #fce8e6;
+  --info-color: #1a73e8;
+  --info-bg: #e8f0fe;
+  
+  
+  // Interactive states
+  --hover-bg: #f1f3f4;
+  --active-bg: #e8f0fe;
+  --focus-ring: #4285f4;
+  --shadow-light: rgba(0, 0, 0, 0.08);
+  --shadow-medium: rgba(0, 0, 0, 0.12);
+  --shadow-strong: rgba(0, 0, 0, 0.16);
+}
+
+// Enhanced dark theme support
+@media (prefers-color-scheme: dark) {
+  :root {
+    // Base colors
+    --background-color: #121212;
+    --surface-color: #1e1e1e;
+    --background-muted: #2d2d2d;
+    --text-color: #e8eaed;
+    --text-muted: #9aa0a6;
+    --border-color: #3c4043;
+    --hover-color: #2a2a2a;
+    
+    // Adjusted brand colors for dark theme
+    --primary-color: #4285f4;
+    --primary-light: #669df6;
+    --primary-dark: #1a73e8;
+    --secondary-color: #34a853;
+    --accent-color: #fbbc04;
+    
+    // Dark theme functional colors
+    --success-color: #81c995;
+    --success-bg: #1e3a1e;
+    --warning-color: #fdd663;
+    --warning-bg: #2d2111;
+    --error-color: #f28b82;
+    --error-bg: #3b1612;
+    --info-color: #8ab4f8;
+    --info-bg: #1a237e;
+    
+    
+    // Dark theme interactive states
+    --hover-bg: #313235;
+    --active-bg: #1e3a8a;
+    --focus-ring: #8ab4f8;
+    --shadow-light: rgba(0, 0, 0, 0.2);
+    --shadow-medium: rgba(0, 0, 0, 0.3);
+    --shadow-strong: rgba(0, 0, 0, 0.4);
+  }
+}

@@ -1,0 +1,325 @@
+// ==================== Recipe Responsive Styles ====================
+
+// Breakpoint variables
+$breakpoint-xs: 480px;
+$breakpoint-sm: 576px;
+$breakpoint-md: 768px;
+$breakpoint-lg: 992px;
+$breakpoint-xl: 1200px;
+$breakpoint-xxl: 1400px;
+
+// Mixins for responsive design
+@mixin xs {
+  @media (max-width: #{$breakpoint-xs}) {
+    @content;
+  }
+}
+
+@mixin sm {
+  @media (max-width: #{$breakpoint-sm}) {
+    @content;
+  }
+}
+
+@mixin md {
+  @media (max-width: #{$breakpoint-md}) {
+    @content;
+  }
+}
+
+@mixin lg {
+  @media (max-width: #{$breakpoint-lg}) {
+    @content;
+  }
+}
+
+@mixin xl {
+  @media (max-width: #{$breakpoint-xl}) {
+    @content;
+  }
+}
+
+@mixin xxl {
+  @media (max-width: #{$breakpoint-xxl}) {
+    @content;
+  }
+}
+
+// Mobile-specific utilities
+@mixin mobile-only {
+  @media (max-width: #{$breakpoint-md}) {
+    @content;
+  }
+}
+
+@mixin tablet-only {
+  @media (min-width: #{$breakpoint-sm + 1px}) and (max-width: #{$breakpoint-lg}) {
+    @content;
+  }
+}
+
+@mixin desktop-only {
+  @media (min-width: #{$breakpoint-lg + 1px}) {
+    @content;
+  }
+}
+
+// Responsive typography
+.recipe-container {
+  // Base font sizes
+  font-size: 16px;
+  
+  @include md {
+    font-size: 15px;
+  }
+  
+  @include sm {
+    font-size: 14px;
+  }
+}
+
+// Responsive spacing utilities
+.recipe-main {
+  @include xl {
+    padding: 80px 80px 120px 80px;
+  }
+  
+  @include lg {
+    padding: 80px 80px 120px 80px;
+  }
+  
+  @include md {
+    padding: 80px 80px 120px 80px;
+  }
+  
+  @include sm {
+    padding: 80px 80px 120px 80px;
+  }
+}
+
+// Responsive grid adjustments
+.category-grid {
+  @include xxl {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  
+  @include xl {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  @include lg {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  @include md {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+  
+  @include sm {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+}
+
+.recipe-grid {
+  @include xxl {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  
+  @include xl {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  @include lg {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  @include md {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+  
+  @include sm {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+}
+
+// Mobile navigation adjustments
+@include mobile-only {
+  .recipe-sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    width: 280px;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    z-index: 1100;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+    
+    &.mobile-open {
+      transform: translateX(0);
+    }
+  }
+  
+  .mobile-sidebar-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1099;
+    display: block;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+  }
+  
+  .mobile-nav-toggle {
+    display: flex !important;
+  }
+  
+  .sidebar-toggle {
+    display: none !important;
+  }
+}
+
+// Tablet-specific adjustments
+@include tablet-only {
+  .recipe-container {
+    grid-template-columns: 220px 1fr;
+    
+    &.sidebar-collapsed {
+      grid-template-columns: 56px 1fr;
+    }
+  }
+  
+  .recipe-sidebar {
+    width: 220px;
+    
+    .category-name {
+      font-size: 0.875rem;
+    }
+    
+    .sidebar-header h2 {
+      font-size: 1rem;
+    }
+  }
+}
+
+// Desktop-specific adjustments
+@include desktop-only {
+  .mobile-nav-toggle {
+    display: none !important;
+  }
+  
+  .mobile-sidebar-overlay {
+    display: none !important;
+  }
+}
+
+// Responsive text truncation
+@include md {
+  .category-name,
+  .result-title,
+  .result-description {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+// Responsive headers
+.home-header,
+.category-header {
+  h1 {
+    @include lg {
+      font-size: 2.25rem;
+    }
+    
+    @include md {
+      font-size: 2rem;
+    }
+    
+    @include sm {
+      font-size: 1.75rem;
+    }
+    
+    @include xs {
+      font-size: 1.5rem;
+    }
+  }
+  
+  .home-description,
+  .category-description {
+    @include md {
+      font-size: 1rem;
+      padding: 0 1rem;
+    }
+    
+    @include sm {
+      font-size: 0.9375rem;
+      padding: 0 0.5rem;
+    }
+  }
+}
+
+// Responsive cards
+@include sm {
+  .recipe-card,
+  .category-card {
+    .card-content {
+      padding: 1rem;
+    }
+    
+    .card-title {
+      font-size: 1rem;
+    }
+    
+    .card-description {
+      font-size: 0.875rem;
+    }
+  }
+}
+
+// Responsive search overlay
+@include md {
+  .search-overlay-content {
+    width: 95%;
+    max-height: 95%;
+    margin-top: 2rem;
+  }
+  
+  .filter-chips {
+    max-height: 120px;
+    overflow-y: auto;
+  }
+  
+  .result-item {
+    padding: 0.75rem;
+    
+    .result-meta {
+      flex-wrap: wrap;
+      gap: 0.25rem;
+    }
+  }
+}
+
+// Utility classes for responsive display
+.desktop-only {
+  @include mobile-only {
+    display: none !important;
+  }
+}
+
+.mobile-only {
+  @include desktop-only {
+    display: none !important;
+  }
+}
+
+.tablet-up {
+  @include sm {
+    display: none !important;
+  }
+}

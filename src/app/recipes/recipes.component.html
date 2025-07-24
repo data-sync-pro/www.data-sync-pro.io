@@ -1,0 +1,461 @@
+<!-- Mobile sidebar toggle button -->
+<button
+  class="mobile-sidebar-toggle"
+  (click)="toggleMobileSidebar()"
+  *ngIf="ui.isMobile"
+  mat-icon-button
+  aria-label="Toggle navigation">
+  <mat-icon>menu</mat-icon>
+</button>
+
+<!-- Mobile sidebar overlay -->
+<div
+  class="sidebar-overlay"
+  [class.active]="ui.mobileSidebarOpen"
+  (click)="closeMobileSidebar()">
+</div>
+
+<!-- W3Schools风格的网格布局容器 -->
+<div class="recipe-layout-container"
+     [class.sidebar-collapsed]="ui.sidebarCollapsed"
+     [class.toc-hidden]="ui.tocHidden">
+  
+  <!-- Left Sidebar - Grid定位 -->
+  <aside class="recipe-sidebar" 
+         [class.collapsed]="ui.sidebarCollapsed"
+         [class.mobile-open]="ui.mobileSidebarOpen">
+      
+      <div class="sidebar-content">
+        <!-- Sidebar Header -->
+        <div class="sidebar-header">
+          <div class="sidebar-title-section" *ngIf="!ui.sidebarCollapsed">
+            <h2 class="sidebar-main-title">Recipes</h2>
+            <span class="sidebar-subtitle">{{ getRecipeCount() }} recipes</span>
+          </div>
+          <button class="sidebar-toggle-btn" 
+                  (click)="toggleSidebar()"
+                  *ngIf="!ui.isMobile"
+                  [title]="ui.sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'"
+                  aria-label="Toggle sidebar">
+            <mat-icon class="toggle-icon">{{ ui.sidebarCollapsed ? 'chevron_right' : 'chevron_left' }}</mat-icon>
+          </button>
+        </div>
+
+        <div class="sidebar-body">
+          <!-- Search in sidebar - Expanded -->
+          <div class="sidebar-search" *ngIf="!ui.sidebarCollapsed">
+            <button
+              class="sidebar-search-btn"
+              (click)="openSearchOverlay(search.query)"
+              title="Search Recipes (Press / or Ctrl+K for quick access)"
+            >
+              <lightning-icon
+                iconName="utility:search"
+                size="x-small"
+                alternativeText="Search"
+              ></lightning-icon>
+              <span class="search-text">Search recipes...</span>
+              <span class="search-shortcut">/</span>
+            </button>
+          </div>
+
+          <!-- Category Navigation -->
+          <div class="sidebar-nav">
+            <!-- Home -->
+            <div class="nav-item home-nav" 
+                 [class.active]="!navigation.category"
+                 (click)="goHome()">
+              <div class="nav-content">
+                <mat-icon class="nav-icon">home</mat-icon>
+                <span class="nav-text" *ngIf="!ui.sidebarCollapsed">All Recipes</span>
+                <span class="nav-count" *ngIf="!ui.sidebarCollapsed">{{ getRecipeCount() }}</span>
+              </div>
+            </div>
+
+            <!-- Search - Collapsed -->
+            <div class="nav-item search-nav" 
+                 *ngIf="ui.sidebarCollapsed"
+                 (click)="openSearchOverlay(search.query)"
+                 title="Search Recipes">
+              <div class="nav-content">
+                <lightning-icon
+                  iconName="utility:search"
+                  size="x-small"
+                  alternativeText="Search"
+                  class="nav-icon"
+                ></lightning-icon>
+              </div>
+            </div>
+
+            <!-- Categories Section -->
+            <div class="nav-section" *ngIf="!ui.sidebarCollapsed">
+              <div class="section-divider"></div>
+              <div class="section-label">Categories</div>
+            </div>
+
+            <div class="nav-tree">
+              <div class="nav-item" 
+                   *ngFor="let category of categories"
+                   [class.active]="navigation.category === category.name"
+                   (click)="goToCategory(category.name)">
+                <div class="nav-content">
+                  <mat-icon class="nav-icon">folder</mat-icon>
+                  <span class="nav-text" *ngIf="!ui.sidebarCollapsed">{{ category.displayName }}</span>
+                  <span class="nav-count" *ngIf="!ui.sidebarCollapsed">{{ category.count }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+  </aside>
+
+  <!-- Breadcrumb Navigation -->
+  <nav class="breadcrumb-nav" *ngIf="breadcrumbPath.length > 1" aria-label="breadcrumb">
+    <div class="breadcrumb">
+      <ng-container *ngFor="let crumb of breadcrumbPath; let last = last; let first = first">
+        <button class="breadcrumb-item" 
+                [class.active]="last"
+                [routerLink]="!last ? crumb.url : null"
+                [disabled]="last"
+                [title]="'Go to ' + crumb.name">
+          <lightning-icon *ngIf="first" iconName="utility:home" size="xx-small" alternativeText="Home"></lightning-icon>
+          <span>{{ crumb.name }}</span>
+        </button>
+        
+        <span class="breadcrumb-separator" *ngIf="!last">
+          <lightning-icon iconName="utility:chevronright" size="xx-small" alternativeText="Next"></lightning-icon>
+        </span>
+      </ng-container>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="recipe-main">
+
+      <!-- Loading State -->
+      <div *ngIf="ui.isLoading" class="loading-container">
+        <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+        <p>Loading recipes...</p>
+      </div>
+
+      <!-- Home View - All Recipes -->
+      <div *ngIf="showHome && !ui.isLoading" class="recipe-home">
+        <div class="home-header">
+          <h2 class="section-title">All Recipes</h2>
+         </div>
+
+        <!-- Recipe Grid -->
+        <div class="recipe-grid" *ngIf="currentRecipes.length > 0">
+          <app-recipe-card 
+            *ngFor="let recipe of currentRecipes"
+            [recipe]="recipe"
+            (recipeSelect)="goToRecipe($event)">
+          </app-recipe-card>
+        </div>
+
+        <!-- No Results -->
+        <div class="no-results" *ngIf="currentRecipes.length === 0">
+          <mat-icon>search_off</mat-icon>
+          <h3>No recipes found</h3>
+          <p>No recipes are currently available.</p>
+        </div>
+
+      </div>
+
+      <!-- Category View - Recipes in Category -->
+      <div *ngIf="showCategory && !ui.isLoading" class="recipe-category-view">
+        <div class="category-header" *ngIf="currentCategory">
+          <h2 class="category-title">{{ currentCategory.displayName }} Recipes</h2>
+          <p class="category-description">{{ currentCategory.description }}</p>
+        </div>
+
+        <!-- Recipe Grid -->
+        <div class="recipe-grid" *ngIf="currentRecipes.length > 0">
+          <app-recipe-card 
+            *ngFor="let recipe of currentRecipes"
+            [recipe]="recipe"
+            (recipeSelect)="goToRecipe($event)">
+          </app-recipe-card>
+        </div>
+
+        <!-- No Results -->
+        <div class="no-results" *ngIf="currentRecipes.length === 0">
+          <mat-icon>search_off</mat-icon>
+          <h3>No recipes found</h3>
+          <p>No recipes match your current search criteria.</p>
+        </div>
+      </div>
+
+      <!-- Recipe Detail View -->
+      <div *ngIf="showRecipeDetails && !ui.isLoading" class="recipe-detail-view">
+        <app-recipe-detail 
+          [recipe]="currentRecipe!"
+          [activeTab]="ui.activeRecipeTab"
+          (stepComplete)="updateRecipeProgress(currentRecipe!, $event)"
+          (backToCategory)="goToCategory(navigation.category)">
+        </app-recipe-detail>
+      </div>
+
+      <!-- Search Results -->
+      <div *ngIf="search.isActive && !ui.isLoading" class="search-results">
+        <div class="search-header">
+          <h2 class="search-title">Search Results for "{{ search.query }}"</h2>
+          <p class="search-summary">
+            {{ search.results.length }} {{ search.results.length === 1 ? 'recipe' : 'recipes' }} found
+          </p>
+        </div>
+
+        <div class="recipe-grid" *ngIf="search.hasResults">
+          <app-recipe-card 
+            *ngFor="let recipe of search.results"
+            [recipe]="recipe"
+            (recipeSelect)="goToRecipe($event)">
+          </app-recipe-card>
+        </div>
+
+        <div class="no-results" *ngIf="!search.hasResults">
+          <mat-icon>search_off</mat-icon>
+          <h3>No recipes found</h3>
+          <p>Try adjusting your search terms or browse by category.</p>
+          <button mat-raised-button color="primary" (click)="clearSearch()">
+            Browse All Recipes
+          </button>
+        </div>
+      </div>
+
+  </main>
+
+  <!-- Right TOC (Table of Contents) -->
+  <aside class="recipe-toc desktop-toc" 
+         *ngIf="shouldShowTOC && !ui.isMobile"
+         [class.in-footer-zone]="ui.tocInFooterZone"
+         [class.footer-approaching]="ui.tocFooterApproaching">
+    
+    <div class="toc-content">
+      <!-- TOC Header -->
+      <div class="toc-header">
+        <div class="toc-title-section">
+          <h3 class="toc-title">{{ showRecipeDetails ? 'Recipe Sections' : (showHome ? 'Popular Recipes' : currentTOCTitle) }}</h3>
+          <span class="toc-count">{{ showRecipeDetails ? getRecipeTabCount() : tocItemCount }} {{ (showRecipeDetails ? getRecipeTabCount() : tocItemCount) === 1 ? 'item' : 'items' }}</span>
+        </div>
+        
+        <!-- TOC Pagination Controls -->
+        <div class="toc-pagination-controls" *ngIf="tocPagination.totalPages > 1">
+          <div class="pagination-info">
+            {{ tocPaginationInfo }}
+          </div>
+          <div class="pagination-buttons">
+            <button class="pagination-btn prev-btn" 
+                    (click)="goToPreviousTOCPage()"
+                    [disabled]="!hasPreviousTOCPage"
+                    mat-icon-button
+                    matTooltip="Previous page">
+              <mat-icon>chevron_left</mat-icon>
+            </button>
+            <button class="pagination-btn next-btn" 
+                    (click)="goToNextTOCPage()"
+                    [disabled]="!hasNextTOCPage"
+                    mat-icon-button
+                    matTooltip="Next page">
+              <mat-icon>chevron_right</mat-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- TOC Items List -->
+      <div class="toc-list">
+        <!-- Recipe Detail Tab Navigation -->
+        <div *ngIf="showRecipeDetails" class="toc-item"
+             [class.active]="ui.activeRecipeTab === 'overview'"
+             (click)="changeRecipeTab('overview')">
+          <div class="toc-item-icon">
+            <mat-icon>article</mat-icon>
+          </div>
+          <div class="toc-item-content">
+            <div class="toc-item-title">Overview</div>
+            <div class="toc-item-meta">
+              <span class="toc-item-category">Use Case & Prerequisites</span>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="showRecipeDetails" class="toc-item"
+             [class.active]="ui.activeRecipeTab === 'walkthrough'"
+             (click)="changeRecipeTab('walkthrough')">
+          <div class="toc-item-icon">
+            <mat-icon>timeline</mat-icon>
+          </div>
+          <div class="toc-item-content">
+            <div class="toc-item-title">Walkthrough</div>
+            <div class="toc-item-meta">
+              <span class="toc-item-category">Step-by-step Guide</span>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="showRecipeDetails && currentRecipe?.downloadableExecutable" class="toc-item"
+             [class.active]="ui.activeRecipeTab === 'download'"
+             (click)="changeRecipeTab('download')">
+          <div class="toc-item-icon">
+            <mat-icon>download</mat-icon>
+          </div>
+          <div class="toc-item-content">
+            <div class="toc-item-title">Download</div>
+            <div class="toc-item-meta">
+              <span class="toc-item-category">Executable Download</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Popular/Trending Recipes for Home -->
+        <ng-container *ngIf="!showRecipeDetails">
+          <div class="toc-item" 
+               *ngFor="let recipe of paginatedTrendingRecipes; let i = index"
+               [class.active]="recipe.id === currentRecipe?.id"
+               (click)="goToRecipe(recipe)">
+            <div class="toc-item-icon">
+              <mat-icon>{{ getCategoryIcon(recipe.category) }}</mat-icon>
+            </div>
+            <div class="toc-item-content">
+              <div class="toc-item-title">{{ recipe.title }}</div>
+              <div class="toc-item-meta">
+                <span class="toc-item-category">{{ recipe.category | titlecase }}</span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Category Recipes -->
+          <div class="toc-item" 
+               *ngFor="let recipe of paginatedCategoryRecipes; let i = index"
+               [class.active]="recipe.id === currentRecipe?.id"
+               (click)="goToRecipe(recipe)">
+            <div class="toc-item-icon">
+              <mat-icon>{{ getCategoryIcon(recipe.category) }}</mat-icon>
+            </div>
+            <div class="toc-item-content">
+              <div class="toc-item-title">{{ recipe.title }}</div>
+              <div class="toc-item-meta">
+                <span class="toc-item-category">{{ recipe.category | titlecase }}</span>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Mobile TOC Toggle Button -->
+  <button class="mobile-toc-toggle" 
+          (click)="toggleMobileTOC()" 
+          *ngIf="ui.isMobile && shouldShowTOC"
+          mat-fab
+          color="primary"
+          matTooltip="Table of Contents">
+    <mat-icon>list</mat-icon>
+  </button>
+
+  <!-- TOC Toggle Button (Desktop) -->
+  <button class="toc-toggle-btn"
+          (click)="toggleTOC()"
+          *ngIf="!ui.isMobile"
+          mat-mini-fab
+          color="primary"
+          [matTooltip]="ui.tocHidden ? 'Show Table of Contents' : 'Hide Table of Contents'">
+    <mat-icon>{{ ui.tocHidden ? 'list' : 'list_alt' }}</mat-icon>
+  </button>
+
+</div>
+
+<!-- Mobile TOC Drawer -->
+<aside class="recipe-toc mobile-toc" 
+       *ngIf="ui.isMobile && shouldShowTOC"
+       [class.open]="ui.mobileTOCOpen">
+  
+  <div class="mobile-toc-overlay" 
+       (click)="closeMobileTOC()"></div>
+  
+  <div class="mobile-toc-content">
+    <div class="mobile-toc-header">
+      <h3>{{ showRecipeDetails ? 'Recipe Sections' : (showHome ? 'Popular Recipes' : currentTOCTitle) }}</h3>
+      <button class="mobile-toc-close" 
+              (click)="closeMobileTOC()"
+              mat-icon-button>
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+    
+    <div class="mobile-toc-list">
+      <!-- Recipe Detail Tab Navigation -->
+      <div *ngIf="showRecipeDetails" class="toc-item"
+           [class.active]="ui.activeRecipeTab === 'overview'"
+           (click)="changeRecipeTab('overview'); closeMobileTOC()">
+        <div class="toc-item-icon">
+          <mat-icon>article</mat-icon>
+        </div>
+        <div class="toc-item-content">
+          <div class="toc-item-title">Overview</div>
+          <div class="toc-item-meta">
+            <span class="toc-item-category">Use Case & Prerequisites</span>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="showRecipeDetails" class="toc-item"
+           [class.active]="ui.activeRecipeTab === 'walkthrough'"
+           (click)="changeRecipeTab('walkthrough'); closeMobileTOC()">
+        <div class="toc-item-icon">
+          <mat-icon>timeline</mat-icon>
+        </div>
+        <div class="toc-item-content">
+          <div class="toc-item-title">Walkthrough</div>
+          <div class="toc-item-meta">
+            <span class="toc-item-category">Step-by-step Guide</span>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="showRecipeDetails && currentRecipe?.downloadableExecutable" class="toc-item"
+           [class.active]="ui.activeRecipeTab === 'download'"
+           (click)="changeRecipeTab('download'); closeMobileTOC()">
+        <div class="toc-item-icon">
+          <mat-icon>download</mat-icon>
+        </div>
+        <div class="toc-item-content">
+          <div class="toc-item-title">Download</div>
+          <div class="toc-item-meta">
+            <span class="toc-item-category">Executable Download</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Same content as desktop TOC -->
+      <ng-container *ngIf="!showRecipeDetails">
+        <div class="toc-item" 
+             *ngFor="let recipe of (showHome ? paginatedTrendingRecipes : paginatedCategoryRecipes)"
+             [class.active]="recipe.id === currentRecipe?.id"
+             (click)="goToRecipe(recipe); closeMobileTOC()">
+          <div class="toc-item-icon">
+            <mat-icon>{{ getCategoryIcon(recipe.category) }}</mat-icon>
+          </div>
+          <div class="toc-item-content">
+            <div class="toc-item-title">{{ recipe.title }}</div>
+            <div class="toc-item-meta">
+              <span class="toc-item-category">{{ recipe.category | titlecase }}</span>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</aside>
+
+<!-- Recipe Search Overlay -->
+<app-recipe-search-overlay
+  *ngIf="search.isOverlayOpen"
+  [isOpen]="search.isOverlayOpen"
+  [initialQuery]="searchOverlayInitialQuery"
+  (closed)="closeSearchOverlay()"
+  (selectedResult)="handleSearchOverlaySelect($event)">
+</app-recipe-search-overlay>

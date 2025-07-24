@@ -1,0 +1,347 @@
+// ==================== W3Schools风格的响应式设计 ====================
+
+// 使用W3Schools的标准断点
+$breakpoint-desktop: 992px;
+$breakpoint-mobile: 500px;
+
+// W3Schools风格的网格布局响应式
+.faq-layout-container {
+  // 大屏幕：完整的三栏布局
+  @media (min-width: $breakpoint-desktop) {
+    grid-template-columns: $sidebar-width 1fr $toc-width;
+    
+    &.sidebar-collapsed {
+      grid-template-columns: $sidebar-collapsed 1fr $toc-width;
+    }
+    
+    &.toc-hidden {
+      grid-template-columns: $sidebar-width 1fr;
+    }
+    
+    &.sidebar-collapsed.toc-hidden {
+      grid-template-columns: $sidebar-collapsed 1fr;
+    }
+  }
+  
+  // 中等屏幕：隐藏TOC，保留侧边栏
+  @media (max-width: $breakpoint-desktop) and (min-width: $breakpoint-mobile) {
+    grid-template-areas: "sidebar main";
+    grid-template-columns: $sidebar-width 1fr;
+    
+    .faq-toc {
+      display: none;
+    }
+  }
+  
+  // 小屏幕：单栏布局，侧边栏浮动
+  @media (max-width: $breakpoint-mobile) {
+    grid-template-areas: "main";
+    grid-template-columns: 1fr;
+    
+    .faq-toc {
+      display: none;
+    }
+  }
+}
+
+// Tablet landscape (768px-1023px)
+@media (max-width: 1023px) and (min-width: 768px) {
+  .faq-container {
+    margin: 60px 0 0 0;
+    padding: 16px 32px;
+    
+    // 为页脚留出额外空间
+    .faq-main {
+      margin-bottom: 140px;
+    }
+  }
+
+  .faq-sidebar {
+    transform: translateX(-100%);
+
+    &.mobile-open {
+      transform: translateX(0);
+    }
+  }
+
+  .faq-toc {
+    display: none;
+  }
+
+  .mobile-sidebar-toggle,
+  .sidebar-overlay {
+    display: flex;
+  }
+
+  // FAQ调整
+  .faq-list .faq-item {
+    .faq-header {
+      padding: 20px 24px;
+    }
+
+    .faq-question {
+      font-size: 1rem;
+    }
+
+    .category-badge,
+    .subcategory-badge {
+      font-size: 0.75rem;
+      padding: 4px 10px;
+    }
+  }
+
+  .trending-faq .faq-list {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 14px;
+  }
+
+  .category-title {
+    font-size: 2.2rem;
+  }
+
+  .faq-detail .faq-question {
+    font-size: 1.8rem;
+  }
+}
+
+// Mobile (up to 767px)
+@media (max-width: 767px) {
+  .faq-container {
+    margin: 60px 0 0 0;
+    padding: 12px 16px;
+    
+    // 移动端为页脚留出更多空间
+    .faq-main {
+      margin-bottom: 160px;
+    }
+  }
+
+  .faq-sidebar {
+    width: 280px;
+    transform: translateX(-100%);
+
+    &.mobile-open {
+      transform: translateX(0);
+    }
+  }
+
+  .faq-toc {
+    display: none;
+  }
+
+  .mobile-sidebar-toggle {
+    display: flex;
+    top: 70px;
+    left: 12px;
+    width: 40px;
+    height: 40px;
+  }
+
+  .sidebar-overlay {
+    display: block;
+  }
+
+  // 标题
+  .section-title,
+  .category-title {
+    font-size: 2rem !important;
+    padding-bottom: 32px;
+  }
+
+  // FAQ项目
+  .faq-list .faq-item {
+    margin-bottom: 12px;
+    border-radius: 8px;
+
+    .faq-header {
+      padding: 16px 20px;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .faq-question {
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    .faq-question-row {
+      width: 100%;
+      justify-content: space-between;
+    }
+
+    .category-badge {
+      font-size: 0.7rem;
+      padding: 3px 8px;
+    }
+
+    .subcategory-badge {
+      font-size: 0.65rem;
+      padding: 2px 6px;
+    }
+
+    .navigate-icon {
+      font-size: 1rem;
+    }
+  }
+
+  // 热门FAQ
+  .trending-faq {
+    margin: 16px auto 24px auto;
+
+    .section-title {
+      font-size: 1.1rem;
+      padding-bottom: 24px;
+    }
+
+    .faq-list {
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .faq-item {
+      padding: 16px 20px;
+      font-size: 0.9rem;
+
+      .faq-question {
+        padding-right: 12px;
+      }
+    }
+  }
+
+  // FAQ详情
+  .faq-detail {
+    padding: 24px 0;
+
+    .faq-question {
+      font-size: 1.5rem;
+      margin-bottom: 16px;
+      line-height: 1.4;
+    }
+
+    .faq-answer {
+      font-size: 0.9rem;
+      line-height: 1.6;
+
+      h1, h2, h3, h4, h5, h6 {
+        margin: 20px 0 10px;
+      }
+
+      ul, ol {
+        padding-left: 20px;
+      }
+
+      pre {
+        padding: 12px;
+        font-size: 0.8rem;
+      }
+    }
+  }
+
+  // 搜索无结果
+  .search-no-results {
+    padding: 32px 16px;
+
+    .no-results-icon {
+      font-size: 3rem;
+      margin-bottom: 12px;
+    }
+
+    h3 {
+      font-size: 1.3rem;
+      margin-bottom: 10px;
+    }
+
+    p {
+      font-size: 0.9rem;
+      margin-bottom: 20px;
+    }
+
+    .popular-faq-item {
+      padding: 6px 10px;
+      font-size: 0.85rem;
+    }
+
+    .contact-button {
+      padding: 10px 20px;
+      font-size: 0.85rem;
+    }
+  }
+
+  // 图片调整
+  .faq-image {
+    margin: 15px auto;
+    border-radius: 6px;
+    cursor: default;
+    transform: none !important;
+  }
+}
+
+// Extra small screens (up to 480px)
+@media (max-width: 480px) {
+  .faq-container {
+    padding: 8px 12px;
+  }
+
+  .mobile-sidebar-toggle {
+    left: 8px;
+    width: 36px;
+    height: 36px;
+    font-size: 1rem;
+  }
+
+  .section-title,
+  .category-title {
+    font-size: 1.7rem !important;
+    padding-bottom: 24px;
+  }
+
+  .faq-list .faq-item {
+    .faq-header {
+      padding: 12px 16px;
+    }
+
+    .faq-question {
+      font-size: 0.9rem;
+    }
+
+    .category-badge {
+      font-size: 0.65rem;
+      padding: 2px 6px;
+    }
+  }
+
+  .trending-faq .faq-item {
+    padding: 12px 16px;
+    font-size: 0.85rem;
+  }
+
+  .faq-detail .faq-question {
+    font-size: 1.3rem;
+  }
+
+  .faq-detail .faq-answer {
+    font-size: 0.85rem;
+  }
+}
+
+// Print styles
+@media print {
+  .faq-sidebar,
+  .faq-toc,
+  .mobile-sidebar-toggle,
+  .sidebar-overlay {
+    display: none !important;
+  }
+
+  .faq-container {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .faq-item {
+    break-inside: avoid;
+    box-shadow: none !important;
+    border: 1px solid #ccc !important;
+  }
+}

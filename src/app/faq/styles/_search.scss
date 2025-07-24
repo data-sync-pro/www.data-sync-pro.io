@@ -1,0 +1,443 @@
+// Simple search styles
+.search-highlight {
+  background-color: #ffeb3b;
+  color: #333;
+  padding: 1px 2px;
+  border-radius: 2px;
+  font-weight: 500;
+}
+
+// Mobile TOC toggle button
+.mobile-toc-toggle {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  width: 48px;
+  height: 48px;
+  background: #1a73e8;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  font-size: 1.2rem;
+  cursor: pointer;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    background: #1557b0;
+    transform: scale(1.05);
+  }
+}
+
+// Mobile TOC overlay
+.mobile-toc-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1050;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+
+  &.active {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+// Desktop and Mobile TOC styles
+.faq-toc {
+  background: #ffffff;
+  border: 1px solid #e1e5e9;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+
+  &.desktop-toc {
+    grid-area: toc;
+    position: sticky;
+    top: $header-height;
+    height: calc(100vh - $header-height);
+    z-index: 80; // 降低z-index
+    border-radius: 0;
+    border-right: none;
+    border-top: none;
+    border-bottom: none;
+    box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+    
+    // W3Schools风格的响应式隐藏
+    @media (max-width: $breakpoint-desktop) {
+      display: none;
+    }
+    
+    &.hidden {
+      display: none;
+    }
+    
+    // 页脚感知：当接近页脚时调整TOC高度
+    &.footer-approaching {
+      
+      // 添加微妙的视觉提示
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, #e8f0fe, transparent);
+        opacity: 0.6;
+        transition: opacity 0.3s ease;
+      }
+    }
+    
+    // 页脚区域：TOC进入非活跃状态，提供视觉反馈
+    &.in-footer-zone {
+      // 整体容器的淡化效果
+      opacity: 0.85;
+      transition: opacity 0.3s ease;
+      
+      .toc-header {
+        // TOC header adjusts when in footer zone - more subdued appearance
+        background: linear-gradient(135deg, #f5f6f7, #fafbfc);
+        opacity: 0.9;
+        
+      }
+      
+      .toc-item {
+        // 所有项目都变为非活跃外观
+        &.active {
+          background: #f8f9fa;
+          border-left-color: #dadce0;
+          
+          .toc-item-title {
+            color: #5f6368;
+          }
+          
+          .toc-item-indicator {
+            opacity: 0.5;
+          }
+        }
+        
+        // 添加微妙的过渡效果
+        transition: all 0.2s ease;
+      }
+    }
+    
+  }
+
+  &.mobile-toc {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 320px;
+    max-width: 85vw;
+    height: 100vh;
+    z-index: 1100;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    border-radius: 0;
+    border-right: none;
+
+    &.open {
+      transform: translateX(0);
+    }
+  }
+}
+
+.toc-content,
+.mobile-toc-content {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; // 确保内容不会溢出父容器
+}
+
+.toc-header,
+.mobile-toc-header {
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid #f1f3f4;
+  background: linear-gradient(135deg, #f8f9fa, #ffffff);
+  flex-shrink: 0; // Prevent header from shrinking
+  position: relative; // Remove any sticky positioning
+  
+  // Ensure TOC header behaves consistently with sidebar
+  // It should scroll with content and adjust in footer zone
+  transition: opacity 0.3s ease, background 0.3s ease;
+}
+
+.toc-header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.toc-title-section {
+  flex: 1;
+  min-width: 0; // Allow text truncation
+}
+
+.desktop-toc .toc-header {
+  padding-top: 24px;
+}
+
+.mobile-toc-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.toc-title,
+.mobile-toc-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #202124;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.toc-category-name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1a73e8;
+  margin-bottom: 2px;
+}
+
+.toc-subtitle {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #5f6368;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.mobile-toc-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #666;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: #f1f3f4;
+    color: #333;
+  }
+}
+
+.toc-list,
+.mobile-toc-list {
+  flex: 1;
+  min-height: 0;
+  overflow: visible; // Remove scroll since we now use pagination
+  padding: 8px 0;
+  
+  // 改进的滚动条样式
+  &::-webkit-scrollbar {
+    width: 8px; // 稍微增大以提高可用性
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #f8f9fa;
+    border-radius: 4px;
+    margin: 4px 0; // 添加边距
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #dadce0;
+    border-radius: 4px;
+    border: 1px solid #f8f9fa; // 添加边框提高视觉效果
+    
+    &:hover {
+      background: #bdc1c6;
+    }
+    
+    &:active {
+      background: #9aa0a6;
+    }
+  }
+}
+
+// TOC容器：确保正确的flexbox行为
+.trending-toc,
+.category-toc,
+.mobile-toc-content > div { // 也适用于移动端TOC内容
+  display: flex;
+  flex-direction: column;
+  flex: 1; // 占用toc-content的剩余空间
+  min-height: 0; // 允许flex子项收缩
+}
+
+// TOC列表：启用滚动
+.desktop-toc .toc-list {
+  padding-bottom: 20px;
+  flex: 1; // 占用trending-toc/category-toc的剩余空间
+  min-height: 0; // 关键：允许flex子项收缩并启用滚动
+  overflow-y: auto; // 确保滚动启用
+  overflow-x: hidden;
+  scroll-behavior: smooth; // 平滑滚动
+  scrollbar-gutter: stable; // 稳定滚动条空间
+  
+  // TOC content styling with pagination support
+  contain: layout style;
+}
+
+// 移动端TOC列表滚动
+.mobile-toc-list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+  scrollbar-gutter: stable;
+}
+
+.toc-item,
+.mobile-toc-item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 12px 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-left: 3px solid transparent;
+  // Prevent text selection during interactions
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+
+  &:hover {
+    background: #f8f9fa;
+    border-left-color: #dadce0;
+  }
+
+  &.active {
+    background: linear-gradient(90deg, rgba(26, 115, 232, 0.08), transparent);
+    border-left-color: #1a73e8;
+    // 优化过渡效果与侧边栏保持一致
+    transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    // 确保active项目在滚动时可见
+    scroll-margin-top: 20px;
+    scroll-margin-bottom: 20px;
+
+    .toc-item-title,
+    .mobile-toc-item-title {
+      color: #1a73e8;
+      font-weight: 600;
+    }
+  }
+}
+
+.toc-item-title,
+.mobile-toc-item-title {
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: #202124;
+  line-height: 1.4;
+  margin: 0;
+  word-break: break-word;
+  flex: 1;
+  transition: color 0.2s ease;
+}
+
+// TOC Pagination Controls
+.toc-pagination-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.pagination-info {
+  font-size: 0.75rem;
+  color: #5f6368;
+  font-weight: 400;
+  white-space: nowrap;
+}
+
+.pagination-buttons {
+  display: flex;
+  gap: 4px;
+}
+
+.pagination-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: #ffffff;
+  border: 1px solid #dadce0;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #5f6368;
+  
+  &:hover:not(:disabled) {
+    background: #f8f9fa;
+    border-color: #1a73e8;
+    color: #1a73e8;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+  
+  &:active:not(:disabled) {
+    background: #e8f0fe;
+    transform: scale(0.95);
+  }
+  
+  &:disabled {
+    background: #f1f3f4;
+    border-color: #e8eaed;
+    color: #9aa0a6;
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+  
+  &:focus-visible {
+    outline: 2px solid #1a73e8;
+    outline-offset: 2px;
+  }
+}
+
+// Mobile TOC Header Layout
+.mobile-toc-header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.mobile-toc-pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 12px;
+  border-top: 1px solid #f1f3f4;
+  
+  .pagination-info {
+    font-size: 0.8rem;
+  }
+}
+
+.mobile-toc-item-indicator {
+  font-size: 1rem;
+  margin-left: 8px;
+  opacity: 0.8;
+}

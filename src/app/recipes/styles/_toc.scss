@@ -1,0 +1,516 @@
+// ==================== Recipe TOC Styles ====================
+// Based on FAQ sidebar patterns with recipe-specific adaptations
+
+// Variables aligned with FAQ patterns
+$toc-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+$breakpoint-desktop: 992px;
+
+// TOC Desktop Styles
+.recipe-toc.desktop-toc {
+  background: #ffffff;
+  border-left: 1px solid #e1e5e9;
+  box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: $toc-transition;
+  
+  .toc-content {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .toc-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid #f1f3f4;
+    background: #f8f9fa;
+    flex-shrink: 0;
+    min-height: 64px;
+
+    .toc-title-section {
+      margin-bottom: 12px;
+
+      .toc-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #202124;
+        margin: 0 0 4px 0;
+      }
+
+      .toc-count {
+        font-size: 0.75rem;
+        color: #5f6368;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 500;
+      }
+    }
+
+    .toc-pagination-controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 8px;
+
+      .pagination-info {
+        font-size: 0.75rem;
+        color: #5f6368;
+        font-weight: 500;
+      }
+
+      .pagination-buttons {
+        display: flex;
+        gap: 4px;
+
+        .pagination-btn {
+          width: 28px;
+          height: 28px;
+          min-width: 28px;
+          padding: 0;
+          border-radius: 4px;
+          transition: $toc-transition;
+          
+          mat-icon {
+            font-size: 16px;
+            width: 16px;
+            height: 16px;
+          }
+          
+          &:hover:not(:disabled) {
+            background-color: #f1f3f4;
+            color: #202124;
+          }
+          
+          &:disabled {
+            opacity: 0.3;
+          }
+        }
+      }
+    }
+  }
+
+  .toc-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px 0;
+
+    // Custom scrollbar matching FAQ style
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 3px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: #dadce0;
+      border-radius: 3px;
+
+      &:hover {
+        background: #bdc1c6;
+      }
+    }
+
+    .toc-item {
+      display: flex;
+      align-items: flex-start;
+      padding: 8px 20px;
+      cursor: pointer;
+      transition: $toc-transition;
+      border-left: 3px solid transparent;
+      user-select: none;
+      border-radius: 0 20px 20px 0;
+      margin-right: 8px;
+      position: relative;
+
+      &:hover {
+        background-color: #f1f3f4;
+        color: #202124;
+        border-left-color: #dadce0;
+      }
+
+      &.active {
+        background-color: #e8f0fe;
+        color: #1a73e8;
+        font-weight: 500;
+        transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+
+        &::before {
+          content: '';
+          position: absolute;
+          left: 0;
+          top: 0;
+          bottom: 0;
+          width: 3px;
+          background-color: #1a73e8;
+          transition: width 0.2s ease-out, background-color 0.15s ease;
+        }
+
+        .toc-item-title {
+          color: #1a73e8;
+          font-weight: 600;
+        }
+
+        .toc-item-meta {
+          .toc-item-category,
+          .toc-item-difficulty {
+            color: #1a73e8;
+          }
+        }
+      }
+
+      .toc-item-icon {
+        margin-right: 12px;
+        margin-top: 2px;
+        flex-shrink: 0;
+        opacity: 0.7;
+
+        mat-icon {
+          font-size: 18px;
+          width: 18px;
+          height: 18px;
+          color: #5f6368;
+          transition: color 0.2s ease;
+        }
+      }
+
+      .toc-item-content {
+        flex: 1;
+        min-width: 0;
+
+        .toc-item-title {
+          font-size: 0.875rem;
+          font-weight: 500;
+          color: #202124;
+          line-height: 1.4;
+          margin-bottom: 4px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+        }
+
+        .toc-item-meta {
+          display: flex;
+          gap: 8px;
+          font-size: 0.75rem;
+          color: #5f6368;
+
+          .toc-item-category,
+          .toc-item-difficulty,
+          .toc-item-time {
+            background: #f1f3f4;
+            border-radius: 8px;
+            padding: 2px 6px;
+            font-weight: 500;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+          }
+
+        }
+      }
+    }
+  }
+
+  // Footer awareness states
+  &.footer-approaching {
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, #e8f0fe, transparent);
+      pointer-events: none;
+    }
+  }
+
+  &.in-footer-zone {
+    opacity: 0.85;
+    
+    .toc-item.active {
+      background: #f8f9fa;
+      border-left-color: #dadce0;
+
+      &::before {
+        background-color: #dadce0;
+      }
+
+      .toc-item-title {
+        color: #5f6368;
+        font-weight: 500;
+      }
+
+      .toc-item-meta {
+        .toc-item-category,
+        .toc-item-difficulty {
+          color: #5f6368;
+        }
+      }
+    }
+  }
+}
+
+// Mobile TOC Styles
+.recipe-toc.mobile-toc {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 300;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: $toc-transition;
+
+  &.open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: all;
+  }
+
+  .mobile-toc-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1;
+    transition: opacity 0.3s ease;
+  }
+
+  .mobile-toc-content {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 320px;
+    max-width: 85vw;
+    height: 100%;
+    background: #ffffff;
+    box-shadow: -2px 0 8px rgba(0, 0, 0, 0.15);
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    transform: translateX(100%);
+    transition: $toc-transition;
+
+    .mobile-toc.open & {
+      transform: translateX(0);
+    }
+  }
+
+  .mobile-toc-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid #f1f3f4;
+    background: #f8f9fa;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+    min-height: 64px;
+
+    h3 {
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: #202124;
+      margin: 0;
+    }
+
+    .mobile-toc-close {
+      width: 32px;
+      height: 32px;
+      min-width: 32px;
+      padding: 0;
+      border-radius: 4px;
+      transition: $toc-transition;
+
+      &:hover {
+        background-color: #f1f3f4;
+        color: #202124;
+      }
+
+      mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+      }
+    }
+  }
+
+  .mobile-toc-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px 0;
+
+    // Custom scrollbar matching desktop
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 3px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: #dadce0;
+      border-radius: 3px;
+
+      &:hover {
+        background: #bdc1c6;
+      }
+    }
+
+    .toc-item {
+      display: flex;
+      align-items: flex-start;
+      padding: 8px 20px;
+      cursor: pointer;
+      transition: $toc-transition;
+      border-left: 3px solid transparent;
+      border-radius: 0 20px 20px 0;
+      margin-right: 8px;
+      position: relative;
+
+      &:hover,
+      &:active {
+        background-color: #f1f3f4;
+        color: #202124;
+      }
+
+      &.active {
+        background-color: #e8f0fe;
+        color: #1a73e8;
+        font-weight: 500;
+        transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+
+        &::before {
+          content: '';
+          position: absolute;
+          left: 0;
+          top: 0;
+          bottom: 0;
+          width: 3px;
+          background-color: #1a73e8;
+          transition: width 0.2s ease-out, background-color 0.15s ease;
+        }
+
+        .toc-item-title {
+          color: #1a73e8;
+          font-weight: 600;
+        }
+      }
+
+      .toc-item-icon {
+        margin-right: 12px;
+        margin-top: 2px;
+        flex-shrink: 0;
+        opacity: 0.7;
+
+        mat-icon {
+          font-size: 18px;
+          width: 18px;
+          height: 18px;
+          color: #5f6368;
+          transition: color 0.2s ease;
+        }
+      }
+
+      .toc-item-content {
+        flex: 1;
+        min-width: 0;
+
+        .toc-item-title {
+          font-size: 0.875rem;
+          font-weight: 500;
+          color: #202124;
+          line-height: 1.4;
+          margin-bottom: 4px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+        }
+
+        .toc-item-meta {
+          display: flex;
+          gap: 8px;
+          font-size: 0.75rem;
+          color: #5f6368;
+
+          .toc-item-category,
+          .toc-item-difficulty,
+          .toc-item-time {
+            background: #f1f3f4;
+            border-radius: 8px;
+            padding: 2px 6px;
+            font-weight: 500;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Responsive adjustments - matching FAQ breakpoint strategy
+@media (max-width: $breakpoint-desktop) {
+  .recipe-toc.desktop-toc {
+    display: none; // Hide desktop TOC on mobile
+  }
+}
+
+// Enhanced mobile responsive adjustments
+@media (max-width: 480px) {
+  .recipe-toc.mobile-toc .mobile-toc-content {
+    width: 100%;
+    max-width: 100%;
+  }
+  
+  // Enhanced mobile TOC for small screens
+  .recipe-toc.mobile-toc {
+    .mobile-toc-header {
+      padding: 12px 16px;
+      min-height: 56px;
+      
+      h3 {
+        font-size: 1rem;
+      }
+      
+      .mobile-toc-close {
+        width: 28px;
+        height: 28px;
+        min-width: 28px;
+      }
+    }
+    
+    .mobile-toc-list .toc-item {
+      padding: 6px 16px;
+      
+      .toc-item-content .toc-item-title {
+        font-size: 0.8125rem;
+      }
+      
+      .toc-item-meta {
+        gap: 6px;
+        
+        .toc-item-category,
+        .toc-item-difficulty,
+        .toc-item-time {
+          font-size: 0.65rem;
+          padding: 1px 4px;
+        }
+      }
+    }
+  }
+}

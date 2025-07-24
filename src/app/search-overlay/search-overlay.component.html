@@ -5,7 +5,7 @@
         #searchInput
         type="text"
         class="overlay-search-box"
-        placeholder="What are you searching for?"
+        placeholder="Search FAQs... (Shortcut: / or Ctrl+K)"
         [(ngModel)]="searchQuery"
         (input)="filterSuggestions()"
       />
@@ -28,6 +28,15 @@
           >
             {{ category }}
           </span>
+          <div *ngIf="isLoading" class="loading-placeholder">
+            Loading categories...
+          </div>
+          <div *ngIf="loadError" class="error-placeholder">
+            Failed to load categories
+          </div>
+          <div *ngIf="!isLoading && !loadError && !categories.length" class="empty-placeholder">
+            No categories available
+          </div>
         </div>
       </div>
 
