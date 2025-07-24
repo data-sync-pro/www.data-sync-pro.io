@@ -211,22 +211,6 @@ $breakpoint-desktop: 992px;
             letter-spacing: 0.5px;
           }
 
-          .toc-item-difficulty {
-            &.beginner {
-              background: var(--difficulty-beginner-bg);
-              color: var(--difficulty-beginner);
-            }
-
-            &.intermediate {
-              background: var(--difficulty-intermediate-bg);
-              color: var(--difficulty-intermediate);
-            }
-
-            &.advanced {
-              background: var(--difficulty-advanced-bg);
-              color: var(--difficulty-advanced);
-            }
-          }
         }
       }
     }

@@ -277,7 +277,6 @@
             <div class="toc-item-title">{{ recipe.title }}</div>
             <div class="toc-item-meta">
               <span class="toc-item-category">{{ recipe.category | titlecase }}</span>
-              <span class="toc-item-difficulty">{{ recipe.difficulty | titlecase }}</span>
             </div>
           </div>
         </div>
@@ -293,8 +292,7 @@
           <div class="toc-item-content">
             <div class="toc-item-title">{{ recipe.title }}</div>
             <div class="toc-item-meta">
-              <span class="toc-item-time">{{ getTimeDisplay(recipe.estimatedTime) }}</span>
-              <span class="toc-item-difficulty">{{ recipe.difficulty | titlecase }}</span>
+              <span class="toc-item-category">{{ recipe.category | titlecase }}</span>
             </div>
           </div>
         </div>
@@ -355,7 +353,6 @@
           <div class="toc-item-title">{{ recipe.title }}</div>
           <div class="toc-item-meta">
             <span class="toc-item-category">{{ recipe.category | titlecase }}</span>
-            <span class="toc-item-difficulty">{{ recipe.difficulty | titlecase }}</span>
           </div>
         </div>
       </div>

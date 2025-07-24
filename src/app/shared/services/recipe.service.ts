@@ -124,8 +124,6 @@ export class RecipeService implements OnDestroy {
       title: record.title,
       category: record.category,
       description: record.description,
-      difficulty: record.difficulty,
-      estimatedTime: record.estimatedTime,
       useCase: record.useCase,
       safeUseCase: this.sanitizer.bypassSecurityTrustHtml(record.useCase),
       prerequisites: {
@@ -221,12 +219,6 @@ export class RecipeService implements OnDestroy {
           );
         }
 
-        // Apply difficulty filter
-        if (filter?.difficulties.length) {
-          filteredRecipes = filteredRecipes.filter(recipe => 
-            filter.difficulties.includes(recipe.difficulty)
-          );
-        }
 
         // Apply search query
         if (query.trim()) {
@@ -436,7 +428,7 @@ export class RecipeService implements OnDestroy {
           recentlyUpdated: recipes
             .sort((a, b) => b.lastUpdated.getTime() - a.lastUpdated.getTime())
             .slice(0, 5),
-          avgCompletionTime: recipes.reduce((sum, recipe) => sum + recipe.estimatedTime, 0) / recipes.length,
+          avgCompletionTime: 0, // Removed estimatedTime calculation
           popularCategories: Array.from(categoryStats.entries())
             .map(([category, count]) => ({ category, count }))
             .sort((a, b) => b.count - a.count)

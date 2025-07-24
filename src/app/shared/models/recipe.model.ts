@@ -9,8 +9,6 @@ export interface SourceRecipeRecord {
   title: string;
   category: string; // One of: action-button, batch, data-list, data-loader, triggers
   description: string;
-  difficulty: 'beginner' | 'intermediate' | 'advanced';
-  estimatedTime: number; // in minutes
   useCase: string; // Rich text describing target/goal
   prerequisites: {
     permissionSetsForBuilding: string[];
@@ -98,8 +96,6 @@ export interface RecipeItem {
   title: string;
   category: string;
   description: string;
-  difficulty: 'beginner' | 'intermediate' | 'advanced';
-  estimatedTime: number;
   useCase: string;
   safeUseCase?: SafeHtml;
   prerequisites: RecipePrerequisites;
@@ -202,13 +198,8 @@ export interface RecipeStats {
  */
 export interface RecipeFilter {
   categories: string[];
-  difficulties: string[];
   searchQuery: string;
   showPopularOnly: boolean;
-  estimatedTimeRange?: {
-    min: number;
-    max: number;
-  };
   tags: string[];
 }
 
@@ -216,7 +207,7 @@ export interface RecipeFilter {
  * Recipe sort options
  */
 export interface RecipeSortOptions {
-  field: 'title' | 'category' | 'difficulty' | 'estimatedTime' | 'viewCount' | 'lastUpdated';
+  field: 'title' | 'category' | 'viewCount' | 'lastUpdated';
   direction: 'asc' | 'desc';
 }
 
@@ -260,10 +251,6 @@ export type RecipeStepType =
   | 'previewTransformed'
   | 'addSchedule';
 
-/**
- * Recipe difficulty levels
- */
-export type RecipeDifficulty = 'beginner' | 'intermediate' | 'advanced';
 
 /**
  * Recipe categories (from Rules Engines subcategories)

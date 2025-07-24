@@ -31,7 +31,7 @@
           <label class="filter-label">Categories</label>
           <button 
             class="clear-filters-btn" 
-            *ngIf="selectedCategory || selectedDifficulty"
+            *ngIf="selectedCategory"
             (click)="clearFilters()">
             Clear filters
           </button>
@@ -48,20 +48,6 @@
         </div>
       </div>
 
-      <!-- Difficulty Filter -->
-      <div class="filter-group">
-        <label class="filter-label">Difficulty</label>
-        <div class="filter-chips">
-          <span
-            class="filter-chip"
-            *ngFor="let difficulty of difficulties"
-            [class.active]="selectedDifficulty === difficulty"
-            (click)="selectDifficulty(difficulty)"
-          >
-            {{ difficulty | titlecase }}
-          </span>
-        </div>
-      </div>
     </div>
 
     <!-- Results Section -->
@@ -97,13 +83,6 @@
           </div>
           <div class="result-meta">
             <span class="category-tag">{{ recipe.category }}</span>
-            <span 
-              class="difficulty-badge" 
-              [ngClass]="getDifficultyClass(recipe.difficulty)"
-            >
-              <mat-icon>{{ getDifficultyIcon(recipe.difficulty) }}</mat-icon>
-              {{ recipe.difficulty | titlecase }}
-            </span>
           </div>
         </a>
       </div>
@@ -115,10 +94,10 @@
         <p *ngIf="searchQuery">
           No recipes match "<strong>{{ searchQuery }}</strong>"
         </p>
-        <p *ngIf="!searchQuery && (selectedCategory || selectedDifficulty)">
+        <p *ngIf="!searchQuery && selectedCategory">
           No recipes match the selected filters
         </p>
-        <p *ngIf="!searchQuery && !selectedCategory && !selectedDifficulty">
+        <p *ngIf="!searchQuery && !selectedCategory">
           Start typing to search for recipes
         </p>
       </div>

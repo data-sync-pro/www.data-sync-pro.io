@@ -111,7 +111,6 @@ export class RecipesComponent implements OnInit, OnDestroy {
   // Filters
   currentFilter: RecipeFilter = {
     categories: [],
-    difficulties: [],
     searchQuery: '',
     showPopularOnly: false,
     tags: []
@@ -641,17 +640,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
       // Sort by estimated time (shorter first) and category diversity
       this._cachedTrendingRecipes = [...this.recipes]
         .sort((a, b) => {
-          // First by estimated time (shorter recipes first)
-          if (a.estimatedTime !== b.estimatedTime) {
-            return a.estimatedTime - b.estimatedTime;
-          }
-          // Then by difficulty (beginner first)
-          const difficultyOrder = { 'beginner': 1, 'intermediate': 2, 'advanced': 3 };
-          const aDiff = difficultyOrder[a.difficulty] || 2;
-          const bDiff = difficultyOrder[b.difficulty] || 2;
-          if (aDiff !== bDiff) {
-            return aDiff - bDiff;
-          }
+          // Sort by title alphabetically
           // Finally by title alphabetically
           return a.title.localeCompare(b.title);
         })
@@ -814,17 +803,4 @@ export class RecipesComponent implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * Get time display for TOC
-   */
-  getTimeDisplay(estimatedTime: number): string {
-    const time = estimatedTime;
-    if (time < 60) {
-      return `${time} min`;
-    } else {
-      const hours = Math.floor(time / 60);
-      const minutes = time % 60;
-      return minutes > 0 ? `${hours}h ${minutes}m` : `${hours}h`;
-    }
-  }
 }

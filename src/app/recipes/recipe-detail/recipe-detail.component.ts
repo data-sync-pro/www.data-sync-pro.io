@@ -6,20 +6,8 @@ import { RecipeItem } from '../../shared/models/recipe.model';
   template: `
     <div class="recipe-detail">
       <div class="recipe-header">
-        <button mat-icon-button (click)="goBack()" aria-label="Go back">
-          <mat-icon>arrow_back</mat-icon>
-        </button>
         <div class="header-content">
           <h1>{{ recipe.title }}</h1>
-          <div class="recipe-meta">
-            <mat-chip [color]="getDifficultyColor()" selected>
-              {{ recipe.difficulty | titlecase }}
-            </mat-chip>
-            <span class="time-estimate">
-              <mat-icon>schedule</mat-icon>
-              {{ getTimeDisplay() }}
-            </span>
-          </div>
         </div>
       </div>
 
@@ -144,23 +132,4 @@ export class RecipeDetailComponent {
     this.stepComplete.emit(stepNumber);
   }
 
-  getDifficultyColor(): string {
-    switch (this.recipe.difficulty) {
-      case 'beginner': return 'accent';
-      case 'intermediate': return 'primary';
-      case 'advanced': return 'warn';
-      default: return 'primary';
-    }
-  }
-
-  getTimeDisplay(): string {
-    const time = this.recipe.estimatedTime;
-    if (time < 60) {
-      return `${time} min`;
-    } else {
-      const hours = Math.floor(time / 60);
-      const minutes = time % 60;
-      return minutes > 0 ? `${hours}h ${minutes}m` : `${hours}h`;
-    }
-  }
 }

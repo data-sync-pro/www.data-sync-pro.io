@@ -104,23 +104,36 @@
 // Minimalist download button in header
 .download-button {
   flex-shrink: 0;
-  width: 24px;
-  height: 24px;
+  // Remove fixed width/height to allow proper Material button sizing
+  min-width: 32px;
+  min-height: 32px;
+  width: 32px;
+  height: 32px;
   border: none;
   background: transparent;
   color: #5f6368;
   transition: color 0.2s ease;
-  margin: 0; // Reset margin since it's now in header
+  margin: 0;
+  padding: 6px; // Proper padding for centering icon
+  display: flex;
+  align-items: center;
+  justify-content: center;
   
   &:hover {
     color: #1a73e8;
-    background: transparent;
+    background: rgba(26, 115, 232, 0.08);
+  }
+  
+  &:focus {
+    outline: 2px solid #1a73e8;
+    outline-offset: 2px;
   }
   
   mat-icon {
-    font-size: 16px;
-    width: 16px;
-    height: 16px;
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    line-height: 1;
   }
 }
 
@@ -149,13 +162,16 @@
   }
   
   .download-button {
-    width: 22px;
-    height: 22px;
+    min-width: 28px;
+    min-height: 28px;
+    width: 28px;
+    height: 28px;
+    padding: 4px;
     
     mat-icon {
-      font-size: 14px;
-      width: 14px;
-      height: 14px;
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
     }
   }
 }

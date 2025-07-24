@@ -5,8 +5,6 @@
     "title": "Sync Account Data to Related Contacts",
     "category": "triggers",
     "description": "Automatically synchronize account information to all related contacts when account data changes, ensuring data consistency across related records.",
-    "difficulty": "intermediate",
-    "estimatedTime": 45,
     "useCase": "When an Account's primary information changes (such as Industry, Phone, or Billing Address), this recipe ensures that all related Contacts are automatically updated with the corresponding information. This maintains data consistency and reduces manual data entry for users.",
     "prerequisites": {
       "permissionSetsForBuilding": [
@@ -96,8 +94,6 @@
     "title": "Import Leads from CSV File",
     "category": "data-loader",
     "description": "Bulk import lead records from CSV files with data validation and deduplication to maintain data quality.",
-    "difficulty": "beginner",
-    "estimatedTime": 30,
     "useCase": "Import leads from trade shows, marketing campaigns, or partner systems using CSV files. This recipe includes built-in validation to ensure data quality and deduplication to prevent duplicate lead creation.",
     "prerequisites": {
       "permissionSetsForBuilding": [

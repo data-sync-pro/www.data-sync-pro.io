@@ -84,7 +84,7 @@ $breakpoint-mobile: 576px;
 
 .recipe-main {
   grid-area: main;
-  padding: 100px 40px 120px 40px; // Add top padding for breadcrumb space
+  padding: 80px; // Add top padding for breadcrumb space
   overflow-x: hidden;
   overflow-y: auto;
   background: #ffffff;
@@ -161,7 +161,6 @@ $breakpoint-mobile: 576px;
 .search-results {
   max-width: $content-max-width;
   margin: 0 auto;
-  animation: fadeInUp 0.3s ease-out;
 }
 
 @keyframes fadeInUp {
