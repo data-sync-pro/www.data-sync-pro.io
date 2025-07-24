@@ -759,19 +759,6 @@ export class FAQService implements OnDestroy {
       normalizedSrc = `assets/${src}`;
     }
 
-    // Enhanced error handling with better visual feedback
-    const onErrorHandler = `
-      this.parentElement.style.display = 'block';
-      this.parentElement.style.padding = '20px';
-      this.parentElement.style.backgroundColor = '#fff3cd';
-      this.parentElement.style.border = '2px dashed #ffeaa7';
-      this.parentElement.style.borderRadius = '8px';
-      this.parentElement.style.textAlign = 'center';
-      this.parentElement.style.color = '#856404';
-      this.parentElement.style.fontStyle = 'italic';
-      this.parentElement.innerHTML = '🖼️ Image could not be loaded<br><small>Path: ' + this.src + '</small><br><small>Full URL: ' + new URL(this.src, window.location.href).href + '</small>';
-    `;
-
     // Create container with better structure
     return `<div class="faq-picture">
       <img 
@@ -780,7 +767,6 @@ export class FAQService implements OnDestroy {
         class="faq-image"
         style="display: block; margin: 20px auto; max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); transition: transform 0.3s ease;"
         loading="lazy"
-        onerror="${onErrorHandler}"
         onload="this.parentElement.classList.add('image-loaded')"
       >
     </div>`;
