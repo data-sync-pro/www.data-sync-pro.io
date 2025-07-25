@@ -39,7 +39,7 @@ interface UIState {
   activeRecipeTab: string; // Used for content display - determines which tab content to show
   activeSectionId: string; // Used for section highlighting within a tab
   highlightedTOCTab: string; // Used for TOC visual highlighting - can be empty to show no tab highlight
-  expandedTabs: Set<string>;
+  // expandedTabs: Set<string>; // No longer used since TOC doesn't show tabs
   userHasScrolled: boolean;
   scrollTicking: boolean;
   disableScrollHighlight: boolean;
@@ -95,8 +95,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
     tocFooterApproaching: false,
     activeRecipeTab: 'overview',
     activeSectionId: 'use-case',
-    highlightedTOCTab: 'overview', // Initially highlight overview tab
-    expandedTabs: new Set(['overview']),
+    highlightedTOCTab: '', // No longer used since TOC doesn't show tabs
     userHasScrolled: false,
     scrollTicking: false,
     disableScrollHighlight: false
@@ -146,8 +145,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
   recipeTOC: RecipeTOCStructure = {
     tabs: [],
     currentTabId: 'overview',
-    currentSectionId: 'use-case',
-    expandedTabs: new Set(['overview'])
+    currentSectionId: 'use-case'
   };
   
   // Filters
@@ -404,9 +402,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
     
     // Reset to overview tab when navigating to a different recipe
     this.ui.activeRecipeTab = 'overview';
-    this.ui.highlightedTOCTab = 'overview'; // Initially highlight overview tab
     this.ui.activeSectionId = 'use-case';
-    this.ui.expandedTabs = new Set(['overview']);
     
     if (this.ui.isMobile) {
       this.closeMobileSidebar();
@@ -414,48 +410,36 @@ export class RecipesComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Change recipe tab
+   * Change recipe tab - Optimized for instant switching
    */
   changeRecipeTab(tabName: string): void {
     console.log('Changing recipe tab to:', tabName);
     
-    // Set both activeRecipeTab (for content display) and highlightedTOCTab (for visual highlighting)
+    // Set active tab for content display
     this.ui.activeRecipeTab = tabName;
-    this.ui.highlightedTOCTab = tabName;
     this.recipeTOC.currentTabId = tabName;
     
     // Clear active section when clicking on tab directly
-    // Only the tab should be highlighted, not any specific section
     this.ui.activeSectionId = '';
     this.recipeTOC.currentSectionId = '';
     
-    // Toggle tab expansion
-    if (this.ui.expandedTabs.has(tabName)) {
-      this.ui.expandedTabs.delete(tabName);
-    } else {
-      this.ui.expandedTabs.add(tabName);
-    }
-    this.recipeTOC.expandedTabs = this.ui.expandedTabs;
-    
-    // When clicking on a tab, just ensure the tab content is visible
-    const selectedTab = this.recipeTOC.tabs.find(tab => tab.id === tabName);
-    if (selectedTab) {
-      
-      // Clear section cache when switching tabs since DOM content changes
-      this.clearSectionElementsCache();
-      
-      // Refresh cache after DOM is updated, but don't auto-scroll to first section
-      setTimeout(() => {
-        this.refreshSectionElementsCache();
-      }, 100);
-    }
+    // Clear section cache when switching tabs since DOM content changes
+    this.clearSectionElementsCache();
     
     // Close mobile TOC after tab change
     if (this.ui.isMobile) {
       this.closeMobileTOC();
     }
     
+    // Trigger immediate UI update
     this.cdr.markForCheck();
+    
+    // Refresh cache after UI updates (non-blocking, only if needed for scroll tracking)
+    if (this.ui.userHasScrolled) {
+      requestAnimationFrame(() => {
+        this.refreshSectionElementsCache();
+      });
+    }
   }
 
   /**
@@ -502,25 +486,18 @@ export class RecipesComponent implements OnInit, OnDestroy {
       this.ui.activeRecipeTab = parentTab.id;
       this.recipeTOC.currentTabId = parentTab.id;
       
-      // Expand the parent tab to show sections
-      this.ui.expandedTabs.add(parentTab.id);
-      this.recipeTOC.expandedTabs = this.ui.expandedTabs;
+      // Parent tab is automatically active for content display
       
       // Note: highlightedTOCTab is handled separately and should be empty when a section is selected
     }
   }
 
   /**
-   * Toggle tab expansion in TOC
+   * Toggle tab expansion in TOC - No longer needed since tabs are not shown in TOC
    */
   toggleTabExpansion(tabId: string): void {
-    if (this.ui.expandedTabs.has(tabId)) {
-      this.ui.expandedTabs.delete(tabId);
-    } else {
-      this.ui.expandedTabs.add(tabId);
-    }
-    this.recipeTOC.expandedTabs = this.ui.expandedTabs;
-    this.cdr.markForCheck();
+    // This method is no longer used since TOC doesn't show tabs
+    console.warn('toggleTabExpansion is deprecated - TOC no longer shows tabs');
   }
 
   /**
@@ -1032,7 +1009,6 @@ export class RecipesComponent implements OnInit, OnDestroy {
     this.recipeTOC.tabs = tabs;
     this.recipeTOC.currentTabId = this.ui.activeRecipeTab;
     this.recipeTOC.currentSectionId = this.ui.activeSectionId;
-    this.recipeTOC.expandedTabs = this.ui.expandedTabs;
   }
 
   /**
@@ -1273,6 +1249,27 @@ export class RecipesComponent implements OnInit, OnDestroy {
   private clearSectionElementsCache(): void {
     this.cachedSectionElements = null;
     this.cachedSectionPositions.clear();
+  }
+
+  /**
+   * Get sections for currently active tab
+   */
+  getActiveTabSections(): RecipeSection[] {
+    if (!this.ui.activeRecipeTab || !this.recipeTOC.tabs) {
+      return [];
+    }
+    
+    const activeTab = this.recipeTOC.tabs.find(tab => tab.id === this.ui.activeRecipeTab);
+    return activeTab ? activeTab.sections : [];
+  }
+
+  /**
+   * Handle step completion in walkthrough
+   */
+  onStepComplete(stepNumber: number): void {
+    if (this.currentRecipe) {
+      this.updateRecipeProgress(this.currentRecipe, stepNumber);
+    }
   }
 
 }

@@ -258,7 +258,7 @@ export interface RecipeTOCStructure {
   tabs: RecipeTab[];
   currentTabId?: string;
   currentSectionId?: string;
-  expandedTabs: Set<string>;
+  // expandedTabs: Set<string>; // No longer used since TOC doesn't show tabs
 }
 
 /**

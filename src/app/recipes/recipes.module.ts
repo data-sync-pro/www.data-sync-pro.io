@@ -24,7 +24,6 @@ import { RecipesRoutingModule } from './recipes-routing.module';
 
 // Components
 import { RecipesComponent } from './recipes.component';
-import { RecipeDetailComponent } from './recipe-detail/recipe-detail.component';
 import { RecipeCardComponent } from './recipe-card/recipe-card.component';
 import { RecipeStepComponent } from './recipe-step/recipe-step.component';
 import { RecipeNavigationComponent } from './recipe-navigation/recipe-navigation.component';
@@ -41,7 +40,6 @@ import { SharedModule } from '../shared/shared.module';
 @NgModule({
   declarations: [
     RecipesComponent,
-    RecipeDetailComponent,
     RecipeCardComponent,
     RecipeStepComponent,
     RecipeNavigationComponent,

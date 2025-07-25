@@ -149,79 +149,114 @@ $toc-text-muted: #5f6368;
     }
 
     .toc-sections {
-      // Clear visual nesting with enhanced indentation
-      margin-left: 16px;
-      border-left: 2px solid #f1f3f4;
-      padding-left: 8px;
-      margin-top: 4px;
+      // Enhanced visual hierarchy for sections
+      padding: 8px 0;
+      margin: 8px 0;
       position: relative;
       
+      // Add a subtle background to group sections
       &::before {
         content: '';
         position: absolute;
-        left: -2px;
+        left: 12px;
+        right: 12px;
         top: 0;
         bottom: 0;
-        width: 2px;
-        background: linear-gradient(to bottom, $toc-border-color 0%, transparent 100%);
+        background: linear-gradient(135deg, #fafbfc 0%, #f8f9fa 100%);
+        border-radius: 8px;
+        border: 1px solid #f1f3f4;
+        z-index: -1;
       }
     }
 
     .toc-section-item {
       font-weight: 400;
-      font-size: 0.8125rem;
-      padding: 4px 12px;
-      margin-bottom: 1px;
-      border-radius: 4px;
+      font-size: 0.875rem;
+      padding: 8px 16px;
+      margin: 2px 12px;
+      border-radius: 6px;
       background: transparent;
+      position: relative;
+      transition: all 0.2s ease;
+      
+      // Add subtle separator between sections
+      &:not(:last-child)::after {
+        content: '';
+        position: absolute;
+        left: 48px;
+        right: 16px;
+        bottom: 0;
+        height: 1px;
+        background: linear-gradient(to right, transparent 0%, #f1f3f4 20%, #f1f3f4 80%, transparent 100%);
+      }
       
       .toc-section-number {
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 18px;
-        height: 18px;
-        margin-right: 8px;
+        width: 22px;
+        height: 22px;
+        margin-right: 12px;
         font-size: 0.75rem;
-        font-weight: 600;
+        font-weight: 700;
         color: $toc-text-muted;
-        background: #f1f3f4;
+        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+        border: 1.5px solid #e1e5e9;
         border-radius: 50%;
         flex-shrink: 0;
+        transition: all 0.2s ease;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
       }
       
-      .toc-item-title {
-        font-size: 0.8125rem;
-        line-height: 1.4;
-        color: $toc-text-muted;
-        font-weight: 400;
+      .toc-item-content {
+        flex: 1;
+        
+        .toc-item-title {
+          font-size: 0.875rem;
+          line-height: 1.4;
+          color: $toc-text-color;
+          font-weight: 450;
+          margin: 0;
+          transition: all 0.2s ease;
+        }
       }
       
       &:hover {
-        background-color: $toc-hover-bg;
+        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+        transform: translateX(2px);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
         
         .toc-item-title {
           color: $toc-text-color;
-        }
-        
-        .toc-section-number {
-          color: $toc-text-color;
-          background: #e1e5e9;
-        }
-      }
-      
-      &.active {
-        background-color: rgba(26, 115, 232, 0.08);
-        color: $toc-active-color;
-        
-        .toc-item-title {
-          color: $toc-active-color;
           font-weight: 500;
         }
         
         .toc-section-number {
+          color: $toc-active-color;
+          background: linear-gradient(135deg, #ffffff 0%, #e8f0fe 100%);
+          border-color: $toc-active-color;
+          transform: scale(1.05);
+        }
+      }
+      
+      &.active {
+        background: linear-gradient(135deg, #e8f0fe 0%, #f0f7ff 100%);
+        border-left: 3px solid $toc-active-color;
+        color: $toc-active-color;
+        transform: translateX(4px);
+        box-shadow: 0 3px 12px rgba(26, 115, 232, 0.15);
+        
+        .toc-item-title {
+          color: $toc-active-color;
+          font-weight: 600;
+        }
+        
+        .toc-section-number {
           color: #ffffff;
-          background: $toc-active-color;
+          background: linear-gradient(135deg, $toc-active-color 0%, #1557b0 100%);
+          border-color: $toc-active-color;
+          box-shadow: 0 2px 6px rgba(26, 115, 232, 0.3);
+          transform: scale(1.1);
         }
       }
     }
@@ -500,66 +535,115 @@ $toc-text-muted: #5f6368;
     }
 
     .toc-sections {
-      margin-left: 16px;
-      border-left: 2px solid #f1f3f4;
-      padding-left: 8px;
-      margin-top: 4px;
+      // Enhanced visual hierarchy for sections (Mobile)
+      padding: 8px 0;
+      margin: 8px 0;
+      position: relative;
+      
+      // Add a subtle background to group sections
+      &::before {
+        content: '';
+        position: absolute;
+        left: 12px;
+        right: 12px;
+        top: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, #fafbfc 0%, #f8f9fa 100%);
+        border-radius: 8px;
+        border: 1px solid #f1f3f4;
+        z-index: -1;
+      }
     }
 
     .toc-section-item {
       font-weight: 400;
-      font-size: 0.8125rem;
-      padding: 6px 12px;
-      margin-bottom: 1px;
-      border-radius: 4px;
+      font-size: 0.875rem;
+      padding: 8px 16px;
+      margin: 2px 12px;
+      border-radius: 6px;
+      background: transparent;
+      position: relative;
+      transition: all 0.2s ease;
+      
+      // Add subtle separator between sections
+      &:not(:last-child)::after {
+        content: '';
+        position: absolute;
+        left: 48px;
+        right: 16px;
+        bottom: 0;
+        height: 1px;
+        background: linear-gradient(to right, transparent 0%, #f1f3f4 20%, #f1f3f4 80%, transparent 100%);
+      }
       
       .toc-section-number {
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 18px;
-        height: 18px;
-        margin-right: 8px;
+        width: 22px;
+        height: 22px;
+        margin-right: 12px;
         font-size: 0.75rem;
-        font-weight: 600;
+        font-weight: 700;
         color: $toc-text-muted;
-        background: #f1f3f4;
+        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+        border: 1.5px solid #e1e5e9;
         border-radius: 50%;
         flex-shrink: 0;
+        transition: all 0.2s ease;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
       }
       
-      .toc-item-title {
-        font-size: 0.8125rem;
-        line-height: 1.4;
-        color: $toc-text-muted;
+      .toc-item-content {
+        flex: 1;
+        
+        .toc-item-title {
+          font-size: 0.875rem;
+          line-height: 1.4;
+          color: $toc-text-color;
+          font-weight: 450;
+          margin: 0;
+          transition: all 0.2s ease;
+        }
       }
       
       &:hover,
       &:active {
-        background-color: $toc-hover-bg;
+        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+        transform: translateX(2px);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
         
         .toc-item-title {
           color: $toc-text-color;
-        }
-        
-        .toc-section-number {
-          color: $toc-text-color;
-          background: #e1e5e9;
-        }
-      }
-      
-      &.active {
-        background-color: rgba(26, 115, 232, 0.08);
-        color: $toc-active-color;
-        
-        .toc-item-title {
-          color: $toc-active-color;
           font-weight: 500;
         }
         
         .toc-section-number {
+          color: $toc-active-color;
+          background: linear-gradient(135deg, #ffffff 0%, #e8f0fe 100%);
+          border-color: $toc-active-color;
+          transform: scale(1.05);
+        }
+      }
+      
+      &.active {
+        background: linear-gradient(135deg, #e8f0fe 0%, #f0f7ff 100%);
+        border-left: 3px solid $toc-active-color;
+        color: $toc-active-color;
+        transform: translateX(4px);
+        box-shadow: 0 3px 12px rgba(26, 115, 232, 0.15);
+        
+        .toc-item-title {
+          color: $toc-active-color;
+          font-weight: 600;
+        }
+        
+        .toc-section-number {
           color: #ffffff;
-          background: $toc-active-color;
+          background: linear-gradient(135deg, $toc-active-color 0%, #1557b0 100%);
+          border-color: $toc-active-color;
+          box-shadow: 0 2px 6px rgba(26, 115, 232, 0.3);
+          transform: scale(1.1);
         }
       }
     }
