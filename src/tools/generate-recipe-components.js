@@ -104,13 +104,6 @@ function generateHTMLTemplate(recipe) {
     <div class="header-content">
       <h1 class="recipe-title">{{ recipe.title }}</h1>
       <div class="recipe-meta">
-        <mat-chip class="difficulty-chip" [color]="getDifficultyColor()" selected>
-          {{ recipe.difficulty | titlecase }}
-        </mat-chip>
-        <span class="time-estimate">
-          <mat-icon>schedule</mat-icon>
-          {{ getTimeDisplay() }}
-        </span>
         <span class="category-tag">{{ recipe.category | titlecase }}</span>
       </div>
     </div>
@@ -284,31 +277,6 @@ export class ${className} implements OnInit {
     this.saveRecipeProgress();
   }
 
-  /**
-   * Get difficulty badge color
-   */
-  getDifficultyColor(): string {
-    switch (this.recipe?.difficulty) {
-      case 'beginner': return 'accent';
-      case 'intermediate': return 'primary';
-      case 'advanced': return 'warn';
-      default: return 'primary';
-    }
-  }
-
-  /**
-   * Get estimated time display
-   */
-  getTimeDisplay(): string {
-    const time = this.recipe?.estimatedTime || 0;
-    if (time < 60) {
-      return \`\${time} min\`;
-    } else {
-      const hours = Math.floor(time / 60);
-      const minutes = time % 60;
-      return minutes > 0 ? \`\${hours}h \${minutes}m\` : \`\${hours}h\`;
-    }
-  }
 
   /**
    * Load recipe progress from localStorage
@@ -385,17 +353,7 @@ function generateSCSSTemplate(recipe) {
     flex-wrap: wrap;
   }
   
-  .difficulty-chip {
-    font-weight: 600;
-  }
   
-  .time-estimate {
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-    color: var(--text-muted);
-    font-weight: 500;
-  }
   
   .category-tag {
     background: var(--surface-color);

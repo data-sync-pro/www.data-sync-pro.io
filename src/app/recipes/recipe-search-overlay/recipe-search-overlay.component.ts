@@ -19,7 +19,6 @@ interface Recipe {
   title: string;
   description: string;
   category: string;
-  difficulty: 'beginner' | 'intermediate' | 'advanced';
   duration: string;
   tags: string[];
   steps: any[];
@@ -43,10 +42,7 @@ export class RecipeSearchOverlayComponent implements OnInit, OnChanges {
 
   searchQuery = '';
   selectedCategory = '';
-  selectedDifficulty = '';
-  
   categories: string[] = [];
-  difficulties = ['beginner', 'intermediate', 'advanced'];
   
   isLoading = true;
   loadError = false;
@@ -82,7 +78,6 @@ export class RecipeSearchOverlayComponent implements OnInit, OnChanges {
         title: 'Basic Salesforce to SQL Server Sync',
         description: 'Learn how to set up a basic data synchronization between Salesforce and SQL Server',
         category: 'Database Integration',
-        difficulty: 'beginner',
         duration: '30 mins',
         tags: ['SQL Server', 'Salesforce', 'Basic'],
         steps: []
@@ -92,7 +87,6 @@ export class RecipeSearchOverlayComponent implements OnInit, OnChanges {
         title: 'Real-time Account Sync with Change Data Capture',
         description: 'Implement real-time synchronization using Salesforce Change Data Capture',
         category: 'Real-time Sync',
-        difficulty: 'advanced',
         duration: '2 hours',
         tags: ['CDC', 'Real-time', 'Accounts'],
         steps: []
@@ -102,7 +96,6 @@ export class RecipeSearchOverlayComponent implements OnInit, OnChanges {
         title: 'Batch Processing Large Data Sets',
         description: 'Optimize batch processing for large data volumes between systems',
         category: 'Performance',
-        difficulty: 'intermediate',
         duration: '1 hour',
         tags: ['Batch', 'Performance', 'Large Data'],
         steps: []
@@ -112,7 +105,6 @@ export class RecipeSearchOverlayComponent implements OnInit, OnChanges {
         title: 'Error Handling and Retry Logic',
         description: 'Implement robust error handling and retry mechanisms for data sync',
         category: 'Best Practices',
-        difficulty: 'intermediate',
         duration: '45 mins',
         tags: ['Error Handling', 'Retry', 'Reliability'],
         steps: []
@@ -122,7 +114,6 @@ export class RecipeSearchOverlayComponent implements OnInit, OnChanges {
         title: 'Multi-Object Relationship Sync',
         description: 'Synchronize complex object relationships between systems',
         category: 'Advanced Patterns',
-        difficulty: 'advanced',
         duration: '1.5 hours',
         tags: ['Relationships', 'Complex', 'Multi-Object'],
         steps: []
@@ -187,7 +178,7 @@ export class RecipeSearchOverlayComponent implements OnInit, OnChanges {
   }
 
   onSelectRecipe(recipe: Recipe) {
-    const categoryFilterApplied = !!this.selectedCategory || !!this.selectedDifficulty;
+    const categoryFilterApplied = !!this.selectedCategory;
     
     this.selectedResult.emit({
       ...recipe,
@@ -202,15 +193,10 @@ export class RecipeSearchOverlayComponent implements OnInit, OnChanges {
     this.filterRecipes();
   }
 
-  selectDifficulty(difficulty: string) {
-    this.selectedDifficulty = this.selectedDifficulty === difficulty ? '' : difficulty;
-    this.filterRecipes();
-  }
 
   clearFilters() {
     this.searchQuery = '';
     this.selectedCategory = '';
-    this.selectedDifficulty = '';
     this.filterRecipes();
   }
 
@@ -230,23 +216,8 @@ export class RecipeSearchOverlayComponent implements OnInit, OnChanges {
       const matchCategory = !this.selectedCategory || 
         recipe.category === this.selectedCategory;
       
-      const matchDifficulty = !this.selectedDifficulty || 
-        recipe.difficulty === this.selectedDifficulty;
-      
-      return matchQuery && matchCategory && matchDifficulty;
+      return matchQuery && matchCategory;
     });
   }
 
-  getDifficultyIcon(difficulty: string): string {
-    switch (difficulty) {
-      case 'beginner': return 'school';
-      case 'intermediate': return 'trending_up';
-      case 'advanced': return 'rocket_launch';
-      default: return 'help';
-    }
-  }
-
-  getDifficultyClass(difficulty: string): string {
-    return difficulty;
-  }
 }

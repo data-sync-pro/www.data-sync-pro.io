@@ -8,6 +8,14 @@
 // Component-specific overrides and adjustments
 // The main layout is handled by modular styles
 
+// Recipe page styling
+:host-context(body.recipe-page) {
+  display: block;
+}
+
+// Note: Footer is now allowed to display normally
+// Users can scroll to see footer at bottom of page
+
 // Enhanced CSS Variables for theming
 :root {
   // Base colors
@@ -36,13 +44,6 @@
   --info-color: #1a73e8;
   --info-bg: #e8f0fe;
   
-  // Difficulty level colors
-  --difficulty-beginner: #137333;
-  --difficulty-beginner-bg: #e8f5e8;
-  --difficulty-intermediate: #f57c00;
-  --difficulty-intermediate-bg: #fef7e0;
-  --difficulty-advanced: #d93025;
-  --difficulty-advanced-bg: #fce8e6;
   
   // Interactive states
   --hover-bg: #f1f3f4;
@@ -82,13 +83,6 @@
     --info-color: #8ab4f8;
     --info-bg: #1a237e;
     
-    // Dark theme difficulty colors
-    --difficulty-beginner: #81c995;
-    --difficulty-beginner-bg: #1e3a1e;
-    --difficulty-intermediate: #fdd663;
-    --difficulty-intermediate-bg: #2d2111;
-    --difficulty-advanced: #f28b82;
-    --difficulty-advanced-bg: #3b1612;
     
     // Dark theme interactive states
     --hover-bg: #313235;

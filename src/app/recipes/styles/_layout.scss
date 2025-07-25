@@ -10,14 +10,14 @@ $breakpoint-desktop: 992px;
 $breakpoint-tablet: 768px;
 $breakpoint-mobile: 576px;
 
-// W3Schools风格的主容器布局 - 三栏设计
+// FAQ-inspired主容器布局 - 三栏设计
 .recipe-layout-container {
   display: grid;
   grid-template-areas: "sidebar main toc";
   grid-template-columns: $sidebar-width 1fr $toc-width;
   min-height: calc(100vh - $header-height);
   margin-top: $header-height;
-  background-color: #f8f9fa;
+  background-color: #ffffff;
   transition: grid-template-columns 0.3s ease;
 
   &.sidebar-collapsed {
@@ -80,26 +80,26 @@ $breakpoint-mobile: 576px;
   grid-area: sidebar;
 }
 
+// Breadcrumb navigation will be positioned within main area
+
 .recipe-main {
   grid-area: main;
-  padding: 2rem;
+  padding: 80px 80px 300px 80px; // Normal bottom padding for footer visibility
   overflow-x: hidden;
   overflow-y: auto;
   background: #ffffff;
   
-  // Ensure proper height calculation
+  // Allow content to extend beyond viewport for footer visibility
   min-height: calc(100vh - $header-height);
-  max-height: calc(100vh - $header-height);
 
   @media (max-width: $breakpoint-tablet) {
-    padding: 1.5rem;
+    padding: 50px 20px 30px 20px; // Normal bottom padding for tablet
   }
 
   @media (max-width: $breakpoint-mobile) {
-    padding: 1rem;
-    // On mobile, full height since container has margin-top
+    padding: 45px 15px 20px 15px; // Normal bottom padding for mobile
+    // On mobile, allow scrolling to footer
     min-height: calc(100vh - $header-height);
-    max-height: calc(100vh - $header-height);
   }
 }
 
@@ -159,7 +159,6 @@ $breakpoint-mobile: 576px;
 .search-results {
   max-width: $content-max-width;
   margin: 0 auto;
-  animation: fadeInUp 0.3s ease-out;
 }
 
 @keyframes fadeInUp {
@@ -173,15 +172,16 @@ $breakpoint-mobile: 576px;
   }
 }
 
-// Home header
+// Header sections - FAQ-inspired spacing
 .home-header,
-.category-header {
+.category-header,
+.search-header {
   text-align: center;
-  margin-bottom: 3rem;
+  margin-bottom: 40px;
 
-  h1 {
+  h1, h2 {
     font-size: 2.5rem;
-    font-weight: 700;
+    font-weight: 600;
     color: #202124;
     margin-bottom: 1rem;
 
@@ -190,6 +190,20 @@ $breakpoint-mobile: 576px;
     }
   }
 
+  // Specific title classes for consistent styling
+  .section-title,
+  .category-title,
+  .search-title {
+    font-size: 2.5rem;
+    font-weight: 600;
+    color: #202124;
+    margin-bottom: 1rem;
+
+    @media (max-width: $breakpoint-tablet) {
+      font-size: 2rem;
+    }
+  }
+  
   .home-description,
   .category-description {
     font-size: 1.125rem;
@@ -201,6 +215,19 @@ $breakpoint-mobile: 576px;
     @media (max-width: $breakpoint-tablet) {
       font-size: 1rem;
     }
+  }
+}
+
+// Recipe count styling (separate from header nesting)
+.recipe-count {
+  font-size: 1rem;
+  color: #5f6368;
+  margin: 0;
+  font-weight: 500;
+  text-align: center;
+
+  @media (max-width: $breakpoint-tablet) {
+    font-size: 0.9rem;
   }
 }
 
@@ -220,11 +247,16 @@ $breakpoint-mobile: 576px;
 // Recipe grid
 .recipe-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 1.5rem;
 
+  @media (max-width: $breakpoint-desktop) {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.25rem;
+  }
+
   @media (max-width: $breakpoint-tablet) {
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
     gap: 1.25rem;
   }
 
@@ -319,39 +351,104 @@ $breakpoint-mobile: 576px;
   }
 }
 
-// Breadcrumb navigation
+// Breadcrumb navigation - sticky positioning like FAQ
 .breadcrumb-nav {
-  .breadcrumb {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    margin: 0;
-    padding: 0;
-    background: transparent;
+  grid-area: main;
+  align-self: start; // Stick to top of main area
+  position: sticky;
+  top: $header-height; // Stick below the main header
+  z-index: 90; // Higher than TOC but below main header
+  padding: 8px 40px; // Match main content horizontal padding
+  margin-bottom: 0;
+  border-bottom: 1px solid #f1f3f4;
+  background: rgba(255, 255, 255, 0.95); // Semi-transparent white background
+  backdrop-filter: blur(8px); // Modern blur effect for better visibility
+  -webkit-backdrop-filter: blur(8px); // Safari support
+  transition: all 0.2s ease;
+  
+  // Add subtle shadow when scrolled
+  &.scrolled {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-bottom-color: #e1e5e9;
+  }
+  
+  // Mobile responsive adjustments
+  @media (max-width: $breakpoint-tablet) {
+    padding: 6px 20px;
+    font-size: 0.9rem;
+    
+    // Adjust for mobile header height if different
+    top: $header-height;
+  }
+  
+  @media (max-width: $breakpoint-mobile) {
+    padding: 6px 15px;
+  }
+  
+  // Ensure proper stacking context
+  isolation: isolate;
+}
 
-    .breadcrumb-item {
-      display: flex;
-      align-items: center;
-      color: #5f6368;
-      font-size: 0.875rem;
-      text-decoration: none;
-      transition: color 0.2s ease;
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
 
-      &:hover {
-        color: #1a73e8;
-      }
+.breadcrumb-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  color: #1a73e8;
+  font-size: 0.8rem;
+  font-weight: 400;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 3px;
+  text-decoration: none;
+  transition: all 0.15s ease;
 
-      &.active {
-        color: #202124;
-        font-weight: 500;
-      }
+  &:hover:not(.active) {
+    background-color: rgba(26, 115, 232, 0.08);
+    color: #1557b0;
+  }
 
-      &:not(:last-child)::after {
-        content: '/';
-        margin: 0 0.5rem;
-        color: #dadce0;
-      }
+  &.active {
+    color: #5f6368;
+    cursor: default;
+    font-weight: 500;
+  }
+
+  &:disabled {
+    cursor: default;
+  }
+
+  span {
+    white-space: nowrap;
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    
+    // Mobile responsive text truncation
+    @media (max-width: $breakpoint-tablet) {
+      max-width: 80px;
+    }
+    
+    @media (max-width: $breakpoint-mobile) {
+      max-width: 60px;
     }
   }
+}
+
+.breadcrumb-separator {
+  display: flex;
+  align-items: center;
+  color: #bdc1c6;
+  margin: 0 1px;
 }
 

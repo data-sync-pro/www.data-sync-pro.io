@@ -7,6 +7,7 @@ import {
   ViewEncapsulation,
   HostListener
 } from '@angular/core';
+import { trigger, state, style, transition, animate } from '@angular/animations';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Meta, Title } from '@angular/platform-browser';
 import { Subject } from 'rxjs';
@@ -17,7 +18,10 @@ import {
   RecipeCategory,
   RecipeFilter,
   RecipeProgress,
-  RecipeNavigationState
+  RecipeNavigationState,
+  RecipeSection,
+  RecipeTab,
+  RecipeTOCStructure
 } from '../shared/models/recipe.model';
 import { RecipeService } from '../shared/services/recipe.service';
 import { SelectedRecipe } from './recipe-search-overlay/recipe-search-overlay.component';
@@ -32,6 +36,13 @@ interface UIState {
   tocHidden: boolean;
   tocInFooterZone: boolean;
   tocFooterApproaching: boolean;
+  activeRecipeTab: string; // Used for content display - determines which tab content to show
+  activeSectionId: string; // Used for section highlighting within a tab
+  highlightedTOCTab: string; // Used for TOC visual highlighting - can be empty to show no tab highlight
+  expandedTabs: Set<string>;
+  userHasScrolled: boolean;
+  scrollTicking: boolean;
+  disableScrollHighlight: boolean;
 }
 
 interface TOCPaginationState {
@@ -55,7 +66,18 @@ interface SearchState {
   templateUrl: './recipes.component.html',
   styleUrls: ['./recipes.component.scss'],
   encapsulation: ViewEncapsulation.None,
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  animations: [
+    trigger('slideInOut', [
+      transition(':enter', [
+        style({ height: '0', opacity: 0, overflow: 'hidden' }),
+        animate('200ms ease-in', style({ height: '*', opacity: 1 }))
+      ]),
+      transition(':leave', [
+        animate('200ms ease-out', style({ height: '0', opacity: 0, overflow: 'hidden' }))
+      ])
+    ])
+  ]
 })
 export class RecipesComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
@@ -70,7 +92,14 @@ export class RecipesComponent implements OnInit, OnDestroy {
     currentView: 'home',
     tocHidden: false,
     tocInFooterZone: false,
-    tocFooterApproaching: false
+    tocFooterApproaching: false,
+    activeRecipeTab: 'overview',
+    activeSectionId: 'use-case',
+    highlightedTOCTab: 'overview', // Initially highlight overview tab
+    expandedTabs: new Set(['overview']),
+    userHasScrolled: false,
+    scrollTicking: false,
+    disableScrollHighlight: false
   };
 
   // TOC pagination state
@@ -85,6 +114,11 @@ export class RecipesComponent implements OnInit, OnDestroy {
   // TOC data
   private _cachedTrendingRecipes?: RecipeItem[];
   private _lastRecipesLength?: number;
+  
+  // Scroll tracking and caching
+  private cachedSectionElements: Element[] | null = null;
+  private cachedSectionPositions: Map<string, number> = new Map();
+  private optimizedScrollListener?: () => void;
 
   search: SearchState = {
     query: '',
@@ -108,10 +142,17 @@ export class RecipesComponent implements OnInit, OnDestroy {
   currentRecipe: RecipeItem | null = null;
   filteredRecipes: RecipeItem[] = [];
   
+  // Recipe TOC structure
+  recipeTOC: RecipeTOCStructure = {
+    tabs: [],
+    currentTabId: 'overview',
+    currentSectionId: 'use-case',
+    expandedTabs: new Set(['overview'])
+  };
+  
   // Filters
   currentFilter: RecipeFilter = {
     categories: [],
-    difficulties: [],
     searchQuery: '',
     showPopularOnly: false,
     tags: []
@@ -133,6 +174,10 @@ export class RecipesComponent implements OnInit, OnDestroy {
     this.checkMobileView();
     this.loadSidebarState();
     this.loadTOCState();
+    this.setupOptimizedScrollListener();
+    
+    // Add body class to hide footer on recipe pages
+    document.body.classList.add('recipe-page');
   }
 
   /**
@@ -173,6 +218,14 @@ export class RecipesComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+    
+    // Clean up scroll listener
+    if (this.optimizedScrollListener) {
+      window.removeEventListener('scroll', this.optimizedScrollListener);
+    }
+    
+    // Remove body class when leaving recipe pages
+    document.body.classList.remove('recipe-page');
   }
 
   /**
@@ -301,6 +354,12 @@ export class RecipesComponent implements OnInit, OnDestroy {
         
         if (recipe) {
           this.trackRecipeView(recipe);
+          // Generate TOC structure for the loaded recipe
+          this.generateRecipeTOCStructure();
+          // Clear scroll cache for new recipe
+          this.clearSectionElementsCache();
+          // Reset scroll state
+          this.ui.userHasScrolled = false;
         }
         
         this.cdr.markForCheck();
@@ -343,8 +402,143 @@ export class RecipesComponent implements OnInit, OnDestroy {
   goToRecipe(recipe: RecipeItem): void {
     this.router.navigate(['/recipes', recipe.category, recipe.name]);
     
+    // Reset to overview tab when navigating to a different recipe
+    this.ui.activeRecipeTab = 'overview';
+    this.ui.highlightedTOCTab = 'overview'; // Initially highlight overview tab
+    this.ui.activeSectionId = 'use-case';
+    this.ui.expandedTabs = new Set(['overview']);
+    
     if (this.ui.isMobile) {
       this.closeMobileSidebar();
+    }
+  }
+
+  /**
+   * Change recipe tab
+   */
+  changeRecipeTab(tabName: string): void {
+    console.log('Changing recipe tab to:', tabName);
+    
+    // Set both activeRecipeTab (for content display) and highlightedTOCTab (for visual highlighting)
+    this.ui.activeRecipeTab = tabName;
+    this.ui.highlightedTOCTab = tabName;
+    this.recipeTOC.currentTabId = tabName;
+    
+    // Clear active section when clicking on tab directly
+    // Only the tab should be highlighted, not any specific section
+    this.ui.activeSectionId = '';
+    this.recipeTOC.currentSectionId = '';
+    
+    // Toggle tab expansion
+    if (this.ui.expandedTabs.has(tabName)) {
+      this.ui.expandedTabs.delete(tabName);
+    } else {
+      this.ui.expandedTabs.add(tabName);
+    }
+    this.recipeTOC.expandedTabs = this.ui.expandedTabs;
+    
+    // When clicking on a tab, just ensure the tab content is visible
+    const selectedTab = this.recipeTOC.tabs.find(tab => tab.id === tabName);
+    if (selectedTab) {
+      
+      // Clear section cache when switching tabs since DOM content changes
+      this.clearSectionElementsCache();
+      
+      // Refresh cache after DOM is updated, but don't auto-scroll to first section
+      setTimeout(() => {
+        this.refreshSectionElementsCache();
+      }, 100);
+    }
+    
+    // Close mobile TOC after tab change
+    if (this.ui.isMobile) {
+      this.closeMobileTOC();
+    }
+    
+    this.cdr.markForCheck();
+  }
+
+  /**
+   * Change recipe section
+   */
+  changeRecipeSection(sectionId: string): void {
+    console.log('Changing recipe section to:', sectionId);
+    
+    this.ui.activeSectionId = sectionId;
+    this.recipeTOC.currentSectionId = sectionId;
+    
+    // Clear TOC tab highlighting when selecting a specific section
+    // Keep activeRecipeTab for content display, but clear highlightedTOCTab for visual highlighting
+    this.ui.highlightedTOCTab = '';
+    
+    // Ensure the parent tab is expanded and set as active for content display
+    this.ensureParentTabActive(sectionId);
+    
+    // Temporarily disable scroll highlighting to avoid conflicts during navigation
+    this.ui.disableScrollHighlight = true;
+    
+    // Scroll to the section element
+    this.scrollToSection(sectionId);
+    
+    // Re-enable scroll highlighting after navigation completes
+    setTimeout(() => {
+      this.ui.disableScrollHighlight = false;
+    }, 1000);
+    
+    this.cdr.markForCheck();
+  }
+
+  /**
+   * Ensure the parent tab of a section is expanded and active for content display
+   */
+  private ensureParentTabActive(sectionId: string): void {
+    const parentTab = this.recipeTOC.tabs.find(tab => 
+      tab.sections.some(section => section.id === sectionId)
+    );
+    
+    if (parentTab) {
+      console.log('Ensuring parent tab is active for content display and expanded for section:', sectionId);
+      // Set the parent tab as active for content display (needed for *ngIf in template)
+      this.ui.activeRecipeTab = parentTab.id;
+      this.recipeTOC.currentTabId = parentTab.id;
+      
+      // Expand the parent tab to show sections
+      this.ui.expandedTabs.add(parentTab.id);
+      this.recipeTOC.expandedTabs = this.ui.expandedTabs;
+      
+      // Note: highlightedTOCTab is handled separately and should be empty when a section is selected
+    }
+  }
+
+  /**
+   * Toggle tab expansion in TOC
+   */
+  toggleTabExpansion(tabId: string): void {
+    if (this.ui.expandedTabs.has(tabId)) {
+      this.ui.expandedTabs.delete(tabId);
+    } else {
+      this.ui.expandedTabs.add(tabId);
+    }
+    this.recipeTOC.expandedTabs = this.ui.expandedTabs;
+    this.cdr.markForCheck();
+  }
+
+  /**
+   * Simple and reliable section scrolling
+   */
+  private scrollToSection(sectionId: string): void {
+    const section = this.recipeTOC.tabs
+      .flatMap(tab => tab.sections)
+      .find(s => s.id === sectionId);
+      
+    if (section?.elementId) {
+      const element = document.getElementById(section.elementId);
+      if (element) {
+        element.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }
     }
   }
 
@@ -513,13 +707,6 @@ export class RecipesComponent implements OnInit, OnDestroy {
       });
     }
     
-    if (this.currentRecipe) {
-      path.push({ 
-        name: this.currentRecipe.title, 
-        url: `/recipes/${this.navigation.category}/${this.navigation.recipeName}` 
-      });
-    }
-    
     return path;
   }
 
@@ -641,17 +828,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
       // Sort by estimated time (shorter first) and category diversity
       this._cachedTrendingRecipes = [...this.recipes]
         .sort((a, b) => {
-          // First by estimated time (shorter recipes first)
-          if (a.estimatedTime !== b.estimatedTime) {
-            return a.estimatedTime - b.estimatedTime;
-          }
-          // Then by difficulty (beginner first)
-          const difficultyOrder = { 'beginner': 1, 'intermediate': 2, 'advanced': 3 };
-          const aDiff = difficultyOrder[a.difficulty] || 2;
-          const bDiff = difficultyOrder[b.difficulty] || 2;
-          if (aDiff !== bDiff) {
-            return aDiff - bDiff;
-          }
+          // Sort by title alphabetically
           // Finally by title alphabetically
           return a.title.localeCompare(b.title);
         })
@@ -680,6 +857,182 @@ export class RecipesComponent implements OnInit, OnDestroy {
   get tocItemCount(): number {
     if (this.showHome) return this.trendingRecipes.length;
     return this.currentRecipes.length;
+  }
+
+  /**
+   * Get recipe tab count for TOC
+   */
+  getRecipeTabCount(): number {
+    return 2; // Overview and Walkthrough are always available (Download merged into Overview)
+  }
+
+  /**
+   * Generate recipe TOC structure based on current recipe
+   */
+  generateRecipeTOCStructure(): void {
+    if (!this.currentRecipe) {
+      this.recipeTOC.tabs = [];
+      return;
+    }
+
+    const tabs: RecipeTab[] = [];
+
+    // Overview Tab
+    tabs.push({
+      id: 'overview',
+      title: 'Overview',
+      icon: 'article',
+      description: '',
+      sections: [
+        {
+          id: 'use-case',
+          title: 'Use Case',
+          icon: 'info',
+          elementId: 'recipe-use-case'
+        },
+        {
+          id: 'building-permissions',
+          title: 'Building Permissions',
+          icon: 'build',
+          elementId: 'recipe-building-permissions'
+        },
+        {
+          id: 'using-permissions',
+          title: 'Using Permissions',
+          icon: 'group',
+          elementId: 'recipe-using-permissions'
+        },
+        {
+          id: 'setup-instructions',
+          title: 'Setup Instructions',
+          icon: 'settings',
+          elementId: 'recipe-setup-instructions'
+        }
+      ]
+    });
+
+    // Add download sections to Overview tab if downloadable executable exists
+    if (this.currentRecipe.downloadableExecutable) {
+      tabs[0].sections.push(
+        {
+          id: 'download-executable',
+          title: 'Download Executable',
+          icon: 'get_app',
+          elementId: 'recipe-download-executable'
+        },
+        {
+          id: 'installation-guide',
+          title: 'Installation Guide',
+          icon: 'install_desktop',
+          elementId: 'recipe-installation-guide'
+        },
+        {
+          id: 'version-info',
+          title: 'Version Information',
+          icon: 'info',
+          elementId: 'recipe-version-info'
+        }
+      );
+    }
+
+    // Walkthrough Tab
+    const walkthroughSections: RecipeSection[] = [];
+    const walkthrough = this.currentRecipe.walkthrough;
+
+    if (walkthrough.createExecutable) {
+      walkthroughSections.push({
+        id: 'create-executable',
+        title: 'Create Executable',
+        icon: 'add_circle',
+        elementId: 'recipe-create-executable'
+      });
+    }
+
+    if (walkthrough.retrieve) {
+      walkthroughSections.push({
+        id: 'retrieve-data',
+        title: 'Retrieve Data',
+        icon: 'download',
+        elementId: 'recipe-retrieve-data'
+      });
+    }
+
+    if (walkthrough.scoping) {
+      walkthroughSections.push({
+        id: 'scoping',
+        title: 'Scoping',
+        icon: 'filter_list',
+        elementId: 'recipe-scoping'
+      });
+    }
+
+    if (walkthrough.match) {
+      walkthroughSections.push({
+        id: 'match',
+        title: 'Match',
+        icon: 'compare_arrows',
+        elementId: 'recipe-match'
+      });
+    }
+
+    if (walkthrough.mapping) {
+      walkthroughSections.push({
+        id: 'mapping',
+        title: 'Mapping',
+        icon: 'swap_horiz',
+        elementId: 'recipe-mapping'
+      });
+    }
+
+    if (walkthrough.action) {
+      walkthroughSections.push({
+        id: 'action',
+        title: 'Action',
+        icon: 'play_arrow',
+        elementId: 'recipe-action'
+      });
+    }
+
+    if (walkthrough.verify) {
+      walkthroughSections.push({
+        id: 'verify',
+        title: 'Verify',
+        icon: 'check_circle',
+        elementId: 'recipe-verify'
+      });
+    }
+
+    if (walkthrough.previewTransformed) {
+      walkthroughSections.push({
+        id: 'preview-transformed',
+        title: 'Preview Transformed',
+        icon: 'preview',
+        elementId: 'recipe-preview-transformed'
+      });
+    }
+
+    if (walkthrough.addSchedule) {
+      walkthroughSections.push({
+        id: 'add-schedule',
+        title: 'Add Schedule',
+        icon: 'schedule',
+        elementId: 'recipe-add-schedule'
+      });
+    }
+
+    tabs.push({
+      id: 'walkthrough',
+      title: 'Walkthrough',
+      icon: 'timeline',
+      description: 'Step-by-step Guide',
+      sections: walkthroughSections
+    });
+
+
+    this.recipeTOC.tabs = tabs;
+    this.recipeTOC.currentTabId = this.ui.activeRecipeTab;
+    this.recipeTOC.currentSectionId = this.ui.activeSectionId;
+    this.recipeTOC.expandedTabs = this.ui.expandedTabs;
   }
 
   /**
@@ -814,17 +1167,112 @@ export class RecipesComponent implements OnInit, OnDestroy {
     }
   }
 
+  // ==================== Scroll Tracking Methods ====================
+
   /**
-   * Get time display for TOC
+   * Setup optimized scroll listener for section highlighting
    */
-  getTimeDisplay(estimatedTime: number): string {
-    const time = estimatedTime;
-    if (time < 60) {
-      return `${time} min`;
-    } else {
-      const hours = Math.floor(time / 60);
-      const minutes = time % 60;
-      return minutes > 0 ? `${hours}h ${minutes}m` : `${hours}h`;
+  private setupOptimizedScrollListener(): void {
+    if (typeof window === 'undefined') return;
+    
+    this.optimizedScrollListener = () => {
+      // Mark that user has scrolled - this enables TOC highlighting
+      if (!this.ui.userHasScrolled) {
+        this.ui.userHasScrolled = true;
+      }
+      
+      if (!this.ui.scrollTicking) {
+        requestAnimationFrame(() => {
+          this.handleOptimizedScroll(window.pageYOffset);
+          this.ui.scrollTicking = false;
+        });
+        this.ui.scrollTicking = true;
+      }
+    };
+    
+    window.addEventListener('scroll', this.optimizedScrollListener, { passive: true });
+  }
+
+  /**
+   * Handle scroll events and update active section
+   */
+  private handleOptimizedScroll(scrollPosition: number): void {
+    // Only update active section when viewing recipe details and auto-highlighting is enabled
+    if (this.showRecipeDetails && this.ui.userHasScrolled && !this.ui.disableScrollHighlight) {
+      this.updateActiveScrollElement(scrollPosition);
     }
   }
+
+  /**
+   * Update active section based on scroll position
+   */
+  private updateActiveScrollElement(scrollPosition: number): void {
+    const offset = scrollPosition + 150; // Account for header height
+    
+    // Cache section elements and their positions
+    if (!this.cachedSectionElements || this.cachedSectionElements.length === 0) {
+      this.refreshSectionElementsCache();
+    }
+    
+    let activeSectionId = '';
+    let closestDistance = Infinity;
+
+    // Find the section that is currently in view
+    this.cachedSectionPositions.forEach((position, sectionId) => {
+      const distance = Math.abs(position - offset);
+      if (distance < closestDistance && position <= offset + 100) {
+        closestDistance = distance;
+        activeSectionId = sectionId;
+      }
+    });
+
+    // Update active section if it has changed
+    if (activeSectionId && activeSectionId !== this.ui.activeSectionId) {
+      this.ui.activeSectionId = activeSectionId;
+      this.recipeTOC.currentSectionId = activeSectionId;
+      
+      // When scrolling updates the section, clear TOC tab highlighting
+      // This ensures only the section is highlighted, not the parent tab
+      this.ui.highlightedTOCTab = '';
+      
+      // Ensure the parent tab is active for content display
+      this.ensureParentTabActive(activeSectionId);
+      
+      this.cdr.markForCheck();
+    }
+  }
+
+  /**
+   * Refresh cache of section elements and their positions
+   */
+  private refreshSectionElementsCache(): void {
+    if (!this.currentRecipe) return;
+
+    this.cachedSectionElements = [];
+    this.cachedSectionPositions.clear();
+
+    // Get all section elements based on the recipe TOC structure
+    this.recipeTOC.tabs.forEach(tab => {
+      tab.sections.forEach(section => {
+        if (section.elementId) {
+          const element = document.getElementById(section.elementId);
+          if (element) {
+            this.cachedSectionElements!.push(element);
+            const rect = element.getBoundingClientRect();
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            this.cachedSectionPositions.set(section.id, rect.top + scrollTop);
+          }
+        }
+      });
+    });
+  }
+
+  /**
+   * Clear section elements cache (call when recipe changes)
+   */
+  private clearSectionElementsCache(): void {
+    this.cachedSectionElements = null;
+    this.cachedSectionPositions.clear();
+  }
+
 }

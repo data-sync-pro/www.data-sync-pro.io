@@ -110,21 +110,28 @@
       </div>
   </aside>
 
+  <!-- Breadcrumb Navigation -->
+  <nav class="breadcrumb-nav" *ngIf="breadcrumbPath.length > 1" aria-label="breadcrumb">
+    <div class="breadcrumb">
+      <ng-container *ngFor="let crumb of breadcrumbPath; let last = last; let first = first">
+        <button class="breadcrumb-item" 
+                [class.active]="last && !showRecipeDetails"
+                [routerLink]="crumb.url"
+                [disabled]="false"
+                [title]="'Go to ' + crumb.name">
+          <lightning-icon *ngIf="first" iconName="utility:home" size="xx-small" alternativeText="Home"></lightning-icon>
+          <span>{{ crumb.name }}</span>
+        </button>
+        
+        <span class="breadcrumb-separator" *ngIf="!last">
+          <lightning-icon iconName="utility:chevronright" size="xx-small" alternativeText="Next"></lightning-icon>
+        </span>
+      </ng-container>
+    </div>
+  </nav>
+
   <!-- Main Content -->
   <main class="recipe-main">
-      
-      <!-- Breadcrumb Navigation -->
-      <nav class="breadcrumb-nav" *ngIf="breadcrumbPath.length > 1" aria-label="breadcrumb">
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item" 
-              *ngFor="let crumb of breadcrumbPath; let last = last" 
-              [class.active]="last">
-            <a *ngIf="!last" [routerLink]="crumb.url">{{ crumb.name }}</a>
-            <span *ngIf="last">{{ crumb.name }}</span>
-          </li>
-        </ol>
-      </nav>
-      
 
       <!-- Loading State -->
       <div *ngIf="ui.isLoading" class="loading-container">
@@ -132,38 +139,34 @@
         <p>Loading recipes...</p>
       </div>
 
-      <!-- Home View - All Categories -->
+      <!-- Home View - All Recipes -->
       <div *ngIf="showHome && !ui.isLoading" class="recipe-home">
         <div class="home-header">
-          <h1>All Recipes</h1>
+          <h2 class="section-title">All Recipes</h2>
+         </div>
+
+        <!-- Recipe Grid -->
+        <div class="recipe-grid" *ngIf="currentRecipes.length > 0">
+          <app-recipe-card 
+            *ngFor="let recipe of currentRecipes"
+            [recipe]="recipe"
+            (recipeSelect)="goToRecipe($event)">
+          </app-recipe-card>
         </div>
 
-        <!-- Category Cards -->
-        <div class="category-grid">
-          <app-recipe-category 
-            *ngFor="let category of categories"
-            [category]="category"
-            (categorySelect)="goToCategory($event)">
-          </app-recipe-category>
+        <!-- No Results -->
+        <div class="no-results" *ngIf="currentRecipes.length === 0">
+          <mat-icon>search_off</mat-icon>
+          <h3>No recipes found</h3>
+          <p>No recipes are currently available.</p>
         </div>
 
-        <!-- Popular Recipes -->
-        <div class="popular-recipes" *ngIf="currentRecipes.length > 0">
-          <h2>Popular Recipes</h2>
-          <div class="recipe-grid">
-            <app-recipe-card 
-              *ngFor="let recipe of currentRecipes.slice(0, 6)"
-              [recipe]="recipe"
-              (recipeSelect)="goToRecipe($event)">
-            </app-recipe-card>
-          </div>
-        </div>
       </div>
 
       <!-- Category View - Recipes in Category -->
       <div *ngIf="showCategory && !ui.isLoading" class="recipe-category-view">
         <div class="category-header" *ngIf="currentCategory">
-          <h1>{{ currentCategory.displayName }} Recipes</h1>
+          <h2 class="category-title">{{ currentCategory.displayName }} Recipes</h2>
           <p class="category-description">{{ currentCategory.description }}</p>
         </div>
 
@@ -188,6 +191,7 @@
       <div *ngIf="showRecipeDetails && !ui.isLoading" class="recipe-detail-view">
         <app-recipe-detail 
           [recipe]="currentRecipe!"
+          [activeTab]="ui.activeRecipeTab"
           (stepComplete)="updateRecipeProgress(currentRecipe!, $event)"
           (backToCategory)="goToCategory(navigation.category)">
         </app-recipe-detail>
@@ -196,7 +200,7 @@
       <!-- Search Results -->
       <div *ngIf="search.isActive && !ui.isLoading" class="search-results">
         <div class="search-header">
-          <h2>Search Results for "{{ search.query }}"</h2>
+          <h2 class="search-title">Search Results for "{{ search.query }}"</h2>
           <p class="search-summary">
             {{ search.results.length }} {{ search.results.length === 1 ? 'recipe' : 'recipes' }} found
           </p>
@@ -206,8 +210,6 @@
           <app-recipe-card 
             *ngFor="let recipe of search.results"
             [recipe]="recipe"
-            [highlightSearchTerms]="true"
-            [searchQuery]="search.query"
             (recipeSelect)="goToRecipe($event)">
           </app-recipe-card>
         </div>
@@ -231,72 +233,59 @@
          [class.footer-approaching]="ui.tocFooterApproaching">
     
     <div class="toc-content">
-      <!-- TOC Header -->
+      <!-- TOC Header - Simplified -->
       <div class="toc-header">
         <div class="toc-title-section">
-          <h3 class="toc-title">{{ showHome ? 'Popular Recipes' : currentTOCTitle }}</h3>
-          <span class="toc-count">{{ tocItemCount }} {{ tocItemCount === 1 ? 'item' : 'items' }}</span>
-        </div>
-        
-        <!-- TOC Pagination Controls -->
-        <div class="toc-pagination-controls" *ngIf="tocPagination.totalPages > 1">
-          <div class="pagination-info">
-            {{ tocPaginationInfo }}
-          </div>
-          <div class="pagination-buttons">
-            <button class="pagination-btn prev-btn" 
-                    (click)="goToPreviousTOCPage()"
-                    [disabled]="!hasPreviousTOCPage"
-                    mat-icon-button
-                    matTooltip="Previous page">
-              <mat-icon>chevron_left</mat-icon>
-            </button>
-            <button class="pagination-btn next-btn" 
-                    (click)="goToNextTOCPage()"
-                    [disabled]="!hasNextTOCPage"
-                    mat-icon-button
-                    matTooltip="Next page">
-              <mat-icon>chevron_right</mat-icon>
-            </button>
-          </div>
+          <h3 class="toc-title">{{ showRecipeDetails ? 'Sections' : 'Recipes' }}</h3>
         </div>
       </div>
       
       <!-- TOC Items List -->
       <div class="toc-list">
-        <!-- Popular/Trending Recipes for Home -->
-        <div class="toc-item" 
-             *ngFor="let recipe of paginatedTrendingRecipes; let i = index"
-             [class.active]="recipe.id === currentRecipe?.id"
-             (click)="goToRecipe(recipe)">
-          <div class="toc-item-icon">
-            <mat-icon>{{ getCategoryIcon(recipe.category) }}</mat-icon>
-          </div>
-          <div class="toc-item-content">
-            <div class="toc-item-title">{{ recipe.title }}</div>
-            <div class="toc-item-meta">
-              <span class="toc-item-category">{{ recipe.category | titlecase }}</span>
-              <span class="toc-item-difficulty">{{ recipe.difficulty | titlecase }}</span>
+        <!-- Recipe Detail Simplified TOC Navigation -->
+        <ng-container *ngIf="showRecipeDetails">
+          <div *ngFor="let tab of recipeTOC.tabs" class="toc-tab-group">
+            <!-- Main Tab -->
+            <div class="toc-item toc-tab-item"
+                 [class.active]="ui.highlightedTOCTab === tab.id"
+                 (click)="changeRecipeTab(tab.id)">
+              <div class="toc-item-icon">
+                <mat-icon>{{ tab.icon }}</mat-icon>
+              </div>
+              <div class="toc-item-content">
+                <div class="toc-item-title">{{ tab.title }}</div>
+              </div>
+            </div>
+
+            <!-- Sub-sections (always shown, no expand/collapse) -->
+            <div class="toc-sections">
+              <div *ngFor="let section of tab.sections; let i = index" 
+                   class="toc-item toc-section-item"
+                   [class.active]="ui.activeSectionId === section.id"
+                   (click)="changeRecipeSection(section.id)">
+                <div class="toc-section-number">{{ i + 1 }}</div>
+                <div class="toc-item-content">
+                  <div class="toc-item-title">{{ section.title }}</div>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
+        </ng-container>
         
-        <!-- Category Recipes -->
-        <div class="toc-item" 
-             *ngFor="let recipe of paginatedCategoryRecipes; let i = index"
-             [class.active]="recipe.id === currentRecipe?.id"
-             (click)="goToRecipe(recipe)">
-          <div class="toc-item-icon">
-            <mat-icon>{{ getCategoryIcon(recipe.category) }}</mat-icon>
-          </div>
-          <div class="toc-item-content">
-            <div class="toc-item-title">{{ recipe.title }}</div>
-            <div class="toc-item-meta">
-              <span class="toc-item-time">{{ getTimeDisplay(recipe.estimatedTime) }}</span>
-              <span class="toc-item-difficulty">{{ recipe.difficulty | titlecase }}</span>
+        <!-- Recipe List for Home/Category View - Simplified -->
+        <ng-container *ngIf="!showRecipeDetails">
+          <div class="toc-item" 
+               *ngFor="let recipe of (showHome ? paginatedTrendingRecipes : paginatedCategoryRecipes)"
+               [class.active]="recipe.id === currentRecipe?.id"
+               (click)="goToRecipe(recipe)">
+            <div class="toc-item-icon">
+              <mat-icon>{{ getCategoryIcon(recipe.category) }}</mat-icon>
+            </div>
+            <div class="toc-item-content">
+              <div class="toc-item-title">{{ recipe.title }}</div>
             </div>
           </div>
-        </div>
+        </ng-container>
       </div>
     </div>
   </aside>
@@ -333,7 +322,7 @@
   
   <div class="mobile-toc-content">
     <div class="mobile-toc-header">
-      <h3>{{ showHome ? 'Popular Recipes' : currentTOCTitle }}</h3>
+      <h3>{{ showRecipeDetails ? 'Sections' : 'Recipes' }}</h3>
       <button class="mobile-toc-close" 
               (click)="closeMobileTOC()"
               mat-icon-button>
@@ -342,22 +331,50 @@
     </div>
     
     <div class="mobile-toc-list">
-      <!-- Same content as desktop TOC -->
-      <div class="toc-item" 
-           *ngFor="let recipe of (showHome ? paginatedTrendingRecipes : paginatedCategoryRecipes)"
-           [class.active]="recipe.id === currentRecipe?.id"
-           (click)="goToRecipe(recipe); closeMobileTOC()">
-        <div class="toc-item-icon">
-          <mat-icon>{{ getCategoryIcon(recipe.category) }}</mat-icon>
-        </div>
-        <div class="toc-item-content">
-          <div class="toc-item-title">{{ recipe.title }}</div>
-          <div class="toc-item-meta">
-            <span class="toc-item-category">{{ recipe.category | titlecase }}</span>
-            <span class="toc-item-difficulty">{{ recipe.difficulty | titlecase }}</span>
+      <!-- Recipe Detail Simplified TOC Navigation (Mobile) -->
+      <ng-container *ngIf="showRecipeDetails">
+        <div *ngFor="let tab of recipeTOC.tabs" class="toc-tab-group">
+          <!-- Main Tab -->
+          <div class="toc-item toc-tab-item"
+               [class.active]="ui.highlightedTOCTab === tab.id"
+               (click)="changeRecipeTab(tab.id); closeMobileTOC()">
+            <div class="toc-item-icon">
+              <mat-icon>{{ tab.icon }}</mat-icon>
+            </div>
+            <div class="toc-item-content">
+              <div class="toc-item-title">{{ tab.title }}</div>
+            </div>
+          </div>
+
+          <!-- Sub-sections (always shown) -->
+          <div class="toc-sections">
+            <div *ngFor="let section of tab.sections; let i = index" 
+                 class="toc-item toc-section-item"
+                 [class.active]="ui.activeSectionId === section.id"
+                 (click)="changeRecipeSection(section.id); closeMobileTOC()">
+              <div class="toc-section-number">{{ i + 1 }}</div>
+              <div class="toc-item-content">
+                <div class="toc-item-title">{{ section.title }}</div>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
+      </ng-container>
+      
+      <!-- Recipe List for Mobile -->
+      <ng-container *ngIf="!showRecipeDetails">
+        <div class="toc-item" 
+             *ngFor="let recipe of (showHome ? paginatedTrendingRecipes : paginatedCategoryRecipes)"
+             [class.active]="recipe.id === currentRecipe?.id"
+             (click)="goToRecipe(recipe); closeMobileTOC()">
+          <div class="toc-item-icon">
+            <mat-icon>{{ getCategoryIcon(recipe.category) }}</mat-icon>
+          </div>
+          <div class="toc-item-content">
+            <div class="toc-item-title">{{ recipe.title }}</div>
+          </div>
+        </div>
+      </ng-container>
     </div>
   </div>
 </aside>

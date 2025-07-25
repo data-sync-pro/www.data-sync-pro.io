@@ -9,8 +9,6 @@ export interface SourceRecipeRecord {
   title: string;
   category: string; // One of: action-button, batch, data-list, data-loader, triggers
   description: string;
-  difficulty: 'beginner' | 'intermediate' | 'advanced';
-  estimatedTime: number; // in minutes
   useCase: string; // Rich text describing target/goal
   prerequisites: {
     permissionSetsForBuilding: string[];
@@ -98,8 +96,6 @@ export interface RecipeItem {
   title: string;
   category: string;
   description: string;
-  difficulty: 'beginner' | 'intermediate' | 'advanced';
-  estimatedTime: number;
   useCase: string;
   safeUseCase?: SafeHtml;
   prerequisites: RecipePrerequisites;
@@ -202,13 +198,8 @@ export interface RecipeStats {
  */
 export interface RecipeFilter {
   categories: string[];
-  difficulties: string[];
   searchQuery: string;
   showPopularOnly: boolean;
-  estimatedTimeRange?: {
-    min: number;
-    max: number;
-  };
   tags: string[];
 }
 
@@ -216,7 +207,7 @@ export interface RecipeFilter {
  * Recipe sort options
  */
 export interface RecipeSortOptions {
-  field: 'title' | 'category' | 'difficulty' | 'estimatedTime' | 'viewCount' | 'lastUpdated';
+  field: 'title' | 'category' | 'viewCount' | 'lastUpdated';
   direction: 'asc' | 'desc';
 }
 
@@ -234,6 +225,40 @@ export interface RecipeEvent {
   rating?: boolean;
   timestamp: Date;
   userId?: string;
+}
+
+/**
+ * Recipe section definition for detailed TOC navigation
+ */
+export interface RecipeSection {
+  id: string;
+  title: string;
+  icon: string;
+  description?: string;
+  elementId?: string; // DOM element ID for scrolling
+  isVisible?: boolean; // Whether this section exists in current recipe
+}
+
+/**
+ * Recipe tab with sections for hierarchical TOC navigation
+ */
+export interface RecipeTab {
+  id: string;
+  title: string;
+  icon: string;
+  description: string;
+  sections: RecipeSection[];
+  isExpanded?: boolean;
+}
+
+/**
+ * Complete recipe TOC structure
+ */
+export interface RecipeTOCStructure {
+  tabs: RecipeTab[];
+  currentTabId?: string;
+  currentSectionId?: string;
+  expandedTabs: Set<string>;
 }
 
 /**
@@ -260,10 +285,6 @@ export type RecipeStepType =
   | 'previewTransformed'
   | 'addSchedule';
 
-/**
- * Recipe difficulty levels
- */
-export type RecipeDifficulty = 'beginner' | 'intermediate' | 'advanced';
 
 /**
  * Recipe categories (from Rules Engines subcategories)

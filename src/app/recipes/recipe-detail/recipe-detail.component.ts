@@ -6,84 +6,139 @@ import { RecipeItem } from '../../shared/models/recipe.model';
   template: `
     <div class="recipe-detail">
       <div class="recipe-header">
-        <button mat-icon-button (click)="goBack()" aria-label="Go back">
-          <mat-icon>arrow_back</mat-icon>
-        </button>
         <div class="header-content">
           <h1>{{ recipe.title }}</h1>
-          <div class="recipe-meta">
-            <mat-chip [color]="getDifficultyColor()" selected>
-              {{ recipe.difficulty | titlecase }}
-            </mat-chip>
-            <span class="time-estimate">
-              <mat-icon>schedule</mat-icon>
-              {{ getTimeDisplay() }}
-            </span>
-          </div>
         </div>
       </div>
 
       <div class="recipe-content">
-        <mat-tab-group>
-          <mat-tab label="Overview">
-            <div class="tab-content">
-              <h3>Use Case</h3>
-              <div [innerHTML]="recipe.safeUseCase"></div>
-              
-              <h3>Prerequisites</h3>
-              <div class="prerequisites">
-                <h4>Permission Sets for Building:</h4>
-                <ul>
-                  <li *ngFor="let permission of recipe.prerequisites.permissionSetsForBuilding">
-                    {{ permission }}
-                  </li>
-                </ul>
-                
-                <h4>Permission Sets for Using:</h4>
-                <ul>
-                  <li *ngFor="let permission of recipe.prerequisites.permissionSetsForUsing">
-                    {{ permission }}
-                  </li>
-                </ul>
-                
-                <h4>Setup Instructions:</h4>
-                <div [innerHTML]="recipe.prerequisites.safeDirections"></div>
-              </div>
-            </div>
-          </mat-tab>
+        <!-- Overview Content -->
+        <div class="tab-content" *ngIf="activeTab === 'overview'">
+          <section id="recipe-use-case" class="recipe-section">
+            <h3>Use Case</h3>
+            <div [innerHTML]="recipe.safeUseCase"></div>
+          </section>
           
-          <mat-tab label="Walkthrough">
-            <div class="tab-content">
-              <mat-stepper orientation="vertical" #stepper>
-                <mat-step label="Create Executable">
-                  <app-recipe-step 
-                    [stepData]="recipe.walkthrough.createExecutable"
-                    stepType="createExecutable"
-                    (stepComplete)="onStepComplete(0)">
-                  </app-recipe-step>
-                </mat-step>
-                
-                <mat-step label="Retrieve Data">
-                  <app-recipe-step 
-                    [stepData]="recipe.walkthrough.retrieve"
-                    stepType="retrieve"
-                    (stepComplete)="onStepComplete(1)">
-                  </app-recipe-step>
-                </mat-step>
-                
-                <!-- Add more steps as needed -->
-              </mat-stepper>
-            </div>
-          </mat-tab>
+          <section id="recipe-building-permissions" class="recipe-section">
+            <h4>Permission Sets for Building:</h4>
+            <ul>
+              <li *ngFor="let permission of recipe.prerequisites.permissionSetsForBuilding">
+                {{ permission }}
+              </li>
+            </ul>
+          </section>
           
-          <mat-tab label="Download" *ngIf="recipe.downloadableExecutable">
-            <div class="tab-content">
-              <app-recipe-download 
-                [executable]="recipe.downloadableExecutable">
-              </app-recipe-download>
-            </div>
-          </mat-tab>
-        </mat-tab-group>
+          <section id="recipe-using-permissions" class="recipe-section">
+            <h4>Permission Sets for Using:</h4>
+            <ul>
+              <li *ngFor="let permission of recipe.prerequisites.permissionSetsForUsing">
+                {{ permission }}
+              </li>
+            </ul>
+          </section>
+          
+          <section id="recipe-setup-instructions" class="recipe-section">
+            <h4>Setup Instructions:</h4>
+            <div [innerHTML]="recipe.prerequisites.safeDirections"></div>
+          </section>
+          
+          <!-- Download section (moved from download tab) -->
+          <section id="recipe-download-executable" class="recipe-section" *ngIf="recipe.downloadableExecutable">
+            <h4>Download Executable:</h4>
+            <app-recipe-download 
+              [executable]="recipe.downloadableExecutable">
+            </app-recipe-download>
+          </section>
+          
+          <section id="recipe-installation-guide" class="recipe-section" *ngIf="recipe.downloadableExecutable">
+            <h4>Installation Guide</h4>
+            <p>Instructions for installing and configuring the downloaded executable.</p>
+          </section>
+          
+          <section id="recipe-version-info" class="recipe-section" *ngIf="recipe.downloadableExecutable">
+            <h4>Version Information</h4>
+            <p>Version: {{ recipe.downloadableExecutable.version }}</p>
+            <p>{{ recipe.downloadableExecutable.description }}</p>
+          </section>
+        </div>
+        
+        <!-- Walkthrough Content -->
+        <div class="tab-content" *ngIf="activeTab === 'walkthrough'">
+          <mat-stepper orientation="vertical" #stepper>
+            <mat-step label="Create Executable" id="recipe-create-executable">
+              <app-recipe-step 
+                [stepData]="recipe.walkthrough.createExecutable"
+                stepType="createExecutable"
+                (stepComplete)="onStepComplete(0)">
+              </app-recipe-step>
+            </mat-step>
+            
+            <mat-step label="Retrieve Data" id="recipe-retrieve-data">
+              <app-recipe-step 
+                [stepData]="recipe.walkthrough.retrieve"
+                stepType="retrieve"
+                (stepComplete)="onStepComplete(1)">
+              </app-recipe-step>
+            </mat-step>
+            
+            <mat-step label="Scoping" id="recipe-scoping" *ngIf="recipe.walkthrough.scoping">
+              <app-recipe-step 
+                [stepData]="recipe.walkthrough.scoping"
+                stepType="scoping"
+                (stepComplete)="onStepComplete(2)">
+              </app-recipe-step>
+            </mat-step>
+            
+            <mat-step label="Match" id="recipe-match" *ngIf="recipe.walkthrough.match">
+              <app-recipe-step 
+                [stepData]="recipe.walkthrough.match"
+                stepType="match"
+                (stepComplete)="onStepComplete(3)">
+              </app-recipe-step>
+            </mat-step>
+            
+            <mat-step label="Mapping" id="recipe-mapping" *ngIf="recipe.walkthrough.mapping">
+              <app-recipe-step 
+                [stepData]="recipe.walkthrough.mapping"
+                stepType="mapping"
+                (stepComplete)="onStepComplete(4)">
+              </app-recipe-step>
+            </mat-step>
+            
+            <mat-step label="Action" id="recipe-action" *ngIf="recipe.walkthrough.action">
+              <app-recipe-step 
+                [stepData]="recipe.walkthrough.action"
+                stepType="action"
+                (stepComplete)="onStepComplete(5)">
+              </app-recipe-step>
+            </mat-step>
+            
+            <mat-step label="Verify" id="recipe-verify" *ngIf="recipe.walkthrough.verify">
+              <app-recipe-step 
+                [stepData]="recipe.walkthrough.verify"
+                stepType="verify"
+                (stepComplete)="onStepComplete(6)">
+              </app-recipe-step>
+            </mat-step>
+            
+            <mat-step label="Preview Transformed" id="recipe-preview-transformed" *ngIf="recipe.walkthrough.previewTransformed">
+              <app-recipe-step 
+                [stepData]="recipe.walkthrough.previewTransformed"
+                stepType="previewTransformed"
+                (stepComplete)="onStepComplete(7)">
+              </app-recipe-step>
+            </mat-step>
+            
+            <mat-step label="Add Schedule" id="recipe-add-schedule" *ngIf="recipe.walkthrough.addSchedule">
+              <app-recipe-step 
+                [stepData]="recipe.walkthrough.addSchedule"
+                stepType="addSchedule"
+                (stepComplete)="onStepComplete(8)">
+              </app-recipe-step>
+            </mat-step>
+            
+          </mat-stepper>
+        </div>
       </div>
     </div>
   `,
@@ -127,11 +182,28 @@ import { RecipeItem } from '../../shared/models/recipe.model';
       margin: 1rem 0 0.5rem 0;
       color: var(--primary-color);
     }
+    
+    .recipe-section {
+      padding: 1rem 0;
+      border-bottom: 1px solid #f0f0f0;
+      scroll-margin-top: 100px; /* Account for fixed header */
+    }
+    
+    .recipe-section:last-child {
+      border-bottom: none;
+    }
+    
+    .recipe-section h3,
+    .recipe-section h4 {
+      margin-top: 0;
+      color: var(--primary-color);
+    }
   `],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class RecipeDetailComponent {
   @Input() recipe!: RecipeItem;
+  @Input() activeTab: string = 'overview';
   
   @Output() stepComplete = new EventEmitter<number>();
   @Output() backToCategory = new EventEmitter<void>();
@@ -144,23 +216,4 @@ export class RecipeDetailComponent {
     this.stepComplete.emit(stepNumber);
   }
 
-  getDifficultyColor(): string {
-    switch (this.recipe.difficulty) {
-      case 'beginner': return 'accent';
-      case 'intermediate': return 'primary';
-      case 'advanced': return 'warn';
-      default: return 'primary';
-    }
-  }
-
-  getTimeDisplay(): string {
-    const time = this.recipe.estimatedTime;
-    if (time < 60) {
-      return `${time} min`;
-    } else {
-      const hours = Math.floor(time / 60);
-      const minutes = time % 60;
-      return minutes > 0 ? `${hours}h ${minutes}m` : `${hours}h`;
-    }
-  }
 }
