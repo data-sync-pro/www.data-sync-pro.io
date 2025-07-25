@@ -3,13 +3,6 @@ body {
   margin: 0;
   font-family: Roboto, "Helvetica Neue", sans-serif;
   background: #ffffff;
-  
-  // Hide footer on recipe pages to prevent unwanted appearance during scroll
-  &.recipe-page {
-    app-footer {
-      display: none !important;
-    }
-  }
 }
 
 // 全局移除所有router-link-active的边框样式

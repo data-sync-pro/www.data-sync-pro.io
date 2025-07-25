@@ -84,24 +84,22 @@ $breakpoint-mobile: 576px;
 
 .recipe-main {
   grid-area: main;
-  padding: 80px 80px 200px 80px; // Add extra bottom padding to prevent footer appearance
+  padding: 80px 80px 300px 80px; // Normal bottom padding for footer visibility
   overflow-x: hidden;
   overflow-y: auto;
   background: #ffffff;
   
-  // Ensure proper height calculation
+  // Allow content to extend beyond viewport for footer visibility
   min-height: calc(100vh - $header-height);
-  max-height: calc(100vh - $header-height);
 
   @media (max-width: $breakpoint-tablet) {
-    padding: 50px 20px 180px 20px; // Increased bottom padding for tablet
+    padding: 50px 20px 30px 20px; // Normal bottom padding for tablet
   }
 
   @media (max-width: $breakpoint-mobile) {
-    padding: 45px 15px 160px 15px; // Increased bottom padding for mobile
-    // On mobile, full height since container has margin-top
+    padding: 45px 15px 20px 15px; // Normal bottom padding for mobile
+    // On mobile, allow scrolling to footer
     min-height: calc(100vh - $header-height);
-    max-height: calc(100vh - $header-height);
   }
 }
 

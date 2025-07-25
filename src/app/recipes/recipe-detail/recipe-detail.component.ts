@@ -81,8 +81,61 @@ import { RecipeItem } from '../../shared/models/recipe.model';
               </app-recipe-step>
             </mat-step>
             
-            <!-- Additional walkthrough steps would be added here with proper IDs -->
-            <!-- e.g., recipe-scoping, recipe-match, recipe-mapping, etc. -->
+            <mat-step label="Scoping" id="recipe-scoping" *ngIf="recipe.walkthrough.scoping">
+              <app-recipe-step 
+                [stepData]="recipe.walkthrough.scoping"
+                stepType="scoping"
+                (stepComplete)="onStepComplete(2)">
+              </app-recipe-step>
+            </mat-step>
+            
+            <mat-step label="Match" id="recipe-match" *ngIf="recipe.walkthrough.match">
+              <app-recipe-step 
+                [stepData]="recipe.walkthrough.match"
+                stepType="match"
+                (stepComplete)="onStepComplete(3)">
+              </app-recipe-step>
+            </mat-step>
+            
+            <mat-step label="Mapping" id="recipe-mapping" *ngIf="recipe.walkthrough.mapping">
+              <app-recipe-step 
+                [stepData]="recipe.walkthrough.mapping"
+                stepType="mapping"
+                (stepComplete)="onStepComplete(4)">
+              </app-recipe-step>
+            </mat-step>
+            
+            <mat-step label="Action" id="recipe-action" *ngIf="recipe.walkthrough.action">
+              <app-recipe-step 
+                [stepData]="recipe.walkthrough.action"
+                stepType="action"
+                (stepComplete)="onStepComplete(5)">
+              </app-recipe-step>
+            </mat-step>
+            
+            <mat-step label="Verify" id="recipe-verify" *ngIf="recipe.walkthrough.verify">
+              <app-recipe-step 
+                [stepData]="recipe.walkthrough.verify"
+                stepType="verify"
+                (stepComplete)="onStepComplete(6)">
+              </app-recipe-step>
+            </mat-step>
+            
+            <mat-step label="Preview Transformed" id="recipe-preview-transformed" *ngIf="recipe.walkthrough.previewTransformed">
+              <app-recipe-step 
+                [stepData]="recipe.walkthrough.previewTransformed"
+                stepType="previewTransformed"
+                (stepComplete)="onStepComplete(7)">
+              </app-recipe-step>
+            </mat-step>
+            
+            <mat-step label="Add Schedule" id="recipe-add-schedule" *ngIf="recipe.walkthrough.addSchedule">
+              <app-recipe-step 
+                [stepData]="recipe.walkthrough.addSchedule"
+                stepType="addSchedule"
+                (stepComplete)="onStepComplete(8)">
+              </app-recipe-step>
+            </mat-step>
             
           </mat-stepper>
         </div>

@@ -39,6 +39,9 @@ interface UIState {
   activeRecipeTab: string;
   activeSectionId: string;
   expandedTabs: Set<string>;
+  userHasScrolled: boolean;
+  scrollTicking: boolean;
+  disableScrollHighlight: boolean;
 }
 
 interface TOCPaginationState {
@@ -91,7 +94,10 @@ export class RecipesComponent implements OnInit, OnDestroy {
     tocFooterApproaching: false,
     activeRecipeTab: 'overview',
     activeSectionId: 'use-case',
-    expandedTabs: new Set(['overview'])
+    expandedTabs: new Set(['overview']),
+    userHasScrolled: false,
+    scrollTicking: false,
+    disableScrollHighlight: false
   };
 
   // TOC pagination state
@@ -106,6 +112,11 @@ export class RecipesComponent implements OnInit, OnDestroy {
   // TOC data
   private _cachedTrendingRecipes?: RecipeItem[];
   private _lastRecipesLength?: number;
+  
+  // Scroll tracking and caching
+  private cachedSectionElements: Element[] | null = null;
+  private cachedSectionPositions: Map<string, number> = new Map();
+  private optimizedScrollListener?: () => void;
 
   search: SearchState = {
     query: '',
@@ -161,6 +172,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
     this.checkMobileView();
     this.loadSidebarState();
     this.loadTOCState();
+    this.setupOptimizedScrollListener();
     
     // Add body class to hide footer on recipe pages
     document.body.classList.add('recipe-page');
@@ -204,6 +216,11 @@ export class RecipesComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+    
+    // Clean up scroll listener
+    if (this.optimizedScrollListener) {
+      window.removeEventListener('scroll', this.optimizedScrollListener);
+    }
     
     // Remove body class when leaving recipe pages
     document.body.classList.remove('recipe-page');
@@ -337,6 +354,10 @@ export class RecipesComponent implements OnInit, OnDestroy {
           this.trackRecipeView(recipe);
           // Generate TOC structure for the loaded recipe
           this.generateRecipeTOCStructure();
+          // Clear scroll cache for new recipe
+          this.clearSectionElementsCache();
+          // Reset scroll state
+          this.ui.userHasScrolled = false;
         }
         
         this.cdr.markForCheck();
@@ -412,10 +433,15 @@ export class RecipesComponent implements OnInit, OnDestroy {
       this.ui.activeSectionId = selectedTab.sections[0].id;
       this.recipeTOC.currentSectionId = selectedTab.sections[0].id;
       
-      // Scroll to first section after tab content is rendered with extra delay for padding to take effect
+      // Clear section cache when switching tabs since DOM content changes
+      this.clearSectionElementsCache();
+      
+      // Scroll to first section after tab content is rendered
       setTimeout(() => {
-        this.scrollToSectionWithRetry(selectedTab.sections[0].id);
-      }, 400); // Increased delay for better DOM rendering and padding application
+        this.scrollToSection(selectedTab.sections[0].id);
+        // Refresh cache after DOM is updated
+        this.refreshSectionElementsCache();
+      }, 100);
     }
     
     // Close mobile TOC after tab change
@@ -438,8 +464,16 @@ export class RecipesComponent implements OnInit, OnDestroy {
     // Ensure the parent tab is expanded and active
     this.ensureParentTabActive(sectionId);
     
-    // Scroll to the section element with improved reliability
-    this.scrollToSectionWithRetry(sectionId);
+    // Temporarily disable scroll highlighting to avoid conflicts during navigation
+    this.ui.disableScrollHighlight = true;
+    
+    // Scroll to the section element
+    this.scrollToSection(sectionId);
+    
+    // Re-enable scroll highlighting after navigation completes
+    setTimeout(() => {
+      this.ui.disableScrollHighlight = false;
+    }, 1000);
     
     this.cdr.markForCheck();
   }
@@ -475,126 +509,21 @@ export class RecipesComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Wrapper method for scrolling with better retry handling
+   * Simple and reliable section scrolling
    */
-  private scrollToSectionWithRetry(sectionId: string): void {
-    // Allow multiple attempts with increasing delays to ensure DOM is ready
-    let attempts = 0;
-    const maxAttempts = 5;
-    
-    const attemptScroll = () => {
-      attempts++;
-      const container = document.querySelector('.recipe-main') as HTMLElement;
-      
-      if (container && container.scrollHeight > container.clientHeight) {
-        // Container is ready, proceed with scroll
-        this.scrollToSection(sectionId, 0);
-      } else if (attempts < maxAttempts) {
-        // Container not ready or no scrollable content, retry
-        console.log(`Container not ready, retry ${attempts}/${maxAttempts}`);
-        setTimeout(attemptScroll, 100 * attempts); // 100ms, 200ms, 300ms, etc.
-      } else {
-        // Final attempt
-        console.log('Final scroll attempt after retries');
-        this.scrollToSection(sectionId, 0);
-      }
-    };
-    
-    attemptScroll();
-  }
-
-  /**
-   * Scroll to specific section with container-based scrolling to prevent footer appearance
-   */
-  private scrollToSection(sectionId: string, retryCount: number = 0): void {
-    console.log('Scrolling to section:', sectionId, 'retry:', retryCount);
-    
+  private scrollToSection(sectionId: string): void {
     const section = this.recipeTOC.tabs
       .flatMap(tab => tab.sections)
-      .find(section => section.id === sectionId);
-    
-    if (section && section.elementId) {
-      // Use requestAnimationFrame to ensure DOM is fully rendered
-      requestAnimationFrame(() => {
-        const element = document.getElementById(section.elementId!);
-        const container = document.querySelector('.recipe-main') as HTMLElement;
-        
-        if (element && container) {
-          console.log('Element and container found:', section.elementId, 'scrolling...');
-          
-          // Get container dimensions and scroll info
-          const containerRect = container.getBoundingClientRect();
-          const elementRect = element.getBoundingClientRect();
-          const containerScrollTop = container.scrollTop;
-          const containerHeight = container.clientHeight;
-          const containerScrollHeight = container.scrollHeight;
-          
-          // Calculate element position relative to container
-          const elementTopInContainer = elementRect.top - containerRect.top + containerScrollTop;
-          const headerOffset = 100; // Fixed header offset
-          
-          // Calculate target scroll position
-          let targetScrollTop = elementTopInContainer - headerOffset;
-          
-          // Calculate maximum scroll position to prevent over-scrolling
-          const maxScrollTop = containerScrollHeight - containerHeight;
-          
-          // Check if element is in bottom area of container
-          const elementRelativePosition = elementTopInContainer / containerScrollHeight;
-          if (elementRelativePosition > 0.8) {
-            // For bottom sections, use scrollIntoView to ensure visibility without over-scrolling
-            console.log('Bottom section detected, using scrollIntoView');
-            element.scrollIntoView({
-              behavior: 'smooth',
-              block: 'center', // Center the element instead of aligning to top
-              inline: 'nearest'
-            });
-            return;
-          }
-          
-          // Ensure we don't scroll beyond container boundaries
-          const finalScrollPosition = Math.min(Math.max(0, targetScrollTop), maxScrollTop);
-          
-          console.log('Container scroll calculation:', {
-            elementTopInContainer,
-            targetScrollTop,
-            maxScrollTop,
-            finalScrollPosition,
-            containerHeight,
-            containerScrollHeight,
-            elementRelativePosition
-          });
-
-          // Scroll the container instead of the window
-          container.scrollTo({
-            top: finalScrollPosition,
-            behavior: 'smooth'
-          });
-          
-        } else {
-          console.warn('Element or container not found:', section.elementId);
-          
-          // Retry up to 3 times with increasing delays
-          if (retryCount < 3) {
-            setTimeout(() => {
-              this.scrollToSection(sectionId, retryCount + 1);
-            }, 200 * (retryCount + 1)); // 200ms, 400ms, 600ms
-          } else {
-            console.error('Failed to find element after retries:', section.elementId);
-            // Final fallback: use scrollIntoView
-            const fallbackElement = document.getElementById(section.elementId!);
-            if (fallbackElement) {
-              fallbackElement.scrollIntoView({
-                behavior: 'smooth',
-                block: 'center',
-                inline: 'nearest'
-              });
-            }
-          }
-        }
-      });
-    } else {
-      console.warn('Section not found in TOC structure:', sectionId);
+      .find(s => s.id === sectionId);
+      
+    if (section?.elementId) {
+      const element = document.getElementById(section.elementId);
+      if (element) {
+        element.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }
     }
   }
 
@@ -1228,6 +1157,110 @@ export class RecipesComponent implements OnInit, OnDestroy {
     } catch (error) {
       console.warn('Failed to load TOC state:', error);
     }
+  }
+
+  // ==================== Scroll Tracking Methods ====================
+
+  /**
+   * Setup optimized scroll listener for section highlighting
+   */
+  private setupOptimizedScrollListener(): void {
+    if (typeof window === 'undefined') return;
+    
+    this.optimizedScrollListener = () => {
+      // Mark that user has scrolled - this enables TOC highlighting
+      if (!this.ui.userHasScrolled) {
+        this.ui.userHasScrolled = true;
+      }
+      
+      if (!this.ui.scrollTicking) {
+        requestAnimationFrame(() => {
+          this.handleOptimizedScroll(window.pageYOffset);
+          this.ui.scrollTicking = false;
+        });
+        this.ui.scrollTicking = true;
+      }
+    };
+    
+    window.addEventListener('scroll', this.optimizedScrollListener, { passive: true });
+  }
+
+  /**
+   * Handle scroll events and update active section
+   */
+  private handleOptimizedScroll(scrollPosition: number): void {
+    // Only update active section when viewing recipe details and auto-highlighting is enabled
+    if (this.showRecipeDetails && this.ui.userHasScrolled && !this.ui.disableScrollHighlight) {
+      this.updateActiveScrollElement(scrollPosition);
+    }
+  }
+
+  /**
+   * Update active section based on scroll position
+   */
+  private updateActiveScrollElement(scrollPosition: number): void {
+    const offset = scrollPosition + 150; // Account for header height
+    
+    // Cache section elements and their positions
+    if (!this.cachedSectionElements || this.cachedSectionElements.length === 0) {
+      this.refreshSectionElementsCache();
+    }
+    
+    let activeSectionId = '';
+    let closestDistance = Infinity;
+
+    // Find the section that is currently in view
+    this.cachedSectionPositions.forEach((position, sectionId) => {
+      const distance = Math.abs(position - offset);
+      if (distance < closestDistance && position <= offset + 100) {
+        closestDistance = distance;
+        activeSectionId = sectionId;
+      }
+    });
+
+    // Update active section if it has changed
+    if (activeSectionId && activeSectionId !== this.ui.activeSectionId) {
+      this.ui.activeSectionId = activeSectionId;
+      this.recipeTOC.currentSectionId = activeSectionId;
+      
+      // Ensure the parent tab is active
+      this.ensureParentTabActive(activeSectionId);
+      
+      this.cdr.markForCheck();
+    }
+  }
+
+  /**
+   * Refresh cache of section elements and their positions
+   */
+  private refreshSectionElementsCache(): void {
+    if (!this.currentRecipe) return;
+
+    this.cachedSectionElements = [];
+    this.cachedSectionPositions.clear();
+
+    // Get all section elements based on the recipe TOC structure
+    this.recipeTOC.tabs.forEach(tab => {
+      tab.sections.forEach(section => {
+        if (section.elementId) {
+          const element = document.getElementById(section.elementId);
+          if (element) {
+            this.cachedSectionElements!.push(element);
+            const rect = element.getBoundingClientRect();
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            this.cachedSectionPositions.set(section.id, rect.top + scrollTop);
+          }
+        }
+      });
+    });
+  }
+
+  /**
+   * Clear section elements cache (call when recipe changes)
+   */
+  private clearSectionElementsCache(): void {
+    this.cachedSectionElements = null;
+    this.cachedSectionPositions.clear();
   }
 
 }
