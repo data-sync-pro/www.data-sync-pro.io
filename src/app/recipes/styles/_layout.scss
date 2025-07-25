@@ -84,7 +84,7 @@ $breakpoint-mobile: 576px;
 
 .recipe-main {
   grid-area: main;
-  padding: 80px; // Add top padding for breadcrumb space
+  padding: 80px 80px 200px 80px; // Add extra bottom padding to prevent footer appearance
   overflow-x: hidden;
   overflow-y: auto;
   background: #ffffff;
@@ -94,11 +94,11 @@ $breakpoint-mobile: 576px;
   max-height: calc(100vh - $header-height);
 
   @media (max-width: $breakpoint-tablet) {
-    padding: 50px 20px 120px 20px;
+    padding: 50px 20px 180px 20px; // Increased bottom padding for tablet
   }
 
   @media (max-width: $breakpoint-mobile) {
-    padding: 45px 15px 80px 15px;
+    padding: 45px 15px 160px 15px; // Increased bottom padding for mobile
     // On mobile, full height since container has margin-top
     min-height: calc(100vh - $header-height);
     max-height: calc(100vh - $header-height);

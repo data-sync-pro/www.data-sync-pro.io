@@ -124,7 +124,96 @@ $breakpoint-desktop: 992px;
       border-radius: 0 20px 20px 0;
       margin-right: 8px;
       position: relative;
+    }
 
+    // Hierarchical TOC styles for recipe sections
+    .toc-tab-group {
+      margin-bottom: 4px;
+    }
+
+    .toc-tab-item {
+      font-weight: 600;
+      border-left-width: 4px;
+      background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+      
+      .toc-expand-indicator {
+        margin-left: auto;
+        padding-left: 8px;
+        display: flex;
+        align-items: center;
+        
+        .expand-icon {
+          font-size: 16px;
+          width: 16px;
+          height: 16px;
+          color: #5f6368;
+          transition: transform 0.2s ease;
+          
+          &.expanded {
+            transform: rotate(90deg);
+          }
+        }
+      }
+      
+      &.expanded {
+        background: linear-gradient(135deg, #e8f0fe 0%, #f8f9fa 100%);
+        border-left-color: #1a73e8;
+      }
+    }
+
+    .toc-sections {
+      margin-left: 20px;
+      border-left: 2px solid #f1f3f4;
+      padding-left: 0;
+      overflow: hidden;
+    }
+
+    .toc-section-item {
+      font-weight: 400;
+      font-size: 0.8125rem;
+      padding: 6px 16px;
+      margin-right: 0;
+      border-radius: 0 12px 12px 0;
+      background: transparent;
+      border-left-width: 2px;
+      
+      .toc-section-icon {
+        opacity: 0.8;
+        
+        mat-icon {
+          font-size: 14px;
+          width: 14px;
+          height: 14px;
+        }
+      }
+      
+      .toc-item-title {
+        font-size: 0.8125rem;
+        line-height: 1.3;
+      }
+      
+      &:hover {
+        background-color: #f8f9fa;
+        border-left-color: #dadce0;
+      }
+      
+      &.active {
+        background-color: #e3f2fd;
+        color: #1976d2;
+        border-left-color: #1976d2;
+        font-weight: 500;
+        
+        &::before {
+          background-color: #1976d2;
+        }
+        
+        .toc-item-title {
+          color: #1976d2;
+        }
+      }
+    }
+
+    .toc-item:not(.toc-section-item) {
       &:hover {
         background-color: #f1f3f4;
         color: #202124;
@@ -153,7 +242,7 @@ $breakpoint-desktop: 992px;
           font-weight: 600;
         }
 
-        .toc-item-meta {
+      .toc-item-meta {
           .toc-item-category,
           .toc-item-difficulty {
             color: #1a73e8;
@@ -177,10 +266,10 @@ $breakpoint-desktop: 992px;
       }
 
       .toc-item-content {
-        flex: 1;
-        min-width: 0;
+      flex: 1;
+      min-width: 0;
 
-        .toc-item-title {
+      .toc-item-title {
           font-size: 0.875rem;
           font-weight: 500;
           color: #202124;
@@ -193,7 +282,7 @@ $breakpoint-desktop: 992px;
           -webkit-box-orient: vertical;
         }
 
-        .toc-item-meta {
+      .toc-item-meta {
           display: flex;
           gap: 8px;
           font-size: 0.75rem;
@@ -254,7 +343,6 @@ $breakpoint-desktop: 992px;
       }
     }
   }
-}
 
 // Mobile TOC Styles
 .recipe-toc.mobile-toc {
@@ -407,27 +495,115 @@ $breakpoint-desktop: 992px;
           font-weight: 600;
         }
       }
+    }
 
-      .toc-item-icon {
-        margin-right: 12px;
-        margin-top: 2px;
-        flex-shrink: 0;
-        opacity: 0.7;
+    // Mobile hierarchical TOC styles
+    .toc-tab-group {
+      margin-bottom: 4px;
+    }
 
-        mat-icon {
-          font-size: 18px;
-          width: 18px;
-          height: 18px;
+    .toc-tab-item {
+      font-weight: 600;
+      border-left-width: 4px;
+      background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+      
+      .toc-expand-indicator {
+        margin-left: auto;
+        padding-left: 8px;
+        display: flex;
+        align-items: center;
+        
+        .expand-icon {
+          font-size: 16px;
+          width: 16px;
+          height: 16px;
           color: #5f6368;
-          transition: color 0.2s ease;
+          transition: transform 0.2s ease;
+          
+          &.expanded {
+            transform: rotate(90deg);
+          }
         }
       }
+      
+      &.expanded {
+        background: linear-gradient(135deg, #e8f0fe 0%, #f8f9fa 100%);
+        border-left-color: #1a73e8;
+      }
+    }
 
-      .toc-item-content {
-        flex: 1;
-        min-width: 0;
+    .toc-sections {
+      margin-left: 20px;
+      border-left: 2px solid #f1f3f4;
+      padding-left: 0;
+    }
 
+    .toc-section-item {
+      font-weight: 400;
+      font-size: 0.8125rem;
+      padding: 6px 16px;
+      margin-right: 0;
+      border-radius: 0 12px 12px 0;
+      background: transparent;
+      border-left-width: 2px;
+      
+      .toc-section-icon {
+        opacity: 0.8;
+        
+        mat-icon {
+          font-size: 14px;
+          width: 14px;
+          height: 14px;
+        }
+      }
+      
+      .toc-item-title {
+        font-size: 0.8125rem;
+        line-height: 1.3;
+      }
+      
+      &:hover,
+      &:active {
+        background-color: #f8f9fa;
+        border-left-color: #dadce0;
+      }
+      
+      &.active {
+        background-color: #e3f2fd;
+        color: #1976d2;
+        border-left-color: #1976d2;
+        font-weight: 500;
+        
+        &::before {
+          background-color: #1976d2;
+        }
+        
         .toc-item-title {
+          color: #1976d2;
+        }
+      }
+    }
+
+    .toc-item-icon {
+      margin-right: 12px;
+      margin-top: 2px;
+      flex-shrink: 0;
+      opacity: 0.7;
+
+      mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+        color: #5f6368;
+        transition: color 0.2s ease;
+      }
+    }
+
+    .toc-item-content {
+      flex: 1;
+      min-width: 0;
+
+      .toc-item-title {
           font-size: 0.875rem;
           font-weight: 500;
           color: #202124;
@@ -440,7 +616,7 @@ $breakpoint-desktop: 992px;
           -webkit-box-orient: vertical;
         }
 
-        .toc-item-meta {
+      .toc-item-meta {
           display: flex;
           gap: 8px;
           font-size: 0.75rem;

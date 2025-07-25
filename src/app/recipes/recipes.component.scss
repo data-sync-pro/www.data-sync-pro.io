@@ -8,6 +8,16 @@
 // Component-specific overrides and adjustments
 // The main layout is handled by modular styles
 
+// Hide footer on recipe pages to prevent it from appearing during scroll
+:host-context(body.recipe-page) {
+  display: block;
+}
+
+// Global style to hide footer when on recipe pages
+:global(body.recipe-page app-footer) {
+  display: none !important;
+}
+
 // Enhanced CSS Variables for theming
 :root {
   // Base colors

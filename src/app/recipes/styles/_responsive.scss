@@ -81,19 +81,19 @@ $breakpoint-xxl: 1400px;
 // Responsive spacing utilities
 .recipe-main {
   @include xl {
-    padding: 80px 80px 120px 80px;
+    padding: 80px 80px 200px 80px; // Increased bottom padding for large screens
   }
   
   @include lg {
-    padding: 80px 80px 120px 80px;
+    padding: 80px 80px 200px 80px; // Increased bottom padding for large screens
   }
   
   @include md {
-    padding: 80px 80px 120px 80px;
+    padding: 80px 80px 180px 80px; // Increased bottom padding for medium screens
   }
   
   @include sm {
-    padding: 80px 80px 120px 80px;
+    padding: 80px 80px 160px 80px; // Increased bottom padding for small screens
   }
 }
 

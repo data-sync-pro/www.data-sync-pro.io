@@ -266,48 +266,49 @@
       
       <!-- TOC Items List -->
       <div class="toc-list">
-        <!-- Recipe Detail Tab Navigation -->
-        <div *ngIf="showRecipeDetails" class="toc-item"
-             [class.active]="ui.activeRecipeTab === 'overview'"
-             (click)="changeRecipeTab('overview')">
-          <div class="toc-item-icon">
-            <mat-icon>article</mat-icon>
-          </div>
-          <div class="toc-item-content">
-            <div class="toc-item-title">Overview</div>
-            <div class="toc-item-meta">
-              <span class="toc-item-category">Use Case & Prerequisites</span>
+        <!-- Recipe Detail Hierarchical TOC Navigation -->
+        <ng-container *ngIf="showRecipeDetails">
+          <div *ngFor="let tab of recipeTOC.tabs" class="toc-tab-group">
+            <!-- Main Tab -->
+            <div class="toc-item toc-tab-item"
+                 [class.active]="ui.activeRecipeTab === tab.id"
+                 [class.expanded]="ui.expandedTabs.has(tab.id)"
+                 (click)="changeRecipeTab(tab.id)">
+              <div class="toc-item-icon">
+                <mat-icon>{{ tab.icon }}</mat-icon>
+              </div>
+              <div class="toc-item-content">
+                <div class="toc-item-title">{{ tab.title }}</div>
+                <div class="toc-item-meta">
+                  <span class="toc-item-category">{{ tab.description }}</span>
+                </div>
+              </div>
+              <div class="toc-expand-indicator">
+                <mat-icon class="expand-icon" 
+                          [class.expanded]="ui.expandedTabs.has(tab.id)">
+                  chevron_right
+                </mat-icon>
+              </div>
             </div>
-          </div>
-        </div>
 
-        <div *ngIf="showRecipeDetails" class="toc-item"
-             [class.active]="ui.activeRecipeTab === 'walkthrough'"
-             (click)="changeRecipeTab('walkthrough')">
-          <div class="toc-item-icon">
-            <mat-icon>timeline</mat-icon>
-          </div>
-          <div class="toc-item-content">
-            <div class="toc-item-title">Walkthrough</div>
-            <div class="toc-item-meta">
-              <span class="toc-item-category">Step-by-step Guide</span>
+            <!-- Sub-sections (only shown when tab is expanded) -->
+            <div class="toc-sections" 
+                 *ngIf="ui.expandedTabs.has(tab.id)"
+                 [@slideInOut]>
+              <div *ngFor="let section of tab.sections" 
+                   class="toc-item toc-section-item"
+                   [class.active]="ui.activeSectionId === section.id"
+                   (click)="changeRecipeSection(section.id)">
+                <div class="toc-item-icon toc-section-icon">
+                  <mat-icon>{{ section.icon }}</mat-icon>
+                </div>
+                <div class="toc-item-content">
+                  <div class="toc-item-title">{{ section.title }}</div>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-
-        <div *ngIf="showRecipeDetails && currentRecipe?.downloadableExecutable" class="toc-item"
-             [class.active]="ui.activeRecipeTab === 'download'"
-             (click)="changeRecipeTab('download')">
-          <div class="toc-item-icon">
-            <mat-icon>download</mat-icon>
-          </div>
-          <div class="toc-item-content">
-            <div class="toc-item-title">Download</div>
-            <div class="toc-item-meta">
-              <span class="toc-item-category">Executable Download</span>
-            </div>
-          </div>
-        </div>
+        </ng-container>
         
         <!-- Popular/Trending Recipes for Home -->
         <ng-container *ngIf="!showRecipeDetails">
@@ -387,48 +388,47 @@
     </div>
     
     <div class="mobile-toc-list">
-      <!-- Recipe Detail Tab Navigation -->
-      <div *ngIf="showRecipeDetails" class="toc-item"
-           [class.active]="ui.activeRecipeTab === 'overview'"
-           (click)="changeRecipeTab('overview'); closeMobileTOC()">
-        <div class="toc-item-icon">
-          <mat-icon>article</mat-icon>
-        </div>
-        <div class="toc-item-content">
-          <div class="toc-item-title">Overview</div>
-          <div class="toc-item-meta">
-            <span class="toc-item-category">Use Case & Prerequisites</span>
+      <!-- Recipe Detail Hierarchical TOC Navigation (Mobile) -->
+      <ng-container *ngIf="showRecipeDetails">
+        <div *ngFor="let tab of recipeTOC.tabs" class="toc-tab-group">
+          <!-- Main Tab -->
+          <div class="toc-item toc-tab-item"
+               [class.active]="ui.activeRecipeTab === tab.id"
+               [class.expanded]="ui.expandedTabs.has(tab.id)"
+               (click)="changeRecipeTab(tab.id)">
+            <div class="toc-item-icon">
+              <mat-icon>{{ tab.icon }}</mat-icon>
+            </div>
+            <div class="toc-item-content">
+              <div class="toc-item-title">{{ tab.title }}</div>
+              <div class="toc-item-meta">
+                <span class="toc-item-category">{{ tab.description }}</span>
+              </div>
+            </div>
+            <div class="toc-expand-indicator">
+              <mat-icon class="expand-icon" 
+                        [class.expanded]="ui.expandedTabs.has(tab.id)">
+                chevron_right
+              </mat-icon>
+            </div>
           </div>
-        </div>
-      </div>
 
-      <div *ngIf="showRecipeDetails" class="toc-item"
-           [class.active]="ui.activeRecipeTab === 'walkthrough'"
-           (click)="changeRecipeTab('walkthrough'); closeMobileTOC()">
-        <div class="toc-item-icon">
-          <mat-icon>timeline</mat-icon>
-        </div>
-        <div class="toc-item-content">
-          <div class="toc-item-title">Walkthrough</div>
-          <div class="toc-item-meta">
-            <span class="toc-item-category">Step-by-step Guide</span>
+          <!-- Sub-sections (only shown when tab is expanded) -->
+          <div class="toc-sections" *ngIf="ui.expandedTabs.has(tab.id)">
+            <div *ngFor="let section of tab.sections" 
+                 class="toc-item toc-section-item"
+                 [class.active]="ui.activeSectionId === section.id"
+                 (click)="changeRecipeSection(section.id); closeMobileTOC()">
+              <div class="toc-item-icon toc-section-icon">
+                <mat-icon>{{ section.icon }}</mat-icon>
+              </div>
+              <div class="toc-item-content">
+                <div class="toc-item-title">{{ section.title }}</div>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-
-      <div *ngIf="showRecipeDetails && currentRecipe?.downloadableExecutable" class="toc-item"
-           [class.active]="ui.activeRecipeTab === 'download'"
-           (click)="changeRecipeTab('download'); closeMobileTOC()">
-        <div class="toc-item-icon">
-          <mat-icon>download</mat-icon>
-        </div>
-        <div class="toc-item-content">
-          <div class="toc-item-title">Download</div>
-          <div class="toc-item-meta">
-            <span class="toc-item-category">Executable Download</span>
-          </div>
-        </div>
-      </div>
+      </ng-container>
       
       <!-- Same content as desktop TOC -->
       <ng-container *ngIf="!showRecipeDetails">

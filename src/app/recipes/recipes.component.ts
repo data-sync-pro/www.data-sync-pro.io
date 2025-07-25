@@ -7,6 +7,7 @@ import {
   ViewEncapsulation,
   HostListener
 } from '@angular/core';
+import { trigger, state, style, transition, animate } from '@angular/animations';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Meta, Title } from '@angular/platform-browser';
 import { Subject } from 'rxjs';
@@ -17,7 +18,10 @@ import {
   RecipeCategory,
   RecipeFilter,
   RecipeProgress,
-  RecipeNavigationState
+  RecipeNavigationState,
+  RecipeSection,
+  RecipeTab,
+  RecipeTOCStructure
 } from '../shared/models/recipe.model';
 import { RecipeService } from '../shared/services/recipe.service';
 import { SelectedRecipe } from './recipe-search-overlay/recipe-search-overlay.component';
@@ -33,6 +37,8 @@ interface UIState {
   tocInFooterZone: boolean;
   tocFooterApproaching: boolean;
   activeRecipeTab: string;
+  activeSectionId: string;
+  expandedTabs: Set<string>;
 }
 
 interface TOCPaginationState {
@@ -56,7 +62,18 @@ interface SearchState {
   templateUrl: './recipes.component.html',
   styleUrls: ['./recipes.component.scss'],
   encapsulation: ViewEncapsulation.None,
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  animations: [
+    trigger('slideInOut', [
+      transition(':enter', [
+        style({ height: '0', opacity: 0, overflow: 'hidden' }),
+        animate('200ms ease-in', style({ height: '*', opacity: 1 }))
+      ]),
+      transition(':leave', [
+        animate('200ms ease-out', style({ height: '0', opacity: 0, overflow: 'hidden' }))
+      ])
+    ])
+  ]
 })
 export class RecipesComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
@@ -72,7 +89,9 @@ export class RecipesComponent implements OnInit, OnDestroy {
     tocHidden: false,
     tocInFooterZone: false,
     tocFooterApproaching: false,
-    activeRecipeTab: 'overview'
+    activeRecipeTab: 'overview',
+    activeSectionId: 'use-case',
+    expandedTabs: new Set(['overview'])
   };
 
   // TOC pagination state
@@ -110,6 +129,14 @@ export class RecipesComponent implements OnInit, OnDestroy {
   currentRecipe: RecipeItem | null = null;
   filteredRecipes: RecipeItem[] = [];
   
+  // Recipe TOC structure
+  recipeTOC: RecipeTOCStructure = {
+    tabs: [],
+    currentTabId: 'overview',
+    currentSectionId: 'use-case',
+    expandedTabs: new Set(['overview'])
+  };
+  
   // Filters
   currentFilter: RecipeFilter = {
     categories: [],
@@ -134,6 +161,9 @@ export class RecipesComponent implements OnInit, OnDestroy {
     this.checkMobileView();
     this.loadSidebarState();
     this.loadTOCState();
+    
+    // Add body class to hide footer on recipe pages
+    document.body.classList.add('recipe-page');
   }
 
   /**
@@ -174,6 +204,9 @@ export class RecipesComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+    
+    // Remove body class when leaving recipe pages
+    document.body.classList.remove('recipe-page');
   }
 
   /**
@@ -302,6 +335,8 @@ export class RecipesComponent implements OnInit, OnDestroy {
         
         if (recipe) {
           this.trackRecipeView(recipe);
+          // Generate TOC structure for the loaded recipe
+          this.generateRecipeTOCStructure();
         }
         
         this.cdr.markForCheck();
@@ -346,6 +381,8 @@ export class RecipesComponent implements OnInit, OnDestroy {
     
     // Reset to overview tab when navigating to a different recipe
     this.ui.activeRecipeTab = 'overview';
+    this.ui.activeSectionId = 'use-case';
+    this.ui.expandedTabs = new Set(['overview']);
     
     if (this.ui.isMobile) {
       this.closeMobileSidebar();
@@ -356,8 +393,209 @@ export class RecipesComponent implements OnInit, OnDestroy {
    * Change recipe tab
    */
   changeRecipeTab(tabName: string): void {
+    console.log('Changing recipe tab to:', tabName);
+    
     this.ui.activeRecipeTab = tabName;
+    this.recipeTOC.currentTabId = tabName;
+    
+    // Toggle tab expansion
+    if (this.ui.expandedTabs.has(tabName)) {
+      this.ui.expandedTabs.delete(tabName);
+    } else {
+      this.ui.expandedTabs.add(tabName);
+    }
+    this.recipeTOC.expandedTabs = this.ui.expandedTabs;
+    
+    // Set first section as active and scroll to it
+    const selectedTab = this.recipeTOC.tabs.find(tab => tab.id === tabName);
+    if (selectedTab && selectedTab.sections.length > 0) {
+      this.ui.activeSectionId = selectedTab.sections[0].id;
+      this.recipeTOC.currentSectionId = selectedTab.sections[0].id;
+      
+      // Scroll to first section after tab content is rendered with extra delay for padding to take effect
+      setTimeout(() => {
+        this.scrollToSectionWithRetry(selectedTab.sections[0].id);
+      }, 400); // Increased delay for better DOM rendering and padding application
+    }
+    
+    // Close mobile TOC after tab change
+    if (this.ui.isMobile) {
+      this.closeMobileTOC();
+    }
+    
     this.cdr.markForCheck();
+  }
+
+  /**
+   * Change recipe section
+   */
+  changeRecipeSection(sectionId: string): void {
+    console.log('Changing recipe section to:', sectionId);
+    
+    this.ui.activeSectionId = sectionId;
+    this.recipeTOC.currentSectionId = sectionId;
+    
+    // Ensure the parent tab is expanded and active
+    this.ensureParentTabActive(sectionId);
+    
+    // Scroll to the section element with improved reliability
+    this.scrollToSectionWithRetry(sectionId);
+    
+    this.cdr.markForCheck();
+  }
+
+  /**
+   * Ensure the parent tab of a section is active and expanded
+   */
+  private ensureParentTabActive(sectionId: string): void {
+    const parentTab = this.recipeTOC.tabs.find(tab => 
+      tab.sections.some(section => section.id === sectionId)
+    );
+    
+    if (parentTab) {
+      console.log('Ensuring parent tab is active:', parentTab.id);
+      this.ui.activeRecipeTab = parentTab.id;
+      this.recipeTOC.currentTabId = parentTab.id;
+      this.ui.expandedTabs.add(parentTab.id);
+      this.recipeTOC.expandedTabs = this.ui.expandedTabs;
+    }
+  }
+
+  /**
+   * Toggle tab expansion in TOC
+   */
+  toggleTabExpansion(tabId: string): void {
+    if (this.ui.expandedTabs.has(tabId)) {
+      this.ui.expandedTabs.delete(tabId);
+    } else {
+      this.ui.expandedTabs.add(tabId);
+    }
+    this.recipeTOC.expandedTabs = this.ui.expandedTabs;
+    this.cdr.markForCheck();
+  }
+
+  /**
+   * Wrapper method for scrolling with better retry handling
+   */
+  private scrollToSectionWithRetry(sectionId: string): void {
+    // Allow multiple attempts with increasing delays to ensure DOM is ready
+    let attempts = 0;
+    const maxAttempts = 5;
+    
+    const attemptScroll = () => {
+      attempts++;
+      const container = document.querySelector('.recipe-main') as HTMLElement;
+      
+      if (container && container.scrollHeight > container.clientHeight) {
+        // Container is ready, proceed with scroll
+        this.scrollToSection(sectionId, 0);
+      } else if (attempts < maxAttempts) {
+        // Container not ready or no scrollable content, retry
+        console.log(`Container not ready, retry ${attempts}/${maxAttempts}`);
+        setTimeout(attemptScroll, 100 * attempts); // 100ms, 200ms, 300ms, etc.
+      } else {
+        // Final attempt
+        console.log('Final scroll attempt after retries');
+        this.scrollToSection(sectionId, 0);
+      }
+    };
+    
+    attemptScroll();
+  }
+
+  /**
+   * Scroll to specific section with container-based scrolling to prevent footer appearance
+   */
+  private scrollToSection(sectionId: string, retryCount: number = 0): void {
+    console.log('Scrolling to section:', sectionId, 'retry:', retryCount);
+    
+    const section = this.recipeTOC.tabs
+      .flatMap(tab => tab.sections)
+      .find(section => section.id === sectionId);
+    
+    if (section && section.elementId) {
+      // Use requestAnimationFrame to ensure DOM is fully rendered
+      requestAnimationFrame(() => {
+        const element = document.getElementById(section.elementId!);
+        const container = document.querySelector('.recipe-main') as HTMLElement;
+        
+        if (element && container) {
+          console.log('Element and container found:', section.elementId, 'scrolling...');
+          
+          // Get container dimensions and scroll info
+          const containerRect = container.getBoundingClientRect();
+          const elementRect = element.getBoundingClientRect();
+          const containerScrollTop = container.scrollTop;
+          const containerHeight = container.clientHeight;
+          const containerScrollHeight = container.scrollHeight;
+          
+          // Calculate element position relative to container
+          const elementTopInContainer = elementRect.top - containerRect.top + containerScrollTop;
+          const headerOffset = 100; // Fixed header offset
+          
+          // Calculate target scroll position
+          let targetScrollTop = elementTopInContainer - headerOffset;
+          
+          // Calculate maximum scroll position to prevent over-scrolling
+          const maxScrollTop = containerScrollHeight - containerHeight;
+          
+          // Check if element is in bottom area of container
+          const elementRelativePosition = elementTopInContainer / containerScrollHeight;
+          if (elementRelativePosition > 0.8) {
+            // For bottom sections, use scrollIntoView to ensure visibility without over-scrolling
+            console.log('Bottom section detected, using scrollIntoView');
+            element.scrollIntoView({
+              behavior: 'smooth',
+              block: 'center', // Center the element instead of aligning to top
+              inline: 'nearest'
+            });
+            return;
+          }
+          
+          // Ensure we don't scroll beyond container boundaries
+          const finalScrollPosition = Math.min(Math.max(0, targetScrollTop), maxScrollTop);
+          
+          console.log('Container scroll calculation:', {
+            elementTopInContainer,
+            targetScrollTop,
+            maxScrollTop,
+            finalScrollPosition,
+            containerHeight,
+            containerScrollHeight,
+            elementRelativePosition
+          });
+
+          // Scroll the container instead of the window
+          container.scrollTo({
+            top: finalScrollPosition,
+            behavior: 'smooth'
+          });
+          
+        } else {
+          console.warn('Element or container not found:', section.elementId);
+          
+          // Retry up to 3 times with increasing delays
+          if (retryCount < 3) {
+            setTimeout(() => {
+              this.scrollToSection(sectionId, retryCount + 1);
+            }, 200 * (retryCount + 1)); // 200ms, 400ms, 600ms
+          } else {
+            console.error('Failed to find element after retries:', section.elementId);
+            // Final fallback: use scrollIntoView
+            const fallbackElement = document.getElementById(section.elementId!);
+            if (fallbackElement) {
+              fallbackElement.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center',
+                inline: 'nearest'
+              });
+            }
+          }
+        }
+      });
+    } else {
+      console.warn('Section not found in TOC structure:', sectionId);
+    }
   }
 
   /**
@@ -688,11 +926,176 @@ export class RecipesComponent implements OnInit, OnDestroy {
    * Get recipe tab count for TOC
    */
   getRecipeTabCount(): number {
-    let count = 2; // Overview and Walkthrough are always available
-    if (this.currentRecipe?.downloadableExecutable) {
-      count++; // Add Download tab if available
+    return 2; // Overview and Walkthrough are always available (Download merged into Overview)
+  }
+
+  /**
+   * Generate recipe TOC structure based on current recipe
+   */
+  generateRecipeTOCStructure(): void {
+    if (!this.currentRecipe) {
+      this.recipeTOC.tabs = [];
+      return;
     }
-    return count;
+
+    const tabs: RecipeTab[] = [];
+
+    // Overview Tab
+    tabs.push({
+      id: 'overview',
+      title: 'Overview',
+      icon: 'article',
+      description: '',
+      sections: [
+        {
+          id: 'use-case',
+          title: 'Use Case',
+          icon: 'info',
+          elementId: 'recipe-use-case'
+        },
+        {
+          id: 'building-permissions',
+          title: 'Building Permissions',
+          icon: 'build',
+          elementId: 'recipe-building-permissions'
+        },
+        {
+          id: 'using-permissions',
+          title: 'Using Permissions',
+          icon: 'group',
+          elementId: 'recipe-using-permissions'
+        },
+        {
+          id: 'setup-instructions',
+          title: 'Setup Instructions',
+          icon: 'settings',
+          elementId: 'recipe-setup-instructions'
+        }
+      ]
+    });
+
+    // Add download sections to Overview tab if downloadable executable exists
+    if (this.currentRecipe.downloadableExecutable) {
+      tabs[0].sections.push(
+        {
+          id: 'download-executable',
+          title: 'Download Executable',
+          icon: 'get_app',
+          elementId: 'recipe-download-executable'
+        },
+        {
+          id: 'installation-guide',
+          title: 'Installation Guide',
+          icon: 'install_desktop',
+          elementId: 'recipe-installation-guide'
+        },
+        {
+          id: 'version-info',
+          title: 'Version Information',
+          icon: 'info',
+          elementId: 'recipe-version-info'
+        }
+      );
+    }
+
+    // Walkthrough Tab
+    const walkthroughSections: RecipeSection[] = [];
+    const walkthrough = this.currentRecipe.walkthrough;
+
+    if (walkthrough.createExecutable) {
+      walkthroughSections.push({
+        id: 'create-executable',
+        title: 'Create Executable',
+        icon: 'add_circle',
+        elementId: 'recipe-create-executable'
+      });
+    }
+
+    if (walkthrough.retrieve) {
+      walkthroughSections.push({
+        id: 'retrieve-data',
+        title: 'Retrieve Data',
+        icon: 'download',
+        elementId: 'recipe-retrieve-data'
+      });
+    }
+
+    if (walkthrough.scoping) {
+      walkthroughSections.push({
+        id: 'scoping',
+        title: 'Scoping',
+        icon: 'filter_list',
+        elementId: 'recipe-scoping'
+      });
+    }
+
+    if (walkthrough.match) {
+      walkthroughSections.push({
+        id: 'match',
+        title: 'Match',
+        icon: 'compare_arrows',
+        elementId: 'recipe-match'
+      });
+    }
+
+    if (walkthrough.mapping) {
+      walkthroughSections.push({
+        id: 'mapping',
+        title: 'Mapping',
+        icon: 'swap_horiz',
+        elementId: 'recipe-mapping'
+      });
+    }
+
+    if (walkthrough.action) {
+      walkthroughSections.push({
+        id: 'action',
+        title: 'Action',
+        icon: 'play_arrow',
+        elementId: 'recipe-action'
+      });
+    }
+
+    if (walkthrough.verify) {
+      walkthroughSections.push({
+        id: 'verify',
+        title: 'Verify',
+        icon: 'check_circle',
+        elementId: 'recipe-verify'
+      });
+    }
+
+    if (walkthrough.previewTransformed) {
+      walkthroughSections.push({
+        id: 'preview-transformed',
+        title: 'Preview Transformed',
+        icon: 'preview',
+        elementId: 'recipe-preview-transformed'
+      });
+    }
+
+    if (walkthrough.addSchedule) {
+      walkthroughSections.push({
+        id: 'add-schedule',
+        title: 'Add Schedule',
+        icon: 'schedule',
+        elementId: 'recipe-add-schedule'
+      });
+    }
+
+    tabs.push({
+      id: 'walkthrough',
+      title: 'Walkthrough',
+      icon: 'timeline',
+      description: 'Step-by-step Guide',
+      sections: walkthroughSections
+    });
+
+
+    this.recipeTOC.tabs = tabs;
+    this.recipeTOC.currentTabId = this.ui.activeRecipeTab;
+    this.recipeTOC.currentSectionId = this.ui.activeSectionId;
+    this.recipeTOC.expandedTabs = this.ui.expandedTabs;
   }
 
   /**
