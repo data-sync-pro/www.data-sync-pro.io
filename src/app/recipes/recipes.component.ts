@@ -4,7 +4,8 @@ import {
   OnDestroy,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
-  ViewEncapsulation
+  ViewEncapsulation,
+  HostListener
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Meta, Title } from '@angular/platform-browser';
@@ -19,6 +20,7 @@ import {
   RecipeNavigationState
 } from '../shared/models/recipe.model';
 import { RecipeService } from '../shared/services/recipe.service';
+import { SelectedRecipe } from './recipe-search-overlay/recipe-search-overlay.component';
 
 interface UIState {
   isLoading: boolean;
@@ -27,6 +29,17 @@ interface UIState {
   mobileTOCOpen: boolean;
   isMobile: boolean;
   currentView: 'home' | 'category' | 'recipe';
+  tocHidden: boolean;
+  tocInFooterZone: boolean;
+  tocFooterApproaching: boolean;
+}
+
+interface TOCPaginationState {
+  currentPage: number;
+  itemsPerPage: number;
+  totalPages: number;
+  startIndex: number;
+  endIndex: number;
 }
 
 interface SearchState {
@@ -34,6 +47,7 @@ interface SearchState {
   isActive: boolean;
   results: RecipeItem[];
   hasResults: boolean;
+  isOverlayOpen: boolean;
 }
 
 @Component({
@@ -53,15 +67,35 @@ export class RecipesComponent implements OnInit, OnDestroy {
     mobileSidebarOpen: false,
     mobileTOCOpen: false,
     isMobile: false,
-    currentView: 'home'
+    currentView: 'home',
+    tocHidden: false,
+    tocInFooterZone: false,
+    tocFooterApproaching: false
   };
+
+  // TOC pagination state
+  tocPagination: TOCPaginationState = {
+    currentPage: 1,
+    itemsPerPage: 8,
+    totalPages: 1,
+    startIndex: 0,
+    endIndex: 0
+  };
+
+  // TOC data
+  private _cachedTrendingRecipes?: RecipeItem[];
+  private _lastRecipesLength?: number;
 
   search: SearchState = {
     query: '',
     isActive: false,
     results: [],
-    hasResults: true
+    hasResults: true,
+    isOverlayOpen: false
   };
+
+  // Search overlay state
+  searchOverlayInitialQuery = '';
 
   navigation: RecipeNavigationState = {
     category: '',
@@ -98,6 +132,42 @@ export class RecipesComponent implements OnInit, OnDestroy {
     this.loadInitialData();
     this.checkMobileView();
     this.loadSidebarState();
+    this.loadTOCState();
+  }
+
+  /**
+   * Keyboard shortcuts for search overlay
+   */
+  @HostListener('document:keydown./', ['$event'])
+  onSlashKey(event: KeyboardEvent) {
+    if (!this.search.isOverlayOpen && !this.isInputFocused()) {
+      event.preventDefault();
+      this.openSearchOverlay();
+    }
+  }
+
+  @HostListener('document:keydown.control.k', ['$event'])
+  @HostListener('document:keydown.meta.k', ['$event'])
+  onCtrlK(event: KeyboardEvent) {
+    event.preventDefault();
+    if (!this.search.isOverlayOpen) {
+      this.openSearchOverlay();
+    }
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscape() {
+    if (this.search.isOverlayOpen) {
+      this.closeSearchOverlay();
+    }
+  }
+
+  private isInputFocused(): boolean {
+    const activeElement = document.activeElement;
+    return !!(activeElement instanceof HTMLInputElement || 
+           activeElement instanceof HTMLTextAreaElement ||
+           (activeElement && activeElement.tagName === 'INPUT') ||
+           (activeElement && activeElement.tagName === 'TEXTAREA'));
   }
 
   ngOnDestroy(): void {
@@ -145,6 +215,8 @@ export class RecipesComponent implements OnInit, OnDestroy {
    * Load initial data
    */
   private loadInitialData(): void {
+    this.updateUIState({ isLoading: true });
+    
     // Load categories
     this.recipeService.getCategories().pipe(
       takeUntil(this.destroy$)
@@ -155,6 +227,23 @@ export class RecipesComponent implements OnInit, OnDestroy {
       },
       error: (error) => {
         console.error('Failed to load categories:', error);
+      }
+    });
+    
+    // Load all recipes
+    this.recipeService.getRecipes().pipe(
+      takeUntil(this.destroy$)
+    ).subscribe({
+      next: (recipes) => {
+        this.recipes = recipes;
+        this.filteredRecipes = recipes;
+        this.resetTOCPagination();
+        this.updateUIState({ isLoading: false });
+        this.cdr.markForCheck();
+      },
+      error: (error) => {
+        console.error('Failed to load recipes:', error);
+        this.updateUIState({ isLoading: false });
       }
     });
   }
@@ -221,6 +310,13 @@ export class RecipesComponent implements OnInit, OnDestroy {
         this.updateUIState({ isLoading: false });
       }
     });
+  }
+
+  /**
+   * Get recipe count
+   */
+  getRecipeCount(): number {
+    return this.recipes.length;
   }
 
   /**
@@ -463,16 +559,272 @@ export class RecipesComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Get category icon for sidebar
+   * Get category icon for sidebar - Updated with more semantic and visually appealing icons
    */
   getCategoryIcon(categoryName: string): string {
     switch (categoryName) {
-      case 'action-button': return 'smart_button';
-      case 'batch': return 'layers';
-      case 'data-list': return 'list_alt';
-      case 'data-loader': return 'upload_file';
-      case 'triggers': return 'bolt';
-      default: return 'description';
+      case 'action-button': return 'touch_app';        // More intuitive touch/action icon
+      case 'batch': return 'batch_prediction';         // Specialized batch processing icon  
+      case 'data-list': return 'view_list';           // Clearer list visualization icon
+      case 'data-loader': return 'cloud_upload';      // Modern cloud upload icon
+      case 'triggers': return 'flash_on';             // Dynamic lightning icon
+      default: return 'article';                      // More semantic document icon
+    }
+  }
+
+  /**
+   * Open search overlay
+   */
+  openSearchOverlay(initialQuery = ''): void {
+    this.searchOverlayInitialQuery = initialQuery;
+    this.search.isOverlayOpen = true;
+    
+    // Prevent body scrolling when overlay is open
+    document.body.style.overflow = 'hidden';
+    
+    this.cdr.markForCheck();
+  }
+
+  /**
+   * Close search overlay
+   */
+  closeSearchOverlay(): void {
+    this.search.isOverlayOpen = false;
+    
+    // Restore body scrolling
+    document.body.style.overflow = '';
+    
+    this.cdr.markForCheck();
+  }
+
+  /**
+   * Handle search overlay selection
+   */
+  handleSearchOverlaySelect(selectedRecipe: SelectedRecipe): void {
+    // Navigate to the selected recipe
+    this.router.navigate(['/recipes', selectedRecipe.category, selectedRecipe.id]);
+    
+    // Track search usage
+    this.recipeService.trackRecipeEvent({
+      type: 'search',
+      recipeId: selectedRecipe.id,
+      recipeTitle: selectedRecipe.title,
+      recipeCategory: selectedRecipe.category,
+      searchQuery: this.searchOverlayInitialQuery,
+      timestamp: new Date()
+    });
+    
+    this.closeSearchOverlay();
+  }
+
+  // ==================== TOC Methods ====================
+
+  /**
+   * Check if TOC should be shown
+   */
+  get shouldShowTOC(): boolean {
+    // Don't show during search
+    if (this.search.isActive || this.search.query.trim()) return false;
+    
+    // Show on home page if we have trending recipes
+    if (this.showHome) return this.trendingRecipes.length > 0;
+    
+    // Show on category pages if we have multiple recipes
+    return (!!this.navigation.category) && this.currentRecipes.length > 1;
+  }
+
+  /**
+   * Get trending recipes for home page TOC
+   */
+  get trendingRecipes(): RecipeItem[] {
+    if (!this._cachedTrendingRecipes || this._lastRecipesLength !== this.recipes.length) {
+      // Sort by estimated time (shorter first) and category diversity
+      this._cachedTrendingRecipes = [...this.recipes]
+        .sort((a, b) => {
+          // First by estimated time (shorter recipes first)
+          if (a.estimatedTime !== b.estimatedTime) {
+            return a.estimatedTime - b.estimatedTime;
+          }
+          // Then by difficulty (beginner first)
+          const difficultyOrder = { 'beginner': 1, 'intermediate': 2, 'advanced': 3 };
+          const aDiff = difficultyOrder[a.difficulty] || 2;
+          const bDiff = difficultyOrder[b.difficulty] || 2;
+          if (aDiff !== bDiff) {
+            return aDiff - bDiff;
+          }
+          // Finally by title alphabetically
+          return a.title.localeCompare(b.title);
+        })
+        .slice(0, 20); // Limit to 20 trending recipes
+      
+      this._lastRecipesLength = this.recipes.length;
+    }
+    return this._cachedTrendingRecipes;
+  }
+
+  /**
+   * Get current TOC title
+   */
+  get currentTOCTitle(): string {
+    if (this.showHome) return 'Popular Recipes';
+    if (this.navigation.category) {
+      const category = this.categories.find(c => c.name === this.navigation.category);
+      return category ? `${category.displayName} Recipes` : 'Category Recipes';
+    }
+    return 'Recipes';
+  }
+
+  /**
+   * Get TOC item count
+   */
+  get tocItemCount(): number {
+    if (this.showHome) return this.trendingRecipes.length;
+    return this.currentRecipes.length;
+  }
+
+  /**
+   * Get paginated trending recipes
+   */
+  get paginatedTrendingRecipes(): RecipeItem[] {
+    if (!this.showHome) return [];
+    return this.trendingRecipes.slice(this.tocPagination.startIndex, this.tocPagination.endIndex);
+  }
+
+  /**
+   * Get paginated category recipes
+   */
+  get paginatedCategoryRecipes(): RecipeItem[] {
+    if (this.showHome) return [];
+    return this.currentRecipes.slice(this.tocPagination.startIndex, this.tocPagination.endIndex);
+  }
+
+  /**
+   * Get TOC pagination info
+   */
+  get tocPaginationInfo(): string {
+    const start = this.tocPagination.startIndex + 1;
+    const end = Math.min(this.tocPagination.endIndex, this.tocItemCount);
+    return `${start}-${end} of ${this.tocItemCount}`;
+  }
+
+  /**
+   * Check if has previous TOC page
+   */
+  get hasPreviousTOCPage(): boolean {
+    return this.tocPagination.currentPage > 1;
+  }
+
+  /**
+   * Check if has next TOC page
+   */
+  get hasNextTOCPage(): boolean {
+    return this.tocPagination.currentPage < this.tocPagination.totalPages;
+  }
+
+  /**
+   * Go to previous TOC page
+   */
+  goToPreviousTOCPage(): void {
+    if (this.tocPagination.currentPage > 1) {
+      this.tocPagination.currentPage--;
+      this.updateTOCPaginationIndices();
+      this.cdr.markForCheck();
+    }
+  }
+
+  /**
+   * Go to next TOC page
+   */
+  goToNextTOCPage(): void {
+    if (this.tocPagination.currentPage < this.tocPagination.totalPages) {
+      this.tocPagination.currentPage++;
+      this.updateTOCPaginationIndices();
+      this.cdr.markForCheck();
+    }
+  }
+
+  /**
+   * Update TOC pagination indices
+   */
+  private updateTOCPaginationIndices(): void {
+    const totalItems = this.tocItemCount;
+    this.tocPagination.totalPages = Math.ceil(totalItems / this.tocPagination.itemsPerPage);
+    this.tocPagination.startIndex = (this.tocPagination.currentPage - 1) * this.tocPagination.itemsPerPage;
+    this.tocPagination.endIndex = Math.min(
+      this.tocPagination.startIndex + this.tocPagination.itemsPerPage,
+      totalItems
+    );
+  }
+
+  /**
+   * Reset TOC pagination
+   */
+  private resetTOCPagination(): void {
+    this.tocPagination.currentPage = 1;
+    this.updateTOCPaginationIndices();
+  }
+
+  /**
+   * Toggle TOC visibility
+   */
+  toggleTOC(): void {
+    this.ui.tocHidden = !this.ui.tocHidden;
+    this.saveTOCState();
+    this.cdr.markForCheck();
+  }
+
+  /**
+   * Toggle mobile TOC
+   */
+  toggleMobileTOC(): void {
+    this.ui.mobileTOCOpen = !this.ui.mobileTOCOpen;
+    this.cdr.markForCheck();
+  }
+
+  /**
+   * Close mobile TOC
+   */
+  closeMobileTOC(): void {
+    this.ui.mobileTOCOpen = false;
+    this.cdr.markForCheck();
+  }
+
+  /**
+   * Save TOC state to localStorage
+   */
+  private saveTOCState(): void {
+    try {
+      localStorage.setItem('recipe_toc_hidden', JSON.stringify(this.ui.tocHidden));
+    } catch (error) {
+      console.warn('Failed to save TOC state:', error);
+    }
+  }
+
+  /**
+   * Load TOC state from localStorage
+   */
+  private loadTOCState(): void {
+    try {
+      const saved = localStorage.getItem('recipe_toc_hidden');
+      if (saved !== null) {
+        this.ui.tocHidden = JSON.parse(saved);
+      }
+    } catch (error) {
+      console.warn('Failed to load TOC state:', error);
+    }
+  }
+
+  /**
+   * Get time display for TOC
+   */
+  getTimeDisplay(estimatedTime: number): string {
+    const time = estimatedTime;
+    if (time < 60) {
+      return `${time} min`;
+    } else {
+      const hours = Math.floor(time / 60);
+      const minutes = time % 60;
+      return minutes > 0 ? `${hours}h ${minutes}m` : `${hours}h`;
     }
   }
 }

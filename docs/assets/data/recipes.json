@@ -1,0 +1,189 @@
+[
+  {
+    "id": "recipe-001",
+    "name": "account-contact-sync",
+    "title": "Sync Account Data to Related Contacts",
+    "category": "triggers",
+    "description": "Automatically synchronize account information to all related contacts when account data changes, ensuring data consistency across related records.",
+    "difficulty": "intermediate",
+    "estimatedTime": 45,
+    "useCase": "When an Account's primary information changes (such as Industry, Phone, or Billing Address), this recipe ensures that all related Contacts are automatically updated with the corresponding information. This maintains data consistency and reduces manual data entry for users.",
+    "prerequisites": {
+      "permissionSetsForBuilding": [
+        "Data Sync Pro Admin",
+        "Data Sync Pro Developer",
+        "Customize Application"
+      ],
+      "permissionSetsForUsing": [
+        "Data Sync Pro User",
+        "Standard User"
+      ],
+      "directions": "Ensure you have access to both Account and Contact objects. Verify that the fields you want to sync exist on both objects and have the appropriate field-level security settings configured."
+    },
+    "walkthrough": {
+      "createExecutable": {
+        "sourceObjectApiName": "Account",
+        "targetObjectApiName": "Contact",
+        "sourceMatchingField": "Id",
+        "targetMatchingField": "AccountId",
+        "action": "Update",
+        "executableName": "Account_to_Contact_Sync",
+        "instructions": "Create a new executable that will monitor Account records for changes and update related Contact records accordingly."
+      },
+      "retrieve": {
+        "soqlQueries": [
+          {
+            "code": "SELECT Id, Industry, Phone, BillingStreet, BillingCity, BillingState, BillingPostalCode, BillingCountry FROM Account WHERE LastModifiedDate = TODAY",
+            "language": "soql",
+            "title": "Source Query - Modified Accounts",
+            "description": "Retrieves accounts that have been modified today"
+          }
+        ],
+        "instructions": "Define the SOQL query to retrieve Account records that have been recently modified. Focus on the fields that need to be synchronized to Contact records."
+      },
+      "scoping": {
+        "scopeFilterSetup": "Filter to only include Accounts with AccountType = 'Customer' and Status = 'Active'",
+        "instructions": "Set up scope filters to ensure only relevant Account records trigger the synchronization process."
+      },
+      "match": {
+        "matchingLogic": "Match Account.Id to Contact.AccountId for all related contacts",
+        "rules": "One Account can match to multiple Contacts (1:Many relationship)",
+        "instructions": "Configure the matching logic to identify all Contact records that are related to the modified Account."
+      },
+      "mapping": {
+        "fieldMappingConfig": "Account.Industry → Contact.Department__c\nAccount.Phone → Contact.Phone\nAccount.BillingStreet → Contact.MailingStreet\nAccount.BillingCity → Contact.MailingCity\nAccount.BillingState → Contact.MailingState\nAccount.BillingPostalCode → Contact.MailingPostalCode\nAccount.BillingCountry → Contact.MailingCountry",
+        "instructions": "Map the Account fields to their corresponding Contact fields. Ensure field types are compatible and consider any field length limitations."
+      },
+      "action": {
+        "actionConfiguration": "Update existing Contact records with new Account information",
+        "options": "Skip records where Contact.DoNotCall = true",
+        "instructions": "Configure the update action to modify Contact records while respecting any opt-out preferences."
+      },
+      "verify": {
+        "verificationQueries": [
+          {
+            "code": "SELECT Id, AccountId, Account.Industry, Department__c, Phone, MailingStreet FROM Contact WHERE AccountId IN (SELECT Id FROM Account WHERE LastModifiedDate = TODAY)",
+            "language": "soql",
+            "title": "Verification Query - Updated Contacts",
+            "description": "Verify that Contact records have been updated correctly"
+          }
+        ],
+        "instructions": "Run verification queries to ensure the synchronization completed successfully and data integrity is maintained."
+      },
+      "previewTransformed": {
+        "previewInstructions": "Use the Preview feature to see how Account data will be transformed and applied to Contact records before running the full process.",
+        "expectedResults": "You should see Contact records with updated Department, Phone, and Mailing Address fields matching their related Account information."
+      },
+      "addSchedule": {
+        "schedulingConfig": "Run every 15 minutes during business hours (8 AM - 6 PM, Mon-Fri)",
+        "setupGuide": "Set up a schedule to run this executable regularly to catch Account changes in near real-time. Consider your organization's data change patterns when setting the frequency."
+      }
+    },
+    "downloadableExecutable": {
+      "fileName": "Account_Contact_Sync_v1.0.zip",
+      "filePath": "assets/executables/account-contact-sync.zip",
+      "version": "1.0",
+      "description": "Pre-configured executable for Account to Contact synchronization"
+    },
+    "tags": ["account", "contact", "triggers", "data-sync", "automation"],
+    "lastUpdated": "2024-01-15T10:30:00Z",
+    "author": "Data Sync Pro Team",
+    "seqNo": 1
+  },
+  {
+    "id": "recipe-002",
+    "name": "csv-lead-import",
+    "title": "Import Leads from CSV File",
+    "category": "data-loader",
+    "description": "Bulk import lead records from CSV files with data validation and deduplication to maintain data quality.",
+    "difficulty": "beginner",
+    "estimatedTime": 30,
+    "useCase": "Import leads from trade shows, marketing campaigns, or partner systems using CSV files. This recipe includes built-in validation to ensure data quality and deduplication to prevent duplicate lead creation.",
+    "prerequisites": {
+      "permissionSetsForBuilding": [
+        "Data Sync Pro Admin",
+        "Data Sync Pro Developer"
+      ],
+      "permissionSetsForUsing": [
+        "Data Sync Pro User",
+        "Lead Import User"
+      ],
+      "directions": "Prepare your CSV file with proper headers matching Salesforce Lead field API names. Ensure your CSV file is properly formatted and contains valid email addresses for deduplication."
+    },
+    "walkthrough": {
+      "createExecutable": {
+        "sourceObjectApiName": "CSV_File",
+        "targetObjectApiName": "Lead",
+        "sourceMatchingField": "Email",
+        "targetMatchingField": "Email",
+        "action": "Insert",
+        "executableName": "CSV_Lead_Import",
+        "instructions": "Create a Data Loader executable to import leads from CSV files with email-based deduplication."
+      },
+      "retrieve": {
+        "soqlQueries": [
+          {
+            "code": "-- CSV Headers: FirstName,LastName,Email,Company,Phone,LeadSource\n-- Sample CSV data will be processed from uploaded file",
+            "language": "sql",
+            "title": "CSV File Structure",
+            "description": "Expected CSV file format for lead import"
+          }
+        ],
+        "instructions": "Upload your CSV file containing lead data. Ensure the file follows the expected format with proper headers."
+      },
+      "scoping": {
+        "scopeFilterSetup": "Process only rows with valid email addresses and required fields (FirstName, LastName, Company)",
+        "instructions": "Configure validation rules to filter out incomplete or invalid lead records during import."
+      },
+      "match": {
+        "matchingLogic": "Match on Email field to identify existing leads",
+        "rules": "If email exists, skip record to avoid duplicates",
+        "instructions": "Set up email-based matching to prevent duplicate lead creation."
+      },
+      "mapping": {
+        "fieldMappingConfig": "CSV.FirstName → Lead.FirstName\nCSV.LastName → Lead.LastName\nCSV.Email → Lead.Email\nCSV.Company → Lead.Company\nCSV.Phone → Lead.Phone\nCSV.LeadSource → Lead.LeadSource",
+        "instructions": "Map CSV columns to corresponding Lead fields. Ensure all required fields are mapped."
+      },
+      "action": {
+        "actionConfiguration": "Insert new Lead records only (skip existing)",
+        "options": "Set Lead.Status = 'Open - Not Contacted' for new records",
+        "instructions": "Configure the insert action to create new leads with appropriate default values."
+      },
+      "verify": {
+        "verificationQueries": [
+          {
+            "code": "SELECT COUNT() FROM Lead WHERE CreatedDate = TODAY AND LeadSource = 'Import'",
+            "language": "soql",
+            "title": "Count New Leads",
+            "description": "Verify the number of leads imported today"
+          },
+          {
+            "code": "SELECT FirstName, LastName, Email, Company FROM Lead WHERE CreatedDate = TODAY ORDER BY CreatedDate DESC LIMIT 10",
+            "language": "soql",
+            "title": "Sample Imported Leads",
+            "description": "Review recently imported lead records"
+          }
+        ],
+        "instructions": "Run verification queries to confirm successful import and review sample records for data quality."
+      },
+      "previewTransformed": {
+        "previewInstructions": "Use the Preview feature to see how CSV data will be transformed and validate the mapping before running the full import.",
+        "expectedResults": "You should see properly formatted Lead records with all required fields populated and any data validation issues highlighted."
+      },
+      "addSchedule": {
+        "schedulingConfig": "Manual execution - no automatic schedule recommended for file imports",
+        "setupGuide": "Data Loader executables are typically run manually when new CSV files are available. Consider setting up a notification system for when new files are ready for import."
+      }
+    },
+    "downloadableExecutable": {
+      "fileName": "CSV_Lead_Import_v1.2.zip",
+      "filePath": "assets/executables/csv-lead-import.zip",
+      "version": "1.2",
+      "description": "Pre-configured Data Loader executable for CSV lead import with validation"
+    },
+    "tags": ["leads", "csv", "import", "data-loader", "deduplication"],
+    "lastUpdated": "2024-01-10T14:20:00Z",
+    "author": "Data Sync Pro Team",
+    "seqNo": 2
+  }
+]
