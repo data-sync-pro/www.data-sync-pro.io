@@ -115,9 +115,9 @@
     <div class="breadcrumb">
       <ng-container *ngFor="let crumb of breadcrumbPath; let last = last; let first = first">
         <button class="breadcrumb-item" 
-                [class.active]="last"
-                [routerLink]="!last ? crumb.url : null"
-                [disabled]="last"
+                [class.active]="last && !showRecipeDetails"
+                [routerLink]="crumb.url"
+                [disabled]="false"
                 [title]="'Go to ' + crumb.name">
           <lightning-icon *ngIf="first" iconName="utility:home" size="xx-small" alternativeText="Home"></lightning-icon>
           <span>{{ crumb.name }}</span>
@@ -247,7 +247,7 @@
           <div *ngFor="let tab of recipeTOC.tabs" class="toc-tab-group">
             <!-- Main Tab -->
             <div class="toc-item toc-tab-item"
-                 [class.active]="ui.activeRecipeTab === tab.id"
+                 [class.active]="ui.highlightedTOCTab === tab.id"
                  (click)="changeRecipeTab(tab.id)">
               <div class="toc-item-icon">
                 <mat-icon>{{ tab.icon }}</mat-icon>
@@ -336,7 +336,7 @@
         <div *ngFor="let tab of recipeTOC.tabs" class="toc-tab-group">
           <!-- Main Tab -->
           <div class="toc-item toc-tab-item"
-               [class.active]="ui.activeRecipeTab === tab.id"
+               [class.active]="ui.highlightedTOCTab === tab.id"
                (click)="changeRecipeTab(tab.id); closeMobileTOC()">
             <div class="toc-item-icon">
               <mat-icon>{{ tab.icon }}</mat-icon>

@@ -122,6 +122,9 @@ $toc-text-muted: #5f6368;
         }
       }
       
+      // When a child section is active, the parent tab should not show active styling
+      // This is handled by the TypeScript logic that clears activeRecipeTab when selecting a section
+      
       .toc-item-icon {
         margin-right: 10px;
         
@@ -294,6 +297,7 @@ $toc-text-muted: #5f6368;
       }
     }
   }
+}
 
 // Mobile TOC Styles - Simplified
 .recipe-toc.mobile-toc {
@@ -473,6 +477,9 @@ $toc-text-muted: #5f6368;
         }
       }
       
+      // Mobile: When a child section is active, the parent tab should not show active styling
+      // This is handled by the TypeScript logic that clears activeRecipeTab when selecting a section
+      
       .toc-item-icon {
         margin-right: 10px;
         
@@ -591,7 +598,6 @@ $toc-text-muted: #5f6368;
           display: none; // Hide meta for cleaner mobile experience
         }
       }
-    }
     }
   }
 }

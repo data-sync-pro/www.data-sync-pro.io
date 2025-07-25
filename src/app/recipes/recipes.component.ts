@@ -36,8 +36,9 @@ interface UIState {
   tocHidden: boolean;
   tocInFooterZone: boolean;
   tocFooterApproaching: boolean;
-  activeRecipeTab: string;
-  activeSectionId: string;
+  activeRecipeTab: string; // Used for content display - determines which tab content to show
+  activeSectionId: string; // Used for section highlighting within a tab
+  highlightedTOCTab: string; // Used for TOC visual highlighting - can be empty to show no tab highlight
   expandedTabs: Set<string>;
   userHasScrolled: boolean;
   scrollTicking: boolean;
@@ -94,6 +95,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
     tocFooterApproaching: false,
     activeRecipeTab: 'overview',
     activeSectionId: 'use-case',
+    highlightedTOCTab: 'overview', // Initially highlight overview tab
     expandedTabs: new Set(['overview']),
     userHasScrolled: false,
     scrollTicking: false,
@@ -402,6 +404,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
     
     // Reset to overview tab when navigating to a different recipe
     this.ui.activeRecipeTab = 'overview';
+    this.ui.highlightedTOCTab = 'overview'; // Initially highlight overview tab
     this.ui.activeSectionId = 'use-case';
     this.ui.expandedTabs = new Set(['overview']);
     
@@ -416,8 +419,15 @@ export class RecipesComponent implements OnInit, OnDestroy {
   changeRecipeTab(tabName: string): void {
     console.log('Changing recipe tab to:', tabName);
     
+    // Set both activeRecipeTab (for content display) and highlightedTOCTab (for visual highlighting)
     this.ui.activeRecipeTab = tabName;
+    this.ui.highlightedTOCTab = tabName;
     this.recipeTOC.currentTabId = tabName;
+    
+    // Clear active section when clicking on tab directly
+    // Only the tab should be highlighted, not any specific section
+    this.ui.activeSectionId = '';
+    this.recipeTOC.currentSectionId = '';
     
     // Toggle tab expansion
     if (this.ui.expandedTabs.has(tabName)) {
@@ -427,19 +437,15 @@ export class RecipesComponent implements OnInit, OnDestroy {
     }
     this.recipeTOC.expandedTabs = this.ui.expandedTabs;
     
-    // Set first section as active and scroll to it
+    // When clicking on a tab, just ensure the tab content is visible
     const selectedTab = this.recipeTOC.tabs.find(tab => tab.id === tabName);
-    if (selectedTab && selectedTab.sections.length > 0) {
-      this.ui.activeSectionId = selectedTab.sections[0].id;
-      this.recipeTOC.currentSectionId = selectedTab.sections[0].id;
+    if (selectedTab) {
       
       // Clear section cache when switching tabs since DOM content changes
       this.clearSectionElementsCache();
       
-      // Scroll to first section after tab content is rendered
+      // Refresh cache after DOM is updated, but don't auto-scroll to first section
       setTimeout(() => {
-        this.scrollToSection(selectedTab.sections[0].id);
-        // Refresh cache after DOM is updated
         this.refreshSectionElementsCache();
       }, 100);
     }
@@ -461,7 +467,11 @@ export class RecipesComponent implements OnInit, OnDestroy {
     this.ui.activeSectionId = sectionId;
     this.recipeTOC.currentSectionId = sectionId;
     
-    // Ensure the parent tab is expanded and active
+    // Clear TOC tab highlighting when selecting a specific section
+    // Keep activeRecipeTab for content display, but clear highlightedTOCTab for visual highlighting
+    this.ui.highlightedTOCTab = '';
+    
+    // Ensure the parent tab is expanded and set as active for content display
     this.ensureParentTabActive(sectionId);
     
     // Temporarily disable scroll highlighting to avoid conflicts during navigation
@@ -479,7 +489,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Ensure the parent tab of a section is active and expanded
+   * Ensure the parent tab of a section is expanded and active for content display
    */
   private ensureParentTabActive(sectionId: string): void {
     const parentTab = this.recipeTOC.tabs.find(tab => 
@@ -487,11 +497,16 @@ export class RecipesComponent implements OnInit, OnDestroy {
     );
     
     if (parentTab) {
-      console.log('Ensuring parent tab is active:', parentTab.id);
+      console.log('Ensuring parent tab is active for content display and expanded for section:', sectionId);
+      // Set the parent tab as active for content display (needed for *ngIf in template)
       this.ui.activeRecipeTab = parentTab.id;
       this.recipeTOC.currentTabId = parentTab.id;
+      
+      // Expand the parent tab to show sections
       this.ui.expandedTabs.add(parentTab.id);
       this.recipeTOC.expandedTabs = this.ui.expandedTabs;
+      
+      // Note: highlightedTOCTab is handled separately and should be empty when a section is selected
     }
   }
 
@@ -689,13 +704,6 @@ export class RecipesComponent implements OnInit, OnDestroy {
       path.push({ 
         name: categoryName, 
         url: `/recipes/${this.navigation.category}` 
-      });
-    }
-    
-    if (this.currentRecipe) {
-      path.push({ 
-        name: this.currentRecipe.title, 
-        url: `/recipes/${this.navigation.category}/${this.navigation.recipeName}` 
       });
     }
     
@@ -1223,7 +1231,11 @@ export class RecipesComponent implements OnInit, OnDestroy {
       this.ui.activeSectionId = activeSectionId;
       this.recipeTOC.currentSectionId = activeSectionId;
       
-      // Ensure the parent tab is active
+      // When scrolling updates the section, clear TOC tab highlighting
+      // This ensures only the section is highlighted, not the parent tab
+      this.ui.highlightedTOCTab = '';
+      
+      // Ensure the parent tab is active for content display
       this.ensureParentTabActive(activeSectionId);
       
       this.cdr.markForCheck();

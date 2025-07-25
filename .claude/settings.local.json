@@ -17,7 +17,8 @@
       "Bash(mv:*)",
       "Bash(npm run build:*)",
       "Bash(dir:*)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "Bash(grep:*)"
     ],
     "deny": []
   }
