@@ -55,11 +55,11 @@ export class RecipeService implements OnDestroy {
   };
   
   private readonly CATEGORY_DESCRIPTIONS: { [key in RecipeCategoryType]: string } = {
-    'action-button': 'Create custom action buttons that execute data processing workflows',
-    'batch': 'Process large volumes of data efficiently with batch operations',
-    'data-list': 'Build actionable data lists with interactive capabilities',
-    'data-loader': 'Load data from external files like CSV into Salesforce',
-    'triggers': 'Set up event-driven data processing based on record changes'
+    'action-button': 'A quick action or button that uses the current record, applies scoping, matching, and field transformations, allows edits, and then performs a DML action.',
+    'batch': 'A job that processes large data sets in batches, applying filters, matching, transformations, and executing DML actions per batch.',
+    'data-list': 'A query-driven list that supports inline and bulk operations. Users can select records, apply transformations, edit, and perform DML actions.',
+    'data-loader': 'A tool for transforming and loading CSV data into Salesforce efficiently, with matching, access control, and centralized error logging.',
+    'triggers': 'A modular, bulk-safe routine that reacts to DML events, applies scoping, transforms fields, validates, and performs DML actions.'
   };
 
   constructor(

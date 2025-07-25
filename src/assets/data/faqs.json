@@ -1319,7 +1319,7 @@
     "Category__c": "Transformation",
     "SubCategory__c": null,
     "SeqNo__c": null,
-    "Question__c": "How does DSP simplify managing data relationships",
+    "Question__c": "How does DSP simplify managing data relationships?",
     "Answer__c": "transformation-dsp-relationship-management.html"
   },
   {
