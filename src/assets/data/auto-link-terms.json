@@ -5,6 +5,16 @@
       "caseSensitive": true,
       "description": "Batch Rules Engine"
     },
+    "Batchs": {
+      "faqLink": "batch.what-is-batch",
+      "caseSensitive": true,
+      "description": "Batch Rules Engine"
+    },
+    "Trigger": {
+      "faqLink": "triggers.how-it-works", 
+      "caseSensitive": true,
+      "description": "Triggers Rules Engine"
+    },    
     "Triggers": {
       "faqLink": "triggers.how-it-works", 
       "caseSensitive": true,
@@ -15,16 +25,31 @@
       "caseSensitive": true,
       "description": "Data List Rules Engine"
     },
+    "Data Lists": {
+      "faqLink": "data-list.what-is-data-list",
+      "caseSensitive": true,
+      "description": "Data List Rules Engine"
+    },    
     "Action Button": {
       "faqLink": "action-button.what-is-action-button",
       "caseSensitive": true,
       "description": "Action Button Rules Engine"
     },
+    "Action Buttons": {
+      "faqLink": "action-button.what-is-action-button",
+      "caseSensitive": true,
+      "description": "Action Button Rules Engine"
+    },    
     "Data Loader": {
       "faqLink": "data-loader.how-it-works",
       "caseSensitive": true,
       "description": "Data Loader Rules Engine"
     },
+    "Data Loaders": {
+      "faqLink": "data-loader.how-it-works",
+      "caseSensitive": true,
+      "description": "Data Loader Rules Engine"
+    },    
     "Input": {
       "faqLink": "input.what-does-input-do",
       "caseSensitive": true,
@@ -40,6 +65,11 @@
       "caseSensitive": true,
       "description": "Retrieve Process Step"
     },
+    "Retrieves": {
+      "faqLink": "retrieve.what-does-retrieve-do",
+      "caseSensitive": true,
+      "description": "Retrieve Process Step"
+    },    
     "Scoping": {
       "faqLink": "scoping.what-does-scoping-do",
       "caseSensitive": true,
