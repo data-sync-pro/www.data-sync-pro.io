@@ -4,34 +4,90 @@ import { SafeHtml } from '@angular/platform-browser';
  * Raw recipe data record (from JSON file)
  */
 export interface SourceRecipeRecord {
-  id: string;
-  name: string;
+  id: string; // Auto generated
   title: string;
-  category: string; // One of: action-button, batch, data-list, data-loader, triggers
-  description: string;
-  useCase: string; // Rich text describing target/goal
-  prerequisites: {
-    permissionSetsForBuilding: string[];
-    permissionSetsForUsing: string[];
-    directions: string; // Setup guidance and preparation steps
-  };
-  walkthrough: RecipeWalkthrough;
-  downloadableExecutable?: {
-    fileName: string;
-    filePath: string;
-    version: string;
-    description: string;
-  };
-  tags: string[];
-  lastUpdated: string;
+  category: string;
+  DSPVersions: string[];
+  usecase: string;
+  prerequisites: RecipePrerequisiteItem[];
+  direction: string;
+  connection: string;
+  walkthrough: RecipeWalkthroughStep[];
+  downloadableExecutables: RecipeDownloadableExecutable[];
+  relatedRecipes: RecipeRelatedItem[];
+  keywords: string[];
+  // Legacy fields for backward compatibility
+  name?: string;
+  description?: string;
+  useCase?: string;
+  tags?: string[];
+  lastUpdated?: string;
   author?: string;
   seqNo?: number;
 }
 
 /**
- * Recipe walkthrough with structured steps
+ * Recipe walkthrough step
  */
-export interface RecipeWalkthrough {
+export interface RecipeWalkthroughStep {
+  step: string;
+  config: RecipeStepConfig[];
+  media: RecipeStepMedia[];
+}
+
+/**
+ * Recipe step configuration
+ */
+export interface RecipeStepConfig {
+  field: string;
+  value: string;
+}
+
+/**
+ * Recipe step media
+ */
+export interface RecipeStepMedia {
+  type: string;
+  url: string;
+  alt: string;
+}
+
+/**
+ * Recipe prerequisite item
+ */
+export interface RecipePrerequisiteItem {
+  description: string;
+  quickLinks: RecipeQuickLink[];
+}
+
+/**
+ * Recipe quick link
+ */
+export interface RecipeQuickLink {
+  title: string;
+  url: string;
+}
+
+/**
+ * Recipe downloadable executable
+ */
+export interface RecipeDownloadableExecutable {
+  title: string;
+  url: string;
+}
+
+/**
+ * Recipe related item
+ */
+export interface RecipeRelatedItem {
+  title: string;
+  url: string;
+}
+
+/**
+ * Legacy recipe walkthrough interface (for backward compatibility)
+ */
+export interface LegacyRecipeWalkthrough {
   createExecutable: {
     sourceObjectApiName: string;
     targetObjectApiName: string;
@@ -92,17 +148,29 @@ export interface CodeExample {
  */
 export interface RecipeItem {
   id: string;
-  name: string;
   title: string;
   category: string;
-  description: string;
-  useCase: string;
+  DSPVersions: string[];
+  usecase: string;
+  safeUsecase?: SafeHtml;
+  prerequisites: RecipePrerequisiteItem[];
+  direction: string;
+  safeDirection?: SafeHtml;
+  connection: string;
+  walkthrough: RecipeWalkthroughStep[];
+  downloadableExecutables: RecipeDownloadableExecutable[];
+  relatedRecipes: RecipeRelatedItem[];
+  keywords: string[];
+  
+  // Legacy fields for backward compatibility
+  name?: string;
+  description?: string;
+  useCase?: string;
   safeUseCase?: SafeHtml;
-  prerequisites: RecipePrerequisites;
-  walkthrough: RecipeWalkthrough;
+  legacyWalkthrough?: LegacyRecipeWalkthrough;
   downloadableExecutable?: RecipeExecutable;
-  tags: string[];
-  lastUpdated: Date;
+  tags?: string[];
+  lastUpdated?: Date;
   author?: string;
   seqNo?: number;
   
@@ -118,7 +186,7 @@ export interface RecipeItem {
 }
 
 /**
- * Recipe prerequisites
+ * Legacy recipe prerequisites (for backward compatibility)
  */
 export interface RecipePrerequisites {
   permissionSetsForBuilding: string[];
@@ -272,7 +340,7 @@ export enum RecipeContentStatus {
 }
 
 /**
- * Recipe step types for walkthrough
+ * Recipe step types for walkthrough (legacy and new)
  */
 export type RecipeStepType = 
   | 'createExecutable'
@@ -283,10 +351,16 @@ export type RecipeStepType =
   | 'action'
   | 'verify'
   | 'previewTransformed'
-  | 'addSchedule';
+  | 'addSchedule'
+  | 'custom'; // For new flexible step structure
 
 
 /**
  * Recipe categories (from Rules Engines subcategories)
  */
 export type RecipeCategoryType = 'action-button' | 'batch' | 'data-list' | 'data-loader' | 'triggers';
+
+/**
+ * Combined recipe walkthrough type (supports both legacy and new formats)
+ */
+export type RecipeWalkthrough = LegacyRecipeWalkthrough | RecipeWalkthroughStep[];

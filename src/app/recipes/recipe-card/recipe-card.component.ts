@@ -22,6 +22,7 @@ export class RecipeCardComponent {
    * Handle recipe card click
    */
   onRecipeClick(): void {
+    console.log('Recipe card clicked:', this.recipe.title);
     this.recipeSelect.emit(this.recipe);
   }
 

@@ -213,32 +213,105 @@
           <div class="recipe-content">
             <!-- Overview Content -->
             <div class="tab-content" *ngIf="ui.activeRecipeTab === 'overview'">
+              <!-- Use Case Section -->
               <section id="recipe-use-case" class="recipe-section">
                 <h3>Use Case</h3>
-                <div [innerHTML]="currentRecipe?.safeUseCase"></div>
+                <div [innerHTML]="currentRecipe?.safeUsecase || currentRecipe?.safeUseCase"></div>
               </section>
               
-              <section id="recipe-building-permissions" class="recipe-section">
+              <!-- DSP Versions -->
+              <section id="recipe-dsp-versions" class="recipe-section" *ngIf="currentRecipe?.DSPVersions?.length">
+                <h4>Supported DSP Versions:</h4>
+                <div class="version-tags">
+                  <span class="version-tag" *ngFor="let version of currentRecipe?.DSPVersions">{{ version }}</span>
+                </div>
+              </section>
+              
+              <!-- Connection Type -->
+              <section id="recipe-connection" class="recipe-section" *ngIf="currentRecipe?.connection">
+                <h4>Connection Type:</h4>
+                <p>{{ currentRecipe?.connection }}</p>
+              </section>
+              
+              <!-- Direction -->
+              <section id="recipe-direction" class="recipe-section" *ngIf="currentRecipe?.direction">
+                <h4>Direction:</h4>
+                <div [innerHTML]="currentRecipe?.safeDirection || currentRecipe?.direction"></div>
+              </section>
+              
+              <!-- Prerequisites (New Format) -->
+              <section id="recipe-prerequisites" class="recipe-section" *ngIf="hasArrayPrerequisites()">
+                <h4>Prerequisites:</h4>
+                <div class="prerequisites-list">
+                  <div class="prerequisite-item" *ngFor="let prereq of currentRecipe?.prerequisites">
+                    <p *ngIf="prereq.description">{{ prereq.description }}</p>
+                    <div class="quick-links" *ngIf="prereq.quickLinks?.length">
+                      <h5>Quick Links:</h5>
+                      <ul>
+                        <li *ngFor="let link of prereq.quickLinks">
+                          <a [href]="link.url" target="_blank">{{ link.title }}</a>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </section>
+              
+              <!-- Legacy Prerequisites Support -->
+              <section id="recipe-building-permissions" class="recipe-section" *ngIf="getPermissionSetsForBuilding().length > 0">
                 <h4>Permission Sets for Building:</h4>
                 <ul>
-                  <li *ngFor="let permission of currentRecipe?.prerequisites?.permissionSetsForBuilding">
+                  <li *ngFor="let permission of getPermissionSetsForBuilding()">
                     {{ permission }}
                   </li>
                 </ul>
               </section>
               
-              <section id="recipe-using-permissions" class="recipe-section">
+              <section id="recipe-using-permissions" class="recipe-section" *ngIf="getPermissionSetsForUsing().length > 0">
                 <h4>Permission Sets for Using:</h4>
                 <ul>
-                  <li *ngFor="let permission of currentRecipe?.prerequisites?.permissionSetsForUsing">
+                  <li *ngFor="let permission of getPermissionSetsForUsing()">
                     {{ permission }}
                   </li>
                 </ul>
               </section>
               
-              <section id="recipe-setup-instructions" class="recipe-section">
+              <section id="recipe-setup-instructions" class="recipe-section" *ngIf="getSafeDirections()">
                 <h4>Setup Instructions:</h4>
-                <div [innerHTML]="currentRecipe?.prerequisites?.safeDirections"></div>
+                <div [innerHTML]="getSafeDirections()"></div>
+              </section>
+              
+              <!-- Download section for new format (downloadableExecutables array) -->
+              <section id="recipe-download-executables" class="recipe-section" *ngIf="currentRecipe?.downloadableExecutables?.length">
+                <h4>Download Executable Files:</h4>
+                <div class="download-list">
+                  <div class="download-item" *ngFor="let executable of currentRecipe?.downloadableExecutables">
+                    <a [href]="executable.url" target="_blank" class="download-link">
+                      <mat-icon>download</mat-icon>
+                      {{ executable.title }}
+                    </a>
+                  </div>
+                </div>
+              </section>
+              
+              <!-- Related Recipes -->
+              <section id="recipe-related" class="recipe-section" *ngIf="currentRecipe?.relatedRecipes?.length">
+                <h4>Related Recipes:</h4>
+                <div class="related-recipes">
+                  <a *ngFor="let related of currentRecipe?.relatedRecipes" 
+                     [href]="related.url" 
+                     class="related-recipe-link">
+                    {{ related.title }}
+                  </a>
+                </div>
+              </section>
+              
+              <!-- Keywords -->
+              <section id="recipe-keywords" class="recipe-section" *ngIf="currentRecipe?.keywords?.length">
+                <h4>Keywords:</h4>
+                <div class="keyword-tags">
+                  <span class="keyword-tag" *ngFor="let keyword of currentRecipe?.keywords">{{ keyword }}</span>
+                </div>
               </section>
               
               <!-- Download section (moved from download tab) -->
@@ -262,80 +335,60 @@
             </div>
             
             <!-- Walkthrough Content -->
-            <div class="tab-content" *ngIf="ui.activeRecipeTab === 'walkthrough'">
-              <mat-stepper orientation="vertical" #stepper>
-                <mat-step label="Create Executable" id="recipe-create-executable" *ngIf="currentRecipe?.walkthrough?.createExecutable">
-                  <app-recipe-step 
-                    [stepData]="currentRecipe!.walkthrough.createExecutable"
-                    stepType="createExecutable"
-                    (stepComplete)="onStepComplete(0)">
-                  </app-recipe-step>
-                </mat-step>
+            <div class="tab-content walkthrough-content" *ngIf="ui.activeRecipeTab === 'walkthrough'">
+              <!-- Step Navigation Container -->
+              <div class="walkthrough-container" *ngIf="walkthroughSteps.length > 0">
                 
-                <mat-step label="Retrieve Data" id="recipe-retrieve-data" *ngIf="currentRecipe?.walkthrough?.retrieve">
-                  <app-recipe-step 
-                    [stepData]="currentRecipe!.walkthrough.retrieve"
-                    stepType="retrieve"
-                    (stepComplete)="onStepComplete(1)">
-                  </app-recipe-step>
-                </mat-step>
-                
-                <mat-step label="Scoping" id="recipe-scoping" *ngIf="currentRecipe?.walkthrough?.scoping">
-                  <app-recipe-step 
-                    [stepData]="currentRecipe!.walkthrough.scoping"
-                    stepType="scoping"
-                    (stepComplete)="onStepComplete(2)">
-                  </app-recipe-step>
-                </mat-step>
-                
-                <mat-step label="Match" id="recipe-match" *ngIf="currentRecipe?.walkthrough?.match">
-                  <app-recipe-step 
-                    [stepData]="currentRecipe!.walkthrough.match"
-                    stepType="match"
-                    (stepComplete)="onStepComplete(3)">
-                  </app-recipe-step>
-                </mat-step>
-                
-                <mat-step label="Mapping" id="recipe-mapping" *ngIf="currentRecipe?.walkthrough?.mapping">
-                  <app-recipe-step 
-                    [stepData]="currentRecipe!.walkthrough.mapping"
-                    stepType="mapping"
-                    (stepComplete)="onStepComplete(4)">
-                  </app-recipe-step>
-                </mat-step>
-                
-                <mat-step label="Action" id="recipe-action" *ngIf="currentRecipe?.walkthrough?.action">
-                  <app-recipe-step 
-                    [stepData]="currentRecipe!.walkthrough.action"
-                    stepType="action"
-                    (stepComplete)="onStepComplete(5)">
-                  </app-recipe-step>
-                </mat-step>
-                
-                <mat-step label="Verify" id="recipe-verify" *ngIf="currentRecipe?.walkthrough?.verify">
-                  <app-recipe-step 
-                    [stepData]="currentRecipe!.walkthrough.verify"
-                    stepType="verify"
-                    (stepComplete)="onStepComplete(6)">
-                  </app-recipe-step>
-                </mat-step>
-                
-                <mat-step label="Preview Transformed" id="recipe-preview-transformed" *ngIf="currentRecipe?.walkthrough?.previewTransformed">
-                  <app-recipe-step 
-                    [stepData]="currentRecipe!.walkthrough.previewTransformed"
-                    stepType="previewTransformed"
-                    (stepComplete)="onStepComplete(7)">
-                  </app-recipe-step>
-                </mat-step>
-                
-                <mat-step label="Add Schedule" id="recipe-add-schedule" *ngIf="currentRecipe?.walkthrough?.addSchedule">
-                  <app-recipe-step 
-                    [stepData]="currentRecipe!.walkthrough.addSchedule"
-                    stepType="addSchedule"
-                    (stepComplete)="onStepComplete(8)">
-                  </app-recipe-step>
-                </mat-step>
-              </mat-stepper>
+
+                <!-- Step Content Area -->
+                <div class="walkthrough-step-container">
+                  <!-- Current Step Content -->
+                  <div class="step-content-wrapper">
+                    <app-recipe-step 
+                      [stepData]="currentStepData"
+                      [stepType]="currentStepType">
+                    </app-recipe-step>
+                  </div>
+                </div>
+
+
+                <!-- Bottom Navigation -->
+                <div class="walkthrough-footer">
+                  <button 
+                    mat-stroked-button
+                    [disabled]="!canGoToPreviousStep"
+                    (click)="goToPreviousWalkthroughStep()">
+                    <mat-icon>chevron_left</mat-icon>
+                    Previous
+                  </button>
+                  
+                  <button 
+                    mat-raised-button
+                    color="primary"
+                    [disabled]="!canGoToNextStep"
+                    (click)="goToNextWalkthroughStep()"
+                    *ngIf="canGoToNextStep">
+                    Next
+                    <mat-icon>chevron_right</mat-icon>
+                  </button>
+                  
+                  <button 
+                    mat-raised-button
+                    color="accent"
+                    *ngIf="!canGoToNextStep">
+                    <mat-icon>check_circle</mat-icon>
+                    Complete
+                  </button>
+                </div>
+
+              </div>
+              
+              <!-- No Steps Available -->
+              <div class="no-steps" *ngIf="walkthroughSteps.length === 0">
+                <mat-icon>info</mat-icon>
+                <h3>No walkthrough steps available</h3>
+                <p>This recipe doesn't have detailed walkthrough steps configured.</p>
+              </div>
             </div>
           </div>
         </div>
@@ -380,7 +433,7 @@
       <!-- TOC Header - Simplified -->
       <div class="toc-header">
         <div class="toc-title-section">
-          <h3 class="toc-title">{{ showRecipeDetails ? 'Sections' : 'Recipes' }}</h3>
+          <h3 class="toc-title">{{ showRecipeDetails ? 'Sections' : currentTOCTitle }}</h3>
         </div>
       </div>
       

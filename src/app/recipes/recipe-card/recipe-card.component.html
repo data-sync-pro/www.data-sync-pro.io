@@ -1,5 +1,5 @@
 <mat-card class="recipe-card" (click)="onRecipeClick()">
-  <!-- 顶部行：category + download按钮 -->
+  <!-- Header row: category + download button -->
   <div class="card-header">
     <span class="category-tag" [class]="recipe.category">{{ recipe.category | titlecase }}</span>
     <button mat-icon-button 
@@ -13,7 +13,7 @@
     </button>
   </div>
   
-  <!-- 主要内容：标题 -->
+  <!-- Main content: title -->
   <div class="card-body">
     <h3 class="recipe-title" [title]="recipe.title">{{ recipe.title }}</h3>
   </div>

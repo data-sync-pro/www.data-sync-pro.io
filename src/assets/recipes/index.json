@@ -1,0 +1,10 @@
+{
+  "recipes": [
+    {
+      "folderId": "salesforce-data-sync-automation",
+      "name": "Auto-Close Stagnant Cases",
+      "category": "batch",
+      "active": true
+    }
+  ]
+}
