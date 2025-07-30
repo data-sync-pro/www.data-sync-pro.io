@@ -8,6 +8,324 @@
 // Component-specific overrides and adjustments
 // The main layout is handled by modular styles
 
+// ==================== Recipe Detail Content Styles ====================
+
+// Version and keyword tags
+.version-tags, .keyword-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.version-tag, .keyword-tag {
+  background: #e3f2fd;
+  color: #1976d2;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 4px 12px;
+  border-radius: 16px;
+  border: 1px solid #bbdefb;
+  transition: all 0.2s ease;
+}
+
+.version-tag:hover, .keyword-tag:hover {
+  background: #bbdefb;
+  transform: translateY(-1px);
+}
+
+// Prerequisites styling
+.prerequisites-list {
+  margin-top: 16px;
+}
+
+.prerequisite-item {
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+  border-left: 4px solid #007bff;
+}
+
+.prerequisite-item p {
+  margin: 0 0 12px 0;
+  color: #495057;
+  line-height: 1.5;
+}
+
+.quick-links h5 {
+  margin: 12px 0 8px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #007bff;
+}
+
+.quick-links ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.quick-links a {
+  color: #007bff;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.quick-links a:hover {
+  color: #0056b3;
+  text-decoration: underline;
+}
+
+// Download section styling
+.download-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.download-item {
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 12px;
+  transition: all 0.2s ease;
+}
+
+.download-item:hover {
+  background: #e9ecef;
+  border-color: #007bff;
+}
+
+.download-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #007bff;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.download-link:hover {
+  color: #0056b3;
+}
+
+.download-link mat-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+// Related recipes styling
+.related-recipes {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.related-recipe-link {
+  color: #007bff;
+  text-decoration: none;
+  font-weight: 500;
+  padding: 8px 12px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.related-recipe-link:hover {
+  background: #e3f2fd;
+  border-color: #bbdefb;
+  text-decoration: none;
+}
+
+// ==================== Walkthrough Styles ====================
+.walkthrough-content {
+  position: relative;
+  min-height: 600px;
+}
+
+.walkthrough-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.walkthrough-header {
+  margin-bottom: 32px;
+  padding-bottom: 24px;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.step-progress {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.step-counter {
+  font-size: 14px;
+  color: #666;
+  font-weight: 500;
+  min-width: 120px;
+}
+
+.progress-bar {
+  flex: 1;
+  height: 8px;
+  background: #e0e0e0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #1976d2 0%, #42a5f5 100%);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.step-title {
+  color: #1976d2;
+  margin: 0;
+  font-size: 28px;
+  font-weight: 600;
+}
+
+.walkthrough-step-container {
+  display: block;
+  margin-bottom: 32px;
+  min-height: 500px;
+}
+
+
+.step-content-wrapper {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  overflow: hidden;
+  min-height: 450px;
+  animation: fadeIn 0.3s ease-in-out;
+  
+  :host ::ng-deep app-recipe-step {
+    display: block;
+    height: 100%;
+  }
+}
+
+.step-indicators {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+}
+
+.step-indicator {
+  width: 36px !important;
+  height: 36px !important;
+  min-width: 36px !important;
+  
+  &.active {
+    background-color: #1976d2 !important;
+    color: white !important;
+  }
+  
+  &.completed {
+    background-color: #4caf50 !important;
+    color: white !important;
+  }
+  
+  span, mat-icon {
+    font-size: 14px;
+    font-weight: 600;
+  }
+}
+
+.walkthrough-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 24px;
+  border-top: 1px solid #e0e0e0;
+  gap: 16px;
+}
+
+.footer-nav-buttons {
+  display: flex;
+  gap: 12px;
+}
+
+.no-steps {
+  text-align: center;
+  padding: 64px 24px;
+  color: #666;
+  
+  mat-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    margin-bottom: 16px;
+    color: #bbb;
+  }
+  
+  h3 {
+    margin-bottom: 8px;
+    color: #333;
+  }
+  
+  p {
+    margin: 0;
+    max-width: 400px;
+    margin: 0 auto;
+  }
+}
+
+// Mobile responsive styles for walkthrough
+@media (max-width: 768px) {
+  .walkthrough-footer {
+    flex-direction: column;
+    gap: 16px;
+    align-items: stretch;
+    
+    button {
+      width: 100%;
+    }
+  }
+  
+  .footer-nav-buttons {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .step-indicators {
+    gap: 6px;
+  }
+  
+  .step-indicator {
+    width: 32px !important;
+    height: 32px !important;
+    min-width: 32px !important;
+  }
+}
+
+// Animations
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 // Recipe page styling
 :host-context(body.recipe-page) {
   display: block;

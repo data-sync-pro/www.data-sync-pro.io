@@ -1,7 +1,7 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, BehaviorSubject, of, throwError } from 'rxjs';
-import { map, catchError, shareReplay, tap, finalize } from 'rxjs/operators';
+import { Observable, BehaviorSubject, of, throwError, combineLatest } from 'rxjs';
+import { map, catchError, shareReplay, tap, finalize, switchMap } from 'rxjs/operators';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 import {
@@ -15,15 +15,31 @@ import {
   RecipeProgress,
   RecipeEvent,
   RecipeContentStatus,
-  RecipeCategoryType
+  RecipeCategoryType,
+  RecipeWalkthroughStep,
+  LegacyRecipeWalkthrough
 } from '../models/recipe.model';
+
+/**
+ * Recipe index configuration
+ */
+interface RecipeIndexConfig {
+  recipes: RecipeIndexItem[];
+}
+
+interface RecipeIndexItem {
+  folderId: string;
+  name: string;
+  category: string;
+  active: boolean;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class RecipeService implements OnDestroy {
-  private readonly RECIPE_DATA_URL = 'assets/data/recipes.json';
-  private readonly RECIPE_CONTENT_BASE = 'assets/recipe-content/';
+  private readonly RECIPE_FOLDERS_BASE = 'assets/recipes/';
+  private readonly RECIPE_INDEX_URL = 'assets/recipes/index.json';
   
   // Cache
   private recipesCache$ = new BehaviorSubject<RecipeItem[]>([]);
@@ -88,7 +104,7 @@ export class RecipeService implements OnDestroy {
   }
 
   /**
-   * Load recipes from JSON file
+   * Load recipes from multiple sources
    */
   private loadRecipes(): void {
     if (this.isLoading) {
@@ -97,8 +113,9 @@ export class RecipeService implements OnDestroy {
 
     this.isLoading = true;
 
-    this.http.get<SourceRecipeRecord[]>(this.RECIPE_DATA_URL).pipe(
-      map(records => this.transformRecipeRecords(records)),
+    // Load recipes from folders
+    this.loadFolderRecipes().pipe(
+      map(recipes => this.transformRecipeRecords(recipes)),
       tap(recipes => this.updateCategoriesCache(recipes)),
       shareReplay(1),
       finalize(() => this.isLoading = false)
@@ -114,35 +131,130 @@ export class RecipeService implements OnDestroy {
     });
   }
 
+
+  /**
+   * Load recipes from individual folders using dynamic discovery
+   */
+  private loadFolderRecipes(): Observable<SourceRecipeRecord[]> {
+    // First, load the recipe index to get available recipe folders
+    return this.http.get<RecipeIndexConfig>(this.RECIPE_INDEX_URL).pipe(
+      map(indexConfig => indexConfig.recipes.filter(item => item.active)),
+      switchMap(activeRecipes => {
+        if (activeRecipes.length === 0) {
+          return of([]);
+        }
+
+        const recipeRequests = activeRecipes.map(recipeIndex => 
+          this.http.get<SourceRecipeRecord>(`${this.RECIPE_FOLDERS_BASE}${recipeIndex.folderId}/recipe.json`).pipe(
+            catchError(error => {
+              console.warn(`Failed to load recipe from folder ${recipeIndex.folderId}:`, error);
+              return of(null);
+            })
+          )
+        );
+
+        return combineLatest(recipeRequests).pipe(
+          map(recipes => recipes.filter(recipe => recipe !== null) as SourceRecipeRecord[])
+        );
+      }),
+      catchError(error => {
+        console.error('Failed to load recipe index:', error);
+        return of([]);
+      })
+    );
+  }
+
   /**
    * Transform source recipe records to application format
    */
   private transformRecipeRecords(records: SourceRecipeRecord[]): RecipeItem[] {
-    return records.map(record => ({
-      id: record.id,
-      name: record.name,
-      title: record.title,
-      category: record.category,
-      description: record.description,
-      useCase: record.useCase,
-      safeUseCase: this.sanitizer.bypassSecurityTrustHtml(record.useCase),
-      prerequisites: {
-        ...record.prerequisites,
-        safeDirections: this.sanitizer.bypassSecurityTrustHtml(record.prerequisites.directions)
-      },
-      walkthrough: record.walkthrough,
-      downloadableExecutable: record.downloadableExecutable,
-      tags: record.tags,
-      lastUpdated: new Date(record.lastUpdated),
-      author: record.author,
-      seqNo: record.seqNo,
-      isExpanded: false,
-      isLoading: false,
-      viewCount: 0,
-      currentStep: 0,
-      completedSteps: [],
-      showSocialShare: false
-    }));
+    return records.map(record => this.transformSingleRecord(record));
+  }
+
+  /**
+   * Transform a single record to handle both new and legacy formats
+   */
+  private transformSingleRecord(record: SourceRecipeRecord): RecipeItem {
+    // Check if this is a new format record (based on walkthrough being an array)
+    if (Array.isArray(record.walkthrough) && record.usecase && Array.isArray(record.prerequisites)) {
+      return {
+        // New format fields
+        id: record.id,
+        title: record.title,
+        category: record.category,
+        DSPVersions: record.DSPVersions || [],
+        usecase: record.usecase,
+        safeUsecase: this.sanitizer.bypassSecurityTrustHtml(record.usecase),
+        prerequisites: record.prerequisites || [],
+        direction: record.direction || '',
+        safeDirection: record.direction ? this.sanitizer.bypassSecurityTrustHtml(record.direction) : this.sanitizer.bypassSecurityTrustHtml(''),
+        connection: record.connection || 'Salesforce to Salesforce',
+        walkthrough: record.walkthrough || [],
+        downloadableExecutables: record.downloadableExecutables || [],
+        relatedRecipes: record.relatedRecipes || [],
+        keywords: record.keywords || [],
+        
+        // Legacy compatibility fields
+        name: record.name,
+        description: record.description,
+        useCase: record.useCase,
+        safeUseCase: record.useCase ? this.sanitizer.bypassSecurityTrustHtml(record.useCase) : undefined,
+        tags: record.tags,
+        lastUpdated: record.lastUpdated ? new Date(record.lastUpdated) : undefined,
+        author: record.author,
+        seqNo: record.seqNo,
+        
+        // Runtime properties
+        isExpanded: false,
+        isLoading: false,
+        viewCount: 0,
+        currentStep: 0,
+        completedSteps: [],
+        showSocialShare: false
+      };
+    } else {
+      // Legacy format - maintain backward compatibility
+      return {
+        // Required new format fields (with defaults)
+        id: record.id,
+        title: record.title,
+        category: record.category,
+        DSPVersions: [],
+        usecase: record.useCase || record.description || '',
+        safeUsecase: this.sanitizer.bypassSecurityTrustHtml(record.useCase || record.description || ''),
+        prerequisites: record.prerequisites as any || [],
+        direction: '',
+        safeDirection: this.sanitizer.bypassSecurityTrustHtml(''),
+        connection: '',
+        walkthrough: [],
+        downloadableExecutables: (record as any).downloadableExecutable ? [{
+          title: (record as any).downloadableExecutable.description || (record as any).downloadableExecutable.fileName,
+          url: (record as any).downloadableExecutable.filePath
+        }] : [],
+        relatedRecipes: [],
+        keywords: record.tags || [],
+        
+        // Legacy fields
+        name: record.name,
+        description: record.description,
+        useCase: record.useCase,
+        safeUseCase: record.useCase ? this.sanitizer.bypassSecurityTrustHtml(record.useCase) : undefined,
+        legacyWalkthrough: record.walkthrough as any as LegacyRecipeWalkthrough,
+        downloadableExecutable: (record as any).downloadableExecutable,
+        tags: record.tags,
+        lastUpdated: new Date(record.lastUpdated || Date.now()),
+        author: record.author,
+        seqNo: record.seqNo,
+        
+        // Runtime properties
+        isExpanded: false,
+        isLoading: false,
+        viewCount: 0,
+        currentStep: 0,
+        completedSteps: [],
+        showSocialShare: false
+      };
+    }
   }
 
   /**
@@ -156,12 +268,15 @@ export class RecipeService implements OnDestroy {
       categoryMap.set(recipe.category, count + 1);
     });
 
-    this.categoriesCache = Array.from(categoryMap.entries()).map(([category, count]) => ({
-      name: category,
-      displayName: this.CATEGORY_DISPLAY_NAMES[category as RecipeCategoryType] || category,
-      description: this.CATEGORY_DESCRIPTIONS[category as RecipeCategoryType] || '',
-      count
-    }));
+    // Only include categories that actually have recipes
+    this.categoriesCache = Array.from(categoryMap.entries())
+      .filter(([_, count]) => count > 0)  // Only include categories with at least one recipe
+      .map(([category, count]) => ({
+        name: category,
+        displayName: this.CATEGORY_DISPLAY_NAMES[category as RecipeCategoryType] || category,
+        description: this.CATEGORY_DESCRIPTIONS[category as RecipeCategoryType] || '',
+        count
+      }));
   }
 
   /**
@@ -181,13 +296,16 @@ export class RecipeService implements OnDestroy {
   }
 
   /**
-   * Get single recipe by name and category
+   * Get single recipe by id and category
    */
-  getRecipe(category: string, recipeName: string): Observable<RecipeItem | null> {
+  getRecipe(category: string, recipeId: string): Observable<RecipeItem | null> {
     return this.recipesCache$.pipe(
-      map(recipes => recipes.find(recipe => 
-        recipe.category === category && recipe.name === recipeName
-      ) || null)
+      map(recipes => {
+        const foundRecipe = recipes.find(recipe => 
+          recipe.category === category && recipe.id === recipeId
+        );
+        return foundRecipe || null;
+      })
     );
   }
 
@@ -252,16 +370,28 @@ export class RecipeService implements OnDestroy {
         matchedFields.push('title');
       }
 
-      // Description match
-      if (recipe.description.toLowerCase().includes(lowerQuery)) {
+      // Description match (legacy)
+      if (recipe.description?.toLowerCase().includes(lowerQuery)) {
         score += 50;
         matchedFields.push('description');
       }
 
-      // Tags match
-      if (recipe.tags.some(tag => tag.toLowerCase().includes(lowerQuery))) {
+      // Usecase match (new format)
+      if (recipe.usecase.toLowerCase().includes(lowerQuery)) {
+        score += 50;
+        matchedFields.push('usecase');
+      }
+
+      // Tags match (legacy)
+      if (recipe.tags?.some(tag => tag.toLowerCase().includes(lowerQuery))) {
         score += 30;
         matchedFields.push('tags');
+      }
+
+      // Keywords match (new format)
+      if (recipe.keywords?.some(keyword => keyword.toLowerCase().includes(lowerQuery))) {
+        score += 30;
+        matchedFields.push('keywords');
       }
 
       // Category match
@@ -270,10 +400,22 @@ export class RecipeService implements OnDestroy {
         matchedFields.push('category');
       }
 
-      // Use case match
-      if (recipe.useCase.toLowerCase().includes(lowerQuery)) {
+      // Use case match (legacy)
+      if (recipe.useCase?.toLowerCase().includes(lowerQuery)) {
         score += 15;
         matchedFields.push('useCase');
+      }
+
+      // Connection match (new format)
+      if (recipe.connection?.toLowerCase().includes(lowerQuery)) {
+        score += 15;
+        matchedFields.push('connection');
+      }
+
+      // Direction match (new format)
+      if (recipe.direction?.toLowerCase().includes(lowerQuery)) {
+        score += 15;
+        matchedFields.push('direction');
       }
 
       if (score > 0) {
@@ -282,7 +424,7 @@ export class RecipeService implements OnDestroy {
           relevanceScore: score,
           matchedFields,
           highlightedTitle: this.highlightKeywords(recipe.title, [query]),
-          highlightedDescription: this.highlightKeywords(recipe.description, [query])
+          highlightedDescription: this.highlightKeywords(recipe.description || recipe.usecase, [query])
         });
       }
     });
@@ -426,7 +568,8 @@ export class RecipeService implements OnDestroy {
             .sort((a, b) => (b.viewCount || 0) - (a.viewCount || 0))
             .slice(0, 5),
           recentlyUpdated: recipes
-            .sort((a, b) => b.lastUpdated.getTime() - a.lastUpdated.getTime())
+            .filter(recipe => recipe.lastUpdated)
+            .sort((a, b) => (b.lastUpdated?.getTime() || 0) - (a.lastUpdated?.getTime() || 0))
             .slice(0, 5),
           avgCompletionTime: 0, // Removed estimatedTime calculation
           popularCategories: Array.from(categoryStats.entries())

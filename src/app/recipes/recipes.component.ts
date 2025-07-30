@@ -21,7 +21,8 @@ import {
   RecipeNavigationState,
   RecipeSection,
   RecipeTab,
-  RecipeTOCStructure
+  RecipeTOCStructure,
+  LegacyRecipeWalkthrough
 } from '../shared/models/recipe.model';
 import { RecipeService } from '../shared/services/recipe.service';
 import { SelectedRecipe } from './recipe-search-overlay/recipe-search-overlay.component';
@@ -43,6 +44,9 @@ interface UIState {
   userHasScrolled: boolean;
   scrollTicking: boolean;
   disableScrollHighlight: boolean;
+  // Walkthrough step navigation
+  currentWalkthroughStep: number;
+  walkthroughStepsCompleted: Set<number>;
 }
 
 interface TOCPaginationState {
@@ -98,7 +102,10 @@ export class RecipesComponent implements OnInit, OnDestroy {
     highlightedTOCTab: '', // No longer used since TOC doesn't show tabs
     userHasScrolled: false,
     scrollTicking: false,
-    disableScrollHighlight: false
+    disableScrollHighlight: false,
+    // Walkthrough step navigation
+    currentWalkthroughStep: 0,
+    walkthroughStepsCompleted: new Set<number>()
   };
 
   // TOC pagination state
@@ -287,7 +294,10 @@ export class RecipesComponent implements OnInit, OnDestroy {
     ).subscribe({
       next: (recipes) => {
         this.recipes = recipes;
-        this.filteredRecipes = recipes;
+        // Only set filteredRecipes when in home view to avoid overwriting category filters
+        if (this.ui.currentView === 'home') {
+          this.filteredRecipes = recipes;
+        }
         this.resetTOCPagination();
         this.updateUIState({ isLoading: false });
         this.cdr.markForCheck();
@@ -398,7 +408,8 @@ export class RecipesComponent implements OnInit, OnDestroy {
    * Navigate to recipe
    */
   goToRecipe(recipe: RecipeItem): void {
-    this.router.navigate(['/recipes', recipe.category, recipe.name]);
+    console.log('Navigating to recipe:', recipe.title, '(id:', recipe.id, ') Category:', recipe.category);
+    this.router.navigate(['/recipes', recipe.category, recipe.id]);
     
     // Reset to overview tab when navigating to a different recipe
     this.ui.activeRecipeTab = 'overview';
@@ -422,6 +433,11 @@ export class RecipesComponent implements OnInit, OnDestroy {
     // Clear active section when clicking on tab directly
     this.ui.activeSectionId = '';
     this.recipeTOC.currentSectionId = '';
+    
+    // If switching to walkthrough tab, sync with current step
+    if (tabName === 'walkthrough') {
+      this.syncTOCSectionWithWalkthrough();
+    }
     
     // Clear section cache when switching tabs since DOM content changes
     this.clearSectionElementsCache();
@@ -457,6 +473,15 @@ export class RecipesComponent implements OnInit, OnDestroy {
     
     // Ensure the parent tab is expanded and set as active for content display
     this.ensureParentTabActive(sectionId);
+    
+    // Check if this is a walkthrough section and navigate to corresponding step
+    if (this.ui.activeRecipeTab === 'walkthrough') {
+      const stepIndex = this.getWalkthroughStepFromSectionId(sectionId);
+      if (stepIndex >= 0) {
+        console.log('Navigating to walkthrough step:', stepIndex);
+        this.ui.currentWalkthroughStep = stepIndex;
+      }
+    }
     
     // Temporarily disable scroll highlighting to avoid conflicts during navigation
     this.ui.disableScrollHighlight = true;
@@ -645,7 +670,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
 
     if (this.currentRecipe) {
       pageTitle = `${this.currentRecipe.title} - Recipe - Data Sync Pro`;
-      pageDescription = this.currentRecipe.description;
+      pageDescription = this.currentRecipe.description || this.currentRecipe.usecase;
     } else if (this.navigation.category) {
       const category = this.categories.find(cat => cat.name === this.navigation.category);
       if (category) {
@@ -793,8 +818,11 @@ export class RecipesComponent implements OnInit, OnDestroy {
     // Show on home page if we have trending recipes
     if (this.showHome) return this.trendingRecipes.length > 0;
     
-    // Show on category pages if we have multiple recipes
-    return (!!this.navigation.category) && this.currentRecipes.length > 1;
+    // Show on recipe detail page
+    if (this.showRecipeDetails) return true;
+    
+    // Show on category pages if we have at least one recipe
+    return (!!this.navigation.category) && this.currentRecipes.length >= 1;
   }
 
   /**
@@ -820,7 +848,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
    * Get current TOC title
    */
   get currentTOCTitle(): string {
-    if (this.showHome) return 'Popular Recipes';
+    if (this.showHome) return 'Trending recipes';
     if (this.navigation.category) {
       const category = this.categories.find(c => c.name === this.navigation.category);
       return category ? `${category.displayName} Recipes` : 'Category Recipes';
@@ -844,7 +872,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Generate recipe TOC structure based on current recipe
+   * Generate recipe TOC structure based on current recipe - Dynamic generation
    */
   generateRecipeTOCStructure(): void {
     if (!this.currentRecipe) {
@@ -854,43 +882,149 @@ export class RecipesComponent implements OnInit, OnDestroy {
 
     const tabs: RecipeTab[] = [];
 
-    // Overview Tab
+    // Generate Overview Tab dynamically based on available content
+    const overviewSections = this.generateOverviewSections();
     tabs.push({
       id: 'overview',
       title: 'Overview',
       icon: 'article',
       description: '',
-      sections: [
-        {
-          id: 'use-case',
-          title: 'Use Case',
-          icon: 'info',
-          elementId: 'recipe-use-case'
-        },
-        {
-          id: 'building-permissions',
-          title: 'Building Permissions',
-          icon: 'build',
-          elementId: 'recipe-building-permissions'
-        },
-        {
-          id: 'using-permissions',
-          title: 'Using Permissions',
-          icon: 'group',
-          elementId: 'recipe-using-permissions'
-        },
-        {
-          id: 'setup-instructions',
-          title: 'Setup Instructions',
-          icon: 'settings',
-          elementId: 'recipe-setup-instructions'
-        }
-      ]
+      sections: overviewSections
     });
 
-    // Add download sections to Overview tab if downloadable executable exists
-    if (this.currentRecipe.downloadableExecutable) {
-      tabs[0].sections.push(
+    // Generate Walkthrough Tab dynamically
+    const walkthroughSections = this.generateWalkthroughSections();
+    if (walkthroughSections.length > 0) {
+      tabs.push({
+        id: 'walkthrough',
+        title: 'Walkthrough',
+        icon: 'timeline',
+        description: 'Step-by-step Guide',
+        sections: walkthroughSections
+      });
+    }
+
+
+    this.recipeTOC.tabs = tabs;
+    this.recipeTOC.currentTabId = this.ui.activeRecipeTab;
+    this.recipeTOC.currentSectionId = this.ui.activeSectionId;
+  }
+
+  /**
+   * Generate Overview sections dynamically based on available content
+   */
+  private generateOverviewSections(): RecipeSection[] {
+    const sections: RecipeSection[] = [];
+
+    // Use Case - Always present
+    sections.push({
+      id: 'use-case',
+      title: 'Use Case',
+      icon: 'info',
+      elementId: 'recipe-use-case'
+    });
+
+    // DSP Versions - New format
+    if (this.currentRecipe?.DSPVersions?.length) {
+      sections.push({
+        id: 'dsp-versions',
+        title: 'DSP Versions',
+        icon: 'verified',
+        elementId: 'recipe-dsp-versions'
+      });
+    }
+
+    // Connection Type - New format
+    if (this.currentRecipe?.connection) {
+      sections.push({
+        id: 'connection',
+        title: 'Connection Type',
+        icon: 'link',
+        elementId: 'recipe-connection'
+      });
+    }
+
+    // Direction - New format
+    if (this.currentRecipe?.direction) {
+      sections.push({
+        id: 'direction',
+        title: 'Direction',
+        icon: 'trending_flat',
+        elementId: 'recipe-direction'
+      });
+    }
+
+    // Prerequisites - New format (array)
+    if (this.hasArrayPrerequisites()) {
+      sections.push({
+        id: 'prerequisites',
+        title: 'Prerequisites',
+        icon: 'checklist',
+        elementId: 'recipe-prerequisites'
+      });
+    }
+
+    // Legacy Prerequisites Support
+    if (this.getPermissionSetsForBuilding().length > 0) {
+      sections.push({
+        id: 'building-permissions',
+        title: 'Building Permissions',
+        icon: 'build',
+        elementId: 'recipe-building-permissions'
+      });
+    }
+
+    if (this.getPermissionSetsForUsing().length > 0) {
+      sections.push({
+        id: 'using-permissions',
+        title: 'Using Permissions',
+        icon: 'group',
+        elementId: 'recipe-using-permissions'
+      });
+    }
+
+    if (this.getSafeDirections()) {
+      sections.push({
+        id: 'setup-instructions',
+        title: 'Setup Instructions',
+        icon: 'settings',
+        elementId: 'recipe-setup-instructions'
+      });
+    }
+
+    // Download Executables - New format (array)
+    if (this.currentRecipe?.downloadableExecutables?.length) {
+      sections.push({
+        id: 'download-executables',
+        title: 'Download Files',
+        icon: 'download',
+        elementId: 'recipe-download-executables'
+      });
+    }
+
+    // Related Recipes - New format
+    if (this.currentRecipe?.relatedRecipes?.length) {
+      sections.push({
+        id: 'related-recipes',
+        title: 'Related Recipes',
+        icon: 'link',
+        elementId: 'recipe-related'
+      });
+    }
+
+    // Keywords - New format
+    if (this.currentRecipe?.keywords?.length) {
+      sections.push({
+        id: 'keywords',
+        title: 'Keywords',
+        icon: 'label',
+        elementId: 'recipe-keywords'
+      });
+    }
+
+    // Legacy Download Support
+    if (this.currentRecipe?.downloadableExecutable) {
+      sections.push(
         {
           id: 'download-executable',
           title: 'Download Executable',
@@ -912,103 +1046,54 @@ export class RecipesComponent implements OnInit, OnDestroy {
       );
     }
 
-    // Walkthrough Tab
-    const walkthroughSections: RecipeSection[] = [];
-    const walkthrough = this.currentRecipe.walkthrough;
+    return sections;
+  }
 
-    if (walkthrough.createExecutable) {
-      walkthroughSections.push({
-        id: 'create-executable',
-        title: 'Create Executable',
-        icon: 'add_circle',
-        elementId: 'recipe-create-executable'
+  /**
+   * Generate Walkthrough sections dynamically based on available content
+   */
+  private generateWalkthroughSections(): RecipeSection[] {
+    const sections: RecipeSection[] = [];
+    const walkthrough = this.currentRecipe?.walkthrough;
+    const legacyWalkthrough = this.currentRecipe?.legacyWalkthrough;
+
+    // Handle new array format
+    if (Array.isArray(walkthrough)) {
+      walkthrough.forEach((step, index) => {
+        sections.push({
+          id: `step-${index}`,
+          title: step.step || `Step ${index + 1}`,
+          icon: 'settings',
+          elementId: `recipe-step-${index}`
+        });
+      });
+    } else if (legacyWalkthrough) {
+      // Legacy format - dynamic detection of available steps
+      const legacySteps = [
+        { key: 'createExecutable', title: 'Create Executable', icon: 'add_circle', elementId: 'recipe-create-executable' },
+        { key: 'retrieve', title: 'Retrieve Data', icon: 'download', elementId: 'recipe-retrieve-data' },
+        { key: 'scoping', title: 'Scoping', icon: 'filter_list', elementId: 'recipe-scoping' },
+        { key: 'match', title: 'Match', icon: 'compare_arrows', elementId: 'recipe-match' },
+        { key: 'mapping', title: 'Mapping', icon: 'swap_horiz', elementId: 'recipe-mapping' },
+        { key: 'action', title: 'Action', icon: 'play_arrow', elementId: 'recipe-action' },
+        { key: 'verify', title: 'Verify', icon: 'check_circle', elementId: 'recipe-verify' },
+        { key: 'previewTransformed', title: 'Preview Transformed', icon: 'preview', elementId: 'recipe-preview-transformed' },
+        { key: 'addSchedule', title: 'Add Schedule', icon: 'schedule', elementId: 'recipe-add-schedule' }
+      ];
+
+      legacySteps.forEach(step => {
+        if ((legacyWalkthrough as any)[step.key]) {
+          sections.push({
+            id: step.key.replace(/([A-Z])/g, '-$1').toLowerCase(),
+            title: step.title,
+            icon: step.icon,
+            elementId: step.elementId
+          });
+        }
       });
     }
 
-    if (walkthrough.retrieve) {
-      walkthroughSections.push({
-        id: 'retrieve-data',
-        title: 'Retrieve Data',
-        icon: 'download',
-        elementId: 'recipe-retrieve-data'
-      });
-    }
-
-    if (walkthrough.scoping) {
-      walkthroughSections.push({
-        id: 'scoping',
-        title: 'Scoping',
-        icon: 'filter_list',
-        elementId: 'recipe-scoping'
-      });
-    }
-
-    if (walkthrough.match) {
-      walkthroughSections.push({
-        id: 'match',
-        title: 'Match',
-        icon: 'compare_arrows',
-        elementId: 'recipe-match'
-      });
-    }
-
-    if (walkthrough.mapping) {
-      walkthroughSections.push({
-        id: 'mapping',
-        title: 'Mapping',
-        icon: 'swap_horiz',
-        elementId: 'recipe-mapping'
-      });
-    }
-
-    if (walkthrough.action) {
-      walkthroughSections.push({
-        id: 'action',
-        title: 'Action',
-        icon: 'play_arrow',
-        elementId: 'recipe-action'
-      });
-    }
-
-    if (walkthrough.verify) {
-      walkthroughSections.push({
-        id: 'verify',
-        title: 'Verify',
-        icon: 'check_circle',
-        elementId: 'recipe-verify'
-      });
-    }
-
-    if (walkthrough.previewTransformed) {
-      walkthroughSections.push({
-        id: 'preview-transformed',
-        title: 'Preview Transformed',
-        icon: 'preview',
-        elementId: 'recipe-preview-transformed'
-      });
-    }
-
-    if (walkthrough.addSchedule) {
-      walkthroughSections.push({
-        id: 'add-schedule',
-        title: 'Add Schedule',
-        icon: 'schedule',
-        elementId: 'recipe-add-schedule'
-      });
-    }
-
-    tabs.push({
-      id: 'walkthrough',
-      title: 'Walkthrough',
-      icon: 'timeline',
-      description: 'Step-by-step Guide',
-      sections: walkthroughSections
-    });
-
-
-    this.recipeTOC.tabs = tabs;
-    this.recipeTOC.currentTabId = this.ui.activeRecipeTab;
-    this.recipeTOC.currentSectionId = this.ui.activeSectionId;
+    return sections;
   }
 
   /**
@@ -1270,6 +1355,356 @@ export class RecipesComponent implements OnInit, OnDestroy {
     if (this.currentRecipe) {
       this.updateRecipeProgress(this.currentRecipe, stepNumber);
     }
+  }
+
+  // ==================== Walkthrough Step Navigation ====================
+
+  /**
+   * Get all walkthrough steps for current recipe
+   */
+  get walkthroughSteps(): string[] {
+    if (!this.currentRecipe?.walkthrough) return [];
+    
+    const steps: string[] = [];
+    const walkthrough = this.currentRecipe.walkthrough;
+    const legacyWalkthrough = this.currentRecipe.legacyWalkthrough;
+    
+    // Handle both new array format and legacy object format
+    if (Array.isArray(walkthrough)) {
+      // New format - return step names
+      return walkthrough.map((step, index) => step.step || `Step ${index + 1}`);
+    } else if (legacyWalkthrough) {
+      // Legacy format - check for named properties
+      if (legacyWalkthrough.createExecutable) steps.push('createExecutable');
+      if (legacyWalkthrough.retrieve) steps.push('retrieve');
+      if (legacyWalkthrough.scoping) steps.push('scoping');
+      if (legacyWalkthrough.match) steps.push('match');
+      if (legacyWalkthrough.mapping) steps.push('mapping');
+      if (legacyWalkthrough.action) steps.push('action');
+      if (legacyWalkthrough.verify) steps.push('verify');
+      if (legacyWalkthrough.previewTransformed) steps.push('previewTransformed');
+      if (legacyWalkthrough.addSchedule) steps.push('addSchedule');
+    }
+    
+    return steps;
+  }
+
+  /**
+   * Get current step data
+   */
+  get currentStepData(): any {
+    if (!this.currentRecipe?.walkthrough) return null;
+    
+    // Handle new array format
+    if (Array.isArray(this.currentRecipe.walkthrough)) {
+      const steps = this.currentRecipe.walkthrough;
+      if (this.ui.currentWalkthroughStep >= 0 && this.ui.currentWalkthroughStep < steps.length) {
+        return steps[this.ui.currentWalkthroughStep];
+      }
+      return null;
+    }
+    
+    // Legacy format handling
+    const steps = this.walkthroughSteps;
+    if (steps.length === 0 || this.ui.currentWalkthroughStep >= steps.length) return null;
+    
+    const stepType = steps[this.ui.currentWalkthroughStep];
+    const walkthrough = this.currentRecipe?.legacyWalkthrough as any;
+    return walkthrough?.[stepType] || null;
+  }
+
+  /**
+   * Get current step type
+   */
+  get currentStepType(): string {
+    if (!this.currentRecipe?.walkthrough) return '';
+    
+    // Handle new array format
+    if (Array.isArray(this.currentRecipe.walkthrough)) {
+      const steps = this.currentRecipe.walkthrough;
+      if (this.ui.currentWalkthroughStep >= 0 && this.ui.currentWalkthroughStep < steps.length) {
+        return 'custom'; // All new format steps use 'custom' type
+      }
+      return '';
+    }
+    
+    // Legacy format handling
+    const steps = this.walkthroughSteps;
+    if (steps.length === 0 || this.ui.currentWalkthroughStep >= steps.length) return '';
+    
+    return steps[this.ui.currentWalkthroughStep];
+  }
+
+  /**
+   * Get step title
+   */
+  getStepTitle(stepType: string): string {
+    const titles: { [key: string]: string } = {
+      'createExecutable': 'Create Executable',
+      'retrieve': 'Retrieve Data',
+      'scoping': 'Scoping',
+      'match': 'Match',
+      'mapping': 'Mapping',
+      'action': 'Action',
+      'verify': 'Verify',
+      'previewTransformed': 'Preview Transformed', 
+      'addSchedule': 'Add Schedule'
+    };
+    return titles[stepType] || stepType;
+  }
+
+  /**
+   * Get walkthrough step index from section ID
+   */
+  private getWalkthroughStepFromSectionId(sectionId: string): number {
+    // Handle new array format - section IDs are like "step-0", "step-1", etc.
+    if (sectionId.startsWith('step-')) {
+      const stepIndex = parseInt(sectionId.replace('step-', ''), 10);
+      return isNaN(stepIndex) ? -1 : stepIndex;
+    }
+
+    // Legacy format mapping
+    const sectionToStepMap: { [key: string]: string } = {
+      'create-executable': 'createExecutable',
+      'retrieve-data': 'retrieve',
+      'scoping': 'scoping',
+      'match': 'match',
+      'mapping': 'mapping',
+      'action': 'action',
+      'verify': 'verify',
+      'preview-transformed': 'previewTransformed',
+      'add-schedule': 'addSchedule'
+    };
+
+    const stepType = sectionToStepMap[sectionId];
+    if (!stepType) return -1;
+
+    return this.walkthroughSteps.indexOf(stepType);
+  }
+
+  /**
+   * Get section ID from walkthrough step index
+   */
+  private getSectionIdFromWalkthroughStep(stepIndex: number): string {
+    if (!this.currentRecipe?.walkthrough) return '';
+
+    // Handle new array format - section IDs are "step-0", "step-1", etc.
+    if (Array.isArray(this.currentRecipe.walkthrough)) {
+      if (stepIndex >= 0 && stepIndex < this.currentRecipe.walkthrough.length) {
+        return `step-${stepIndex}`;
+      }
+      return '';
+    }
+
+    // Legacy format mapping
+    const stepToSectionMap: { [key: string]: string } = {
+      'createExecutable': 'create-executable',
+      'retrieve': 'retrieve-data',
+      'scoping': 'scoping',
+      'match': 'match',
+      'mapping': 'mapping',
+      'action': 'action',
+      'verify': 'verify',
+      'previewTransformed': 'preview-transformed',
+      'addSchedule': 'add-schedule'
+    };
+
+    const steps = this.walkthroughSteps;
+    if (stepIndex < 0 || stepIndex >= steps.length) return '';
+
+    const stepType = steps[stepIndex];
+    return stepToSectionMap[stepType] || '';
+  }
+
+  /**
+   * Sync TOC section with current walkthrough step
+   */
+  private syncTOCSectionWithWalkthrough(): void {
+    if (this.ui.activeRecipeTab === 'walkthrough') {
+      const sectionId = this.getSectionIdFromWalkthroughStep(this.ui.currentWalkthroughStep);
+      if (sectionId) {
+        console.log('Syncing TOC section with walkthrough step:', sectionId);
+        this.ui.activeSectionId = sectionId;
+        this.recipeTOC.currentSectionId = sectionId;
+      }
+    }
+  }
+
+  /**
+   * Navigate to next step
+   */
+  goToNextWalkthroughStep(): void {
+    const steps = this.walkthroughSteps;
+    if (this.ui.currentWalkthroughStep < steps.length - 1) {
+      this.ui.currentWalkthroughStep++;
+      this.syncTOCSectionWithWalkthrough();
+      this.cdr.markForCheck();
+    }
+  }
+
+  /**
+   * Navigate to previous step
+   */
+  goToPreviousWalkthroughStep(): void {
+    if (this.ui.currentWalkthroughStep > 0) {
+      this.ui.currentWalkthroughStep--;
+      this.syncTOCSectionWithWalkthrough();
+      this.cdr.markForCheck();
+    }
+  }
+
+  /**
+   * Navigate to specific step
+   */
+  goToWalkthroughStep(stepIndex: number): void {
+    const steps = this.walkthroughSteps;
+    if (stepIndex >= 0 && stepIndex < steps.length) {
+      this.ui.currentWalkthroughStep = stepIndex;
+      this.syncTOCSectionWithWalkthrough();
+      this.cdr.markForCheck();
+    }
+  }
+
+  /**
+   * Mark current step as completed
+   */
+  markCurrentStepComplete(): void {
+    this.ui.walkthroughStepsCompleted.add(this.ui.currentWalkthroughStep);
+    this.onStepComplete(this.ui.currentWalkthroughStep);
+    
+    // Auto advance to next step if not the last one
+    if (this.ui.currentWalkthroughStep < this.walkthroughSteps.length - 1) {
+      setTimeout(() => {
+        this.goToNextWalkthroughStep();
+      }, 500);
+    }
+  }
+
+  /**
+   * Check if step is completed
+   */
+  isStepCompleted(stepIndex: number): boolean {
+    return this.ui.walkthroughStepsCompleted.has(stepIndex);
+  }
+
+  /**
+   * Check if can go to next step
+   */
+  get canGoToNextStep(): boolean {
+    return this.ui.currentWalkthroughStep < this.walkthroughSteps.length - 1;
+  }
+
+  /**
+   * Check if can go to previous step
+   */
+  get canGoToPreviousStep(): boolean {
+    return this.ui.currentWalkthroughStep > 0;
+  }
+
+  /**
+   * Get progress percentage
+   */
+  get walkthroughProgress(): number {
+    const steps = this.walkthroughSteps;
+    if (steps.length === 0) return 0;
+    return ((this.ui.currentWalkthroughStep + 1) / steps.length) * 100;
+  }
+
+  /**
+   * Reset walkthrough to first step
+   */
+  resetWalkthrough(): void {
+    this.ui.currentWalkthroughStep = 0;
+    this.ui.walkthroughStepsCompleted.clear();
+    this.cdr.markForCheck();
+  }
+
+  // ==================== Compatibility Helper Methods ====================
+
+  /**
+   * Check if prerequisites is an array (for template use)
+   */
+  isArrayPrerequisites(prerequisites: any): boolean {
+    return Array.isArray(prerequisites);
+  }
+
+  /**
+   * Check if current recipe has array prerequisites with items
+   */
+  hasArrayPrerequisites(): boolean {
+    return !!(this.currentRecipe?.prerequisites && 
+              Array.isArray(this.currentRecipe.prerequisites) && 
+              this.currentRecipe.prerequisites.length > 0);
+  }
+
+  /**
+   * Get permission sets for building (supports both new and legacy formats)
+   */
+  getPermissionSetsForBuilding(): string[] {
+    if (!this.currentRecipe) return [];
+    
+    // Check if recipe has legacy prerequisites structure
+    const legacyPrereqs = this.currentRecipe.prerequisites as any;
+    if (legacyPrereqs?.permissionSetsForBuilding) {
+      return legacyPrereqs.permissionSetsForBuilding;
+    }
+    
+    // New format - extract from prerequisites array
+    const buildingPermissions: string[] = [];
+    if (Array.isArray(this.currentRecipe.prerequisites)) {
+      this.currentRecipe.prerequisites.forEach(prereq => {
+        if (prereq.description.toLowerCase().includes('permission') && 
+            prereq.description.toLowerCase().includes('building')) {
+          // This is a simplified extraction - you might want to improve this logic
+          buildingPermissions.push(prereq.description);
+        }
+      });
+    }
+    
+    return buildingPermissions;
+  }
+
+  /**
+   * Get permission sets for using (supports both new and legacy formats)
+   */
+  getPermissionSetsForUsing(): string[] {
+    if (!this.currentRecipe) return [];
+    
+    // Check if recipe has legacy prerequisites structure
+    const legacyPrereqs = this.currentRecipe.prerequisites as any;
+    if (legacyPrereqs?.permissionSetsForUsing) {
+      return legacyPrereqs.permissionSetsForUsing;
+    }
+    
+    // New format - extract from prerequisites array
+    const usingPermissions: string[] = [];
+    if (Array.isArray(this.currentRecipe.prerequisites)) {
+      this.currentRecipe.prerequisites.forEach(prereq => {
+        if (prereq.description.toLowerCase().includes('permission') && 
+            prereq.description.toLowerCase().includes('using')) {
+          // This is a simplified extraction - you might want to improve this logic
+          usingPermissions.push(prereq.description);
+        }
+      });
+    }
+    
+    return usingPermissions;
+  }
+
+  /**
+   * Get safe directions (supports both new and legacy formats)
+   */
+  getSafeDirections(): any {
+    if (!this.currentRecipe) return '';
+    
+    // Check if recipe has legacy prerequisites structure
+    const legacyPrereqs = this.currentRecipe.prerequisites as any;
+    if (legacyPrereqs?.safeDirections) {
+      return legacyPrereqs.safeDirections;
+    }
+    
+    // New format - return direction
+    return this.currentRecipe.safeDirection || this.currentRecipe.direction || '';
   }
 
 }
