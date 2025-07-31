@@ -103,7 +103,7 @@
 }
 
 .faq-content strong {
-  color: #007bff;
+  color: #000000;
   font-weight: 600;
 }
 
@@ -152,32 +152,3 @@
   }
 }
 
-// Auto-generated FAQ links styling - Force black color and no underline
-strong a.rules-engine-link,
-a.rules-engine-link,
-.rules-engine-link {
-  color: #000000 !important;
-  text-decoration: none !important;
-  border-bottom: none !important;
-  outline: none !important;
-  background: none !important;
-  text-decoration-line: none !important;
-  text-decoration-color: transparent !important;
-  text-decoration-style: none !important;
-  border: none !important;
-  box-shadow: none !important;
-  text-underline-offset: 0 !important;
-  text-decoration-thickness: 0 !important;
-  transition: all 0.3s ease;
-
-  &:link,
-  &:visited,
-  &:hover,
-  &:focus,
-  &:active {
-    color: #000000 !important;
-    text-decoration: none !important;
-    border-bottom: none !important;
-    text-decoration-line: none !important;
-  }
-}

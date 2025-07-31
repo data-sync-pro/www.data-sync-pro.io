@@ -5,29 +5,27 @@ body {
   background: #ffffff;
 }
 
-// 全局移除所有router-link-active的边框样式
 .router-link-active {
-  outline: none !important;
-  box-shadow: none !important;
-  border: none !important;
-  background-image: none !important;
-  text-decoration: none !important;
+  outline: none;
+  box-shadow: none;
+  border: none;
+  background-image: none;
+  text-decoration: none;
 }
 
-// 移除所有链接的默认样式
 a {
   &:focus,
   &:active,
   &:focus-visible {
-    outline: none !important;
-    box-shadow: none !important;
-    border: none !important;
+    outline: none;
+    box-shadow: none;
+    border: none;
   }
 }
 
 .rules-engine-link {
-  color: #000 !important;
-  text-decoration: none !important;
+  color: #333;
+  text-decoration: none;
 }
 
 
