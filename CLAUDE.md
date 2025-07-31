@@ -19,7 +19,7 @@ This is an Angular 15 website for Data Sync Pro (DSP), a Salesforce data synchro
 - **Install dependencies**: `npm install`
 - **Generate FAQ components**: `node src/tools/generate-faq-components.js`
 - **Generate Designer Guide pages**: `node src/tools/generate-designer-pages.js`
-- **Generate Recipe components**: `node src/tools/generate-recipe-components.js` (generates recipe detail components from recipes.json)
+- **Generate Recipe components**: `node src/tools/generate-recipe-components.js` (generates recipe detail components from recipes.json - NOTE: recipes.json file currently does not exist)
 - **Extract i18n**: `ng extract-i18n` (Angular i18n extraction)
 - **Angular CLI help**: `ng help` (view all available Angular CLI commands)
 
@@ -29,6 +29,11 @@ This is an Angular 15 website for Data Sync Pro (DSP), a Salesforce data synchro
 - **Run tests once**: `ng test --watch=false`
 - **Run tests headless**: `ng test --watch=false --browsers=ChromeHeadless`
 - **TypeScript compilation check**: `npx tsc --noEmit`
+
+### Code Quality Commands
+- **TypeScript type checking**: `npx tsc --noEmit`
+- **Angular lint** (if configured): `ng lint`
+- **Note**: No ESLint or TSLint configuration found in this project
 
 ## Architecture Overview
 
@@ -44,11 +49,11 @@ The site features a sophisticated content generation system:
 
 - **FAQ system**: JSON-driven FAQ content (`src/assets/data/faqs.json`) with auto-generated components
 - **Designer Guide**: Hierarchical documentation system with sidebar navigation (`src/assets/data/designer-sidebar.json`)
-- **Recipe system**: 交互式配方/教程系统（`src/assets/data/recipes.json`），支持分步演练、进度跟踪、分类和内容下载
-- **Content generation**: Node.js 脚本位于 `src/tools/`，用于根据 JSON 数据自动生成组件：
-  - `generate-faq-components.js` - 生成 FAQ 组件
-  - `generate-designer-pages.js` - 生成 Designer Guide 页面
-  - `generate-recipe-components.js` - 生成带有交互式分步演练和进度跟踪的 Recipe 详情组件，并自动更新路由
+- **Recipe system**: Interactive recipe/tutorial system (`src/assets/data/recipes.json` - NOTE: file currently does not exist), supports step-by-step walkthroughs, progress tracking, categories, and content download
+- **Content generation**: Node.js scripts in `src/tools/` for auto-generating components from JSON data:
+  - `generate-faq-components.js` - generates FAQ components
+  - `generate-designer-pages.js` - generates Designer Guide pages
+  - `generate-recipe-components.js` - generates Recipe detail components with interactive step-by-step walkthroughs and progress tracking, automatically updates routing
 - **HTML content**: Static HTML files stored in `src/assets/faq-item/` for FAQ answers
 
 ### Special Features
@@ -105,11 +110,10 @@ To generate new recipe components:
 
 - **FAQ content**: `src/assets/data/faqs.json` - drives FAQ section generation
 - **Designer Guide nav**: `src/assets/data/designer-sidebar.json` - sidebar navigation structure
-- **Recipe content**: `src/assets/data/recipes.json` - step-by-step recipe data with categories and metadata
+- **Recipe content**: `src/assets/data/recipes.json` - step-by-step recipe data with categories and metadata (NOTE: file currently does not exist)
 - **FAQ HTML content**: `src/assets/faq-item/*.html` - static HTML content for FAQ answers
 - **Service Worker config**: `ngsw-config.json` - PWA caching configuration
-- **Recipe data**: `src/assets/data/recipes.json` - 配方/教程内容，包含分步演练、分类、元数据和进度跟踪
-- **Auto-link terms**: `src/assets/data/auto-link-terms.json` - FAQ 中自动转为链接的术语
+- **Auto-link terms**: `src/assets/data/auto-link-terms.json` - terms in FAQ that auto-convert to links
 
 ## Content Generation Tools
 
@@ -227,9 +231,3 @@ There is a critical issue with the FAQ auto-linking system that needs immediate 
 - **Testing**: After fixing, clear browser cache and check console for "✅ Created link:" messages
 
 For detailed debugging steps and solution options, see TODO.md.
-
-# important-instruction-reminders
-Do what has been asked; nothing more, nothing less.
-NEVER create files unless they're absolutely necessary for achieving your goal.
-ALWAYS prefer editing an existing file to creating a new one.
-NEVER proactively create documentation files (*.md) or README files. Only create documentation files if explicitly requested by the User.

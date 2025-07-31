@@ -20,7 +20,9 @@
       "Bash(node:*)",
       "Bash(grep:*)",
       "WebFetch(domain:www.anthropic.com)",
-      "Bash(git restore:*)"
+      "Bash(git restore:*)",
+      "Bash(ls:*)",
+      "Bash(git add:*)"
     ],
     "deny": []
   }

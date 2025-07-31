@@ -262,6 +262,7 @@
 
                 <!-- Rating and Share combined section on the right -->
                 <div class="rating-share-section">
+                  <!-- Rating section commented out for later use
                   <span class="rating-title">Is this helpful?</span>
                   <div class="rating-buttons">
                     <button
@@ -283,6 +284,7 @@
                       <span class="rating-icon">👎</span>
                     </button>
                   </div>
+                  -->
                   
                   <!-- Share Options -->
                   <div class="share-buttons">
@@ -363,7 +365,7 @@
                 </div>
               </div>
               
-              <!-- Thank you message -->
+              <!-- Thank you message - commented out since rating is disabled
               <div class="rating-feedback" *ngIf="current.faqItem.userRating !== null">
                 <div class="feedback-message" [class.positive]="current.faqItem.userRating" [class.negative]="!current.faqItem.userRating">
                   <lightning-icon 
@@ -376,6 +378,7 @@
                   </span>
                 </div>
               </div>
+              -->
             </div>
           </div>
         </div>
