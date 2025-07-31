@@ -194,4 +194,12 @@ export class SearchOverlayComponent implements OnInit, OnChanges {
       return matchKW && matchCat && matchSub;
     });
   }
+
+  get hasActiveFilters(): boolean {
+    return !!(
+      this.searchQuery.trim() ||
+      this.selectedCategory ||
+      this.selectedSubCategories.length > 0
+    );
+  }
 }

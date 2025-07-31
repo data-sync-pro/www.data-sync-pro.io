@@ -16,7 +16,7 @@
       <div class="filter-group">
         <div class="filter-header">
           <div class="filter-label">Categories</div>
-          <button class="clear-filters-btn" (click)="clearFilters()">Clear Filters</button>
+          <button class="clear-filters-btn" *ngIf="hasActiveFilters" (click)="clearFilters()">Clear Filters</button>
         </div>
 
         <div class="filter-chips scrollable-container">
