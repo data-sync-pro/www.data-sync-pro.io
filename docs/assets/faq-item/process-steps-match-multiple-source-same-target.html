@@ -1,18 +1,19 @@
 <article>
   <p>
     DSP applies transformations to the matched target record
-    <strong>iteratively based on the order of the source records</strong>. When
+    iteratively based on the <strong>order of the source records</strong>. When
     multiple source records are associated with the same target record, each one
-    updates the target in turn—<strong
-      >with later updates overwriting changes made by earlier ones</strong
-    >, resulting in a <strong>single final version</strong> of the target record
+    updates the target in turn — with later updates overwriting changes made by earlier ones, 
+      resulting in a single final versionof the target record
     before execution.
   </p>
 
   <p>
-    To prevent this behavior, use the
+    To <strong>prevent</strong> this behavior, use the
     <strong><code>IS_FIRST_IN_ITERATION(...)</code></strong> function in the
-    <strong>Scope Filter</strong> to ensure only the first source record per
+    <strong>Scope Filter</strong> to ensure <strong>only the first</strong> source record per
     group is processed.
   </p>
 </article>
+
+<img src="assets/image/process-steps-match-multiple-source-same-target/process-steps-match-multiple-source-same-target.jpg" />
