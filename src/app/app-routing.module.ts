@@ -6,9 +6,9 @@ import { RulesEnginesComponent } from './rules-engines/rules-engines.component';
 import { SolutionsComponent } from './solutions/solutions.component';
 import { SupportComponent } from './support/support.component';
 const routes: Routes = [
-  //{
-    //path: 'recipes',loadChildren: () => import('./recipes/recipes.module').then(m => m.RecipesModule)
-  //},
+  {
+    path: 'recipes',loadChildren: () => import('./recipes/recipes.module').then(m => m.RecipesModule)
+  },
   //{ path: 'pricing', component: PricingComponent },
   //{ path: 'home', component: HomeComponent },
   //{ path: 'rules-engines', component: RulesEnginesComponent },
