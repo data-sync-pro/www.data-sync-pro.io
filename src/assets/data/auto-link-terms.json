@@ -5,7 +5,7 @@
       "caseSensitive": true,
       "description": "Batch Rules Engine"
     },
-    "Batches": {
+    "#Batches": {
       "faqLink": "batch.what-is-batch",
       "caseSensitive": true,
       "description": "Batch Rules Engine"
@@ -15,8 +15,13 @@
       "caseSensitive": true,
       "description": "Batch Rules Engine"
     },
+    "Batch job": {
+      "faqLink": "batch.what-is-batch",
+      "caseSensitive": true,
+      "description": "Batch Rules Engine"
+    },
 
-    "Trigger": {
+    "#Trigger": {
       "faqLink": "triggers.how-it-works", 
       "caseSensitive": true,
       "description": "Triggers Rules Engine"
@@ -37,7 +42,7 @@
       "caseSensitive": true,
       "description": "Data List Rules Engine"
     },
-    "Data Lists": {
+    "#Data Lists": {
       "faqLink": "data-list.what-is-data-list",
       "caseSensitive": true,
       "description": "Data List Rules Engine"
@@ -53,7 +58,7 @@
       "caseSensitive": true,
       "description": "Action Button Rules Engine"
     },
-    "Action Buttons": {
+    "#Action Buttons": {
       "faqLink": "action-button.what-is-action-button",
       "caseSensitive": true,
       "description": "Action Button Rules Engine"
@@ -69,7 +74,7 @@
       "caseSensitive": true,
       "description": "Data Loader Rules Engine"
     },
-    "Data Loaders": {
+    "#Data Loaders": {
       "faqLink": "data-loader.how-it-works",
       "caseSensitive": true,
       "description": "Data Loader Rules Engine"
