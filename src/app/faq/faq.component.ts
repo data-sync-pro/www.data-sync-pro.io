@@ -1272,6 +1272,8 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
       setTimeout(() => {
         this.scrollToAndExpandFAQ(this.pendingFragment!);
         this.pendingFragment = undefined;
+        // 确保UI立即更新
+        this.cdr.detectChanges();
       }, 100); // 减少延迟时间，只等待DOM更新
     }
   }
@@ -1327,6 +1329,14 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
       this.router.navigate([url], { fragment: this.slugify(faqItem.question) });
       return;
     }
+
+    // Navigate to the TOC page containing this FAQ
+    this.navigateToFAQPage(faqItem);
+    
+    // Set current FAQ state
+    this.current.faqItem = faqItem;
+    this.current.faqTitle = faqItem.question;
+    this.activeScrollElement = faqItem.question;
 
     this.expandFAQPanel(faqItem);
     this.onFaqOpened(faqItem);
@@ -1703,6 +1713,23 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     return this.currentFAQList.slice(this.tocPagination.startIndex, this.tocPagination.endIndex);
   }
 
+  /**
+   * Navigate to the TOC page containing the specified FAQ item
+   */
+  private navigateToFAQPage(faqItem: FAQItem): void {
+    const faqList = this.showHome ? this.trendingQuestions : this.currentFAQList;
+    const index = faqList.findIndex(item => item.id === faqItem.id);
+    
+    if (index >= 0) {
+      const targetPage = Math.floor(index / this.tocPagination.itemsPerPage) + 1;
+      if (targetPage !== this.tocPagination.currentPage) {
+        this.tocPagination.currentPage = targetPage;
+        this.updateTOCPaginationIndices();
+        this.cdr.markForCheck();
+      }
+    }
+  }
+
   // ==================== Debug Methods ====================
   
   /**
@@ -1867,6 +1894,9 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
   scrollToFAQ(item: FAQItem): void {
     // Mark that user has interacted - this enables TOC highlighting
     this.userHasScrolled = true;
+    
+    // Navigate to the TOC page containing this FAQ
+    this.navigateToFAQPage(item);
     
     // 设置当前FAQ项目
     this.current.faqItem = item;
@@ -2063,6 +2093,9 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
   selectTrendingQuestion(item: FAQItem): void {
     // Mark that user has interacted - this enables TOC highlighting
     this.userHasScrolled = true;
+    
+    // Navigate to the TOC page containing this FAQ
+    this.navigateToFAQPage(item);
     
     // 设置当前FAQ
     this.current.faqTitle = item.question;

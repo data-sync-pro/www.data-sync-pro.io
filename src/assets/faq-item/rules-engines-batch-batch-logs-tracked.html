@@ -1,4 +1,4 @@
-<article>
+
   <p>
     Data Sync Pro tracks <strong>#Batch</strong> <strong>Execution logs</strong> using structured records and
     optional file-based logging:
@@ -6,23 +6,23 @@
 
   <ul>
     <li>
-      <strong>Execution Records</strong> – For each batch job run, an Execution
+      <strong>Execution Records</strong> - For each batch job run, an Execution
       record is created and linked to the original Executable record.
     </li>
     <li>
-      <strong>Batch Execution Records</strong> – Each individual batch within
+      <strong>Batch Execution Records</strong> - Each individual batch within
       the job generates a Batch Execution record, linked to the parent Execution
       record.
     </li>
     <li>
-      <strong>Log to File (Optional)</strong> – If
+      <strong>Log to File (Optional)</strong> - If
       "<strong>Log to File</strong>" is enabled, additional execution details
       are saved in <strong>JSON format</strong> as a
       <strong>ContentDocument</strong>, linked to the corresponding Batch
       Execution record.
     </li>
     <li>
-      <strong>Pipeline Execution (if applicable)</strong> – When the batch job
+      <strong>Pipeline Execution (if applicable)</strong> - When the batch job
       runs as part of a Pipeline, a Pipeline Execution record is created. The
       related Execution records within the pipeline are automatically assigned
       <strong>sequence numbers</strong> to indicate their order.
@@ -33,6 +33,6 @@
     This logging structure enables <strong>detailed tracking</strong>, <strong>auditing</strong>, and
     <strong>troubleshooting</strong> for every step of the batch process.
   </p>
-</article>
+
 
 <img src="assets/image/rules-engines-batch-batch-logs-tracked/rules-engines-batch-batch-logs-tracked.jpg" />

@@ -887,7 +887,7 @@ export class FAQService implements OnDestroy {
         
         // Check if this is the complete content of the <strong> tag (no extra text)
         const strongContent = beforeTerm + capturedTerm + afterTerm;
-        if (strongContent.trim() !== term.trim()) {
+        if (strongContent!== term) {
           return fullMatch; // Return unchanged if strong tag contains more than just the term
         }
         
