@@ -1,10 +1,5 @@
 {
   "terms": {
-    "Batch": {
-      "faqLink": "batch.what-is-batch",
-      "caseSensitive": true,
-      "description": "Batch Rules Engine"
-    },
     "#Batches": {
       "faqLink": "batch.what-is-batch",
       "caseSensitive": true,
@@ -15,7 +10,7 @@
       "caseSensitive": true,
       "description": "Batch Rules Engine"
     },
-    "Batch job": {
+    "#Batch job": {
       "faqLink": "batch.what-is-batch",
       "caseSensitive": true,
       "description": "Batch Rules Engine"
@@ -26,18 +21,13 @@
       "caseSensitive": true,
       "description": "Triggers Rules Engine"
     },    
-    "Triggers": {
-      "faqLink": "triggers.how-it-works", 
-      "caseSensitive": true,
-      "description": "Triggers Rules Engine"
-    },
     "#Triggers": {
       "faqLink": "triggers.how-it-works", 
       "caseSensitive": true,
       "description": "Triggers Rules Engine"
     },
 
-    "Data List": {
+    "#Data List": {
       "faqLink": "data-list.what-is-data-list",
       "caseSensitive": true,
       "description": "Data List Rules Engine"
@@ -47,13 +37,8 @@
       "caseSensitive": true,
       "description": "Data List Rules Engine"
     },    
-    "#Data List": {
-      "faqLink": "data-list.what-is-data-list",
-      "caseSensitive": true,
-      "description": "Data List Rules Engine"
-    },
 
-    "Action Button": {
+    "#Action Button": {
       "faqLink": "action-button.what-is-action-button",
       "caseSensitive": true,
       "description": "Action Button Rules Engine"
@@ -63,13 +48,8 @@
       "caseSensitive": true,
       "description": "Action Button Rules Engine"
     },    
-    "#Action Button": {
-      "faqLink": "action-button.what-is-action-button",
-      "caseSensitive": true,
-      "description": "Action Button Rules Engine"
-    },   
 
-    "Data Loader": {
+    "#Data Loader": {
       "faqLink": "data-loader.how-it-works",
       "caseSensitive": true,
       "description": "Data Loader Rules Engine"
@@ -79,11 +59,6 @@
       "caseSensitive": true,
       "description": "Data Loader Rules Engine"
     },    
-    "#Data Loader": {
-      "faqLink": "data-loader.how-it-works",
-      "caseSensitive": true,
-      "description": "Data Loader Rules Engine"
-    },
 
     "Input": {
       "faqLink": "input.what-does-input-do",
