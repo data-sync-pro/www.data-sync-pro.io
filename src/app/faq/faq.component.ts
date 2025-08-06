@@ -1191,9 +1191,13 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     return '';
   }
 
-  private openAndScroll(question: string): void {
+  private openAndScroll(question: string, faqId?: string): void {
     setTimeout(() => {
-      const idx = this.filteredFAQ.findIndex(f => f.question === question);
+      // Prioritize ID-based search if ID is provided
+      const idx = faqId 
+        ? this.filteredFAQ.findIndex(f => f.id === faqId)
+        : this.filteredFAQ.findIndex(f => f.question === question);
+      
       if (idx >= 0) {
         const faqItem = this.filteredFAQ[idx];
         const panel = this.expansionPanels.toArray()[idx];
@@ -1210,6 +1214,7 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
   trackBySlug(_: number, item: FAQItem) { return item.id; }
 
   handleSearchSelect(sel: {
+    id?: string;
     question: string;
     category: string;
     subCategory: string | null;
@@ -1217,7 +1222,7 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
   }): void {
   
     const cat = sel.category;
-    const sub = sel.subCatFilterApplied ? (sel.subCategory ?? '') : '';
+    const sub = sel.subCategory ?? '';
     const frag= this.slugify(sel.question);
   
     this.router.navigate(
@@ -1227,7 +1232,7 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
   
     this.search.isOpen = false;
   
-    setTimeout(() => this.openAndScroll(sel.question));
+    setTimeout(() => this.openAndScroll(sel.question, sel.id));
   }
   
   
