@@ -215,7 +215,7 @@
             <div class="tab-content" *ngIf="ui.activeRecipeTab === 'overview'">
               <!-- Use Case Section -->
               <section id="recipe-use-case" class="recipe-section" *ngIf="hasValidUseCase()">
-                <h3>Use Case</h3>
+                <h4>Use Case</h4>
                 <div [innerHTML]="currentRecipe?.safeUsecase || currentRecipe?.safeUseCase"></div>
               </section>
               
@@ -276,10 +276,6 @@
                 </ul>
               </section>
               
-              <section id="recipe-setup-instructions" class="recipe-section" *ngIf="getSafeDirections()">
-                <h4>Setup Instructions:</h4>
-                <div [innerHTML]="getSafeDirections()"></div>
-              </section>
               
               <!-- Download section for new format (downloadableExecutables array) -->
               <section id="recipe-download-executables" class="recipe-section" *ngIf="hasValidDownloadableExecutables()">
@@ -374,7 +370,7 @@
                   
                   <button 
                     mat-raised-button
-                    color="accent"
+                    color="primary"
                     *ngIf="!canGoToNextStep">
                     <mat-icon>check_circle</mat-icon>
                     Complete
@@ -423,53 +419,66 @@
 
   </main>
 
-  <!-- Right TOC (Table of Contents) -->
-  <aside class="recipe-toc desktop-toc" 
-         *ngIf="shouldShowTOC && !ui.isMobile"
-         [class.in-footer-zone]="ui.tocInFooterZone"
-         [class.footer-approaching]="ui.tocFooterApproaching">
+  <!-- Right TOC (Table of Contents) - Microsoft Learn Style -->
+  <aside class="recipe-toc-outline" 
+         *ngIf="shouldShowTOC && !ui.isMobile && showRecipeDetails">
     
-    <div class="toc-content">
-      <!-- TOC Header - Simplified -->
-      <div class="toc-header">
-        <div class="toc-title-section">
-          <h3 class="toc-title">{{ showRecipeDetails ? 'Sections' : currentTOCTitle }}</h3>
-        </div>
-      </div>
+    <div class="toc-container">
       
-      <!-- TOC Items List -->
-      <div class="toc-list">
-        <!-- Recipe Detail TOC Navigation - Sections Only -->
-        <ng-container *ngIf="showRecipeDetails">
-          <!-- Only show sections for the active tab -->
-          <div class="toc-sections" *ngIf="ui.activeRecipeTab">
-            <div *ngFor="let section of getActiveTabSections(); let i = index" 
-                 class="toc-item toc-section-item"
-                 [class.active]="ui.activeSectionId === section.id"
-                 (click)="changeRecipeSection(section.id)">
-              <div class="toc-section-number">{{ i + 1 }}</div>
-              <div class="toc-item-content">
-                <div class="toc-item-title">{{ section.title }}</div>
-              </div>
-            </div>
-          </div>
-        </ng-container>
-        
-        <!-- Recipe List for Home/Category View - Simplified -->
-        <ng-container *ngIf="!showRecipeDetails">
-          <div class="toc-item" 
-               *ngFor="let recipe of (showHome ? paginatedTrendingRecipes : paginatedCategoryRecipes)"
-               [class.active]="recipe.id === currentRecipe?.id"
-               (click)="goToRecipe(recipe)">
-            <div class="toc-item-icon">
-              <mat-icon>{{ getCategoryIcon(recipe.category) }}</mat-icon>
-            </div>
-            <div class="toc-item-content">
-              <div class="toc-item-title">{{ recipe.title }}</div>
-            </div>
-          </div>
-        </ng-container>
-      </div>
+      <!-- TOC Navigation -->
+      <nav class="toc-nav" role="navigation" aria-label="Article contents">
+        <ul class="toc-sections-list">
+          <!-- Overview Section Group -->
+          <li class="toc-section-group" *ngIf="getOverviewSectionsForTOC().length > 0">
+            <span class="toc-group-title">Overview</span>
+            <ul class="toc-items">
+              <li *ngFor="let section of getOverviewSectionsForTOC()" 
+                  class="toc-item"
+                  [class.active]="ui.activeSectionId === section.id && ui.activeRecipeTab === 'overview'">
+                <a (click)="navigateToOverviewSection(section.id)" 
+                   [attr.aria-current]="ui.activeSectionId === section.id ? 'location' : null">
+                  {{ section.title }}
+                </a>
+              </li>
+            </ul>
+          </li>
+          
+          <!-- Walkthrough Section Group -->
+          <li class="toc-section-group" *ngIf="getWalkthroughSectionsForTOC().length > 0">
+            <span class="toc-group-title">Walkthrough</span>
+            <ul class="toc-items">
+              <li *ngFor="let section of getWalkthroughSectionsForTOC(); let i = index" 
+                  class="toc-item"
+                  [class.active]="ui.activeSectionId === section.id && ui.activeRecipeTab === 'walkthrough'">
+                <a (click)="navigateToWalkthroughSection(section.id, i)" 
+                   [attr.aria-current]="ui.activeSectionId === section.id ? 'location' : null">
+                  {{ section.title }}
+                </a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </aside>
+  
+  <!-- Recipe List TOC (for Home/Category pages) -->
+  <aside class="recipe-list-toc" 
+         *ngIf="shouldShowTOC && !ui.isMobile && !showRecipeDetails">
+    <div class="toc-container">
+      <h3 class="toc-heading">{{ currentTOCTitle }}</h3>
+      <nav class="toc-nav">
+        <ul class="toc-items">
+          <li class="toc-item" 
+              *ngFor="let recipe of (showHome ? paginatedTrendingRecipes : paginatedCategoryRecipes)"
+              [class.active]="recipe.id === currentRecipe?.id">
+            <a (click)="goToRecipe(recipe)">
+              <mat-icon class="recipe-icon">{{ getCategoryIcon(recipe.category) }}</mat-icon>
+              <span>{{ recipe.title }}</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
     </div>
   </aside>
 

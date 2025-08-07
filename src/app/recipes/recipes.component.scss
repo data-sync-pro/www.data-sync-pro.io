@@ -2,7 +2,8 @@
 @import './styles/layout';
 @import './styles/sidebar';
 @import './styles/search-overlay';
-@import './styles/toc';
+// @import './styles/toc'; // Old TOC styles - replaced with Microsoft style
+@import './styles/toc-microsoft'; // New Microsoft Learn style TOC
 @import './styles/responsive';
 
 // Component-specific overrides and adjustments

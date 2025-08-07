@@ -331,12 +331,9 @@ import { RecipeWalkthroughStep, RecipeStepConfig, RecipeStepMedia } from '../../
   `,
   styles: [`
     .recipe-step-container {
-      padding: 24px;
+      padding: 24px 24px 0px 24px;
     }
 
-    .step-main-content {
-      margin-bottom: 32px;
-    }
 
     .step-description {
       text-align:center;

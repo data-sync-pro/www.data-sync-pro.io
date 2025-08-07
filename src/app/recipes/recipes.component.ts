@@ -450,12 +450,10 @@ export class RecipesComponent implements OnInit, OnDestroy {
     // Trigger immediate UI update
     this.cdr.markForCheck();
     
-    // Refresh cache after UI updates (non-blocking, only if needed for scroll tracking)
-    if (this.ui.userHasScrolled) {
-      requestAnimationFrame(() => {
-        this.refreshSectionElementsCache();
-      });
-    }
+    // Refresh cache after UI updates for the new active tab
+    setTimeout(() => {
+      this.refreshSectionElementsCacheForActiveTab();
+    }, 100);
   }
 
   /**
@@ -935,7 +933,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
     }
 
     // Connection Type - New format
-    if (this.currentRecipe?.connection) {
+    if (this.currentRecipe?.connection && this.currentRecipe.connection.trim()) {
       sections.push({
         id: 'connection',
         title: 'Connection Type',
@@ -983,17 +981,8 @@ export class RecipesComponent implements OnInit, OnDestroy {
       });
     }
 
-    if (this.getSafeDirections()) {
-      sections.push({
-        id: 'setup-instructions',
-        title: 'Setup Instructions',
-        icon: 'settings',
-        elementId: 'recipe-setup-instructions'
-      });
-    }
-
     // Download Executables - New format (array)
-    if (this.currentRecipe?.downloadableExecutables?.length) {
+    if (this.hasValidDownloadableExecutables()) {
       sections.push({
         id: 'download-executables',
         title: 'Download Files',
@@ -1003,7 +992,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
     }
 
     // Related Recipes - New format
-    if (this.currentRecipe?.relatedRecipes?.length) {
+    if (this.hasValidRelatedRecipes()) {
       sections.push({
         id: 'related-recipes',
         title: 'Related Recipes',
@@ -1266,20 +1255,29 @@ export class RecipesComponent implements OnInit, OnDestroy {
 
   /**
    * Update active section based on scroll position
+   * Only tracks sections within the currently active tab to prevent unwanted tab switches
    */
   private updateActiveScrollElement(scrollPosition: number): void {
     const offset = scrollPosition + 150; // Account for header height
     
-    // Cache section elements and their positions
+    // Only process if we have an active tab
+    if (!this.ui.activeRecipeTab) return;
+    
+    // Cache section elements and their positions for current active tab only
     if (!this.cachedSectionElements || this.cachedSectionElements.length === 0) {
-      this.refreshSectionElementsCache();
+      this.refreshSectionElementsCacheForActiveTab();
     }
     
     let activeSectionId = '';
     let closestDistance = Infinity;
 
-    // Find the section that is currently in view
+    // Find the section that is currently in view (only from active tab)
     this.cachedSectionPositions.forEach((position, sectionId) => {
+      // Double-check that this section belongs to the active tab
+      if (!this.sectionBelongsToActiveTab(sectionId)) {
+        return;
+      }
+      
       const distance = Math.abs(position - offset);
       if (distance < closestDistance && position <= offset + 100) {
         closestDistance = distance;
@@ -1296,8 +1294,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
       // This ensures only the section is highlighted, not the parent tab
       this.ui.highlightedTOCTab = '';
       
-      // Ensure the parent tab is active for content display
-      this.ensureParentTabActive(activeSectionId);
+      // No need to call ensureParentTabActive since we're already in the correct tab
       
       this.cdr.markForCheck();
     }
@@ -1305,26 +1302,36 @@ export class RecipesComponent implements OnInit, OnDestroy {
 
   /**
    * Refresh cache of section elements and their positions
+   * Legacy method - now delegates to active tab specific method
    */
   private refreshSectionElementsCache(): void {
-    if (!this.currentRecipe) return;
+    this.refreshSectionElementsCacheForActiveTab();
+  }
+
+  /**
+   * Refresh cache of section elements and their positions for active tab only
+   * This prevents scroll detection from switching between tabs
+   */
+  private refreshSectionElementsCacheForActiveTab(): void {
+    if (!this.currentRecipe || !this.ui.activeRecipeTab) return;
 
     this.cachedSectionElements = [];
     this.cachedSectionPositions.clear();
 
-    // Get all section elements based on the recipe TOC structure
-    this.recipeTOC.tabs.forEach(tab => {
-      tab.sections.forEach(section => {
-        if (section.elementId) {
-          const element = document.getElementById(section.elementId);
-          if (element) {
-            this.cachedSectionElements!.push(element);
-            const rect = element.getBoundingClientRect();
-            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-            this.cachedSectionPositions.set(section.id, rect.top + scrollTop);
-          }
+    // Get section elements only from the currently active tab
+    const activeTab = this.recipeTOC.tabs.find(tab => tab.id === this.ui.activeRecipeTab);
+    if (!activeTab) return;
+
+    activeTab.sections.forEach(section => {
+      if (section.elementId) {
+        const element = document.getElementById(section.elementId);
+        if (element) {
+          this.cachedSectionElements!.push(element);
+          const rect = element.getBoundingClientRect();
+          const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+          this.cachedSectionPositions.set(section.id, rect.top + scrollTop);
         }
-      });
+      }
     });
   }
 
@@ -1337,6 +1344,18 @@ export class RecipesComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Check if a section belongs to the currently active tab
+   */
+  private sectionBelongsToActiveTab(sectionId: string): boolean {
+    if (!this.ui.activeRecipeTab) return false;
+    
+    const activeTab = this.recipeTOC.tabs.find(tab => tab.id === this.ui.activeRecipeTab);
+    if (!activeTab) return false;
+    
+    return activeTab.sections.some(section => section.id === sectionId);
+  }
+
+  /**
    * Get sections for currently active tab
    */
   getActiveTabSections(): RecipeSection[] {
@@ -1346,6 +1365,51 @@ export class RecipesComponent implements OnInit, OnDestroy {
     
     const activeTab = this.recipeTOC.tabs.find(tab => tab.id === this.ui.activeRecipeTab);
     return activeTab ? activeTab.sections : [];
+  }
+
+  /**
+   * Get Overview sections for TOC display
+   */
+  getOverviewSectionsForTOC(): RecipeSection[] {
+    const overviewTab = this.recipeTOC.tabs.find(tab => tab.id === 'overview');
+    return overviewTab ? overviewTab.sections : [];
+  }
+
+  /**
+   * Get Walkthrough sections for TOC display
+   */
+  getWalkthroughSectionsForTOC(): RecipeSection[] {
+    const walkthroughTab = this.recipeTOC.tabs.find(tab => tab.id === 'walkthrough');
+    return walkthroughTab ? walkthroughTab.sections : [];
+  }
+
+  /**
+   * Navigate to Overview section
+   */
+  navigateToOverviewSection(sectionId: string): void {
+    // Switch to overview tab if not already there
+    if (this.ui.activeRecipeTab !== 'overview') {
+      this.ui.activeRecipeTab = 'overview';
+      this.recipeTOC.currentTabId = 'overview';
+    }
+    
+    // Navigate to the section
+    this.changeRecipeSection(sectionId);
+  }
+
+  /**
+   * Navigate to Walkthrough section
+   */
+  navigateToWalkthroughSection(sectionId: string, stepIndex: number): void {
+    // Switch to walkthrough tab if not already there
+    if (this.ui.activeRecipeTab !== 'walkthrough') {
+      this.ui.activeRecipeTab = 'walkthrough';
+      this.recipeTOC.currentTabId = 'walkthrough';
+      this.ui.currentWalkthroughStep = stepIndex;
+    }
+    
+    // Navigate to the section
+    this.changeRecipeSection(sectionId);
   }
 
   /**
