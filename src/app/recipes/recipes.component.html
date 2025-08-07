@@ -189,6 +189,32 @@
 
       <!-- Recipe Detail View -->
       <div *ngIf="showRecipeDetails && !ui.isLoading" class="recipe-detail-view">
+        
+        <!-- Recipe Navigation - Page Level (只在walkthrough tab时显示) -->
+        <!-- Previous Button Container - Left Side -->
+        <div class="recipe-nav-container recipe-nav-left-container" *ngIf="ui.activeRecipeTab === 'walkthrough' && walkthroughSteps.length > 0">
+          <button 
+            mat-fab
+            [disabled]="!canGoToPreviousStep"
+            (click)="goToPreviousWalkthroughStep()"
+            class="recipe-nav-button recipe-nav-prev"
+            [attr.aria-label]="'Go to previous step'">
+            <mat-icon>chevron_left</mat-icon>
+          </button>
+        </div>
+        
+        <!-- Next Button Container - Right Side -->
+        <div class="recipe-nav-container recipe-nav-right-container" *ngIf="ui.activeRecipeTab === 'walkthrough' && walkthroughSteps.length > 0 && canGoToNextStep">
+          <button 
+            mat-fab
+            [disabled]="!canGoToNextStep"
+            (click)="goToNextWalkthroughStep()"
+            class="recipe-nav-button recipe-nav-next"
+            [attr.aria-label]="'Go to next step'">
+            <mat-icon>chevron_right</mat-icon>
+          </button>
+        </div>
+        
         <div class="recipe-detail">
           <!-- Recipe Header -->
           <div class="recipe-header">
@@ -213,167 +239,94 @@
           <div class="recipe-content">
             <!-- Overview Content -->
             <div class="tab-content" *ngIf="ui.activeRecipeTab === 'overview'">
-              <!-- Use Case Section -->
-              <section id="recipe-use-case" class="recipe-section" *ngIf="hasValidUseCase()">
-                <h4>Use Case</h4>
-                <div [innerHTML]="currentRecipe?.safeUsecase || currentRecipe?.safeUseCase"></div>
-              </section>
-              
-              <!-- DSP Versions -->
-              <section id="recipe-dsp-versions" class="recipe-section" *ngIf="currentRecipe?.DSPVersions?.length">
-                <h4>Supported DSP Versions:</h4>
-                <div class="version-tags">
-                  <span class="version-tag" *ngFor="let version of currentRecipe?.DSPVersions">{{ version }}</span>
-                </div>
-              </section>
-              
-              <!-- Connection Type -->
-              <section id="recipe-connection" class="recipe-section" *ngIf="hasValidConnection()">
-                <h4>Connection Type:</h4>
-                <p>{{ currentRecipe?.connection }}</p>
-              </section>
-              
-              <!-- Direction -->
-              <section id="recipe-direction" class="recipe-section" *ngIf="hasValidDirection()">
-                <h4>Direction:</h4>
-                <div [innerHTML]="currentRecipe?.safeDirection || currentRecipe?.direction"></div>
-              </section>
-              
-              <!-- Prerequisites (New Format) -->
-              <section id="recipe-prerequisites" class="recipe-section" *ngIf="hasArrayPrerequisites()">
-                <h4>Prerequisites:</h4>
-                <div class="prerequisites-list">
-                  <div class="prerequisite-item" *ngFor="let prereq of getValidPrerequisites()">
-                    <p *ngIf="prereq.description && prereq.description.trim()">{{ prereq.description }}</p>
-                    <div class="quick-links" *ngIf="prereq.quickLinks?.length">
-                      <h5>Quick Links:</h5>
-                      <ul>
-                        <li *ngFor="let link of prereq.quickLinks">
-                          <a *ngIf="link.title && link.title.trim()" [href]="link.url" target="_blank">{{ link.title }}</a>
-                        </li>
-                      </ul>
+              <!-- Dynamic sections using configuration -->
+              <section *ngFor="let sectionConfig of getVisibleOverviewSections()" 
+                       [id]="sectionConfig.elementId" 
+                       class="recipe-section">
+                <h4>{{ sectionConfig.title }}</h4>
+                
+                <!-- Switch based on content type -->
+                <ng-container [ngSwitch]="sectionConfig.contentType">
+                  
+                  <!-- HTML content -->
+                  <div *ngSwitchCase="'html'" [innerHTML]="sectionConfig.data"></div>
+                  
+                  <!-- Simple text content -->
+                  <p *ngSwitchCase="'text'">{{ sectionConfig.data }}</p>
+                  
+                  <!-- Tag list (versions, keywords) -->
+                  <div *ngSwitchCase="'tag-list'" [class]="sectionConfig.tagClass === 'version-tag' ? 'version-tags' : 'keyword-tags'">
+                    <span *ngFor="let item of $any(sectionConfig.data)" 
+                          [class]="sectionConfig.tagClass || 'tag'">{{ item }}</span>
+                  </div>
+                  
+                  <!-- Simple list -->
+                  <ul *ngSwitchCase="'list'">
+                    <li *ngFor="let item of $any(sectionConfig.data)">{{ item }}</li>
+                  </ul>
+                  
+                  <!-- Download list -->
+                  <div *ngSwitchCase="'download-list'" class="download-list">
+                    <div *ngFor="let executable of $any(sectionConfig.data)" class="download-item">
+                      <a [href]="executable.url" target="_blank" class="download-link">
+                        <mat-icon>download</mat-icon>
+                        {{ executable.title }}
+                      </a>
                     </div>
                   </div>
-                </div>
-              </section>
-              
-              <!-- Legacy Prerequisites Support -->
-              <section id="recipe-building-permissions" class="recipe-section" *ngIf="getPermissionSetsForBuilding().length > 0">
-                <h4>Permission Sets for Building:</h4>
-                <ul>
-                  <li *ngFor="let permission of getPermissionSetsForBuilding()">
-                    {{ permission }}
-                  </li>
-                </ul>
-              </section>
-              
-              <section id="recipe-using-permissions" class="recipe-section" *ngIf="getPermissionSetsForUsing().length > 0">
-                <h4>Permission Sets for Using:</h4>
-                <ul>
-                  <li *ngFor="let permission of getPermissionSetsForUsing()">
-                    {{ permission }}
-                  </li>
-                </ul>
-              </section>
-              
-              
-              <!-- Download section for new format (downloadableExecutables array) -->
-              <section id="recipe-download-executables" class="recipe-section" *ngIf="hasValidDownloadableExecutables()">
-                <h4>Download Executable Files:</h4>
-                <div class="download-list">
-                  <div class="download-item" *ngFor="let executable of getValidDownloadableExecutables()">
-                    <a [href]="executable.url" target="_blank" class="download-link">
-                      <mat-icon>download</mat-icon>
-                      {{ executable.title }}
+                  
+                  <!-- Link list (related recipes) -->
+                  <div *ngSwitchCase="'link-list'" class="related-recipes">
+                    <a *ngFor="let related of $any(sectionConfig.data)" 
+                       [href]="related.url" 
+                       class="related-recipe-link">
+                      {{ related.title }}
                     </a>
                   </div>
-                </div>
-              </section>
-              
-              <!-- Related Recipes -->
-              <section id="recipe-related" class="recipe-section" *ngIf="hasValidRelatedRecipes()">
-                <h4>Related Recipes:</h4>
-                <div class="related-recipes">
-                  <a *ngFor="let related of getValidRelatedRecipes()" 
-                     [href]="related.url" 
-                     class="related-recipe-link">
-                    {{ related.title }}
-                  </a>
-                </div>
-              </section>
-              
-              <!-- Keywords -->
-              <section id="recipe-keywords" class="recipe-section" *ngIf="currentRecipe?.keywords?.length">
-                <h4>Keywords:</h4>
-                <div class="keyword-tags">
-                  <span class="keyword-tag" *ngFor="let keyword of currentRecipe?.keywords">{{ keyword }}</span>
-                </div>
-              </section>
-              
-              <!-- Download section (moved from download tab) -->
-              <section id="recipe-download-executable" class="recipe-section" *ngIf="currentRecipe?.downloadableExecutable">
-                <h4>Download Executable:</h4>
-                <app-recipe-download 
-                  [executable]="currentRecipe!.downloadableExecutable!">
-                </app-recipe-download>
-              </section>
-              
-              <section id="recipe-installation-guide" class="recipe-section" *ngIf="currentRecipe?.downloadableExecutable">
-                <h4>Installation Guide</h4>
-                <p>Instructions for installing and configuring the downloaded executable.</p>
-              </section>
-              
-              <section id="recipe-version-info" class="recipe-section" *ngIf="currentRecipe?.downloadableExecutable">
-                <h4>Version Information</h4>
-                <p>Version: {{ currentRecipe!.downloadableExecutable!.version }}</p>
-                <p>{{ currentRecipe!.downloadableExecutable!.description }}</p>
+                  
+                  <!-- Prerequisites (complex structure) -->
+                  <div *ngSwitchCase="'prerequisites'" class="prerequisites-list">
+                    <div *ngFor="let prereq of $any(sectionConfig.data)" class="prerequisite-item">
+                      <p *ngIf="prereq.description && prereq.description.trim()">{{ prereq.description }}</p>
+                      <div *ngIf="prereq.quickLinks?.length" class="quick-links">
+                        <h5>Quick Links:</h5>
+                        <ul>
+                          <li *ngFor="let link of prereq.quickLinks">
+                            <a *ngIf="link.title && link.title.trim()" [href]="link.url" target="_blank">{{ link.title }}</a>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <!-- Component (legacy download) -->
+                  <app-recipe-download *ngSwitchCase="'component'" 
+                                     [executable]="$any(sectionConfig.data)">
+                  </app-recipe-download>
+                  
+                  <!-- Version info -->
+                  <div *ngSwitchCase="'version-info'">
+                    <p>Version: {{ $any(sectionConfig.data)?.version }}</p>
+                    <p>{{ $any(sectionConfig.data)?.description }}</p>
+                  </div>
+                  
+                </ng-container>
               </section>
             </div>
             
             <!-- Walkthrough Content -->
             <div class="tab-content walkthrough-content" *ngIf="ui.activeRecipeTab === 'walkthrough'">
-              <!-- Step Navigation Container -->
+              <!-- Step Container -->
               <div class="walkthrough-container" *ngIf="walkthroughSteps.length > 0">
                 
-
-                <!-- Step Content Area -->
+                <!-- Step Content -->
                 <div class="walkthrough-step-container">
-                  <!-- Current Step Content -->
                   <div class="step-content-wrapper">
                     <app-recipe-step 
                       [stepData]="currentStepData">
                     </app-recipe-step>
                   </div>
-                </div>
-
-
-                <!-- Bottom Navigation -->
-                <div class="walkthrough-footer">
-                  <button 
-                    mat-stroked-button
-                    [disabled]="!canGoToPreviousStep"
-                    (click)="goToPreviousWalkthroughStep()">
-                    <mat-icon>chevron_left</mat-icon>
-                    Previous
-                  </button>
                   
-                  <button 
-                    mat-raised-button
-                    color="primary"
-                    [disabled]="!canGoToNextStep"
-                    (click)="goToNextWalkthroughStep()"
-                    *ngIf="canGoToNextStep">
-                    Next
-                    <mat-icon>chevron_right</mat-icon>
-                  </button>
-                  
-                  <button 
-                    mat-raised-button
-                    color="primary"
-                    *ngIf="!canGoToNextStep">
-                    <mat-icon>check_circle</mat-icon>
-                    Complete
-                  </button>
                 </div>
 
               </div>

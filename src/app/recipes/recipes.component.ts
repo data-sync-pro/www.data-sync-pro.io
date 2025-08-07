@@ -1000,133 +1000,168 @@ export class RecipesComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Configuration for overview sections
+   */
+  private readonly overviewSectionConfigs = [
+    {
+      id: 'use-case',
+      title: 'Use Case',
+      icon: 'info',
+      elementId: 'recipe-use-case',
+      contentType: 'html',
+      isVisible: () => this.hasValidUseCase(),
+      getData: () => this.currentRecipe?.safeUsecase || this.currentRecipe?.safeUseCase,
+      alwaysShow: true
+    },
+    {
+      id: 'dsp-versions',
+      title: 'Supported DSP Versions',
+      icon: 'verified',
+      elementId: 'recipe-dsp-versions',
+      contentType: 'tag-list',
+      isVisible: () => !!(this.currentRecipe?.DSPVersions?.length && this.currentRecipe.DSPVersions.length > 0),
+      getData: () => this.currentRecipe?.DSPVersions,
+      tagClass: 'version-tag'
+    },
+    {
+      id: 'connection',
+      title: 'Connection Type',
+      icon: 'link',
+      elementId: 'recipe-connection',
+      contentType: 'text',
+      isVisible: () => this.hasValidConnection(),
+      getData: () => this.currentRecipe?.connection
+    },
+    {
+      id: 'direction',
+      title: 'Direction',
+      icon: 'trending_flat',
+      elementId: 'recipe-direction',
+      contentType: 'html',
+      isVisible: () => this.hasValidDirection(),
+      getData: () => this.currentRecipe?.safeDirection || this.currentRecipe?.direction
+    },
+    {
+      id: 'prerequisites',
+      title: 'Prerequisites',
+      icon: 'checklist',
+      elementId: 'recipe-prerequisites',
+      contentType: 'prerequisites',
+      isVisible: () => this.hasArrayPrerequisites(),
+      getData: () => this.getValidPrerequisites()
+    },
+    {
+      id: 'building-permissions',
+      title: 'Permission Sets for Building',
+      icon: 'build',
+      elementId: 'recipe-building-permissions',
+      contentType: 'list',
+      isVisible: () => this.getPermissionSetsForBuilding().length > 0,
+      getData: () => this.getPermissionSetsForBuilding()
+    },
+    {
+      id: 'using-permissions',
+      title: 'Permission Sets for Using',
+      icon: 'group',
+      elementId: 'recipe-using-permissions',
+      contentType: 'list',
+      isVisible: () => this.getPermissionSetsForUsing().length > 0,
+      getData: () => this.getPermissionSetsForUsing()
+    },
+    {
+      id: 'download-executables',
+      title: 'Download Executable Files',
+      icon: 'download',
+      elementId: 'recipe-download-executables',
+      contentType: 'download-list',
+      isVisible: () => this.hasValidDownloadableExecutables(),
+      getData: () => this.getValidDownloadableExecutables()
+    },
+    {
+      id: 'related-recipes',
+      title: 'Related Recipes',
+      icon: 'link',
+      elementId: 'recipe-related',
+      contentType: 'link-list',
+      isVisible: () => this.hasValidRelatedRecipes(),
+      getData: () => this.getValidRelatedRecipes()
+    },
+    {
+      id: 'keywords',
+      title: 'Keywords',
+      icon: 'label',
+      elementId: 'recipe-keywords',
+      contentType: 'tag-list',
+      isVisible: () => !!(this.currentRecipe?.keywords?.length && this.currentRecipe.keywords.length > 0),
+      getData: () => this.currentRecipe?.keywords,
+      tagClass: 'keyword-tag'
+    },
+    // Legacy download support sections
+    {
+      id: 'download-executable',
+      title: 'Download Executable',
+      icon: 'get_app',
+      elementId: 'recipe-download-executable',
+      contentType: 'component',
+      componentName: 'app-recipe-download',
+      isVisible: () => !!this.currentRecipe?.downloadableExecutable,
+      getData: () => this.currentRecipe?.downloadableExecutable,
+      isLegacy: true
+    },
+    {
+      id: 'installation-guide',
+      title: 'Installation Guide',
+      icon: 'install_desktop',
+      elementId: 'recipe-installation-guide',
+      contentType: 'text',
+      isVisible: () => !!this.currentRecipe?.downloadableExecutable,
+      getData: () => 'Instructions for installing and configuring the downloaded executable.',
+      isLegacy: true
+    },
+    {
+      id: 'version-info',
+      title: 'Version Information',
+      icon: 'info',
+      elementId: 'recipe-version-info',
+      contentType: 'version-info',
+      isVisible: () => !!this.currentRecipe?.downloadableExecutable,
+      getData: () => this.currentRecipe?.downloadableExecutable,
+      isLegacy: true
+    }
+  ];
+
+  /**
    * Generate Overview sections dynamically based on available content
    */
   private generateOverviewSections(): RecipeSection[] {
     const sections: RecipeSection[] = [];
 
-    // Use Case - Always present
-    sections.push({
-      id: 'use-case',
-      title: 'Use Case',
-      icon: 'info',
-      elementId: 'recipe-use-case'
-    });
-
-    // DSP Versions - New format
-    if (this.currentRecipe?.DSPVersions?.length) {
-      sections.push({
-        id: 'dsp-versions',
-        title: 'DSP Versions',
-        icon: 'verified',
-        elementId: 'recipe-dsp-versions'
-      });
-    }
-
-    // Connection Type - New format
-    if (this.currentRecipe?.connection && this.currentRecipe.connection.trim()) {
-      sections.push({
-        id: 'connection',
-        title: 'Connection Type',
-        icon: 'link',
-        elementId: 'recipe-connection'
-      });
-    }
-
-    // Direction - New format
-    if (this.currentRecipe?.direction) {
-      sections.push({
-        id: 'direction',
-        title: 'Direction',
-        icon: 'trending_flat',
-        elementId: 'recipe-direction'
-      });
-    }
-
-    // Prerequisites - New format (array)
-    if (this.hasArrayPrerequisites()) {
-      sections.push({
-        id: 'prerequisites',
-        title: 'Prerequisites',
-        icon: 'checklist',
-        elementId: 'recipe-prerequisites'
-      });
-    }
-
-    // Legacy Prerequisites Support
-    if (this.getPermissionSetsForBuilding().length > 0) {
-      sections.push({
-        id: 'building-permissions',
-        title: 'Building Permissions',
-        icon: 'build',
-        elementId: 'recipe-building-permissions'
-      });
-    }
-
-    if (this.getPermissionSetsForUsing().length > 0) {
-      sections.push({
-        id: 'using-permissions',
-        title: 'Using Permissions',
-        icon: 'group',
-        elementId: 'recipe-using-permissions'
-      });
-    }
-
-    // Download Executables - New format (array)
-    if (this.hasValidDownloadableExecutables()) {
-      sections.push({
-        id: 'download-executables',
-        title: 'Download Files',
-        icon: 'download',
-        elementId: 'recipe-download-executables'
-      });
-    }
-
-    // Related Recipes - New format
-    if (this.hasValidRelatedRecipes()) {
-      sections.push({
-        id: 'related-recipes',
-        title: 'Related Recipes',
-        icon: 'link',
-        elementId: 'recipe-related'
-      });
-    }
-
-    // Keywords - New format
-    if (this.currentRecipe?.keywords?.length) {
-      sections.push({
-        id: 'keywords',
-        title: 'Keywords',
-        icon: 'label',
-        elementId: 'recipe-keywords'
-      });
-    }
-
-    // Legacy Download Support
-    if (this.currentRecipe?.downloadableExecutable) {
-      sections.push(
-        {
-          id: 'download-executable',
-          title: 'Download Executable',
-          icon: 'get_app',
-          elementId: 'recipe-download-executable'
-        },
-        {
-          id: 'installation-guide',
-          title: 'Installation Guide',
-          icon: 'install_desktop',
-          elementId: 'recipe-installation-guide'
-        },
-        {
-          id: 'version-info',
-          title: 'Version Information',
-          icon: 'info',
-          elementId: 'recipe-version-info'
-        }
-      );
+    // Iterate through configuration and add visible sections
+    for (const config of this.overviewSectionConfigs) {
+      // Check if section should be visible
+      if (config.alwaysShow || (config.isVisible && config.isVisible())) {
+        sections.push({
+          id: config.id,
+          title: config.title,
+          icon: config.icon,
+          elementId: config.elementId
+        });
+      }
     }
 
     return sections;
+  }
+
+  /**
+   * Get visible overview sections with their data for template rendering
+   */
+  getVisibleOverviewSections() {
+    return this.overviewSectionConfigs.filter(config => 
+      config.alwaysShow || (config.isVisible && config.isVisible())
+    ).map(config => ({
+      ...config,
+      data: config.getData ? config.getData() : null
+    }));
   }
 
   /**

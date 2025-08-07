@@ -162,27 +162,27 @@ function generateHTMLTemplate(recipe) {
             <p>{{ recipe.walkthrough.createExecutable.instructions }}</p>
             <div class="form-fields">
               <div class="field-row">
-                <label>Source Object:</label>
+                <label>1. Source Object:</label>
                 <code>{{ recipe.walkthrough.createExecutable.sourceObjectApiName }}</code>
               </div>
               <div class="field-row">
-                <label>Target Object:</label>
+                <label>2. Target Object:</label>
                 <code>{{ recipe.walkthrough.createExecutable.targetObjectApiName }}</code>
               </div>
               <div class="field-row">
-                <label>Matching Field (Source):</label>
+                <label>3. Matching Field (Source):</label>
                 <code>{{ recipe.walkthrough.createExecutable.sourceMatchingField }}</code>
               </div>
               <div class="field-row">
-                <label>Matching Field (Target):</label>
+                <label>4. Matching Field (Target):</label>
                 <code>{{ recipe.walkthrough.createExecutable.targetMatchingField }}</code>
               </div>
               <div class="field-row">
-                <label>Action:</label>
+                <label>5. Action:</label>
                 <code>{{ recipe.walkthrough.createExecutable.action }}</code>
               </div>
               <div class="field-row">
-                <label>Executable Name:</label>
+                <label>6. Executable Name:</label>
                 <code>{{ recipe.walkthrough.createExecutable.executableName }}</code>
               </div>
             </div>

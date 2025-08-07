@@ -4,10 +4,10 @@
 // Variables
 $ms-toc-text: #242424;
 $ms-toc-text-secondary: #616161;
-$ms-toc-link: #0060c7;
-$ms-toc-link-hover: #004499;
+$ms-toc-link: #666666; // 改为深灰色，与导航按钮统一
+$ms-toc-link-hover: #333333; // 改为更深灰色，与按钮悬停色统一
 $ms-toc-active-bg: #f0f0f0;
-$ms-toc-active-border: #0060c7;
+$ms-toc-active-border: #666666; // 边框也统一为深灰色
 $ms-toc-border: #d2d2d2;
 $ms-toc-bg: #ffffff;
 $ms-toc-group-title: #171717;
@@ -252,9 +252,9 @@ $ms-toc-group-title: #171717;
         }
         
         &.active a {
-          color: #4db8ff;
-          background: rgba(77, 184, 255, 0.15);
-          border-left-color: #4db8ff;
+          color: #666666; // 统一使用深灰色
+          background: rgba(102, 102, 102, 0.1); // 对应的浅灰色背景
+          border-left-color: #666666; // 边框也统一
         }
       }
     }

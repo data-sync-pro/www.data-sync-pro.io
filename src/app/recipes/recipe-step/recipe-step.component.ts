@@ -15,8 +15,8 @@ import { RecipeWalkthroughStep, RecipeStepConfig, RecipeStepMedia } from '../../
           <!-- Configuration Fields -->
           <div class="config-section" *ngIf="stepData.config?.length">
             <div class="config-fields">
-              <div class="field-group" *ngFor="let config of stepData.config">
-                <label>{{ config.field }}:</label>
+              <div class="field-group" *ngFor="let config of stepData.config; let i = index">
+                <label>{{ i + 1 }}. {{ config.field }}:</label>
                 <div class="field-value-container">
                   <span class="field-value">{{ config.value }}</span>
                   <button class="copy-btn" (click)="copyToClipboard($event, config.value)" title="Copy to clipboard">

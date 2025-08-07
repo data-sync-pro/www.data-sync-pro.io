@@ -6,6 +6,14 @@
 @import './styles/toc-microsoft'; // New Microsoft Learn style TOC
 @import './styles/responsive';
 
+// Import layout variables for precise button positioning
+$sidebar-width: 240px;
+$sidebar-collapsed-width: 56px;
+$toc-width: 240px;
+$breakpoint-desktop: 992px;
+$breakpoint-tablet: 768px;
+$breakpoint-mobile: 576px;
+
 // Component-specific overrides and adjustments
 // The main layout is handled by modular styles
 
@@ -195,11 +203,8 @@
 }
 
 .walkthrough-step-container {
-  display: block;
-  margin-bottom: 32px;
   min-height: 500px;
 }
-
 
 .step-content-wrapper {
   background: #fff;
@@ -214,6 +219,7 @@
     height: 100%;
   }
 }
+
 
 .step-indicators {
   display: flex;
@@ -244,18 +250,82 @@
   }
 }
 
-.walkthrough-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-top: 24px;
-  border-top: 1px solid #e0e0e0;
-  gap: 16px;
+// ==================== Page Level Recipe Navigation ====================
+.recipe-nav-container {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1500; // Above all other elements
+  pointer-events: none; // Allow content to be clickable
 }
 
-.footer-nav-buttons {
-  display: flex;
-  gap: 12px;
+.recipe-nav-left-container {
+  // Default: Sidebar width + 30px margin (240px + 30px = 270px)
+  left: calc(#{$sidebar-width} + 30px);
+  
+  // When sidebar is collapsed (56px + 30px = 86px)
+  :host-context(.sidebar-collapsed) & {
+    left: calc(#{$sidebar-collapsed-width} + 30px);
+  }
+  
+  // Mobile: Fixed position when sidebar is hidden
+  @media (max-width: #{$breakpoint-desktop}) {
+    left: 20px;
+  }
+}
+
+.recipe-nav-right-container {
+  // Default: TOC width + 30px margin (240px + 30px = 270px from right edge)
+  right: calc(#{$toc-width} + 30px);
+  
+  // When TOC is hidden
+  :host-context(.toc-hidden) & {
+    right: 30px;
+  }
+  
+  // Mobile: Fixed position when TOC is hidden
+  @media (max-width: #{$breakpoint-desktop}) {
+    right: 20px;
+  }
+}
+
+.recipe-nav-button {
+  width: 56px !important;
+  height: 56px !important;
+  background-color: transparent !important; // 完全透明背景
+  border: none !important;
+  box-shadow: none !important; // 移除阴影
+  pointer-events: auto !important; // Re-enable clicking for buttons
+  transition: all 0.3s ease !important;
+  
+  &:hover:not([disabled]) {
+    background-color: rgba(0, 0, 0, 0.05) !important; // 悬停时很淡的背景
+    transform: scale(1.1) !important;
+  }
+  
+  &[disabled] {
+    background-color: transparent !important; // 禁用时也透明
+    cursor: not-allowed !important;
+    transform: scale(0.9) !important;
+  }
+  
+  mat-icon {
+    font-size: 28px !important; // 稍微放大箭头
+    width: 28px !important;
+    height: 28px !important;
+    color: #666666 !important; // 正常状态：深灰色箭头
+    transition: color 0.3s ease !important;
+  }
+  
+  // 悬停状态：更深的颜色
+  &:hover:not([disabled]) mat-icon {
+    color: #333333 !important;
+  }
+  
+  // 禁用状态：浅灰色
+  &[disabled] mat-icon {
+    color: #cccccc !important;
+  }
 }
 
 .no-steps {
@@ -283,21 +353,29 @@
   }
 }
 
-// Mobile responsive styles for walkthrough
-@media (max-width: 768px) {
-  .walkthrough-footer {
-    flex-direction: column;
-    gap: 16px;
-    align-items: stretch;
+// Mobile responsive styles for walkthrough  
+@media (max-width: #{$breakpoint-tablet}) {
+  .recipe-nav-left-container {
+    left: 12px !important; // Override calculated position on mobile
+  }
+
+  .recipe-nav-right-container {
+    right: 12px !important; // Override calculated position on mobile
+  }
+
+  .recipe-nav-button {
+    width: 48px !important;
+    height: 48px !important;
     
-    button {
-      width: 100%;
+    mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
     }
   }
   
-  .footer-nav-buttons {
-    flex-direction: column;
-    gap: 8px;
+  .walkthrough-step-container {
+    margin: 0 70px; // Add margin to avoid button overlap
   }
   
   .step-indicators {
@@ -308,6 +386,26 @@
     width: 32px !important;
     height: 32px !important;
     min-width: 32px !important;
+  }
+}
+
+// Very small mobile screens
+@media (max-width: #{$breakpoint-mobile}) {
+  .recipe-nav-left-container {
+    left: 8px !important; // Override calculated position on small mobile
+  }
+
+  .recipe-nav-right-container {
+    right: 8px !important; // Override calculated position on small mobile
+  }
+
+  .recipe-nav-button {
+    width: 44px !important;
+    height: 44px !important;
+  }
+  
+  .walkthrough-step-container {
+    margin: 0 60px; // Adjust for smaller buttons
   }
 }
 
