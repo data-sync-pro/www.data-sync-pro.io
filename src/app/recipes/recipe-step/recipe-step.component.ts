@@ -17,24 +17,27 @@ import { RecipeWalkthroughStep, RecipeStepConfig, RecipeStepMedia } from '../../
             <div class="step-content">
               <!-- Configuration Fields -->
               <div class="config-section" *ngIf="stepData.config?.length">
-                <h4>Configuration</h4>
                 <div class="config-fields">
                   <div class="field-group" *ngFor="let config of stepData.config">
                     <label>{{ config.field }}:</label>
-                    <span class="field-value">{{ config.value }}</span>
+                    <div class="field-value-container">
+                      <span class="field-value">{{ config.value }}</span>
+                      <button class="copy-btn" (click)="copyToClipboard($event, config.value)" title="Copy to clipboard">
+                        <mat-icon>content_copy</mat-icon>
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
               
               <!-- Media Content -->
               <div class="media-section" *ngIf="stepData.media?.length">
-                <h4>Media & Resources</h4>
                 <div class="media-content">
                   <div class="media-item" *ngFor="let media of stepData.media">
                     <div [ngSwitch]="media.type">
                       <!-- Image -->
-                      <div *ngSwitchCase="'image'" class="media-image">
-                        <img [src]="media.url" [alt]="media.alt" class="responsive-image">
+                      <div *ngSwitchCase="'image'" class="media-image" appSimpleZoomable>
+                        <img [src]="media.url" [alt]="media.alt" class="responsive-image zoomable-image">
                         <p class="media-caption" *ngIf="media.alt">{{ media.alt }}</p>
                       </div>
                       
@@ -87,27 +90,57 @@ import { RecipeWalkthroughStep, RecipeStepConfig, RecipeStepMedia } from '../../
               <div class="config-fields">
                 <div class="field-group">
                   <label>Source Object API Name:</label>
-                  <span class="field-value">{{ stepData.sourceObjectApiName }}</span>
+                  <div class="field-value-container">
+                    <span class="field-value">{{ stepData.sourceObjectApiName }}</span>
+                    <button class="copy-btn" (click)="copyToClipboard($event, stepData.sourceObjectApiName)" title="Copy to clipboard">
+                      <mat-icon>content_copy</mat-icon>
+                    </button>
+                  </div>
                 </div>
                 <div class="field-group">
                   <label>Target Object API Name:</label>
-                  <span class="field-value">{{ stepData.targetObjectApiName }}</span>
+                  <div class="field-value-container">
+                    <span class="field-value">{{ stepData.targetObjectApiName }}</span>
+                    <button class="copy-btn" (click)="copyToClipboard($event, stepData.targetObjectApiName)" title="Copy to clipboard">
+                      <mat-icon>content_copy</mat-icon>
+                    </button>
+                  </div>
                 </div>
                 <div class="field-group">
                   <label>Source Matching Field:</label>
-                  <span class="field-value">{{ stepData.sourceMatchingField }}</span>
+                  <div class="field-value-container">
+                    <span class="field-value">{{ stepData.sourceMatchingField }}</span>
+                    <button class="copy-btn" (click)="copyToClipboard($event, stepData.sourceMatchingField)" title="Copy to clipboard">
+                      <mat-icon>content_copy</mat-icon>
+                    </button>
+                  </div>
                 </div>
                 <div class="field-group">
                   <label>Target Matching Field:</label>
-                  <span class="field-value">{{ stepData.targetMatchingField }}</span>
+                  <div class="field-value-container">
+                    <span class="field-value">{{ stepData.targetMatchingField }}</span>
+                    <button class="copy-btn" (click)="copyToClipboard($event, stepData.targetMatchingField)" title="Copy to clipboard">
+                      <mat-icon>content_copy</mat-icon>
+                    </button>
+                  </div>
                 </div>
                 <div class="field-group">
                   <label>Action:</label>
-                  <span class="field-value action-type">{{ stepData.action }}</span>
+                  <div class="field-value-container action-type">
+                    <span class="field-value">{{ stepData.action }}</span>
+                    <button class="copy-btn" (click)="copyToClipboard($event, stepData.action)" title="Copy to clipboard">
+                      <mat-icon>content_copy</mat-icon>
+                    </button>
+                  </div>
                 </div>
                 <div class="field-group">
                   <label>Executable Name:</label>
-                  <span class="field-value executable-name">{{ stepData.executableName }}</span>
+                  <div class="field-value-container executable-name">
+                    <span class="field-value">{{ stepData.executableName }}</span>
+                    <button class="copy-btn" (click)="copyToClipboard($event, stepData.executableName)" title="Copy to clipboard">
+                      <mat-icon>content_copy</mat-icon>
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -141,7 +174,12 @@ import { RecipeWalkthroughStep, RecipeStepConfig, RecipeStepMedia } from '../../
               <div class="scope-config">
                 <div class="config-item">
                   <label>Filter Setup:</label>
-                  <div class="config-value">{{ stepData.scopeFilterSetup }}</div>
+                  <div class="field-value-container">
+                    <div class="config-value">{{ stepData.scopeFilterSetup }}</div>
+                    <button class="copy-btn" (click)="copyToClipboard($event, stepData.scopeFilterSetup)" title="Copy to clipboard">
+                      <mat-icon>content_copy</mat-icon>
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -158,11 +196,21 @@ import { RecipeWalkthroughStep, RecipeStepConfig, RecipeStepMedia } from '../../
               <div class="match-config">
                 <div class="config-item">
                   <label>Matching Logic:</label>
-                  <div class="config-value">{{ stepData.matchingLogic }}</div>
+                  <div class="field-value-container">
+                    <div class="config-value">{{ stepData.matchingLogic }}</div>
+                    <button class="copy-btn" (click)="copyToClipboard($event, stepData.matchingLogic)" title="Copy to clipboard">
+                      <mat-icon>content_copy</mat-icon>
+                    </button>
+                  </div>
                 </div>
                 <div class="config-item">
                   <label>Rules:</label>
-                  <div class="config-value">{{ stepData.rules }}</div>
+                  <div class="field-value-container">
+                    <div class="config-value">{{ stepData.rules }}</div>
+                    <button class="copy-btn" (click)="copyToClipboard($event, stepData.rules)" title="Copy to clipboard">
+                      <mat-icon>content_copy</mat-icon>
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -193,11 +241,21 @@ import { RecipeWalkthroughStep, RecipeStepConfig, RecipeStepMedia } from '../../
               <div class="action-config">
                 <div class="config-item">
                   <label>Configuration:</label>
-                  <div class="config-value">{{ stepData.actionConfiguration }}</div>
+                  <div class="field-value-container">
+                    <div class="config-value">{{ stepData.actionConfiguration }}</div>
+                    <button class="copy-btn" (click)="copyToClipboard($event, stepData.actionConfiguration)" title="Copy to clipboard">
+                      <mat-icon>content_copy</mat-icon>
+                    </button>
+                  </div>
                 </div>
                 <div class="config-item" *ngIf="stepData.options">
                   <label>Options:</label>
-                  <div class="config-value">{{ stepData.options }}</div>
+                  <div class="field-value-container">
+                    <div class="config-value">{{ stepData.options }}</div>
+                    <button class="copy-btn" (click)="copyToClipboard($event, stepData.options)" title="Copy to clipboard">
+                      <mat-icon>content_copy</mat-icon>
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -245,7 +303,12 @@ import { RecipeWalkthroughStep, RecipeStepConfig, RecipeStepMedia } from '../../
               <div class="schedule-config">
                 <div class="config-item">
                   <label>Schedule:</label>
-                  <div class="config-value">{{ stepData.schedulingConfig }}</div>
+                  <div class="field-value-container">
+                    <div class="config-value">{{ stepData.schedulingConfig }}</div>
+                    <button class="copy-btn" (click)="copyToClipboard($event, stepData.schedulingConfig)" title="Copy to clipboard">
+                      <mat-icon>content_copy</mat-icon>
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -269,8 +332,6 @@ import { RecipeWalkthroughStep, RecipeStepConfig, RecipeStepMedia } from '../../
   styles: [`
     .recipe-step-container {
       padding: 24px;
-      max-width: 1200px;
-      margin: 0 auto;
     }
 
     .step-main-content {
@@ -298,42 +359,89 @@ import { RecipeWalkthroughStep, RecipeStepConfig, RecipeStepMedia } from '../../
       font-weight: 500;
     }
 
-    .config-fields, .config-item, .action-config, .match-config, .scope-config, .schedule-config {
+    .config-fields, .action-config, .match-config, .scope-config, .schedule-config {
+      display: grid;
+      grid-template-columns: max-content 1fr;
+      gap: 12px 12px;
       margin-bottom: 16px;
     }
 
     .field-group, .config-item {
-      display: flex;
-      margin-bottom: 12px;
-      align-items: flex-start;
+      display: contents;
     }
 
     .field-group label, .config-item label {
       font-weight: 500;
-      min-width: 180px;
       color: #555;
-      margin-right: 12px;
+      white-space: nowrap;
     }
 
-    .field-value, .config-value {
+    .field-value-container {
+      display: flex;
+      align-items: center;
+      gap: 8px;
       background: #f5f5f5;
       padding: 8px 12px;
       border-radius: 4px;
+      position: relative;
+    }
+
+    .field-value, .config-value {
       font-family: 'Courier New', monospace;
       flex: 1;
       word-break: break-word;
+      margin: 0;
+    }
+
+    .copy-btn {
+      padding: 4px;
+      min-width: 24px;
+      height: 24px;
+      border: none;
+      background: transparent;
+      color: #666;
+      cursor: pointer;
+      border-radius: 3px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0.7;
+      transition: all 0.2s ease;
+      
+      mat-icon {
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
+        line-height: 16px;
+      }
+      
+      &:hover {
+        opacity: 1;
+        background: rgba(0, 0, 0, 0.1);
+        color: #333;
+      }
+      
+      &:active {
+        transform: scale(0.95);
+      }
     }
 
     .action-type {
-      background: #e3f2fd;
-      color: #1976d2;
-      font-weight: 500;
+      background: #e3f2fd !important;
+      
+      .field-value {
+        color: #1976d2;
+        font-weight: 500;
+      }
     }
 
     .executable-name {
-      background: #f3e5f5;
-      color: #7b1fa2;
-      font-weight: 500;
+      background: #f3e5f5 !important;
+      
+      .field-value {
+        color: #7b1fa2;
+        font-weight: 500;
+      }
     }
 
     .query-example, .code-example {
@@ -396,7 +504,6 @@ import { RecipeWalkthroughStep, RecipeStepConfig, RecipeStepMedia } from '../../
     
     .media-item {
       background: #f8f9fa;
-      padding: 16px;
       border-radius: 8px;
       border: 1px solid #e9ecef;
     }
@@ -410,6 +517,15 @@ import { RecipeWalkthroughStep, RecipeStepConfig, RecipeStepMedia } from '../../
       height: auto;
       border-radius: 4px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .zoomable-image {
+      cursor: zoom-in;
+      transition: transform 0.2s ease;
+    }
+    
+    .zoomable-image:hover {
+      transform: scale(1.02);
     }
     
     .responsive-video {
@@ -463,4 +579,30 @@ import { RecipeWalkthroughStep, RecipeStepConfig, RecipeStepMedia } from '../../
 export class RecipeStepComponent {
   @Input() stepData: any;
   @Input() stepType: string = '';
+
+  copyToClipboard(event: Event, text: string): void {
+    event.stopPropagation();
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(text).then(() => {
+        // Successfully copied
+        console.log('Copied to clipboard:', text);
+      }).catch(err => {
+        console.error('Failed to copy text: ', err);
+      });
+    } else {
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = text;
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      try {
+        document.execCommand('copy');
+        console.log('Copied to clipboard:', text);
+      } catch (err) {
+        console.error('Failed to copy text: ', err);
+      }
+      document.body.removeChild(textArea);
+    }
+  }
 }

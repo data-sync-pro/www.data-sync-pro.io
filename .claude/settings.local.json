@@ -22,7 +22,8 @@
       "WebFetch(domain:www.anthropic.com)",
       "Bash(git restore:*)",
       "Bash(ls:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(del test-recipe-images.html)"
     ],
     "deny": []
   }

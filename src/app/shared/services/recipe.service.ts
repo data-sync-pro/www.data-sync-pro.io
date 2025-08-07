@@ -172,6 +172,26 @@ export class RecipeService implements OnDestroy {
   }
 
   /**
+   * Process walkthrough steps to convert relative image paths to absolute paths
+   */
+  private processWalkthroughImagePaths(walkthrough: any[], recipeId: string): any[] {
+    return walkthrough.map(step => {
+      if (step.media && Array.isArray(step.media)) {
+        step.media = step.media.map((media: any) => {
+          if (media.type === 'image' && media.url && media.url.startsWith('images/')) {
+            return {
+              ...media,
+              url: `${this.RECIPE_FOLDERS_BASE}${recipeId}/${media.url}`
+            };
+          }
+          return media;
+        });
+      }
+      return step;
+    });
+  }
+
+  /**
    * Transform a single record to handle both new and legacy formats
    */
   private transformSingleRecord(record: SourceRecipeRecord): RecipeItem {
@@ -189,7 +209,7 @@ export class RecipeService implements OnDestroy {
         direction: record.direction || '',
         safeDirection: record.direction ? this.sanitizer.bypassSecurityTrustHtml(record.direction) : this.sanitizer.bypassSecurityTrustHtml(''),
         connection: record.connection || 'Salesforce to Salesforce',
-        walkthrough: record.walkthrough || [],
+        walkthrough: this.processWalkthroughImagePaths(record.walkthrough || [], record.id),
         downloadableExecutables: record.downloadableExecutables || [],
         relatedRecipes: record.relatedRecipes || [],
         keywords: record.keywords || [],

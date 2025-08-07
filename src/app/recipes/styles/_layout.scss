@@ -467,9 +467,12 @@ $breakpoint-mobile: 576px;
 // Recipe header
 .recipe-header {
   display: flex;
-  align-items: flex-start;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
   gap: 1rem;
   margin-bottom: 2rem;
+  
 
   .header-content h1 {
     margin: 0 0 0.5rem 0;
@@ -552,10 +555,6 @@ $breakpoint-mobile: 576px;
   }
 }
 
-// Recipe content area
-.recipe-content {
-  padding: 1.5rem 0;
-}
 
 .tab-content {
   animation: fadeInUp 0.15s ease;
