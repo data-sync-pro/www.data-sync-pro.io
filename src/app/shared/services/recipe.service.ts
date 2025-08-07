@@ -208,7 +208,7 @@ export class RecipeService implements OnDestroy {
         prerequisites: record.prerequisites || [],
         direction: record.direction || '',
         safeDirection: record.direction ? this.sanitizer.bypassSecurityTrustHtml(record.direction) : this.sanitizer.bypassSecurityTrustHtml(''),
-        connection: record.connection || 'Salesforce to Salesforce',
+        connection: record.connection || '',
         walkthrough: this.processWalkthroughImagePaths(record.walkthrough || [], record.id),
         downloadableExecutables: record.downloadableExecutables || [],
         relatedRecipes: record.relatedRecipes || [],

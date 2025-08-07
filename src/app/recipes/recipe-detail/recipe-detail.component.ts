@@ -77,11 +77,7 @@ import { RecipeItem, RecipeWalkthroughStep, LegacyRecipeWalkthrough } from '../.
                 </li>
               </ul>
             </section>
-            
-            <section id="recipe-setup-instructions" class="recipe-section">
-              <h4>Setup Instructions:</h4>
-              <div [innerHTML]="recipe.prerequisites.safeDirections"></div>
-            </section>
+          
           </ng-container>
           
           <!-- Download section -->

@@ -1629,12 +1629,19 @@ export class RecipesComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Check if current recipe has array prerequisites with items
+   * Check if current recipe has array prerequisites with valid items
    */
   hasArrayPrerequisites(): boolean {
-    return !!(this.currentRecipe?.prerequisites && 
-              Array.isArray(this.currentRecipe.prerequisites) && 
-              this.currentRecipe.prerequisites.length > 0);
+    if (!this.currentRecipe?.prerequisites || !Array.isArray(this.currentRecipe.prerequisites)) {
+      return false;
+    }
+    
+    // Check if there's at least one prerequisite with actual content
+    return this.currentRecipe.prerequisites.some(prereq => 
+      (prereq.description && prereq.description.trim().length > 0) ||
+      (prereq.quickLinks && prereq.quickLinks.length > 0 && 
+       prereq.quickLinks.some(link => link.title && link.title.trim().length > 0))
+    );
   }
 
   /**
@@ -1705,6 +1712,82 @@ export class RecipesComponent implements OnInit, OnDestroy {
     
     // New format - return direction
     return this.currentRecipe.safeDirection || this.currentRecipe.direction || '';
+  }
+
+  /**
+   * Check if current recipe has valid use case
+   */
+  hasValidUseCase(): boolean {
+    const usecase = this.currentRecipe?.usecase || this.currentRecipe?.useCase;
+    return !!(usecase && usecase.trim().length > 0);
+  }
+
+  /**
+   * Check if current recipe has valid connection
+   */
+  hasValidConnection(): boolean {
+    const connection = this.currentRecipe?.connection;
+    return !!(connection && connection.trim().length > 0);
+  }
+
+  /**
+   * Check if current recipe has valid direction
+   */
+  hasValidDirection(): boolean {
+    const direction = this.currentRecipe?.direction;
+    return !!(direction && direction.trim().length > 0);
+  }
+
+  /**
+   * Check if current recipe has valid downloadable executables
+   */
+  hasValidDownloadableExecutables(): boolean {
+    const executables = this.currentRecipe?.downloadableExecutables;
+    return !!(executables && executables.length > 0 && 
+              executables.some(exe => exe.title && exe.title.trim().length > 0 && 
+                                     exe.url && exe.url.trim().length > 0));
+  }
+
+  /**
+   * Get valid downloadable executables (with non-empty title and url)
+   */
+  getValidDownloadableExecutables() {
+    const executables = this.currentRecipe?.downloadableExecutables || [];
+    return executables.filter(exe => exe.title && exe.title.trim().length > 0 && 
+                                    exe.url && exe.url.trim().length > 0);
+  }
+
+  /**
+   * Check if current recipe has valid related recipes
+   */
+  hasValidRelatedRecipes(): boolean {
+    const related = this.currentRecipe?.relatedRecipes;
+    return !!(related && related.length > 0 && 
+              related.some(recipe => recipe.title && recipe.title.trim().length > 0 && 
+                                    recipe.url && recipe.url.trim().length > 0));
+  }
+
+  /**
+   * Get valid related recipes (with non-empty title and url)
+   */
+  getValidRelatedRecipes() {
+    const related = this.currentRecipe?.relatedRecipes || [];
+    return related.filter(recipe => recipe.title && recipe.title.trim().length > 0 && 
+                                   recipe.url && recipe.url.trim().length > 0);
+  }
+
+  /**
+   * Get valid prerequisites (with non-empty content)
+   */
+  getValidPrerequisites() {
+    const prerequisites = this.currentRecipe?.prerequisites || [];
+    if (!Array.isArray(prerequisites)) return [];
+    
+    return prerequisites.filter(prereq => 
+      (prereq.description && prereq.description.trim().length > 0) ||
+      (prereq.quickLinks && prereq.quickLinks.length > 0 && 
+       prereq.quickLinks.some(link => link.title && link.title.trim().length > 0))
+    );
   }
 
 }

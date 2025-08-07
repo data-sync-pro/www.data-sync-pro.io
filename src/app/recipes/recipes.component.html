@@ -214,7 +214,7 @@
             <!-- Overview Content -->
             <div class="tab-content" *ngIf="ui.activeRecipeTab === 'overview'">
               <!-- Use Case Section -->
-              <section id="recipe-use-case" class="recipe-section">
+              <section id="recipe-use-case" class="recipe-section" *ngIf="hasValidUseCase()">
                 <h3>Use Case</h3>
                 <div [innerHTML]="currentRecipe?.safeUsecase || currentRecipe?.safeUseCase"></div>
               </section>
@@ -228,13 +228,13 @@
               </section>
               
               <!-- Connection Type -->
-              <section id="recipe-connection" class="recipe-section" *ngIf="currentRecipe?.connection">
+              <section id="recipe-connection" class="recipe-section" *ngIf="hasValidConnection()">
                 <h4>Connection Type:</h4>
                 <p>{{ currentRecipe?.connection }}</p>
               </section>
               
               <!-- Direction -->
-              <section id="recipe-direction" class="recipe-section" *ngIf="currentRecipe?.direction">
+              <section id="recipe-direction" class="recipe-section" *ngIf="hasValidDirection()">
                 <h4>Direction:</h4>
                 <div [innerHTML]="currentRecipe?.safeDirection || currentRecipe?.direction"></div>
               </section>
@@ -243,13 +243,13 @@
               <section id="recipe-prerequisites" class="recipe-section" *ngIf="hasArrayPrerequisites()">
                 <h4>Prerequisites:</h4>
                 <div class="prerequisites-list">
-                  <div class="prerequisite-item" *ngFor="let prereq of currentRecipe?.prerequisites">
-                    <p *ngIf="prereq.description">{{ prereq.description }}</p>
+                  <div class="prerequisite-item" *ngFor="let prereq of getValidPrerequisites()">
+                    <p *ngIf="prereq.description && prereq.description.trim()">{{ prereq.description }}</p>
                     <div class="quick-links" *ngIf="prereq.quickLinks?.length">
                       <h5>Quick Links:</h5>
                       <ul>
                         <li *ngFor="let link of prereq.quickLinks">
-                          <a [href]="link.url" target="_blank">{{ link.title }}</a>
+                          <a *ngIf="link.title && link.title.trim()" [href]="link.url" target="_blank">{{ link.title }}</a>
                         </li>
                       </ul>
                     </div>
@@ -282,10 +282,10 @@
               </section>
               
               <!-- Download section for new format (downloadableExecutables array) -->
-              <section id="recipe-download-executables" class="recipe-section" *ngIf="currentRecipe?.downloadableExecutables?.length">
+              <section id="recipe-download-executables" class="recipe-section" *ngIf="hasValidDownloadableExecutables()">
                 <h4>Download Executable Files:</h4>
                 <div class="download-list">
-                  <div class="download-item" *ngFor="let executable of currentRecipe?.downloadableExecutables">
+                  <div class="download-item" *ngFor="let executable of getValidDownloadableExecutables()">
                     <a [href]="executable.url" target="_blank" class="download-link">
                       <mat-icon>download</mat-icon>
                       {{ executable.title }}
@@ -295,10 +295,10 @@
               </section>
               
               <!-- Related Recipes -->
-              <section id="recipe-related" class="recipe-section" *ngIf="currentRecipe?.relatedRecipes?.length">
+              <section id="recipe-related" class="recipe-section" *ngIf="hasValidRelatedRecipes()">
                 <h4>Related Recipes:</h4>
                 <div class="related-recipes">
-                  <a *ngFor="let related of currentRecipe?.relatedRecipes" 
+                  <a *ngFor="let related of getValidRelatedRecipes()" 
                      [href]="related.url" 
                      class="related-recipe-link">
                     {{ related.title }}
