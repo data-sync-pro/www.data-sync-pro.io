@@ -4,13 +4,15 @@ import { LightningIconComponent } from './components/lightning-icon/lightning-ic
 import { OfflineIndicatorComponent } from './components/offline-indicator/offline-indicator.component';
 import { FaqSkeletonComponent } from './components/skeleton/faq-skeleton.component';
 import { LoadingComponent } from './components/loading/loading.component';
+import { SimpleZoomableDirective } from '../simple-zoomable.directive';
 
 @NgModule({
   declarations: [
     LightningIconComponent,
     OfflineIndicatorComponent,
     FaqSkeletonComponent,
-    LoadingComponent
+    LoadingComponent,
+    SimpleZoomableDirective
   ],
   imports: [
     CommonModule
@@ -19,7 +21,8 @@ import { LoadingComponent } from './components/loading/loading.component';
     LightningIconComponent,
     OfflineIndicatorComponent,
     FaqSkeletonComponent,
-    LoadingComponent
+    LoadingComponent,
+    SimpleZoomableDirective
   ]
 })
 export class SharedModule { }

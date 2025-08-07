@@ -493,7 +493,7 @@ $breakpoint-mobile: 576px;
   margin-bottom: 2rem;
   border-bottom: 1px solid #e1e5e9;
   padding-bottom: 0;
-
+  
   @media (max-width: $breakpoint-mobile) {
     flex-direction: column;
     gap: 0.25rem;

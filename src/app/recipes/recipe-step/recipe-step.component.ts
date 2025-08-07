@@ -339,6 +339,7 @@ import { RecipeWalkthroughStep, RecipeStepConfig, RecipeStepMedia } from '../../
     }
 
     .step-description {
+      text-align:center;
       margin-bottom: 24px;
     }
 
@@ -374,6 +375,9 @@ import { RecipeWalkthroughStep, RecipeStepConfig, RecipeStepMedia } from '../../
       font-weight: 500;
       color: #555;
       white-space: nowrap;
+      display: flex;
+      align-items: center;
+      align-self: center;
     }
 
     .field-value-container {

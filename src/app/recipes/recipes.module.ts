@@ -34,9 +34,6 @@ import { RecipeCategoryComponent } from './recipe-category/recipe-category.compo
 import { CodeHighlightComponent } from './code-highlight/code-highlight.component';
 import { RecipeSearchOverlayComponent } from './recipe-search-overlay/recipe-search-overlay.component';
 
-// Directives
-import { SimpleZoomableDirective } from '../simple-zoomable.directive';
-
 // Shared Modules and Components
 import { SharedModule } from '../shared/shared.module';
 
@@ -51,8 +48,7 @@ import { SharedModule } from '../shared/shared.module';
     RecipeProgressComponent,
     RecipeCategoryComponent,
     CodeHighlightComponent,
-    RecipeSearchOverlayComponent,
-    SimpleZoomableDirective
+    RecipeSearchOverlayComponent
   ],
   imports: [
     CommonModule,

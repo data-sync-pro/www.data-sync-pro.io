@@ -11,14 +11,12 @@ import { FaqRoutingModule } from './faq-routing.module';
 import { FaqComponent } from './faq.component';
 import { SearchOverlayComponent } from '../search-overlay/search-overlay.component';
 import { ZoomableDirective } from 'src/app/zoomable.directive';
-import { SimpleZoomableDirective } from 'src/app/simple-zoomable.directive';
 import { SharedModule } from '../shared/shared.module';
 @NgModule({
   declarations: [
     FaqComponent,
     SearchOverlayComponent,
-    ZoomableDirective,
-    SimpleZoomableDirective
+    ZoomableDirective
   ],
   imports: [
     CommonModule,
@@ -32,8 +30,7 @@ import { SharedModule } from '../shared/shared.module';
   ],
   exports: [
     FaqComponent,
-    ZoomableDirective,
-    SimpleZoomableDirective
+    ZoomableDirective
   ]
 })
 export class FaqModule {}
