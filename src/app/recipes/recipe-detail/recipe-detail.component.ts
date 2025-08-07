@@ -131,9 +131,7 @@ import { RecipeItem, RecipeWalkthroughStep, LegacyRecipeWalkthrough } from '../.
               [label]="step.step" 
               [id]="'recipe-step-' + i">
               <app-recipe-step 
-                [stepData]="step"
-                stepType="custom"
-                (stepComplete)="onStepComplete(i)">
+                [stepData]="step">
               </app-recipe-step>
             </mat-step>
           </mat-stepper>
@@ -142,73 +140,55 @@ import { RecipeItem, RecipeWalkthroughStep, LegacyRecipeWalkthrough } from '../.
           <mat-stepper orientation="vertical" #stepper *ngIf="!isArrayWalkthrough()">
             <mat-step label="Create Executable" id="recipe-create-executable">
               <app-recipe-step 
-                [stepData]="getLegacyWalkthrough().createExecutable"
-                stepType="createExecutable"
-                (stepComplete)="onStepComplete(0)">
+                [stepData]="getLegacyWalkthrough().createExecutable">
               </app-recipe-step>
             </mat-step>
             
             <mat-step label="Retrieve Data" id="recipe-retrieve-data">
               <app-recipe-step 
-                [stepData]="getLegacyWalkthrough().retrieve"
-                stepType="retrieve"
-                (stepComplete)="onStepComplete(1)">
+                [stepData]="getLegacyWalkthrough().retrieve">
               </app-recipe-step>
             </mat-step>
             
             <mat-step label="Scoping" id="recipe-scoping" *ngIf="getLegacyWalkthrough().scoping">
               <app-recipe-step 
-                [stepData]="getLegacyWalkthrough().scoping"
-                stepType="scoping"
-                (stepComplete)="onStepComplete(2)">
+                [stepData]="getLegacyWalkthrough().scoping">
               </app-recipe-step>
             </mat-step>
             
             <mat-step label="Match" id="recipe-match" *ngIf="getLegacyWalkthrough().match">
               <app-recipe-step 
-                [stepData]="getLegacyWalkthrough().match"
-                stepType="match"
-                (stepComplete)="onStepComplete(3)">
+                [stepData]="getLegacyWalkthrough().match">
               </app-recipe-step>
             </mat-step>
             
             <mat-step label="Mapping" id="recipe-mapping" *ngIf="getLegacyWalkthrough().mapping">
               <app-recipe-step 
-                [stepData]="getLegacyWalkthrough().mapping"
-                stepType="mapping"
-                (stepComplete)="onStepComplete(4)">
+                [stepData]="getLegacyWalkthrough().mapping">
               </app-recipe-step>
             </mat-step>
             
             <mat-step label="Action" id="recipe-action" *ngIf="getLegacyWalkthrough().action">
               <app-recipe-step 
-                [stepData]="getLegacyWalkthrough().action"
-                stepType="action"
-                (stepComplete)="onStepComplete(5)">
+                [stepData]="getLegacyWalkthrough().action">
               </app-recipe-step>
             </mat-step>
             
             <mat-step label="Verify" id="recipe-verify" *ngIf="getLegacyWalkthrough().verify">
               <app-recipe-step 
-                [stepData]="getLegacyWalkthrough().verify"
-                stepType="verify"
-                (stepComplete)="onStepComplete(6)">
+                [stepData]="getLegacyWalkthrough().verify">
               </app-recipe-step>
             </mat-step>
             
             <mat-step label="Preview Transformed" id="recipe-preview-transformed" *ngIf="getLegacyWalkthrough().previewTransformed">
               <app-recipe-step 
-                [stepData]="getLegacyWalkthrough().previewTransformed"
-                stepType="previewTransformed"
-                (stepComplete)="onStepComplete(7)">
+                [stepData]="getLegacyWalkthrough().previewTransformed">
               </app-recipe-step>
             </mat-step>
             
             <mat-step label="Add Schedule" id="recipe-add-schedule" *ngIf="getLegacyWalkthrough().addSchedule">
               <app-recipe-step 
-                [stepData]="getLegacyWalkthrough().addSchedule"
-                stepType="addSchedule"
-                (stepComplete)="onStepComplete(8)">
+                [stepData]="getLegacyWalkthrough().addSchedule">
               </app-recipe-step>
             </mat-step>
           </mat-stepper>

@@ -244,6 +244,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
    * Setup route parameter handling
    */
   private setupRouteHandling(): void {
+    // Monitor both params and query params
     this.route.paramMap.pipe(
       takeUntil(this.destroy$)
     ).subscribe(params => {
@@ -267,6 +268,82 @@ export class RecipesComponent implements OnInit, OnDestroy {
       this.updatePageMetadata();
       this.cdr.markForCheck();
     });
+
+    // Monitor query parameters for tab and step state
+    this.route.queryParamMap.pipe(
+      takeUntil(this.destroy$)
+    ).subscribe(queryParams => {
+      const tab = queryParams.get('tab');
+      const step = queryParams.get('step');
+      
+      // Only process if we're viewing a recipe and recipe is loaded
+      if (this.ui.currentView === 'recipe' && this.currentRecipe) {
+        // Small delay to ensure recipe TOC is generated
+        setTimeout(() => {
+          this.restoreStateFromUrl(tab, step);
+        }, 50);
+      }
+    });
+  }
+
+  /**
+   * Update URL parameters without causing navigation
+   */
+  private updateUrlParams(tab: string | null, step: number | null): void {
+    if (!this.navigation.category || !this.navigation.recipeName) {
+      return; // Can't update URL without recipe context
+    }
+
+    const queryParams: any = {};
+    
+    // Add tab parameter if not overview (which is default)
+    if (tab && tab !== 'overview') {
+      queryParams.tab = tab;
+    }
+    
+    // Add step parameter for walkthrough tab
+    if (tab === 'walkthrough' && step !== null && step >= 0) {
+      queryParams.step = step.toString();
+    }
+    
+    // Update URL without triggering navigation
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams,
+      queryParamsHandling: 'merge',
+      replaceUrl: true // Replace current URL in history instead of adding new entry
+    });
+  }
+
+  /**
+   * Restore UI state from URL parameters
+   */
+  private restoreStateFromUrl(tab: string | null, step: string | null): void {
+    // Restore tab state
+    if (tab && (tab === 'overview' || tab === 'walkthrough')) {
+      this.ui.activeRecipeTab = tab;
+      this.recipeTOC.currentTabId = tab;
+    }
+    
+    // Restore step state for walkthrough
+    if (tab === 'walkthrough' && step !== null) {
+      const stepIndex = parseInt(step, 10);
+      const walkthroughSteps = this.walkthroughSteps;
+      
+      // Validate step index
+      if (!isNaN(stepIndex) && stepIndex >= 0 && stepIndex < walkthroughSteps.length) {
+        this.ui.currentWalkthroughStep = stepIndex;
+        
+        // Update section ID for TOC highlighting
+        const sectionId = this.getSectionIdFromWalkthroughStep(stepIndex);
+        if (sectionId) {
+          this.ui.activeSectionId = sectionId;
+          this.recipeTOC.currentSectionId = sectionId;
+        }
+      }
+    }
+    
+    this.cdr.markForCheck();
   }
 
   /**
@@ -409,11 +486,20 @@ export class RecipesComponent implements OnInit, OnDestroy {
    */
   goToRecipe(recipe: RecipeItem): void {
     console.log('Navigating to recipe:', recipe.title, '(id:', recipe.id, ') Category:', recipe.category);
+    
+    // Check if navigating to the same recipe
+    const isSameRecipe = this.currentRecipe && 
+                        this.currentRecipe.id === recipe.id && 
+                        this.currentRecipe.category === recipe.category;
+    
     this.router.navigate(['/recipes', recipe.category, recipe.id]);
     
-    // Reset to overview tab when navigating to a different recipe
-    this.ui.activeRecipeTab = 'overview';
-    this.ui.activeSectionId = 'use-case';
+    // Only reset to overview tab when navigating to a different recipe
+    if (!isSameRecipe) {
+      this.ui.activeRecipeTab = 'overview';
+      this.ui.activeSectionId = 'use-case';
+      this.ui.currentWalkthroughStep = 0;
+    }
     
     if (this.ui.isMobile) {
       this.closeMobileSidebar();
@@ -434,9 +520,14 @@ export class RecipesComponent implements OnInit, OnDestroy {
     this.ui.activeSectionId = '';
     this.recipeTOC.currentSectionId = '';
     
+    // Update URL with tab information
+    this.updateUrlParams(tabName, null);
+    
     // If switching to walkthrough tab, sync with current step
     if (tabName === 'walkthrough') {
       this.syncTOCSectionWithWalkthrough();
+      // Update URL with current step
+      this.updateUrlParams(tabName, this.ui.currentWalkthroughStep);
     }
     
     // Clear section cache when switching tabs since DOM content changes
@@ -1406,7 +1497,13 @@ export class RecipesComponent implements OnInit, OnDestroy {
       this.ui.activeRecipeTab = 'walkthrough';
       this.recipeTOC.currentTabId = 'walkthrough';
       this.ui.currentWalkthroughStep = stepIndex;
+    } else {
+      // If already in walkthrough tab, just update the step
+      this.ui.currentWalkthroughStep = stepIndex;
     }
+    
+    // Update URL with new step
+    this.updateUrlParams('walkthrough', stepIndex);
     
     // Navigate to the section
     this.changeRecipeSection(sectionId);
@@ -1602,6 +1699,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
     if (this.ui.currentWalkthroughStep < steps.length - 1) {
       this.ui.currentWalkthroughStep++;
       this.syncTOCSectionWithWalkthrough();
+      this.updateUrlParams('walkthrough', this.ui.currentWalkthroughStep);
       this.cdr.markForCheck();
     }
   }
@@ -1613,6 +1711,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
     if (this.ui.currentWalkthroughStep > 0) {
       this.ui.currentWalkthroughStep--;
       this.syncTOCSectionWithWalkthrough();
+      this.updateUrlParams('walkthrough', this.ui.currentWalkthroughStep);
       this.cdr.markForCheck();
     }
   }
@@ -1625,6 +1724,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
     if (stepIndex >= 0 && stepIndex < steps.length) {
       this.ui.currentWalkthroughStep = stepIndex;
       this.syncTOCSectionWithWalkthrough();
+      this.updateUrlParams('walkthrough', this.ui.currentWalkthroughStep);
       this.cdr.markForCheck();
     }
   }

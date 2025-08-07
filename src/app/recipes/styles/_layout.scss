@@ -2,9 +2,9 @@
 
 // Layout variables
 $header-height: 60px; // Global header height
-$sidebar-width: 280px;
+$sidebar-width: 240px;
 $sidebar-collapsed-width: 56px;
-$toc-width: 320px;
+$toc-width: 240px;
 $content-max-width: 1200px;
 $breakpoint-desktop: 992px;
 $breakpoint-tablet: 768px;
@@ -407,7 +407,7 @@ $breakpoint-mobile: 576px;
   gap: 4px;
   background: none;
   border: none;
-  color: #1a73e8;
+  color: #202124;
   font-size: 0.8rem;
   font-weight: 400;
   cursor: pointer;
@@ -418,7 +418,7 @@ $breakpoint-mobile: 576px;
 
   &:hover:not(.active) {
     background-color: rgba(26, 115, 232, 0.08);
-    color: #1557b0;
+    color: #202124;
   }
 
   &.active {
@@ -517,11 +517,11 @@ $breakpoint-mobile: 576px;
 
   &:hover {
     background-color: rgba(26, 115, 232, 0.08);
-    color: #1a73e8;
+    color: #202124;
   }
 
   &.active {
-    color: #1a73e8;
+    color: #202124;
     background-color: #fff;
     
     &::after {
@@ -531,7 +531,7 @@ $breakpoint-mobile: 576px;
       left: 0;
       right: 0;
       height: 2px;
-      background-color: #1a73e8;
+      background-color: #202124;
     }
   }
 
@@ -573,7 +573,7 @@ $breakpoint-mobile: 576px;
   h3, h4 {
     margin-top: 0;
     margin-bottom: 1rem;
-    color: #1a73e8;
+    color: #202124;
   }
 
   h3 {
