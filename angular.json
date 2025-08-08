@@ -28,6 +28,7 @@
               "src/assets",
               "src/404.html",
               "src/.nojekyll",
+              "src/CNAME",
               {
                 "glob": "**/*.html",
                 "input": "src/app/designer-guide/designer-guide-item",
@@ -69,6 +70,28 @@
               "extractLicenses": false,
               "sourceMap": true,
               "namedChunks": true
+            },
+            "github-pages": {
+              "baseHref": "/",
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "1.5mb",
+                  "maximumError": "2mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "60kb",
+                  "maximumError": "80kb"
+                }
+              ],
+              "outputHashing": "all",
+              "optimization": true,
+              "sourceMap": false,
+              "buildOptimizer": true,
+              "vendorChunk": false,
+              "extractLicenses": true,
+              "namedChunks": false
             }
           },
           "defaultConfiguration": "production"
