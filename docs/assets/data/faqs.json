@@ -1409,7 +1409,7 @@
     "Category__c": "Query Manager(Q)",
     "SubCategory__c": null,
     "SeqNo__c": null,
-    "Question__c": "What is Query Manager (Q)?",
+    "Question__c": "What is Query Manager(Q)?",
     "Answer__c": "query-managerq-what-is-query-manager.html"
   },
   {
