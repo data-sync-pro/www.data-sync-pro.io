@@ -6,6 +6,7 @@ import { HttpClient } from '@angular/common/http';
 })
 export class AnalyticsService {
   userConsented = false;
+  private enabled = false; // Analytics is disabled
 
   constructor(private http: HttpClient) {}
 
@@ -48,6 +49,10 @@ export class AnalyticsService {
   }
 
   trackClickEvent(data: { element: string; timestamp: string }) {
+    if (!this.enabled) {
+      console.log('Analytics disabled: Click tracking skipped');
+      return;
+    }
     if (!this.userConsented) {
       return;
     }
@@ -66,6 +71,9 @@ export class AnalyticsService {
   }
 
   trackPageView(pageUrl: string) {
+    if (!this.enabled) {
+            return;
+    }
     if (!this.userConsented) {
       return;
     }
@@ -83,6 +91,10 @@ export class AnalyticsService {
       });
   }
   trackCustomEvent(data: any) {
+    if (!this.enabled) {
+      console.log('Analytics disabled: Custom event tracking skipped');
+      return;
+    }
     if (!this.userConsented) {
       return;
     }
