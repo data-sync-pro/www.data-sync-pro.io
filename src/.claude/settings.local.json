@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir:*)",
+      "Bash(magick:*)",
+      "Bash(convert:*)",
+      "Bash(cp:*)",
+      "Bash(npm run build:*)",
+      "Bash(ng build)",
+      "Bash(start ng serve --port 4200 --open)"
+    ],
+    "deny": []
+  }
+}

@@ -2,9 +2,14 @@
 
 // Layout variables
 $header-height: 60px; // Global header height
-$sidebar-width: 280px;
+// 改为百分比布局，更加响应式
+$sidebar-width-percent: 18%; // 约216px in 1200px container
+$sidebar-collapsed-width-percent: 5%; // 约60px in 1200px container  
+$toc-width-percent: 20%; // 约240px in 1200px container
+// 保留像素值用于移动端和特殊情况
+$sidebar-width: 240px;
 $sidebar-collapsed-width: 56px;
-$toc-width: 320px;
+$toc-width: 240px;
 $content-max-width: 1200px;
 $breakpoint-desktop: 992px;
 $breakpoint-tablet: 768px;
@@ -14,25 +19,46 @@ $breakpoint-mobile: 576px;
 .recipe-layout-container {
   display: grid;
   grid-template-areas: "sidebar main toc";
-  grid-template-columns: $sidebar-width 1fr $toc-width;
+  // 使用百分比布局，更响应式和灵活
+  grid-template-columns: $sidebar-width-percent 1fr $toc-width-percent;
   min-height: calc(100vh - $header-height);
   margin-top: $header-height;
   background-color: #ffffff;
   transition: grid-template-columns 0.3s ease;
 
   &.sidebar-collapsed {
-    grid-template-columns: $sidebar-collapsed-width 1fr $toc-width;
+    // 折叠时sidebar占用更少空间，给主内容更多空间
+    grid-template-columns: $sidebar-collapsed-width-percent 1fr $toc-width-percent;
   }
 
   &.toc-hidden {
     grid-template-areas: "sidebar main";
-    grid-template-columns: $sidebar-width 1fr;
+    // TOC隐藏时，主内容获得更多空间
+    grid-template-columns: $sidebar-width-percent 1fr;
     
     &.sidebar-collapsed {
-      grid-template-columns: $sidebar-collapsed-width 1fr;
+      grid-template-columns: $sidebar-collapsed-width-percent 1fr;
     }
   }
 
+  // 在大屏幕上优化比例
+  @media (min-width: 1400px) {
+    grid-template-columns: 16% 1fr 18%; // 大屏幕上稍微减少侧栏占比
+    
+    &.sidebar-collapsed {
+      grid-template-columns: 4% 1fr 18%;
+    }
+
+    &.toc-hidden {
+      grid-template-columns: 16% 1fr;
+      
+      &.sidebar-collapsed {
+        grid-template-columns: 4% 1fr;
+      }
+    }
+  }
+
+  // 移动端切换到全宽布局
   @media (max-width: $breakpoint-desktop) {
     grid-template-areas: "main";
     grid-template-columns: 1fr;
@@ -84,7 +110,7 @@ $breakpoint-mobile: 576px;
 
 .recipe-main {
   grid-area: main;
-  padding: 80px 80px 300px 80px; // Normal bottom padding for footer visibility
+  padding: 80px; // Normal bottom padding for footer visibility
   overflow-x: hidden;
   overflow-y: auto;
   background: #ffffff;
@@ -122,7 +148,8 @@ $breakpoint-mobile: 576px;
 .toc-toggle-btn {
   position: fixed;
   top: 50%;
-  right: $toc-width;
+  // 使用百分比定位，与walkthrough导航按钮保持一致
+  right: calc($toc-width-percent + 2%); // TOC宽度 + 小边距
   transform: translateY(-50%);
   z-index: 90;
   opacity: 0;
@@ -130,9 +157,18 @@ $breakpoint-mobile: 576px;
   transition: all 0.3s ease;
   
   .recipe-layout-container.toc-hidden & {
-    right: 20px;
+    right: 2%; // 使用百分比替代固定20px
     opacity: 1;
     visibility: visible;
+  }
+  
+  // 大屏幕上调整位置
+  @media (min-width: 1400px) {
+    right: calc(18% + 2%); // 大屏幕TOC比例 + 边距
+    
+    .recipe-layout-container.toc-hidden & {
+      right: 2%;
+    }
   }
   
   @media (max-width: $breakpoint-desktop) {
@@ -407,7 +443,7 @@ $breakpoint-mobile: 576px;
   gap: 4px;
   background: none;
   border: none;
-  color: #1a73e8;
+  color: #202124;
   font-size: 0.8rem;
   font-weight: 400;
   cursor: pointer;
@@ -418,7 +454,7 @@ $breakpoint-mobile: 576px;
 
   &:hover:not(.active) {
     background-color: rgba(26, 115, 232, 0.08);
-    color: #1557b0;
+    color: #202124;
   }
 
   &.active {
@@ -517,11 +553,11 @@ $breakpoint-mobile: 576px;
 
   &:hover {
     background-color: rgba(26, 115, 232, 0.08);
-    color: #1a73e8;
+    color: #202124;
   }
 
   &.active {
-    color: #1a73e8;
+    color: #202124;
     background-color: #fff;
     
     &::after {
@@ -531,7 +567,7 @@ $breakpoint-mobile: 576px;
       left: 0;
       right: 0;
       height: 2px;
-      background-color: #1a73e8;
+      background-color: #202124;
     }
   }
 
@@ -573,7 +609,7 @@ $breakpoint-mobile: 576px;
   h3, h4 {
     margin-top: 0;
     margin-bottom: 1rem;
-    color: #1a73e8;
+    color: #202124;
   }
 
   h3 {

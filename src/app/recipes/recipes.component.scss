@@ -2,13 +2,137 @@
 @import './styles/layout';
 @import './styles/sidebar';
 @import './styles/search-overlay';
-@import './styles/toc';
+// @import './styles/toc'; // Old TOC styles - replaced with Microsoft style
+@import './styles/toc-microsoft'; // New Microsoft Learn style TOC
 @import './styles/responsive';
+
+// Import layout variables for precise button positioning
+$sidebar-width: 240px;
+$sidebar-collapsed-width: 56px;
+$toc-width: 240px;
+$breakpoint-desktop: 992px;
+$breakpoint-tablet: 768px;
+$breakpoint-mobile: 576px;
 
 // Component-specific overrides and adjustments
 // The main layout is handled by modular styles
 
 // ==================== Recipe Detail Content Styles ====================
+
+// ==================== Use Case Highlight Styles ====================
+
+// Use Case section with simple card-style design
+.recipe-section.use-case-highlight {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 24px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+
+  // Clean header styling for Use Case
+  h4 {
+    color: #007bff;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0 0 16px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    .section-icon {
+      font-size: 1.1rem;
+      color: #007bff;
+    }
+  }
+}
+
+// Use Case content - direct display without nested card
+.use-case-content {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #495057;
+
+  // Clean text styling
+  p {
+    margin: 0 0 12px 0;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  // Subtle highlight for important terms
+  strong, b {
+    color: #007bff;
+    font-weight: 600;
+  }
+
+  // Simple link styling
+  a {
+    color: #007bff;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+// Section icons for all sections
+.recipe-section h4 .section-icon {
+  font-size: 1.2rem;
+  margin-right: 8px;
+  color: #6c757d;
+  transition: color 0.2s ease;
+}
+
+// Responsive adjustments for Use Case highlight
+@media (max-width: 768px) {
+  .recipe-section.use-case-highlight {
+    padding: 16px;
+    margin-bottom: 20px;
+
+    h4 {
+      font-size: 1rem;
+    }
+  }
+
+  .use-case-content {
+    font-size: 0.95rem;
+  }
+}
+
+// Dark theme support for Use Case highlight
+@media (prefers-color-scheme: dark) {
+  .recipe-section.use-case-highlight {
+    background: #2d3748;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+
+    h4 {
+      color: #4299e1;
+
+      .section-icon {
+        color: #4299e1;
+      }
+    }
+  }
+
+  .use-case-content {
+    color: #e2e8f0;
+
+    strong, b {
+      color: #4299e1;
+    }
+
+    a {
+      color: #4299e1;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+}
 
 // Version and keyword tags
 .version-tags, .keyword-tags {
@@ -194,11 +318,8 @@
 }
 
 .walkthrough-step-container {
-  display: block;
-  margin-bottom: 32px;
   min-height: 500px;
 }
-
 
 .step-content-wrapper {
   background: #fff;
@@ -213,6 +334,7 @@
     height: 100%;
   }
 }
+
 
 .step-indicators {
   display: flex;
@@ -243,18 +365,96 @@
   }
 }
 
-.walkthrough-footer {
+// ==================== Bottom Navigation Buttons ====================
+.walkthrough-bottom-nav {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-top: 24px;
+  justify-content: space-between; // 左右分开布局
+  padding: 32px 16px 16px 16px;
+  margin-top: 24px;
   border-top: 1px solid #e0e0e0;
-  gap: 16px;
+  
+  @media (max-width: #{$breakpoint-mobile}) {
+    padding: 24px 12px 12px 12px;
+  }
 }
 
-.footer-nav-buttons {
-  display: flex;
-  gap: 12px;
+.nav-button {
+  display: flex !important;
+  align-items: center;
+  gap: 8px;
+  min-width: 120px;
+  height: 44px;
+  font-weight: 500 !important;
+  border-radius: 8px !important;
+  transition: all 0.2s ease !important;
+  padding: 0 20px !important;
+  
+  // 使用与页面一致的灰色系配色
+  background-color: #f5f5f5 !important; // 浅灰色背景
+  color: #666666 !important; // 深灰色文字
+  border: 1px solid #e0e0e0 !important;
+  box-shadow: none !important;
+  
+  &:hover:not([disabled]) {
+    background-color: #eeeeee !important; // 悬停时稍深的灰色
+    color: #333333 !important; // 更深的文字颜色
+    border-color: #d0d0d0 !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+  }
+  
+  &:active:not([disabled]) {
+    transform: translateY(0) !important;
+    box-shadow: none !important;
+  }
+  
+  &.prev-button {
+    mat-icon {
+      order: -1; // 图标在左侧
+    }
+  }
+  
+  &.next-button {
+    mat-icon {
+      order: 1; // 图标在右侧
+    }
+  }
+  
+  span {
+    font-size: 14px;
+    font-weight: 500;
+  }
+  
+  mat-icon {
+    font-size: 20px !important;
+    width: 20px !important;
+    height: 20px !important;
+    color: inherit !important;
+  }
+  
+  &[disabled] {
+    background-color: #fafafa !important;
+    color: #cccccc !important;
+    border-color: #f0f0f0 !important;
+    cursor: not-allowed !important;
+    opacity: 1 !important; // 覆盖默认的opacity
+  }
+  
+  // 手机端保持图标优先
+  @media (max-width: #{$breakpoint-mobile}) {
+    min-width: 44px;
+    max-width: 44px;
+    height: 40px;
+    padding: 0 !important;
+    
+    span {
+      display: none; // 在手机端只显示图标，保持简洁
+    }
+    
+    mat-icon {
+      margin: 0;
+    }
+  }
 }
 
 .no-steps {
@@ -282,23 +482,13 @@
   }
 }
 
-// Mobile responsive styles for walkthrough
-@media (max-width: 768px) {
-  .walkthrough-footer {
-    flex-direction: column;
-    gap: 16px;
-    align-items: stretch;
-    
-    button {
-      width: 100%;
-    }
-  }
-  
-  .footer-nav-buttons {
-    flex-direction: column;
-    gap: 8px;
-  }
-  
+// Walkthrough step container - 简洁清爽的原始设置
+.walkthrough-step-container {
+  min-height: 500px;
+}
+
+// Step indicators responsive styles
+@media (max-width: #{$breakpoint-tablet}) {
   .step-indicators {
     gap: 6px;
   }

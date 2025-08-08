@@ -1,7 +1,7 @@
 {
-  "name": "Data Sync Pro FAQ",
-  "short_name": "FAQ",
-  "description": "Data Sync Pro FAQ - Frequently Asked Questions and Support",
+  "name": "Data Sync Pro",
+  "short_name": "DSP",
+  "description": "Data Sync Pro - Salesforce Data Synchronization Platform",
   "theme_color": "#1a73e8",
   "background_color": "#ffffff",
   "display": "standalone",

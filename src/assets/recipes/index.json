@@ -1,12 +1,6 @@
 {
   "recipes": [
     {
-      "folderId": "salesforce-data-sync-automation",
-      "name": "Auto-Close Stagnant Cases",
-      "category": "batch",
-      "active": true
-    },
-    {
       "folderId": "calculate-rollup-summaries-for-related-records",
       "name": "Calculate Rollup Summaries for Related Records",
       "category": "triggers",
