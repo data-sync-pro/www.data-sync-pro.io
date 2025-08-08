@@ -307,10 +307,11 @@ export class RecipesComponent implements OnInit, OnDestroy {
     }
     
     // Update URL without triggering navigation
+    // Don't use 'merge' to ensure old parameters are cleared when switching tabs
     this.router.navigate([], {
       relativeTo: this.route,
       queryParams,
-      queryParamsHandling: 'merge',
+      queryParamsHandling: '', // Empty string means replace all query params
       replaceUrl: true // Replace current URL in history instead of adding new entry
     });
   }
