@@ -240,12 +240,12 @@ export const FAQ_URL_MAPPINGS: { [category: string]: { [key: string]: FAQUrlMapp
   'query-manager': {
     'query-manager': {
       key: 'query-manager',
-      path: '/Query%20Manager(Q)',
+      path: '/Query%20Manager%28Q%29',
       description: 'Query Manager overview'
     },
     'query-manager.what-is-query-manager': {
       key: 'query-manager.what-is-query-manager',
-      path: '/Query%20Manager(Q)',
+      path: '/Query%20Manager%28Q%29',
       fragment: 'what-is-query-manager-q',
       description: 'What is Query Manager(Q)'
     }
