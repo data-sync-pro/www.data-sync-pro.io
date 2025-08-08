@@ -125,6 +125,11 @@
       "caseSensitive": true,
       "description": "Action Process Step"
     },
+    "Actions": {
+      "faqLink": "action.what-does-action-do",
+      "caseSensitive": true,
+      "description": "Action Process Step"
+    },
     "Verify": {
       "faqLink": "verify.what-does-verify-do",
       "caseSensitive": true,
