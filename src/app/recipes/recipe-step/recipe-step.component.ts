@@ -12,22 +12,7 @@ import { RecipeWalkthroughStep, RecipeStepConfig, RecipeStepMedia } from '../../
         </div>
         
         <div class="step-content">
-          <!-- Configuration Fields -->
-          <div class="config-section" *ngIf="stepData.config?.length">
-            <div class="config-fields">
-              <div class="field-group" *ngFor="let config of stepData.config; let i = index">
-                <label>{{ i + 1 }}. {{ config.field }}:</label>
-                <div class="field-value-container">
-                  <span class="field-value">{{ config.value }}</span>
-                  <button class="copy-btn" (click)="copyToClipboard($event, config.value)" title="Copy to clipboard">
-                    <mat-icon>content_copy</mat-icon>
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <!-- Media Content -->
+          <!-- Media Content (moved to display first) -->
           <div class="media-section" *ngIf="stepData.media?.length">
             <div class="media-content">
               <div class="media-item" *ngFor="let media of stepData.media">
@@ -69,6 +54,21 @@ import { RecipeWalkthroughStep, RecipeStepConfig, RecipeStepMedia } from '../../
                       {{ media.alt || media.url }}
                     </a>
                   </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Configuration Fields (moved to display after media) -->
+          <div class="config-section" *ngIf="stepData.config?.length">
+            <div class="config-fields">
+              <div class="field-group" *ngFor="let config of stepData.config; let i = index">
+                <label>{{ i + 1 }}. {{ config.field }}:</label>
+                <div class="field-value-container">
+                  <span class="field-value">{{ config.value }}</span>
+                  <button class="copy-btn" (click)="copyToClipboard($event, config.value)" title="Copy to clipboard">
+                    <mat-icon>content_copy</mat-icon>
+                  </button>
                 </div>
               </div>
             </div>

@@ -1006,12 +1006,13 @@ export class RecipesComponent implements OnInit, OnDestroy {
     {
       id: 'use-case',
       title: 'Use Case',
-      icon: 'info',
+      icon: 'lightbulb',
       elementId: 'recipe-use-case',
-      contentType: 'html',
+      contentType: 'use-case-highlight',
       isVisible: () => this.hasValidUseCase(),
       getData: () => this.currentRecipe?.safeUsecase || this.currentRecipe?.safeUseCase,
-      alwaysShow: true
+      alwaysShow: true,
+      isHighlight: true
     },
     {
       id: 'dsp-versions',
@@ -1736,6 +1737,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
       this.syncTOCSectionWithWalkthrough();
       this.updateUrlParams('walkthrough', this.ui.currentWalkthroughStep);
       this.cdr.markForCheck();
+      this.scrollToTop();
     }
   }
 
@@ -1748,6 +1750,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
       this.syncTOCSectionWithWalkthrough();
       this.updateUrlParams('walkthrough', this.ui.currentWalkthroughStep);
       this.cdr.markForCheck();
+      this.scrollToTop();
     }
   }
 
@@ -1761,6 +1764,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
       this.syncTOCSectionWithWalkthrough();
       this.updateUrlParams('walkthrough', this.ui.currentWalkthroughStep);
       this.cdr.markForCheck();
+      this.scrollToTop();
     }
   }
 
@@ -1801,6 +1805,43 @@ export class RecipesComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Get previous step title
+   */
+  get previousStepTitle(): string {
+    if (!this.canGoToPreviousStep) return '上一步';
+    const prevIndex = this.ui.currentWalkthroughStep - 1;
+    return this.getStepTitleByIndex(prevIndex);
+  }
+
+  /**
+   * Get next step title  
+   */
+  get nextStepTitle(): string {
+    if (!this.canGoToNextStep) return '下一步';
+    const nextIndex = this.ui.currentWalkthroughStep + 1;
+    return this.getStepTitleByIndex(nextIndex);
+  }
+
+  /**
+   * Get step title by index
+   */
+  private getStepTitleByIndex(index: number): string {
+    // Handle new array format
+    if (Array.isArray(this.currentRecipe?.walkthrough)) {
+      const step = this.currentRecipe?.walkthrough[index];
+      return step?.step || `Step ${index + 1}`;
+    }
+    
+    // Handle legacy format
+    const steps = this.walkthroughSteps;
+    if (index >= 0 && index < steps.length) {
+      return this.getStepTitle(steps[index]);
+    }
+    
+    return `Step ${index + 1}`;
+  }
+
+  /**
    * Get progress percentage
    */
   get walkthroughProgress(): number {
@@ -1816,6 +1857,16 @@ export class RecipesComponent implements OnInit, OnDestroy {
     this.ui.currentWalkthroughStep = 0;
     this.ui.walkthroughStepsCompleted.clear();
     this.cdr.markForCheck();
+  }
+
+  /**
+   * Scroll to top of page smoothly
+   */
+  private scrollToTop(): void {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
   }
 
   // ==================== Compatibility Helper Methods ====================

@@ -190,31 +190,6 @@
       <!-- Recipe Detail View -->
       <div *ngIf="showRecipeDetails && !ui.isLoading" class="recipe-detail-view">
         
-        <!-- Recipe Navigation - Page Level (只在walkthrough tab时显示) -->
-        <!-- Previous Button Container - Left Side -->
-        <div class="recipe-nav-container recipe-nav-left-container" *ngIf="ui.activeRecipeTab === 'walkthrough' && walkthroughSteps.length > 0">
-          <button 
-            mat-fab
-            [disabled]="!canGoToPreviousStep"
-            (click)="goToPreviousWalkthroughStep()"
-            class="recipe-nav-button recipe-nav-prev"
-            [attr.aria-label]="'Go to previous step'">
-            <mat-icon>chevron_left</mat-icon>
-          </button>
-        </div>
-        
-        <!-- Next Button Container - Right Side -->
-        <div class="recipe-nav-container recipe-nav-right-container" *ngIf="ui.activeRecipeTab === 'walkthrough' && walkthroughSteps.length > 0 && canGoToNextStep">
-          <button 
-            mat-fab
-            [disabled]="!canGoToNextStep"
-            (click)="goToNextWalkthroughStep()"
-            class="recipe-nav-button recipe-nav-next"
-            [attr.aria-label]="'Go to next step'">
-            <mat-icon>chevron_right</mat-icon>
-          </button>
-        </div>
-        
         <div class="recipe-detail">
           <!-- Recipe Header -->
           <div class="recipe-header">
@@ -242,11 +217,20 @@
               <!-- Dynamic sections using configuration -->
               <section *ngFor="let sectionConfig of getVisibleOverviewSections()" 
                        [id]="sectionConfig.elementId" 
-                       class="recipe-section">
-                <h4>{{ sectionConfig.title }}</h4>
+                       class="recipe-section"
+                       [class.use-case-highlight]="sectionConfig.isHighlight">
+                <h4>
+                  <mat-icon *ngIf="sectionConfig.icon" class="section-icon">{{ sectionConfig.icon }}</mat-icon>
+                  {{ sectionConfig.title }}
+                </h4>
                 
                 <!-- Switch based on content type -->
                 <ng-container [ngSwitch]="sectionConfig.contentType">
+                  
+                  <!-- Use Case Highlight (special treatment) -->
+                  <div *ngSwitchCase="'use-case-highlight'" class="use-case-content">
+                    <div [innerHTML]="sectionConfig.data"></div>
+                  </div>
                   
                   <!-- HTML content -->
                   <div *ngSwitchCase="'html'" [innerHTML]="sectionConfig.data"></div>
@@ -327,6 +311,28 @@
                     </app-recipe-step>
                   </div>
                   
+                  <!-- Bottom Navigation Buttons -->
+                  <div class="walkthrough-bottom-nav" *ngIf="walkthroughSteps.length > 0">
+                    <button 
+                      mat-raised-button
+                      [disabled]="!canGoToPreviousStep"
+                      (click)="goToPreviousWalkthroughStep()"
+                      class="nav-button prev-button"
+                      [attr.aria-label]="'Go to previous step'">
+                      <mat-icon>chevron_left</mat-icon>
+                      <span>Previous</span>
+                    </button>
+                    
+                    <button 
+                      mat-raised-button
+                      [disabled]="!canGoToNextStep"
+                      (click)="goToNextWalkthroughStep()"
+                      class="nav-button next-button"
+                      [attr.aria-label]="'Go to next step'">
+                      <span>Next</span>
+                      <mat-icon>chevron_right</mat-icon>
+                    </button>
+                  </div>
                 </div>
 
               </div>
