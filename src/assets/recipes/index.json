@@ -2,9 +2,15 @@
   "recipes": [
     {
       "folderId": "calculate-rollup-summaries-for-related-records",
-      "name": "Calculate Rollup Summaries for Related Records",
-      "category": "triggers",
       "active": true
+    },
+    {
+      "folderId": "auto_close-stagnant-cases",
+      "active": true
+    },
+    {
+      "folderId":"reassign-opportunity-owners-for-inactive-users",
+      "active":true
     }
   ]
 }

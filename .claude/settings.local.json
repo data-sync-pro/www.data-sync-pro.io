@@ -24,7 +24,9 @@
       "Bash(ls:*)",
       "Bash(git add:*)",
       "Bash(del test-recipe-images.html)",
-      "WebFetch(domain:learn.microsoft.com)"
+      "WebFetch(domain:learn.microsoft.com)",
+      "Bash(cmd /c \"dir D:\\www.data-sync-pro.io\\src\\assets\\recipes\\auto*\")",
+      "Bash(powershell:*)"
     ],
     "deny": []
   }

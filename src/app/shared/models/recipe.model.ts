@@ -72,8 +72,9 @@ export interface RecipeQuickLink {
  * Recipe downloadable executable
  */
 export interface RecipeDownloadableExecutable {
-  title: string;
-  url: string;
+  title?: string;
+  url?: string;
+  filePath?: string; // New format - path to downloadable file
 }
 
 /**
