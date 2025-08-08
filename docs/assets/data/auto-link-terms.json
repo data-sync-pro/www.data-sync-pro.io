@@ -15,6 +15,7 @@
       "caseSensitive": true,
       "description": "Batch Rules Engine"
     },
+
     "Triggers": {
       "faqLink": "triggers.how-it-works", 
       "caseSensitive": true,
@@ -119,6 +120,11 @@
       "caseSensitive": true,
       "description": "Action Process Step"
     },
+    "Actions": {
+      "faqLink": "action.what-does-action-do",
+      "caseSensitive": true,
+      "description": "Action Process Step"
+    },
     "Verify": {
       "faqLink": "verify.what-does-verify-do",
       "caseSensitive": true,
@@ -130,11 +136,21 @@
       "caseSensitive": true,
       "description": "Self-Adaptive Trigger Rules Engine"
     },
+    "#Self-Adaptive Trigger": {
+      "faqLink": "triggers.what-is-self-adaptive-trigger",
+      "caseSensitive": true,
+      "description": "Self-Adaptive Trigger Rules Engine"
+    },
+    "#Self-Adaptive Triggers": {
+      "faqLink": "triggers.what-is-self-adaptive-trigger",
+      "caseSensitive": true,
+      "description": "Self-Adaptive Trigger Rules Engine"
+    },
 
-    "Query Manager (Q)": {
+    "Query Manager(Q)": {
       "faqLink": "query-manager.what-is-query-manager",
       "caseSensitive": true,
-      "description": "Query Manager (Q) - Advanced Query Tool"
+      "description": "Query Manager(Q) - Advanced Query Tool"
     },
     "Query Manager": {
       "faqLink": "query-manager.what-is-query-manager",
