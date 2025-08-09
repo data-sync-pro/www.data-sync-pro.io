@@ -307,10 +307,11 @@ export class RecipesComponent implements OnInit, OnDestroy {
     }
     
     // Update URL without triggering navigation
+    // Don't use 'merge' to ensure old parameters are cleared when switching tabs
     this.router.navigate([], {
       relativeTo: this.route,
       queryParams,
-      queryParamsHandling: 'merge',
+      queryParamsHandling: '', // Empty string means replace all query params
       replaceUrl: true // Replace current URL in history instead of adding new entry
     });
   }
@@ -1994,17 +1995,113 @@ export class RecipesComponent implements OnInit, OnDestroy {
   hasValidDownloadableExecutables(): boolean {
     const executables = this.currentRecipe?.downloadableExecutables;
     return !!(executables && executables.length > 0 && 
-              executables.some(exe => exe.title && exe.title.trim().length > 0 && 
-                                     exe.url && exe.url.trim().length > 0));
+              executables.some(exe => 
+                // Support new format with filePath
+                (exe.filePath && exe.filePath.trim().length > 0) ||
+                // Support legacy format with title and url
+                (exe.title && exe.title.trim().length > 0 && 
+                 exe.url && exe.url.trim().length > 0)
+              ));
   }
 
   /**
-   * Get valid downloadable executables (with non-empty title and url)
+   * Get valid downloadable executables (with non-empty title and url or filePath)
    */
   getValidDownloadableExecutables() {
     const executables = this.currentRecipe?.downloadableExecutables || [];
-    return executables.filter(exe => exe.title && exe.title.trim().length > 0 && 
-                                    exe.url && exe.url.trim().length > 0);
+    return executables.filter(exe => 
+      // Support new format with filePath
+      (exe.filePath && exe.filePath.trim().length > 0) ||
+      // Support legacy format with title and url
+      (exe.title && exe.title.trim().length > 0 && 
+       exe.url && exe.url.trim().length > 0)
+    ).map(exe => {
+      // Transform new format to legacy format for template compatibility
+      if (exe.filePath && !exe.title && !exe.url) {
+        const fileName = exe.filePath.split('/').pop() || exe.filePath;
+        // Remove extension and keep the original filename (including special characters)
+        const titleFromFileName = fileName.replace(/\.[^/.]+$/, '');
+        
+        // Build correct assets path for download
+        const correctUrl = this.buildAssetPath(exe.filePath);
+        
+        return {
+          ...exe,
+          title: titleFromFileName,
+          url: correctUrl,
+          // Keep original filename for download attribute
+          originalFileName: fileName
+        };
+      }
+      return exe;
+    });
+  }
+
+  /**
+   * Build correct asset path for recipe files
+   */
+  private buildAssetPath(filePath: string): string {
+    if (!this.currentRecipe || !filePath) return filePath;
+    
+    // If filePath already starts with '/assets/', return as is
+    if (filePath.startsWith('/assets/')) {
+      return filePath;
+    }
+    
+    // If filePath already starts with 'assets/', make it absolute
+    if (filePath.startsWith('assets/')) {
+      return `/${filePath}`;
+    }
+    
+    // If filePath is absolute URL, return as is
+    if (filePath.startsWith('http://') || filePath.startsWith('https://')) {
+      return filePath;
+    }
+    
+    // Build the correct absolute assets path: /assets/recipes/{recipeId}/{filePath}
+    // Replace em dash and other dash characters with underscore to match actual folder names
+    const normalizedRecipeId = this.currentRecipe.id.replace(/[\u2010-\u2015]/g, '_');
+    return `/assets/recipes/${normalizedRecipeId}/${filePath}`;
+  }
+
+  /**
+   * Handle download link click to bypass Angular routing
+   */
+  downloadExecutable(url: string, title: string, originalFileName?: string): void {
+    if (!url) {
+      console.error('Download URL is empty');
+      return;
+    }
+    
+    // Replace em dash and other dash characters with underscore in the URL to match actual folder names
+    const normalizedUrl = url.replace(/[\u2010-\u2015]/g, '_');
+    
+    console.log('Original URL:', url);
+    console.log('Normalized URL:', normalizedUrl);
+    console.log('Download title:', title);
+    
+    // Create a temporary anchor element to force download
+    const link = document.createElement('a');
+    link.href = normalizedUrl;
+    // Use original filename if available, otherwise use title
+    link.download = originalFileName || title || 'download';
+    
+    // Use direct download approach without opening in new tab
+    // This avoids potential routing issues
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    // Track download event if analytics service is available
+    if (this.currentRecipe) {
+      this.recipeService.trackRecipeEvent({
+        type: 'download',
+        recipeId: this.currentRecipe.id,
+        recipeTitle: this.currentRecipe.title,
+        recipeCategory: this.currentRecipe.category,
+        timestamp: new Date()
+      });
+    }
   }
 
   /**

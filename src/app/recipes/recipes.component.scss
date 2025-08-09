@@ -231,6 +231,12 @@ $breakpoint-mobile: 576px;
   text-decoration: none;
   font-weight: 500;
   transition: color 0.2s ease;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  font-size: inherit;
+  font-family: inherit;
 }
 
 .download-link:hover {

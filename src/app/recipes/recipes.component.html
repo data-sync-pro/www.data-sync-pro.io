@@ -220,7 +220,6 @@
                        class="recipe-section"
                        [class.use-case-highlight]="sectionConfig.isHighlight">
                 <h4>
-                  <mat-icon *ngIf="sectionConfig.icon" class="section-icon">{{ sectionConfig.icon }}</mat-icon>
                   {{ sectionConfig.title }}
                 </h4>
                 
@@ -252,10 +251,12 @@
                   <!-- Download list -->
                   <div *ngSwitchCase="'download-list'" class="download-list">
                     <div *ngFor="let executable of $any(sectionConfig.data)" class="download-item">
-                      <a [href]="executable.url" target="_blank" class="download-link">
+                      <button type="button" 
+                              class="download-link" 
+                              (click)="downloadExecutable(executable.url, executable.title, executable.originalFileName)">
                         <mat-icon>download</mat-icon>
                         {{ executable.title }}
-                      </a>
+                      </button>
                     </div>
                   </div>
                   

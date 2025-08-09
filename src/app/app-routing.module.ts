@@ -22,6 +22,11 @@ const routes: Routes = [
     path: '', 
     loadChildren: () => import('./faq/faq.module').then(m => m.FaqModule)
   },
+  // Exclude assets from Angular routing - let the browser handle them directly
+  {
+    path: 'assets',
+    children: [] // Empty children means Angular won't handle routes starting with 'assets'
+  },
   { path: '**', redirectTo: '' },
 ];
 

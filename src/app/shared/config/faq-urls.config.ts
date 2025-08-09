@@ -56,6 +56,12 @@ export const FAQ_URL_MAPPINGS: { [category: string]: { [key: string]: FAQUrlMapp
       fragment: 'how-does-the-dsp-trigger-rules-engine-work',
       description: 'How DSP Trigger Rules Engine Works'
     },
+    'triggers.what-is-self-adaptive-trigger': {
+      key: 'triggers.what-is-self-adaptive-trigger',
+      path: '/Rules%20Engines/Triggers',
+      fragment: 'what-is-a-self-adaptive-trigger',
+      description: 'What is a Self-Adaptive Trigger'
+    },
     'action-button': {
       key: 'action-button',
       path: '/Rules%20Engines/Action%20Button',
@@ -227,6 +233,21 @@ export const FAQ_URL_MAPPINGS: { [category: string]: { [key: string]: FAQUrlMapp
       path: '/General',
       fragment: 'why-data-sync-pro',
       description: 'Why Data Sync Pro'
+    }
+  },
+
+  // Query Manager Category
+  'query-manager': {
+    'query-manager': {
+      key: 'query-manager',
+      path: '/Query%20Manager(Q)',
+      description: 'Query Manager overview'
+    },
+    'query-manager.what-is-query-manager': {
+      key: 'query-manager.what-is-query-manager',
+      path: '/Query%20Manager(Q)',
+      fragment: 'what-is-query-manager-q',
+      description: 'What is Query Manager(Q)'
     }
   }
 };

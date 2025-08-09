@@ -877,7 +877,7 @@ export class FAQService implements OnDestroy {
       }
       
       // Pattern to match the exact term within <strong> tags, case-sensitive
-      const pattern = new RegExp(`<strong>([^<]*?)\(${escapedTerm})\([^<]*?)</strong>`, 'g');
+      const pattern = new RegExp(`<strong>([^<]*?)(${escapedTerm})([^<]*?)</strong>`, 'g');
       
       processedContent = processedContent.replace(pattern, (fullMatch, beforeTerm, capturedTerm, afterTerm, offset, fullString) => {
         // Check if the captured term exactly matches the expected term (case-sensitive)
