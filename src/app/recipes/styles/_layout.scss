@@ -110,7 +110,7 @@ $breakpoint-mobile: 576px;
 
 .recipe-main {
   grid-area: main;
-  padding: 80px 80px 300px 80px; // Normal bottom padding for footer visibility
+  padding: 80px; // Normal bottom padding for footer visibility
   overflow-x: hidden;
   overflow-y: auto;
   background: #ffffff;

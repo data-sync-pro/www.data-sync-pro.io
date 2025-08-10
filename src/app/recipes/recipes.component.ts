@@ -47,6 +47,15 @@ interface UIState {
   // Walkthrough step navigation
   currentWalkthroughStep: number;
   walkthroughStepsCompleted: Set<number>;
+  // Scroll-to-next-step control
+  isTransitioningStep: boolean;
+  lastStepTransitionTime: number;
+  // Scroll hint display
+  showScrollHint: boolean;
+  scrollHintDirection: 'top' | 'bottom' | null;
+  scrollHintOpacity: number;
+  // Animation control
+  stepAnimationDirection: 'forward' | 'backward' | null;
 }
 
 interface TOCPaginationState {
@@ -105,7 +114,16 @@ export class RecipesComponent implements OnInit, OnDestroy {
     disableScrollHighlight: false,
     // Walkthrough step navigation
     currentWalkthroughStep: 0,
-    walkthroughStepsCompleted: new Set<number>()
+    walkthroughStepsCompleted: new Set<number>(),
+    // Scroll-to-next-step control
+    isTransitioningStep: false,
+    lastStepTransitionTime: 0,
+    // Scroll hint display
+    showScrollHint: false,
+    scrollHintDirection: null,
+    scrollHintOpacity: 0,
+    // Animation control
+    stepAnimationDirection: null
   };
 
   // TOC pagination state
@@ -210,6 +228,123 @@ export class RecipesComponent implements OnInit, OnDestroy {
     if (this.search.isOverlayOpen) {
       this.closeSearchOverlay();
     }
+  }
+
+  /**
+   * Handle wheel scroll events for walkthrough auto-navigation
+   */
+  @HostListener('window:wheel', ['$event'])
+  onWheelScroll(event: WheelEvent) {
+    // Only handle in walkthrough tab
+    if (this.ui.activeRecipeTab !== 'walkthrough' || !this.showRecipeDetails) {
+      return;
+    }
+
+    // Update scroll hint based on position
+    this.updateScrollHint();
+
+    // Prevent transitions if already transitioning
+    if (this.ui.isTransitioningStep) {
+      return;
+    }
+
+    // Check cooldown period (800ms between transitions)
+    const now = Date.now();
+    if (now - this.ui.lastStepTransitionTime < 800) {
+      return;
+    }
+
+    // Check if scrolling down and at bottom
+    if (event.deltaY > 0 && this.isAtPageBottom() && this.canGoToNextStep) {
+      this.ui.isTransitioningStep = true;
+      this.ui.lastStepTransitionTime = now;
+      
+      // Hide hint before transitioning
+      this.ui.showScrollHint = false;
+      
+      // Navigate to next step
+      this.goToNextWalkthroughStep();
+      
+      // Reset transition flag after animation
+      setTimeout(() => {
+        this.ui.isTransitioningStep = false;
+      }, 500);
+    }
+    // Check if scrolling up and at top
+    else if (event.deltaY < 0 && this.isAtPageTop() && this.canGoToPreviousStep) {
+      this.ui.isTransitioningStep = true;
+      this.ui.lastStepTransitionTime = now;
+      
+      // Hide hint before transitioning
+      this.ui.showScrollHint = false;
+      
+      // Navigate to previous step
+      this.goToPreviousWalkthroughStep();
+      
+      // Reset transition flag after animation
+      setTimeout(() => {
+        this.ui.isTransitioningStep = false;
+      }, 500);
+    }
+  }
+
+  /**
+   * Update scroll hint based on scroll position
+   */
+  private updateScrollHint(): void {
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    const windowHeight = window.innerHeight;
+    const documentHeight = document.documentElement.scrollHeight;
+    
+    const distanceToBottom = documentHeight - (scrollTop + windowHeight);
+    const distanceToTop = scrollTop;
+    
+    // Threshold for showing hint (150px)
+    const hintThreshold = 150;
+    
+    // Check if should show bottom hint
+    if (distanceToBottom < hintThreshold && this.canGoToNextStep) {
+      this.ui.showScrollHint = true;
+      this.ui.scrollHintDirection = 'bottom';
+      // Calculate opacity based on distance (closer = more opaque)
+      this.ui.scrollHintOpacity = Math.max(0, Math.min(1, (hintThreshold - distanceToBottom) / hintThreshold));
+    }
+    // Check if should show top hint
+    else if (distanceToTop < hintThreshold && this.canGoToPreviousStep) {
+      this.ui.showScrollHint = true;
+      this.ui.scrollHintDirection = 'top';
+      // Calculate opacity based on distance (closer = more opaque)
+      this.ui.scrollHintOpacity = Math.max(0, Math.min(1, (hintThreshold - distanceToTop) / hintThreshold));
+    }
+    // Hide hint if not near edges
+    else {
+      this.ui.showScrollHint = false;
+      this.ui.scrollHintOpacity = 0;
+    }
+    
+    this.cdr.markForCheck();
+  }
+
+  /**
+   * Check if user has scrolled to the bottom of the page
+   */
+  private isAtPageBottom(): boolean {
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    const windowHeight = window.innerHeight;
+    const documentHeight = document.documentElement.scrollHeight;
+    
+    // Allow 50px tolerance for "bottom"
+    const tolerance = 50;
+    return (scrollTop + windowHeight) >= (documentHeight - tolerance);
+  }
+
+  /**
+   * Check if user is at the top of the page
+   */
+  private isAtPageTop(): boolean {
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    // Consider "at top" if scroll is less than 50px
+    return scrollTop < 50;
   }
 
   private isInputFocused(): boolean {
@@ -1734,11 +1869,17 @@ export class RecipesComponent implements OnInit, OnDestroy {
   goToNextWalkthroughStep(): void {
     const steps = this.walkthroughSteps;
     if (this.ui.currentWalkthroughStep < steps.length - 1) {
+      this.ui.stepAnimationDirection = 'forward';
       this.ui.currentWalkthroughStep++;
       this.syncTOCSectionWithWalkthrough();
       this.updateUrlParams('walkthrough', this.ui.currentWalkthroughStep);
       this.cdr.markForCheck();
       this.scrollToTop();
+      // Reset animation direction after animation completes
+      setTimeout(() => {
+        this.ui.stepAnimationDirection = null;
+        this.cdr.markForCheck();
+      }, 950); // Slightly after animation ends
     }
   }
 
@@ -1747,11 +1888,17 @@ export class RecipesComponent implements OnInit, OnDestroy {
    */
   goToPreviousWalkthroughStep(): void {
     if (this.ui.currentWalkthroughStep > 0) {
+      this.ui.stepAnimationDirection = 'backward';
       this.ui.currentWalkthroughStep--;
       this.syncTOCSectionWithWalkthrough();
       this.updateUrlParams('walkthrough', this.ui.currentWalkthroughStep);
       this.cdr.markForCheck();
       this.scrollToTop();
+      // Reset animation direction after animation completes
+      setTimeout(() => {
+        this.ui.stepAnimationDirection = null;
+        this.cdr.markForCheck();
+      }, 950); // Slightly after animation ends
     }
   }
 
@@ -1766,6 +1913,11 @@ export class RecipesComponent implements OnInit, OnDestroy {
       this.updateUrlParams('walkthrough', this.ui.currentWalkthroughStep);
       this.cdr.markForCheck();
       this.scrollToTop();
+      // Reset animation direction after animation completes
+      setTimeout(() => {
+        this.ui.stepAnimationDirection = null;
+        this.cdr.markForCheck();
+      }, 950); // Slightly after animation ends
     }
   }
 
