@@ -43,6 +43,11 @@ a {
     left: 0;
   }
 }
+
+// Hide footer on recipe detail pages
+body.recipe-page app-footer {
+  display: none;
+}
   
 
   

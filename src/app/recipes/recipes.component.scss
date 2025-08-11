@@ -279,6 +279,84 @@ $breakpoint-mobile: 576px;
   min-height: 600px;
 }
 
+// ==================== Scroll Navigation Hint ====================
+.scroll-navigation-hint {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  opacity: 0;
+  
+  &.visible {
+    opacity: 1;
+  }
+  
+  &.bottom {
+    bottom: 120px;
+  }
+  
+  &.top {
+    top: 120px;
+  }
+  
+  .hint-content {
+    background: rgba(33, 33, 33, 0.95);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 24px;
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: white;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .hint-arrow {
+    color: #4CAF50;
+    font-size: 24px;
+    height: 24px;
+    width: 24px;
+    
+    // Pulse animation for bottom arrow
+    .bottom & {
+      animation: pulseDown 1.5s infinite;
+    }
+    
+    // Pulse animation for top arrow
+    .top & {
+      animation: pulseUp 1.5s infinite;
+    }
+  }
+  
+  .hint-text {
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+  }
+}
+
+@keyframes pulseDown {
+  0%, 100% { 
+    transform: translateY(0); 
+  }
+  50% { 
+    transform: translateY(4px); 
+  }
+}
+
+@keyframes pulseUp {
+  0%, 100% { 
+    transform: translateY(0); 
+  }
+  50% { 
+    transform: translateY(-4px); 
+  }
+}
+
 
 
 .walkthrough-header {
@@ -333,11 +411,22 @@ $breakpoint-mobile: 576px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   overflow: hidden;
   min-height: 450px;
-  animation: fadeIn 0.3s ease-in-out;
   
   :host ::ng-deep app-recipe-step {
     display: block;
     height: 100%;
+    will-change: transform, opacity;
+    
+    // Direction-aware animations
+    &.slide-forward {
+      animation: slideFromRight 0.9s cubic-bezier(0.25, 0.1, 0.25, 1);
+      animation-fill-mode: both;
+    }
+    
+    &.slide-backward {
+      animation: slideFromLeft 0.9s cubic-bezier(0.25, 0.1, 0.25, 1);
+      animation-fill-mode: both;
+    }
   }
 }
 
@@ -510,11 +599,33 @@ $breakpoint-mobile: 576px;
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(40px);
   }
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes slideFromRight {
+  0% {
+    opacity: 0;
+    transform: translateX(100px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideFromLeft {
+  0% {
+    opacity: 0;
+    transform: translateX(-100px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
   }
 }
 

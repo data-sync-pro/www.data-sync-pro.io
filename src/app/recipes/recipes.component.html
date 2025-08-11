@@ -301,6 +301,22 @@
             
             <!-- Walkthrough Content -->
             <div class="tab-content walkthrough-content" *ngIf="ui.activeRecipeTab === 'walkthrough'">
+              <!-- Scroll Navigation Hint -->
+              <div class="scroll-navigation-hint" 
+                   [class.visible]="ui.showScrollHint" 
+                   [class.bottom]="ui.scrollHintDirection === 'bottom'"
+                   [class.top]="ui.scrollHintDirection === 'top'"
+                   [style.opacity]="ui.scrollHintOpacity">
+                <div class="hint-content">
+                  <mat-icon class="hint-arrow">
+                    {{ ui.scrollHintDirection === 'bottom' ? 'keyboard_double_arrow_down' : 'keyboard_double_arrow_up' }}
+                  </mat-icon>
+                  <span class="hint-text">
+                    {{ ui.scrollHintDirection === 'bottom' ? 'Scroll to continue to next step' : 'Scroll to go back to previous step' }}
+                  </span>
+                </div>
+              </div>
+              
               <!-- Step Container -->
               <div class="walkthrough-container" *ngIf="walkthroughSteps.length > 0">
                 
@@ -308,7 +324,9 @@
                 <div class="walkthrough-step-container">
                   <div class="step-content-wrapper">
                     <app-recipe-step 
-                      [stepData]="currentStepData">
+                      [stepData]="currentStepData"
+                      [class.slide-forward]="ui.stepAnimationDirection === 'forward'"
+                      [class.slide-backward]="ui.stepAnimationDirection === 'backward'">
                     </app-recipe-step>
                   </div>
                   
