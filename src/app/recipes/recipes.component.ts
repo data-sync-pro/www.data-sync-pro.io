@@ -7,7 +7,7 @@ import {
   ViewEncapsulation,
   HostListener
 } from '@angular/core';
-import { trigger, state, style, transition, animate } from '@angular/animations';
+// Removed Angular animations to prevent conflicts with CSS animations
 import { ActivatedRoute, Router } from '@angular/router';
 import { Meta, Title } from '@angular/platform-browser';
 import { Subject } from 'rxjs';
@@ -56,6 +56,7 @@ interface UIState {
   scrollHintOpacity: number;
   // Animation control
   stepAnimationDirection: 'forward' | 'backward' | null;
+  tabAnimationDirection: 'forward' | 'backward' | null;
 }
 
 interface TOCPaginationState {
@@ -79,18 +80,8 @@ interface SearchState {
   templateUrl: './recipes.component.html',
   styleUrls: ['./recipes.component.scss'],
   encapsulation: ViewEncapsulation.None,
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  animations: [
-    trigger('slideInOut', [
-      transition(':enter', [
-        style({ height: '0', opacity: 0, overflow: 'hidden' }),
-        animate('200ms ease-in', style({ height: '*', opacity: 1 }))
-      ]),
-      transition(':leave', [
-        animate('200ms ease-out', style({ height: '0', opacity: 0, overflow: 'hidden' }))
-      ])
-    ])
-  ]
+  changeDetection: ChangeDetectionStrategy.OnPush
+  // Removed animations array to prevent conflicts with CSS animations
 })
 export class RecipesComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
@@ -123,7 +114,8 @@ export class RecipesComponent implements OnInit, OnDestroy {
     scrollHintDirection: null,
     scrollHintOpacity: 0,
     // Animation control
-    stepAnimationDirection: null
+    stepAnimationDirection: null,
+    tabAnimationDirection: null
   };
 
   // TOC pagination state
@@ -258,18 +250,19 @@ export class RecipesComponent implements OnInit, OnDestroy {
         this.ui.isTransitioningStep = true;
         this.ui.lastStepTransitionTime = now;
         
-        // Switch to Walkthrough tab at first step
+        // Switch to Walkthrough tab at first step with animation
         this.ui.currentWalkthroughStep = 0;
-        this.changeRecipeTab('walkthrough');
+        this.changeRecipeTab('walkthrough', true); // Enable animation
         
-        // Scroll to top for the first step
+        // Scroll to top for the first step after animation starts
         setTimeout(() => {
-          window.scrollTo({
-            top: 0,
-            behavior: 'smooth'
-          });
+          this.scrollToTop();
+        }, 100); // Small delay to let animation start
+        
+        // Reset transition flag after animation completes
+        setTimeout(() => {
           this.ui.isTransitioningStep = false;
-        }, 500);
+        }, 1000); // After animation (0.9s) + buffer
       }
       return;
     }
@@ -304,17 +297,18 @@ export class RecipesComponent implements OnInit, OnDestroy {
       // Hide hint before transitioning
       this.ui.showScrollHint = false;
       
-      // Switch to Overview tab
-      this.changeRecipeTab('overview');
+      // Switch to Overview tab with animation
+      this.changeRecipeTab('overview', true); // Enable animation
       
-      // Scroll to Overview bottom for continuous experience
+      // Scroll to top for consistent experience after animation starts
       setTimeout(() => {
-        window.scrollTo({
-          top: document.documentElement.scrollHeight,
-          behavior: 'smooth'
-        });
+        this.scrollToTop();
+      }, 100); // Small delay to let animation start
+      
+      // Reset transition flag after animation completes
+      setTimeout(() => {
         this.ui.isTransitioningStep = false;
-      }, 500);
+      }, 1000); // After animation (0.9s) + buffer
       
       return; // Prevent further processing
     }
@@ -708,10 +702,23 @@ export class RecipesComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Change recipe tab - Optimized for instant switching
+   * Change recipe tab - Optimized for smooth animation without conflicts
    */
-  changeRecipeTab(tabName: string): void {
+  changeRecipeTab(tabName: string, withAnimation: boolean = false): void {
     console.log('Changing recipe tab to:', tabName);
+    
+    // Clear previous animation state at the start
+    this.ui.tabAnimationDirection = null;
+    
+    // Determine animation direction if animation is requested
+    if (withAnimation) {
+      const currentTab = this.ui.activeRecipeTab;
+      if (currentTab === 'overview' && tabName === 'walkthrough') {
+        this.ui.tabAnimationDirection = 'forward';
+      } else if (currentTab === 'walkthrough' && tabName === 'overview') {
+        this.ui.tabAnimationDirection = 'backward';
+      }
+    }
     
     // Set active tab for content display
     this.ui.activeRecipeTab = tabName;
@@ -739,8 +746,14 @@ export class RecipesComponent implements OnInit, OnDestroy {
       this.closeMobileTOC();
     }
     
-    // Trigger immediate UI update
-    this.cdr.markForCheck();
+    // Use requestAnimationFrame to avoid interrupting animations
+    if (withAnimation) {
+      requestAnimationFrame(() => {
+        this.cdr.markForCheck();
+      });
+    } else {
+      this.cdr.markForCheck();
+    }
     
     // Refresh cache after UI updates for the new active tab
     setTimeout(() => {
