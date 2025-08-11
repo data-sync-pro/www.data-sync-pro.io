@@ -235,8 +235,47 @@ export class RecipesComponent implements OnInit, OnDestroy {
    */
   @HostListener('window:wheel', ['$event'])
   onWheelScroll(event: WheelEvent) {
-    // Only handle in walkthrough tab
-    if (this.ui.activeRecipeTab !== 'walkthrough' || !this.showRecipeDetails) {
+    // Only handle when viewing recipe details
+    if (!this.showRecipeDetails) {
+      return;
+    }
+
+    // Handle Overview to Walkthrough transition
+    if (this.ui.activeRecipeTab === 'overview') {
+      // Prevent transitions if already transitioning
+      if (this.ui.isTransitioningStep) {
+        return;
+      }
+
+      // Check cooldown period (800ms between transitions)
+      const now = Date.now();
+      if (now - this.ui.lastStepTransitionTime < 800) {
+        return;
+      }
+
+      // If scrolling down at bottom of Overview, switch to Walkthrough
+      if (event.deltaY > 0 && this.isAtPageBottom()) {
+        this.ui.isTransitioningStep = true;
+        this.ui.lastStepTransitionTime = now;
+        
+        // Switch to Walkthrough tab at first step
+        this.ui.currentWalkthroughStep = 0;
+        this.changeRecipeTab('walkthrough');
+        
+        // Scroll to top for the first step
+        setTimeout(() => {
+          window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+          });
+          this.ui.isTransitioningStep = false;
+        }, 500);
+      }
+      return;
+    }
+
+    // Only handle in walkthrough tab from here
+    if (this.ui.activeRecipeTab !== 'walkthrough') {
       return;
     }
 
@@ -252,6 +291,32 @@ export class RecipesComponent implements OnInit, OnDestroy {
     const now = Date.now();
     if (now - this.ui.lastStepTransitionTime < 800) {
       return;
+    }
+
+    // If in walkthrough first step and scrolling up at top, switch to overview
+    if (event.deltaY < 0 && this.isAtPageTop() && 
+        this.ui.currentWalkthroughStep === 0 && 
+        this.ui.activeRecipeTab === 'walkthrough') {
+      
+      this.ui.isTransitioningStep = true;
+      this.ui.lastStepTransitionTime = now;
+      
+      // Hide hint before transitioning
+      this.ui.showScrollHint = false;
+      
+      // Switch to Overview tab
+      this.changeRecipeTab('overview');
+      
+      // Scroll to Overview bottom for continuous experience
+      setTimeout(() => {
+        window.scrollTo({
+          top: document.documentElement.scrollHeight,
+          behavior: 'smooth'
+        });
+        this.ui.isTransitioningStep = false;
+      }, 500);
+      
+      return; // Prevent further processing
     }
 
     // Check if scrolling down and at bottom
