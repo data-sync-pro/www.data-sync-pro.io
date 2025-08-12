@@ -273,6 +273,34 @@ $breakpoint-mobile: 576px;
   text-decoration: none;
 }
 
+// ==================== Tab Content Animation ====================
+.tab-content {
+  position: relative;
+  // Set explicit opacity but avoid transform conflicts
+  opacity: 1;
+  /* Removed static transform to prevent conflicts with animations */
+  
+  // Tab switch animations using vertical movement with smoother easing
+  &.tab-slide-forward {
+    animation: slideFromBottom 0.8s cubic-bezier(0.165, 0.84, 0.44, 1);
+    animation-fill-mode: forwards;
+    will-change: transform, opacity;
+  }
+  
+  &.tab-slide-backward {
+    animation: slideFromTop 0.8s cubic-bezier(0.165, 0.84, 0.44, 1);
+    animation-fill-mode: forwards;
+    will-change: transform, opacity;
+  }
+  
+  // Clean up GPU optimization when not animating
+  &:not(.tab-slide-forward):not(.tab-slide-backward) {
+    will-change: auto;
+  }
+  
+  // Tab-level animations removed - step animations are handled separately
+}
+
 // ==================== Walkthrough Styles ====================
 .walkthrough-content {
   position: relative;
@@ -411,22 +439,23 @@ $breakpoint-mobile: 576px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   overflow: hidden;
   min-height: 450px;
+}
+
+// Step animations - high priority selectors for recipe steps
+app-recipe-step {
+  display: block;
+  height: 100%;
+  will-change: transform, opacity;
   
-  :host ::ng-deep app-recipe-step {
-    display: block;
-    height: 100%;
-    will-change: transform, opacity;
-    
-    // Direction-aware animations
-    &.slide-forward {
-      animation: slideFromRight 0.9s cubic-bezier(0.25, 0.1, 0.25, 1);
-      animation-fill-mode: both;
-    }
-    
-    &.slide-backward {
-      animation: slideFromLeft 0.9s cubic-bezier(0.25, 0.1, 0.25, 1);
-      animation-fill-mode: both;
-    }
+  // Direction-aware horizontal animations for step navigation
+  &.slide-forward {
+    animation: slideFromRight 0.9s cubic-bezier(0.25, 0.1, 0.25, 1) !important;
+    animation-fill-mode: both !important;
+  }
+  
+  &.slide-backward {
+    animation: slideFromLeft 0.9s cubic-bezier(0.25, 0.1, 0.25, 1) !important;
+    animation-fill-mode: both !important;
   }
 }
 
@@ -626,6 +655,28 @@ $breakpoint-mobile: 576px;
   100% {
     opacity: 1;
     transform: translateX(0);
+  }
+}
+
+@keyframes slideFromBottom {
+  0% {
+    opacity: 0;
+    transform: translateY(100px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideFromTop {
+  0% {
+    opacity: 0;
+    transform: translateY(-100px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 

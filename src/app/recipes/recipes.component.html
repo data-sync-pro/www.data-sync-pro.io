@@ -213,7 +213,10 @@
           <!-- Recipe Content -->
           <div class="recipe-content">
             <!-- Overview Content -->
-            <div class="tab-content" *ngIf="ui.activeRecipeTab === 'overview'">
+            <div class="tab-content" 
+                 *ngIf="ui.activeRecipeTab === 'overview'"
+                 [class.tab-slide-forward]="ui.tabAnimationDirection === 'forward' && ui.activeRecipeTab === 'overview'"
+                 [class.tab-slide-backward]="ui.tabAnimationDirection === 'backward' && ui.activeRecipeTab === 'overview'">
               <!-- Dynamic sections using configuration -->
               <section *ngFor="let sectionConfig of getVisibleOverviewSections()" 
                        [id]="sectionConfig.elementId" 
@@ -300,7 +303,10 @@
             </div>
             
             <!-- Walkthrough Content -->
-            <div class="tab-content walkthrough-content" *ngIf="ui.activeRecipeTab === 'walkthrough'">
+            <div class="tab-content walkthrough-content" 
+                 *ngIf="ui.activeRecipeTab === 'walkthrough'"
+                 [class.tab-slide-forward]="ui.tabAnimationDirection === 'forward' && ui.activeRecipeTab === 'walkthrough'"
+                 [class.tab-slide-backward]="ui.tabAnimationDirection === 'backward' && ui.activeRecipeTab === 'walkthrough'">
               <!-- Scroll Navigation Hint -->
               <div class="scroll-navigation-hint" 
                    [class.visible]="ui.showScrollHint" 
