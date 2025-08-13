@@ -1981,6 +1981,22 @@ export class RecipesComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Handle scroll hint click
+   */
+  onScrollHintClick(): void {
+    // Hide hint immediately
+    this.ui.showScrollHint = false;
+    this.ui.scrollHintOpacity = 0;
+    
+    // Navigate based on hint direction
+    if (this.ui.scrollHintDirection === 'bottom') {
+      this.goToNextWalkthroughStep();
+    } else if (this.ui.scrollHintDirection === 'top') {
+      this.goToPreviousWalkthroughStep();
+    }
+  }
+
+  /**
    * Navigate to specific step
    */
   goToWalkthroughStep(stepIndex: number): void {

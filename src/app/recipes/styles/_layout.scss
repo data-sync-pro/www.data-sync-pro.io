@@ -114,9 +114,6 @@ $breakpoint-mobile: 576px;
   overflow-x: hidden;
   overflow-y: auto;
   background: #ffffff;
-  
-  // Allow content to extend beyond viewport for footer visibility
-  min-height: calc(100vh - $header-height);
 
   @media (max-width: $breakpoint-tablet) {
     padding: 50px 20px 30px 20px; // Normal bottom padding for tablet

@@ -319,6 +319,7 @@ $breakpoint-mobile: 576px;
   
   &.visible {
     opacity: 1;
+    pointer-events: auto; // Enable clicks when visible
   }
   
   &.bottom {
@@ -330,7 +331,7 @@ $breakpoint-mobile: 576px;
   }
   
   .hint-content {
-    background: rgba(33, 33, 33, 0.95);
+    background: rgba(255, 255, 255, 0.98);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     border-radius: 24px;
@@ -338,16 +339,31 @@ $breakpoint-mobile: 576px;
     display: flex;
     align-items: center;
     gap: 12px;
-    color: white;
-    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #333333;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12), 0 1px 3px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+    
+    &:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15), 0 2px 6px rgba(0, 0, 0, 0.1);
+      background: rgba(255, 255, 255, 1);
+    }
+    
+    &:active {
+      transform: scale(0.98);
+      box-shadow: 0 1px 8px rgba(0, 0, 0, 0.1);
+    }
   }
   
   .hint-arrow {
-    color: #4CAF50;
+    color: #1976d2; // Use primary blue color
     font-size: 24px;
     height: 24px;
     width: 24px;
+    transition: color 0.2s ease;
     
     // Pulse animation for bottom arrow
     .bottom & {
@@ -358,12 +374,22 @@ $breakpoint-mobile: 576px;
     .top & {
       animation: pulseUp 1.5s infinite;
     }
+    
+    .hint-content:hover & {
+      color: #1565c0; // Darker blue on hover
+    }
   }
   
   .hint-text {
     font-size: 14px;
     font-weight: 500;
     letter-spacing: 0.3px;
+    color: #5f6368;
+    transition: color 0.2s ease;
+    
+    .hint-content:hover & {
+      color: #333333; // Darker text on hover
+    }
   }
 }
 

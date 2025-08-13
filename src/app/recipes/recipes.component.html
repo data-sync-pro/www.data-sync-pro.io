@@ -198,17 +198,6 @@
             </div>
           </div>
 
-          <!-- Tab Navigation -->
-          <div class="recipe-tabs">
-            <button 
-              *ngFor="let tab of recipeTOC.tabs" 
-              class="recipe-tab"
-              [class.active]="ui.activeRecipeTab === tab.id"
-              (click)="changeRecipeTab(tab.id)">
-              <mat-icon>{{ tab.icon }}</mat-icon>
-              <span>{{ tab.title }}</span>
-            </button>
-          </div>
 
           <!-- Recipe Content -->
           <div class="recipe-content">
@@ -313,12 +302,16 @@
                    [class.bottom]="ui.scrollHintDirection === 'bottom'"
                    [class.top]="ui.scrollHintDirection === 'top'"
                    [style.opacity]="ui.scrollHintOpacity">
-                <div class="hint-content">
+                <div class="hint-content" 
+                     (click)="onScrollHintClick()"
+                     [attr.role]="'button'"
+                     [attr.tabindex]="0"
+                     [attr.aria-label]="ui.scrollHintDirection === 'bottom' ? 'Click to go to next step' : 'Click to go to previous step'">
                   <mat-icon class="hint-arrow">
                     {{ ui.scrollHintDirection === 'bottom' ? 'keyboard_double_arrow_down' : 'keyboard_double_arrow_up' }}
                   </mat-icon>
                   <span class="hint-text">
-                    {{ ui.scrollHintDirection === 'bottom' ? 'Scroll to continue to next step' : 'Scroll to go back to previous step' }}
+                    {{ ui.scrollHintDirection === 'bottom' ? 'Scroll or click to continue' : 'Scroll or click to go back' }}
                   </span>
                 </div>
               </div>
@@ -336,28 +329,6 @@
                     </app-recipe-step>
                   </div>
                   
-                  <!-- Bottom Navigation Buttons -->
-                  <div class="walkthrough-bottom-nav" *ngIf="walkthroughSteps.length > 0">
-                    <button 
-                      mat-raised-button
-                      [disabled]="!canGoToPreviousStep"
-                      (click)="goToPreviousWalkthroughStep()"
-                      class="nav-button prev-button"
-                      [attr.aria-label]="'Go to previous step'">
-                      <mat-icon>chevron_left</mat-icon>
-                      <span>Previous</span>
-                    </button>
-                    
-                    <button 
-                      mat-raised-button
-                      [disabled]="!canGoToNextStep"
-                      (click)="goToNextWalkthroughStep()"
-                      class="nav-button next-button"
-                      [attr.aria-label]="'Go to next step'">
-                      <span>Next</span>
-                      <mat-icon>chevron_right</mat-icon>
-                    </button>
-                  </div>
                 </div>
 
               </div>
