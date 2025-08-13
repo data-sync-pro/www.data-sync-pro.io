@@ -114,7 +114,8 @@ $breakpoint-mobile: 576px;
   overflow-x: hidden;
   overflow-y: auto;
   background: #ffffff;
-
+  
+  min-height: calc(100vh - $header-height);
   @media (max-width: $breakpoint-tablet) {
     padding: 50px 20px 30px 20px; // Normal bottom padding for tablet
   }

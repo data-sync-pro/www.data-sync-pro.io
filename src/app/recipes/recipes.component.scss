@@ -323,33 +323,36 @@ $breakpoint-mobile: 576px;
   }
   
   &.bottom {
-    bottom: 120px;
+    bottom: 40px; // Closer to bottom for better visibility
   }
   
   &.top {
-    top: 120px;
+    top: 100px; // Account for header, but not too far down
   }
   
   .hint-content {
-    background: rgba(255, 255, 255, 0.98);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border-radius: 24px;
-    padding: 12px 24px;
+    background: rgba(255, 255, 255, 1); // Full white background for better contrast
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 18px; // Scaled down from 24px
+    padding: 10px 20px; // Scaled down from 14px 28px
     display: flex;
     align-items: center;
-    gap: 12px;
-    color: #333333;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12), 0 1px 3px rgba(0, 0, 0, 0.08);
-    border: 1px solid rgba(0, 0, 0, 0.08);
+    gap: 10px; // Scaled down from 12px
+    color: #1a1a1a; // Darker text for better contrast
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15), // Stronger shadow
+                0 2px 8px rgba(0, 0, 0, 0.1),
+                0 0 0 1px rgba(0, 0, 0, 0.05); // Subtle outline
+    border: 1px solid rgba(26, 115, 232, 0.2); // Light blue border
     cursor: pointer;
     transition: all 0.2s ease;
     user-select: none;
     
     &:hover {
-      transform: scale(1.05);
+      transform: scale(1.03); // Scaled down from 1.05 for more subtle effect
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15), 0 2px 6px rgba(0, 0, 0, 0.1);
       background: rgba(255, 255, 255, 1);
+      border-color: rgba(26, 115, 232, 0.3); // Add blue border on hover
     }
     
     &:active {
@@ -360,9 +363,9 @@ $breakpoint-mobile: 576px;
   
   .hint-arrow {
     color: #1976d2; // Use primary blue color
-    font-size: 24px;
-    height: 24px;
-    width: 24px;
+    font-size: 22px; // Scaled down from 28px
+    height: 22px;
+    width: 22px;
     transition: color 0.2s ease;
     
     // Pulse animation for bottom arrow
@@ -381,10 +384,10 @@ $breakpoint-mobile: 576px;
   }
   
   .hint-text {
-    font-size: 14px;
-    font-weight: 500;
+    font-size: 13px; // Scaled down from 15px
+    font-weight: 500; // Slightly lighter from 600
     letter-spacing: 0.3px;
-    color: #5f6368;
+    color: #2c2c2c; // Much darker for better contrast
     transition: color 0.2s ease;
     
     .hint-content:hover & {

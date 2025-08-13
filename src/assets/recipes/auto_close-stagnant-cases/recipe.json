@@ -101,7 +101,7 @@
       "config": [
         {
           "field": "Status",
-          "value": ""
+          "value": "\"Closed\""
         }
       ],
       "media": [

@@ -254,9 +254,15 @@ export class RecipesComponent implements OnInit, OnDestroy {
         this.ui.currentWalkthroughStep = 0;
         this.changeRecipeTab('walkthrough', true); // Enable animation
         
-        // Scroll to top for the first step after animation starts
+        // Scroll to first step section instead of top
         setTimeout(() => {
-          this.scrollToTop();
+          const firstStepSectionId = this.getSectionIdFromWalkthroughStep(0);
+          if (firstStepSectionId) {
+            this.scrollToSection(firstStepSectionId);
+          } else {
+            // Fallback to top if section not found
+            this.scrollToTop();
+          }
         }, 100); // Small delay to let animation start
         
         // Reset transition flag after animation completes
@@ -271,9 +277,6 @@ export class RecipesComponent implements OnInit, OnDestroy {
     if (this.ui.activeRecipeTab !== 'walkthrough') {
       return;
     }
-
-    // Update scroll hint based on position
-    this.updateScrollHint();
 
     // Prevent transitions if already transitioning
     if (this.ui.isTransitioningStep) {
@@ -300,7 +303,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
       // Switch to Overview tab with animation
       this.changeRecipeTab('overview', true); // Enable animation
       
-      // Scroll to top for consistent experience after animation starts
+      // Scroll to top of overview for intuitive navigation
       setTimeout(() => {
         this.scrollToTop();
       }, 100); // Small delay to let animation start
@@ -308,6 +311,8 @@ export class RecipesComponent implements OnInit, OnDestroy {
       // Reset transition flag after animation completes
       setTimeout(() => {
         this.ui.isTransitioningStep = false;
+        // Update scroll hint based on new state
+        this.updateScrollHint();
       }, 1000); // After animation (0.9s) + buffer
       
       return; // Prevent further processing
@@ -324,10 +329,10 @@ export class RecipesComponent implements OnInit, OnDestroy {
       // Navigate to next step
       this.goToNextWalkthroughStep();
       
-      // Reset transition flag after animation
+      // Reset transition flag after animation - extended time to prevent hint from reappearing
       setTimeout(() => {
         this.ui.isTransitioningStep = false;
-      }, 500);
+      }, 1500);
     }
     // Check if scrolling up and at top
     else if (event.deltaY < 0 && this.isAtPageTop() && this.canGoToPreviousStep) {
@@ -340,15 +345,15 @@ export class RecipesComponent implements OnInit, OnDestroy {
       // Navigate to previous step
       this.goToPreviousWalkthroughStep();
       
-      // Reset transition flag after animation
+      // Reset transition flag after animation - extended time to prevent hint from reappearing
       setTimeout(() => {
         this.ui.isTransitioningStep = false;
-      }, 500);
+      }, 1500);
     }
   }
 
   /**
-   * Update scroll hint based on scroll position
+   * Update scroll hint based on scroll position - Unified logic for both tabs
    */
   private updateScrollHint(): void {
     const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
@@ -361,22 +366,53 @@ export class RecipesComponent implements OnInit, OnDestroy {
     // Threshold for showing hint (150px)
     const hintThreshold = 150;
     
-    // Check if should show bottom hint
-    if (distanceToBottom < hintThreshold && this.canGoToNextStep) {
+    // Determine what actions are available based on current context
+    let canScrollDown = false;
+    let canScrollUp = false;
+    
+    if (this.ui.activeRecipeTab === 'overview') {
+      // In Overview: can scroll down to switch to Walkthrough
+      canScrollDown = this.canSwitchToWalkthrough;
+      canScrollUp = false; // No upward action in Overview
+    } else if (this.ui.activeRecipeTab === 'walkthrough') {
+      // In Walkthrough: check both step navigation and tab switching
+      canScrollDown = this.canGoToNextStep; // Can go to next step
+      canScrollUp = this.canGoToPreviousStep || this.canSwitchToOverview; // Can go to previous step OR back to Overview
+    }
+    
+    // Determine which hint to show based on distance comparison when both conditions are met
+    const canShowTopHint = distanceToTop < hintThreshold && canScrollUp;
+    const canShowBottomHint = distanceToBottom < hintThreshold && canScrollDown;
+    
+    if (canShowTopHint && canShowBottomHint) {
+      // Both conditions are met - show the hint for the closer edge
+      if (distanceToTop <= distanceToBottom) {
+        // User is closer to top - show top hint
+        this.ui.showScrollHint = true;
+        this.ui.scrollHintDirection = 'top';
+        const rawOpacity = (hintThreshold - distanceToTop) / hintThreshold;
+        this.ui.scrollHintOpacity = Math.max(0.8, Math.min(1, rawOpacity));
+      } else {
+        // User is closer to bottom - show bottom hint
+        this.ui.showScrollHint = true;
+        this.ui.scrollHintDirection = 'bottom';
+        const rawOpacity = (hintThreshold - distanceToBottom) / hintThreshold;
+        this.ui.scrollHintOpacity = Math.max(0.8, Math.min(1, rawOpacity));
+      }
+    } else if (canShowBottomHint) {
+      // Only bottom hint condition is met
       this.ui.showScrollHint = true;
       this.ui.scrollHintDirection = 'bottom';
-      // Calculate opacity based on distance (closer = more opaque)
-      this.ui.scrollHintOpacity = Math.max(0, Math.min(1, (hintThreshold - distanceToBottom) / hintThreshold));
-    }
-    // Check if should show top hint
-    else if (distanceToTop < hintThreshold && this.canGoToPreviousStep) {
+      const rawOpacity = (hintThreshold - distanceToBottom) / hintThreshold;
+      this.ui.scrollHintOpacity = Math.max(0.8, Math.min(1, rawOpacity));
+    } else if (canShowTopHint) {
+      // Only top hint condition is met
       this.ui.showScrollHint = true;
       this.ui.scrollHintDirection = 'top';
-      // Calculate opacity based on distance (closer = more opaque)
-      this.ui.scrollHintOpacity = Math.max(0, Math.min(1, (hintThreshold - distanceToTop) / hintThreshold));
-    }
-    // Hide hint if not near edges
-    else {
+      const rawOpacity = (hintThreshold - distanceToTop) / hintThreshold;
+      this.ui.scrollHintOpacity = Math.max(0.8, Math.min(1, rawOpacity));
+    } else {
+      // No hint conditions are met
       this.ui.showScrollHint = false;
       this.ui.scrollHintOpacity = 0;
     }
@@ -422,6 +458,11 @@ export class RecipesComponent implements OnInit, OnDestroy {
     if (this.optimizedScrollListener) {
       window.removeEventListener('scroll', this.optimizedScrollListener);
     }
+    
+    // Clean up scroll hint state to prevent it from showing on other pages
+    this.ui.showScrollHint = false;
+    this.ui.scrollHintOpacity = 0;
+    this.ui.scrollHintDirection = null;
     
     // Remove body class when leaving recipe pages
     document.body.classList.remove('recipe-page');
@@ -829,22 +870,73 @@ export class RecipesComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Simple and reliable section scrolling
+   * Enhanced intelligent section scrolling with multiple strategies
    */
   private scrollToSection(sectionId: string): void {
-    const section = this.recipeTOC.tabs
-      .flatMap(tab => tab.sections)
-      .find(s => s.id === sectionId);
-      
-    if (section?.elementId) {
-      const element = document.getElementById(section.elementId);
-      if (element) {
-        element.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start'
-        });
+    // Add small delay to ensure DOM is ready
+    setTimeout(() => {
+      const section = this.recipeTOC.tabs
+        .flatMap(tab => tab.sections)
+        .find(s => s.id === sectionId);
+
+      let targetElement: HTMLElement | null = null;
+
+      // Strategy 1: Find by section's elementId
+      if (section?.elementId) {
+        targetElement = document.getElementById(section.elementId);
       }
-    }
+
+      // Strategy 2: Try to find by sectionId directly
+      if (!targetElement) {
+        targetElement = document.getElementById(sectionId);
+      }
+
+      // Strategy 3: Find by data attribute
+      if (!targetElement) {
+        const dataElement = document.querySelector(`[data-section-id="${sectionId}"]`);
+        if (dataElement) {
+          targetElement = dataElement as HTMLElement;
+        }
+      }
+
+      // Strategy 4: Find by class name pattern
+      if (!targetElement) {
+        const classElement = document.querySelector(`.recipe-${sectionId}, .${sectionId}-section`);
+        if (classElement) {
+          targetElement = classElement as HTMLElement;
+        }
+      }
+
+      if (targetElement) {
+        // Calculate optimal scroll position with header offset
+        const headerOffset = 80; // Account for fixed header
+        const elementRect = targetElement.getBoundingClientRect();
+        const elementPosition = elementRect.top + window.pageYOffset;
+        const optimalScrollPosition = Math.max(0, elementPosition - headerOffset);
+
+        // Smooth scroll to the target
+        window.scrollTo({
+          top: optimalScrollPosition,
+          behavior: 'smooth'
+        });
+
+        // Add visual feedback to show scroll target
+        this.addScrollVisualFeedback(targetElement);
+
+      } else {
+        // Fallback 1: Try to scroll to tab content area
+        const activeTabContent = document.querySelector(`[data-tab="${this.ui.activeRecipeTab}"]`);
+        if (activeTabContent) {
+          (activeTabContent as HTMLElement).scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          });
+        } else {
+          // Fallback 2: Scroll to top if no target found
+          this.scrollToTop();
+        }
+      }
+    }, 100); // Small delay to ensure DOM updates are complete
   }
 
   /**
@@ -1592,6 +1684,11 @@ export class RecipesComponent implements OnInit, OnDestroy {
     if (this.showRecipeDetails && this.ui.userHasScrolled && !this.ui.disableScrollHighlight) {
       this.updateActiveScrollElement(scrollPosition);
     }
+    
+    // Update scroll hint for all scroll events (not just wheel events)
+    if (this.showRecipeDetails) {
+      this.updateScrollHint();
+    }
   }
 
   /**
@@ -1942,7 +2039,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Navigate to next step
+   * Navigate to next step with section-based scrolling
    */
   goToNextWalkthroughStep(): void {
     const steps = this.walkthroughSteps;
@@ -1952,7 +2049,16 @@ export class RecipesComponent implements OnInit, OnDestroy {
       this.syncTOCSectionWithWalkthrough();
       this.updateUrlParams('walkthrough', this.ui.currentWalkthroughStep);
       this.cdr.markForCheck();
-      this.scrollToTop();
+      
+      // Scroll to the specific step section instead of top
+      const sectionId = this.getSectionIdFromWalkthroughStep(this.ui.currentWalkthroughStep);
+      if (sectionId) {
+        this.scrollToSection(sectionId);
+      } else {
+        // Fallback to top if section not found
+        this.scrollToTop();
+      }
+      
       // Reset animation direction after animation completes
       setTimeout(() => {
         this.ui.stepAnimationDirection = null;
@@ -1962,7 +2068,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Navigate to previous step
+   * Navigate to previous step with section-based scrolling
    */
   goToPreviousWalkthroughStep(): void {
     if (this.ui.currentWalkthroughStep > 0) {
@@ -1971,7 +2077,16 @@ export class RecipesComponent implements OnInit, OnDestroy {
       this.syncTOCSectionWithWalkthrough();
       this.updateUrlParams('walkthrough', this.ui.currentWalkthroughStep);
       this.cdr.markForCheck();
-      this.scrollToTop();
+      
+      // Scroll to the specific step section instead of top
+      const sectionId = this.getSectionIdFromWalkthroughStep(this.ui.currentWalkthroughStep);
+      if (sectionId) {
+        this.scrollToSection(sectionId);
+      } else {
+        // Fallback to top if section not found
+        this.scrollToTop();
+      }
+      
       // Reset animation direction after animation completes
       setTimeout(() => {
         this.ui.stepAnimationDirection = null;
@@ -1981,23 +2096,78 @@ export class RecipesComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Handle scroll hint click
+   * Handle scroll hint click - unified logic for both tabs
    */
   onScrollHintClick(): void {
     // Hide hint immediately
     this.ui.showScrollHint = false;
     this.ui.scrollHintOpacity = 0;
     
-    // Navigate based on hint direction
-    if (this.ui.scrollHintDirection === 'bottom') {
-      this.goToNextWalkthroughStep();
-    } else if (this.ui.scrollHintDirection === 'top') {
-      this.goToPreviousWalkthroughStep();
+    // Determine action based on current context
+    if (this.ui.activeRecipeTab === 'overview') {
+      // In Overview: clicking bottom hint switches to Walkthrough
+      if (this.ui.scrollHintDirection === 'bottom' && this.canSwitchToWalkthrough) {
+        // Switch to Walkthrough tab at first step
+        this.ui.currentWalkthroughStep = 0;
+        this.changeRecipeTab('walkthrough', true); // Enable animation
+        
+        // Scroll to first step section
+        setTimeout(() => {
+          const firstStepSectionId = this.getSectionIdFromWalkthroughStep(0);
+          if (firstStepSectionId) {
+            this.scrollToSection(firstStepSectionId);
+          } else {
+            this.scrollToTop();
+          }
+          
+          // Re-evaluate scroll hints after tab switch and scroll complete
+          setTimeout(() => {
+            this.updateScrollHint();
+          }, 200);
+        }, 100);
+      }
+    } else if (this.ui.activeRecipeTab === 'walkthrough') {
+      // In Walkthrough: handle both step navigation and tab switching
+      if (this.ui.scrollHintDirection === 'bottom') {
+        // Navigate to next step
+        if (this.canGoToNextStep) {
+          this.goToNextWalkthroughStep();
+          
+          // Re-evaluate scroll hints after step switch complete
+          setTimeout(() => {
+            this.updateScrollHint();
+          }, 200);
+        }
+      } else if (this.ui.scrollHintDirection === 'top') {
+        // Check if we should go back to Overview or previous step
+        if (this.ui.currentWalkthroughStep === 0 && this.canSwitchToOverview) {
+          // Switch back to Overview
+          this.changeRecipeTab('overview', true); // Enable animation
+          
+          // Scroll to top of overview for intuitive navigation
+          setTimeout(() => {
+            this.scrollToTop();
+            
+            // Re-evaluate scroll hints after tab switch and scroll complete
+            setTimeout(() => {
+              this.updateScrollHint();
+            }, 200);
+          }, 100);
+        } else if (this.canGoToPreviousStep) {
+          // Navigate to previous step
+          this.goToPreviousWalkthroughStep();
+          
+          // Re-evaluate scroll hints after step switch complete
+          setTimeout(() => {
+            this.updateScrollHint();
+          }, 200);
+        }
+      }
     }
   }
 
   /**
-   * Navigate to specific step
+   * Navigate to specific step with section-based scrolling
    */
   goToWalkthroughStep(stepIndex: number): void {
     const steps = this.walkthroughSteps;
@@ -2006,7 +2176,16 @@ export class RecipesComponent implements OnInit, OnDestroy {
       this.syncTOCSectionWithWalkthrough();
       this.updateUrlParams('walkthrough', this.ui.currentWalkthroughStep);
       this.cdr.markForCheck();
-      this.scrollToTop();
+      
+      // Scroll to the specific step section instead of top
+      const sectionId = this.getSectionIdFromWalkthroughStep(this.ui.currentWalkthroughStep);
+      if (sectionId) {
+        this.scrollToSection(sectionId);
+      } else {
+        // Fallback to top if section not found
+        this.scrollToTop();
+      }
+      
       // Reset animation direction after animation completes
       setTimeout(() => {
         this.ui.stepAnimationDirection = null;
@@ -2049,6 +2228,20 @@ export class RecipesComponent implements OnInit, OnDestroy {
    */
   get canGoToPreviousStep(): boolean {
     return this.ui.currentWalkthroughStep > 0;
+  }
+
+  /**
+   * Check if can switch from Overview to Walkthrough
+   */
+  get canSwitchToWalkthrough(): boolean {
+    return this.ui.activeRecipeTab === 'overview' && this.walkthroughSteps.length > 0;
+  }
+
+  /**
+   * Check if can switch from Walkthrough back to Overview
+   */
+  get canSwitchToOverview(): boolean {
+    return this.ui.activeRecipeTab === 'walkthrough' && this.ui.currentWalkthroughStep === 0;
   }
 
   /**
@@ -2114,6 +2307,27 @@ export class RecipesComponent implements OnInit, OnDestroy {
       top: 0,
       behavior: 'smooth'
     });
+  }
+
+  /**
+   * Add visual feedback to indicate successful scroll target
+   */
+  private addScrollVisualFeedback(element: HTMLElement): void {
+    // Add a brief highlight effect to show the user which section was targeted
+    const originalBoxShadow = element.style.boxShadow;
+    const originalTransition = element.style.transition;
+    
+    element.style.transition = 'box-shadow 0.3s ease';
+    element.style.boxShadow = '0 0 0 3px rgba(26, 115, 232, 0.3)';
+    
+    // Remove the highlight after a short duration
+    setTimeout(() => {
+      element.style.boxShadow = originalBoxShadow;
+      // Remove transition after effect is complete
+      setTimeout(() => {
+        element.style.transition = originalTransition;
+      }, 300);
+    }, 1000);
   }
 
   // ==================== Compatibility Helper Methods ====================
