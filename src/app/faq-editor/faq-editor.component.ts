@@ -344,19 +344,26 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
     // Load edited content if exists (should be original HTML source)
     const edited = this.editedFAQs.get(faq.id);
     if (edited) {
-      this.editorContent = edited.answer; // This should be original HTML source
+      // For WYSIWYG editor, set HTML content directly to DOM
+      this.editorContent = edited.answer;
       this.currentQuestion = edited.question;
       this.currentCategory = edited.category;
       
-      // Content is already set in editorContent via ngModel binding
-      console.log('✅ Edited HTML content set in textarea:', edited.answer);
+      // Set content directly in DOM after view init
+      setTimeout(() => {
+        if (this.htmlSourceEditor?.nativeElement) {
+          this.htmlSourceEditor.nativeElement.innerHTML = this.editorContent;
+        }
+      }, 0);
+      
+      console.log('✅ Edited HTML content set for WYSIWYG editor:', this.editorContent);
       this.state.isLoading = false;
       
       // Initialize undo state
       this.initializeUndoState();
       
-      // Update preview with full FAQ service processing
-      this.updatePreviewFromFAQService(faq);
+      // Update preview
+      this.updatePreview();
     } else {
       // Load original content
       this.loadOriginalContent(faq);
@@ -381,16 +388,22 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
           
           this.editorContent = editableContent;
           
-          // Content is automatically displayed in textarea via ngModel binding
-          console.log('✅ HTML source content set in textarea');
+          // Set content directly in DOM
+          setTimeout(() => {
+            if (this.htmlSourceEditor?.nativeElement) {
+              this.htmlSourceEditor.nativeElement.innerHTML = editableContent;
+            }
+          }, 0);
+          
+          console.log('✅ HTML content set in WYSIWYG editor');
           console.log('📄 Content now in editor:', editableContent);
           this.state.isLoading = false;
           
           // Initialize undo state
           this.initializeUndoState();
           
-          // Update preview with fully processed content
-          this.updatePreviewFromFAQService(faq);
+          // Update preview
+          this.updatePreview();
         },
         error: (error) => {
           console.error('❌ Error loading raw HTML content:', error);
@@ -407,10 +420,14 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
     this.state.isSaving = true;
     this.state.saveError = null;
     
+    // For WYSIWYG editor, get HTML content directly from contenteditable
+    const editorElement = this.htmlSourceEditor.nativeElement;
+    const htmlContent = editorElement.innerHTML || this.editorContent;
+    
     const faqData: Partial<EditedFAQ> = {
       faqId: this.state.selectedFAQ.id,
       question: this.currentQuestion,
-      answer: this.editorContent,
+      answer: htmlContent,
       category: this.currentCategory,
       subCategory: this.state.selectedFAQ.subCategory || undefined
     };
@@ -451,30 +468,104 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   /**
-   * Handle changes in the HTML source editor
+   * Get current selection in contenteditable editor
+   */
+  private getSelection(): { start: number, end: number } {
+    try {
+      const selection = window.getSelection();
+      if (selection && selection.rangeCount > 0) {
+        const range = selection.getRangeAt(0);
+        return {
+          start: range.startOffset,
+          end: range.endOffset
+        };
+      }
+    } catch (error) {
+      console.warn('Could not get selection:', error);
+    }
+    return { start: 0, end: 0 };
+  }
+
+  /**
+   * Save current cursor position for later restoration
+   */
+  private saveCursorPosition(): any {
+    try {
+      const selection = window.getSelection();
+      if (selection && selection.rangeCount > 0) {
+        const range = selection.getRangeAt(0);
+        return {
+          startContainer: range.startContainer,
+          startOffset: range.startOffset,
+          endContainer: range.endContainer,
+          endOffset: range.endOffset
+        };
+      }
+    } catch (error) {
+      console.warn('Could not save cursor position:', error);
+    }
+    return null;
+  }
+
+  /**
+   * Restore cursor position
+   */
+  private restoreCursorPosition(savedPosition: any): void {
+    if (!savedPosition) return;
+    
+    try {
+      const selection = window.getSelection();
+      if (selection) {
+        const range = document.createRange();
+        range.setStart(savedPosition.startContainer, savedPosition.startOffset);
+        range.setEnd(savedPosition.endContainer, savedPosition.endOffset);
+        selection.removeAllRanges();
+        selection.addRange(range);
+      }
+    } catch (error) {
+      console.warn('Could not restore cursor position:', error);
+    }
+  }
+
+  /**
+   * Handle changes in the WYSIWYG editor
    */
   onEditorContentChange(): void {
     this.state.hasChanges = true;
     this.state.saveError = null;
     
-    // Update preview with simple sanitization for real-time editing
-    // Note: Full FAQ service processing would be too slow for real-time updates
+    // Don't immediately update editorContent to avoid DOM re-render
+    // Instead, update it only when needed (save, preview, undo/redo)
+    
+    // Update preview with current content (use DOM content directly)
     this.updatePreview();
     
     // Save state for undo/redo (but only if this isn't an undo/redo or formatting operation)
     if (!this.isUndoRedoOperation && !this.isFormattingOperation) {
-      const textarea = this.htmlSourceEditor?.nativeElement;
-      if (textarea) {
-        const selection = {
-          start: textarea.selectionStart || 0,
-          end: textarea.selectionEnd || 0
-        };
-        this.undoRedoManager.saveState(this.editorContent, selection, 'Content change');
+      const editorElement = this.htmlSourceEditor?.nativeElement;
+      if (editorElement) {
+        const currentContent = editorElement.innerHTML;
+        const selection = this.getSelection();
+        this.undoRedoManager.saveState(currentContent, selection, 'Content change');
       }
     }
     
-    // Trigger smart auto-save
-    this.contentChangeSubject.next(this.editorContent);
+    // Trigger smart auto-save with debounced content update
+    this.debouncedContentUpdate();
+  }
+
+  /**
+   * Debounced content update to avoid frequent re-renders
+   */
+  private debouncedContentUpdate(): void {
+    // Update editorContent for auto-save, but with debouncing
+    setTimeout(() => {
+      const editorElement = this.htmlSourceEditor?.nativeElement;
+      if (editorElement) {
+        this.editorContent = editorElement.innerHTML;
+        this.contentChangeSubject.next(this.editorContent);
+      }
+    }, 100); // Short delay to avoid disrupting typing
   }
 
   resetCurrentFAQ(): void {
@@ -502,7 +593,10 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
    * Update preview using simple sanitization (fallback method)
    */
   private updatePreview(): void {
-    this.previewContent = this.sanitizer.bypassSecurityTrustHtml(this.editorContent);
+    // For WYSIWYG editor, use content directly
+    const editorElement = this.htmlSourceEditor?.nativeElement;
+    const htmlContent = editorElement?.innerHTML || this.editorContent;
+    this.previewContent = this.sanitizer.bypassSecurityTrustHtml(htmlContent);
   }
 
   /**
@@ -710,23 +804,25 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
 
+
   /**
-   * Prepare content for editing - preserve original HTML source as much as possible
+   * Prepare content for editing - now using WYSIWYG contenteditable
    */
   private prepareContentForEditing(content: string): string {
     console.log('🔍 Original content received:', content);
     
-    // MINIMAL processing - only remove obvious security threats
+    // For WYSIWYG editor, just clean up and return HTML directly
     let prepared = content
-      // Remove potential security threats only
+      // Remove potential security threats
       .replace(/<script[^>]*>.*?<\/script>/gi, '')
-      .replace(/<style[^>]*>.*?<\/style>/gi, '');
+      .replace(/<style[^>]*>.*?<\/style>/gi, '')
+      // Clean up common browser-generated tags
+      .replace(/<span[^>]*>\s*<\/span>/gi, '')
+      .replace(/<div[^>]*>\s*<\/div>/gi, '')
+      .trim();
     
-    // NO HTML entity decoding - preserve exactly as written in source file
-    // NO whitespace normalization - preserve original formatting
-    
-    console.log('✅ Content prepared for editing (original HTML preserved):', prepared);
-    return prepared; // Don't even trim - preserve exact original content
+    console.log('✅ Content prepared for WYSIWYG editing:', prepared);
+    return prepared;
   }
 
   // HTML Editor Enhancement Functions
@@ -760,162 +856,88 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
+
   /**
-   * Wrap selected text with HTML tags (with smart toggle and undo support)
+   * Wrap selected text with HTML tags (simple implementation)
    */
   wrapSelectedText(startTag: string, endTag: string): void {
-    const textarea = this.htmlSourceEditor.nativeElement;
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
+    const editorElement = this.htmlSourceEditor.nativeElement;
     
-    // 关键修复：使用 textarea 的实际内容，确保数据源一致
-    const textareaContent = textarea.value;
-    const selectedText = textareaContent.substring(start, end);
+    // Save current state for undo
+    const savedPosition = this.saveCursorPosition();
+    const currentContent = editorElement.innerHTML;
+    this.undoRedoManager.saveState(currentContent, this.getSelection(), 'Text formatting');
+
+    // Focus the editor to ensure execCommand works
+    editorElement.focus();
+
+    // Set formatting flag to avoid recursive content change handling
+    this.isFormattingOperation = true;
+
+    // Map HTML tags to execCommand commands
+    let command = '';
     
-    // Save current state for undo before making changes
-    const currentSelection = {
-      start: start,
-      end: end
-    };
-    this.undoRedoManager.saveState(textareaContent, currentSelection, 'Text formatting');
-
-    // Smart tag detection and toggle using consistent data source
-    const result = this.smartTagToggle(start, end, startTag, endTag, selectedText, textareaContent);
-    
-    // 直接更新 textarea 和组件属性
-    textarea.value = result.newContent;
-    this.editorContent = result.newContent;
-
-    // 立即设置新的光标位置
-    textarea.setSelectionRange(result.newCursorPos, result.newCursorPos);
-    textarea.focus();
-
-    // Mark as having changes and update UI
-    this.state.hasChanges = true;
-    this.state.saveError = null;
-    this.updatePreview();
-
-    // Trigger auto-save
-    this.contentChangeSubject.next(this.editorContent);
-  }
-
-  /**
-   * Smart tag toggle - detects existing tags and toggles them
-   */
-  private smartTagToggle(start: number, end: number, startTag: string, endTag: string, selectedText: string, textareaContent: string): 
-    { newContent: string, newCursorPos: number } {
-    
-    const beforeCursor = textareaContent.substring(0, start);
-    const afterCursor = textareaContent.substring(end);
-
-    // Strategy 1: Check if selection includes the tags themselves
-    if (selectedText.startsWith(startTag) && selectedText.endsWith(endTag)) {
-      // User selected text including tags, remove the tags
-      const innerText = selectedText.substring(startTag.length, selectedText.length - endTag.length);
-      const newContent = beforeCursor + innerText + afterCursor;
-      return {
-        newContent,
-        newCursorPos: start + innerText.length
-      };
+    if (startTag === '<strong>' && endTag === '</strong>') {
+      command = 'bold';
+    } else if (startTag === '<em>' && endTag === '</em>') {
+      command = 'italic';
+    } else if (startTag === '<u>' && endTag === '</u>') {
+      command = 'underline';
+    } else if (startTag === '<code>' && endTag === '</code>') {
+      // Code formatting requires special handling
+      this.toggleCodeFormat();
+      this.isFormattingOperation = false;
+      return;
     }
 
-    // Strategy 2: Check if selection is immediately surrounded by tags
-    const startTagLength = startTag.length;
-    const endTagLength = endTag.length;
-    
-    const beforeTagStart = Math.max(0, start - startTagLength);
-    const afterTagEnd = Math.min(this.editorContent.length, end + endTagLength);
-    
-    const possibleStartTag = this.editorContent.substring(beforeTagStart, start);
-    const possibleEndTag = this.editorContent.substring(end, afterTagEnd);
-
-    if (possibleStartTag === startTag && possibleEndTag === endTag) {
-      // Remove existing tags that immediately surround the selection
-      const newContent = this.editorContent.substring(0, beforeTagStart) + 
-                        selectedText + 
-                        this.editorContent.substring(afterTagEnd);
+    if (command) {
+      // Execute the formatting command - let browser handle DOM changes naturally
+      document.execCommand(command, false);
       
-      return {
-        newContent,
-        newCursorPos: beforeTagStart + selectedText.length
-      };
-    }
-
-    // Strategy 3: Check if we're inside existing tags (broader search)
-    const surroundingTags = this.findSurroundingTags(start, end, startTag, endTag, textareaContent);
-    if (surroundingTags) {
-      // Remove the surrounding tags
-      const newContent = textareaContent.substring(0, surroundingTags.startTagStart) + 
-                        surroundingTags.innerContent + 
-                        textareaContent.substring(surroundingTags.endTagEnd);
+      // Mark as having changes but don't immediately update editorContent
+      this.state.hasChanges = true;
+      this.state.saveError = null;
       
-      return {
-        newContent,
-        newCursorPos: surroundingTags.startTagStart + surroundingTags.innerContent.length
-      };
-    }
-
-    // Strategy 4: Add new tags
-    let wrappedText: string;
-    let newCursorPos: number;
-
-    if (selectedText) {
-      // Wrap selected text - place cursor after the wrapped content
-      wrappedText = `${startTag}${selectedText}${endTag}`;
-      newCursorPos = start + startTag.length + selectedText.length + endTag.length;
+      // Update preview asynchronously
+      setTimeout(() => {
+        this.updatePreview();
+        // Update editorContent for auto-save
+        this.editorContent = editorElement.innerHTML;
+        this.contentChangeSubject.next(this.editorContent);
+        this.isFormattingOperation = false;
+      }, 10);
     } else {
-      // Insert tag pair with cursor in the middle for typing
-      wrappedText = `${startTag}${endTag}`;
-      newCursorPos = start + startTag.length;
+      this.isFormattingOperation = false;
     }
-
-    const newContent = beforeCursor + wrappedText + afterCursor;
-    
-    return { newContent, newCursorPos };
   }
 
   /**
-   * Find surrounding tags around the current selection
+   * Toggle code formatting (special case as execCommand doesn't support it)
    */
-  private findSurroundingTags(start: number, end: number, startTag: string, endTag: string, textareaContent: string): 
-    { startTagStart: number, startTagEnd: number, endTagStart: number, endTagEnd: number, innerContent: string } | null {
-    
-    const searchRadius = 200; // Search within 200 characters
-    const searchStart = Math.max(0, start - searchRadius);
-    const searchEnd = Math.min(textareaContent.length, end + searchRadius);
-    const searchArea = textareaContent.substring(searchStart, searchEnd);
-    
-    // Find the last occurrence of startTag before cursor
-    const relativeStart = start - searchStart;
-    const relativeEnd = end - searchStart;
-    
-    let lastStartTag = -1;
-    let pos = 0;
-    while ((pos = searchArea.indexOf(startTag, pos)) !== -1 && pos < relativeStart) {
-      lastStartTag = pos;
-      pos += startTag.length;
+  private toggleCodeFormat(): void {
+    const selection = window.getSelection();
+    if (selection && selection.rangeCount > 0) {
+      const range = selection.getRangeAt(0);
+      const selectedText = range.toString();
+      
+      if (selectedText) {
+        // Create code element
+        const codeElement = document.createElement('code');
+        codeElement.textContent = selectedText;
+        
+        // Replace selection with code element
+        range.deleteContents();
+        range.insertNode(codeElement);
+        
+        // Update content and UI
+        this.editorContent = this.htmlSourceEditor.nativeElement.innerHTML;
+        this.state.hasChanges = true;
+        this.updatePreview();
+        this.contentChangeSubject.next(this.editorContent);
+      }
     }
-    
-    if (lastStartTag === -1) return null;
-    
-    // Find the first occurrence of endTag after cursor
-    const firstEndTag = searchArea.indexOf(endTag, relativeEnd);
-    if (firstEndTag === -1) return null;
-    
-    // Validate that these tags actually surround our selection
-    const startTagEnd = lastStartTag + startTag.length;
-    if (startTagEnd <= relativeStart && firstEndTag >= relativeEnd) {
-      return {
-        startTagStart: searchStart + lastStartTag,
-        startTagEnd: searchStart + startTagEnd,
-        endTagStart: searchStart + firstEndTag,
-        endTagEnd: searchStart + firstEndTag + endTag.length,
-        innerContent: searchArea.substring(startTagEnd, firstEndTag)
-      };
-    }
-    
-    return null;
   }
+
 
   /**
    * Insert a link with prompt for URL

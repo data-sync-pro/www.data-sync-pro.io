@@ -206,16 +206,14 @@
           <p>Loading content...</p>
         </div>
         
-        <textarea 
+        <div 
           #htmlSourceEditor
-          class="html-source-editor" 
+          class="html-wysiwyg-editor" 
           [class.hidden]="state.isLoading"
-          [(ngModel)]="editorContent"
+          contenteditable="true"
           (input)="onEditorContentChange()"
-          placeholder="HTML source code will appear here..."
-          rows="20"
-          spellcheck="false"
-          wrap="soft"></textarea>
+          placeholder="Content will appear here..."
+          spellcheck="false"></div>
       </div>
     </div>
 
