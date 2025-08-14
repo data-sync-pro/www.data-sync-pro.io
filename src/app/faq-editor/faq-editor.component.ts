@@ -1,13 +1,91 @@
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewInit, HostListener } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, takeUntil, debounceTime, distinctUntilChanged } from 'rxjs';
 import { Observable, of } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import { FAQService } from '../shared/services/faq.service';
 import { FAQStorageService, EditedFAQ } from '../shared/services/faq-storage.service';
-import { FAQExportService, ExportData } from '../shared/services/faq-export.service';
+import { FAQExportService, ExportData, ExportProgress } from '../shared/services/faq-export.service';
 import { FAQItem } from '../shared/models/faq.model';
+import { NotificationService } from '../shared/services/notification.service';
+import { html_beautify } from 'js-beautify';
+
+interface EditHistory {
+  content: string;
+  selection: { start: number, end: number };
+  timestamp: number;
+  description: string;
+}
+
+class UndoRedoManager {
+  private history: EditHistory[] = [];
+  private currentIndex = -1;
+  private readonly maxHistory = 50;
+
+  saveState(content: string, selection: { start: number, end: number }, description: string = 'Edit'): void {
+    // Remove any redo history when new change is made
+    if (this.currentIndex < this.history.length - 1) {
+      this.history = this.history.slice(0, this.currentIndex + 1);
+    }
+
+    // Add new state
+    this.history.push({
+      content,
+      selection,
+      timestamp: Date.now(),
+      description
+    });
+
+    // Limit history size
+    if (this.history.length > this.maxHistory) {
+      this.history.shift();
+    } else {
+      this.currentIndex++;
+    }
+  }
+
+  canUndo(): boolean {
+    return this.currentIndex > 0;
+  }
+
+  canRedo(): boolean {
+    return this.currentIndex < this.history.length - 1;
+  }
+
+  undo(): EditHistory | null {
+    if (this.canUndo()) {
+      this.currentIndex--;
+      return this.history[this.currentIndex];
+    }
+    return null;
+  }
+
+  redo(): EditHistory | null {
+    if (this.canRedo()) {
+      this.currentIndex++;
+      return this.history[this.currentIndex];
+    }
+    return null;
+  }
+
+  clear(): void {
+    this.history = [];
+    this.currentIndex = -1;
+  }
+
+  getCurrentState(): EditHistory | null {
+    return this.currentIndex >= 0 ? this.history[this.currentIndex] : null;
+  }
+
+  getHistoryInfo(): { canUndo: boolean, canRedo: boolean, historySize: number } {
+    return {
+      canUndo: this.canUndo(),
+      canRedo: this.canRedo(),
+      historySize: this.history.length
+    };
+  }
+}
 
 interface EditorState {
   selectedFAQ: FAQItem | null;
@@ -19,6 +97,9 @@ interface EditorState {
   showVersionHistory: boolean;
   showExportDialog: boolean;
   showImportDialog: boolean;
+  saveError: string | null;
+  isExporting: boolean;
+  exportProgress: ExportProgress | null;
 }
 
 @Component({
@@ -32,6 +113,11 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
   
   private destroy$ = new Subject<void>();
   private autoSaveTimer: any;
+  private contentChangeSubject = new Subject<string>();
+  private smartAutoSaveTimer: any;
+  private undoRedoManager = new UndoRedoManager();
+  private isUndoRedoOperation = false;
+  private isFormattingOperation = false;
   
   faqList: FAQItem[] = [];
   filteredFAQs: FAQItem[] = [];
@@ -47,7 +133,10 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
     lastSaved: null,
     showVersionHistory: false,
     showExportDialog: false,
-    showImportDialog: false
+    showImportDialog: false,
+    saveError: null,
+    isExporting: false,
+    exportProgress: null
   };
   
   searchQuery = '';
@@ -66,7 +155,8 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
     private faqService: FAQService,
     private storageService: FAQStorageService,
     private exportService: FAQExportService,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
+    private notificationService: NotificationService
   ) {}
 
   ngOnInit(): void {
@@ -74,16 +164,107 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
     this.loadEditedFAQs();
     this.updateStorageStats();
     
-    // Auto-save every 30 seconds when there are changes
+    // Setup smart auto-save with debouncing
+    this.setupSmartAutoSave();
+    
+    // Keep the original timer as fallback
     this.autoSaveTimer = setInterval(() => {
       if (this.state.hasChanges && this.state.selectedFAQ) {
-        this.saveFAQ();
+        this.saveFAQ(true); // true indicates auto-save
       }
-    }, 30000);
+    }, 120000); // Increased to 2 minutes since we have smart auto-save
+  }
+
+  private setupSmartAutoSave(): void {
+    this.contentChangeSubject.pipe(
+      debounceTime(3000), // Wait for user to stop typing for 3 seconds
+      distinctUntilChanged(),
+      takeUntil(this.destroy$)
+    ).subscribe(() => {
+      if (this.state.hasChanges && this.state.selectedFAQ) {
+        this.saveFAQ(true); // Auto-save
+      }
+    });
   }
 
   ngAfterViewInit(): void {
     // HTML source editor is ready to use - no initialization needed
+  }
+
+  // Keyboard shortcuts
+  @HostListener('document:keydown', ['$event'])
+  handleKeyboardEvent(event: KeyboardEvent): void {
+    // Only apply HTML editing shortcuts when textarea is focused
+    const isTextareaFocused = event.target === this.htmlSourceEditor?.nativeElement;
+    
+    // Ctrl+S or Cmd+S for save
+    if ((event.ctrlKey || event.metaKey) && event.key === 's') {
+      event.preventDefault();
+      if (this.state.hasChanges && this.state.selectedFAQ) {
+        this.saveFAQ();
+      }
+    }
+    
+    // HTML formatting and text editing shortcuts (only when textarea is focused)
+    if (isTextareaFocused && this.state.selectedFAQ) {
+      // Ctrl+Shift+F for HTML format
+      if ((event.ctrlKey || event.metaKey) && event.shiftKey && event.key === 'F') {
+        event.preventDefault();
+        this.formatHTML();
+        return;
+      }
+      
+      // Ctrl+B for bold
+      if ((event.ctrlKey || event.metaKey) && event.key === 'b') {
+        event.preventDefault();
+        this.wrapSelectedText('<strong>', '</strong>');
+        return;
+      }
+      
+      // Ctrl+I for italic
+      if ((event.ctrlKey || event.metaKey) && event.key === 'i') {
+        event.preventDefault();
+        this.wrapSelectedText('<em>', '</em>');
+        return;
+      }
+      
+      // Ctrl+U for underline
+      if ((event.ctrlKey || event.metaKey) && event.key === 'u') {
+        event.preventDefault();
+        this.wrapSelectedText('<u>', '</u>');
+        return;
+      }
+      
+      // Ctrl+K for link
+      if ((event.ctrlKey || event.metaKey) && event.key === 'k') {
+        event.preventDefault();
+        this.insertLink();
+        return;
+      }
+    }
+    
+    // Ctrl+Z for undo (when textarea is focused)
+    if (isTextareaFocused && (event.ctrlKey || event.metaKey) && event.key === 'z' && !event.shiftKey) {
+      event.preventDefault();
+      this.performUndo();
+      return;
+    }
+    
+    // Ctrl+Y or Ctrl+Shift+Z for redo (when textarea is focused)
+    if (isTextareaFocused && (event.ctrlKey || event.metaKey) && 
+        (event.key === 'y' || (event.shiftKey && event.key === 'z'))) {
+      event.preventDefault();
+      this.performRedo();
+      return;
+    }
+    
+    
+    // Escape to close dialogs
+    if (event.key === 'Escape') {
+      this.state.showExportDialog = false;
+      this.state.showImportDialog = false;
+      this.state.showVersionHistory = false;
+    }
   }
 
   ngOnDestroy(): void {
@@ -92,6 +273,10 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
     
     if (this.autoSaveTimer) {
       clearInterval(this.autoSaveTimer);
+    }
+    
+    if (this.smartAutoSaveTimer) {
+      clearTimeout(this.smartAutoSaveTimer);
     }
     
     // Save any pending changes
@@ -153,6 +338,9 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
     this.currentQuestion = faq.question;
     this.currentCategory = faq.category;
     
+    // Clear undo history when switching FAQs
+    this.clearUndoHistory();
+    
     // Load edited content if exists (should be original HTML source)
     const edited = this.editedFAQs.get(faq.id);
     if (edited) {
@@ -163,6 +351,9 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
       // Content is already set in editorContent via ngModel binding
       console.log('✅ Edited HTML content set in textarea:', edited.answer);
       this.state.isLoading = false;
+      
+      // Initialize undo state
+      this.initializeUndoState();
       
       // Update preview with full FAQ service processing
       this.updatePreviewFromFAQService(faq);
@@ -195,6 +386,9 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
           console.log('📄 Content now in editor:', editableContent);
           this.state.isLoading = false;
           
+          // Initialize undo state
+          this.initializeUndoState();
+          
           // Update preview with fully processed content
           this.updatePreviewFromFAQService(faq);
         },
@@ -207,10 +401,11 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
       });
   }
 
-  saveFAQ(): void {
+  saveFAQ(isAutoSave = false): void {
     if (!this.state.selectedFAQ) return;
     
     this.state.isSaving = true;
+    this.state.saveError = null;
     
     const faqData: Partial<EditedFAQ> = {
       faqId: this.state.selectedFAQ.id,
@@ -224,10 +419,35 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
       if (success) {
         this.state.hasChanges = false;
         this.state.lastSaved = new Date();
+        this.state.saveError = null;
         this.loadEditedFAQs();
+        
+        // Show notification only for manual saves
+        if (!isAutoSave) {
+          this.notificationService.saveSuccess(this.getTruncatedTitle(this.currentQuestion));
+        }
+        // Auto-save is silent - no notification needed
+      } else {
+        this.state.saveError = 'Failed to save to storage';
+        this.notificationService.saveError(
+          this.getTruncatedTitle(this.currentQuestion), 
+          this.state.saveError || undefined
+        );
       }
       this.state.isSaving = false;
+    }).catch(error => {
+      this.state.saveError = error.message || 'Unknown error occurred';
+      this.notificationService.saveError(
+        this.getTruncatedTitle(this.currentQuestion), 
+        this.state.saveError || undefined
+      );
+      this.state.isSaving = false;
+      console.error('Save error:', error);
     });
+  }
+
+  private getTruncatedTitle(title: string, maxLength = 40): string {
+    return title.length > maxLength ? title.substring(0, maxLength) + '...' : title;
   }
 
   /**
@@ -235,17 +455,48 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
    */
   onEditorContentChange(): void {
     this.state.hasChanges = true;
+    this.state.saveError = null;
+    
     // Update preview with simple sanitization for real-time editing
     // Note: Full FAQ service processing would be too slow for real-time updates
     this.updatePreview();
+    
+    // Save state for undo/redo (but only if this isn't an undo/redo or formatting operation)
+    if (!this.isUndoRedoOperation && !this.isFormattingOperation) {
+      const textarea = this.htmlSourceEditor?.nativeElement;
+      if (textarea) {
+        const selection = {
+          start: textarea.selectionStart || 0,
+          end: textarea.selectionEnd || 0
+        };
+        this.undoRedoManager.saveState(this.editorContent, selection, 'Content change');
+      }
+    }
+    
+    // Trigger smart auto-save
+    this.contentChangeSubject.next(this.editorContent);
   }
 
-  discardChanges(): void {
-    if (this.state.selectedFAQ) {
-      console.log('Discarding changes and reloading original content');
-      this.selectFAQ(this.state.selectedFAQ);
+  resetCurrentFAQ(): void {
+    if (!this.state.selectedFAQ) return;
+
+    // Save current state to undo system before resetting
+    const textarea = this.htmlSourceEditor?.nativeElement;
+    if (textarea) {
+      const currentSelection = {
+        start: textarea.selectionStart || 0,
+        end: textarea.selectionEnd || 0
+      };
+      this.undoRedoManager.saveState(this.editorContent, currentSelection, 'FAQ reset');
     }
+
+    console.log('Resetting current FAQ to original content');
+    this.selectFAQ(this.state.selectedFAQ);
+    
+    // Show notification
+    this.notificationService.resetWarning(this.getTruncatedTitle(this.state.selectedFAQ.question));
   }
+
 
   /**
    * Update preview using simple sanitization (fallback method)
@@ -309,24 +560,70 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   async exportAll(): Promise<void> {
-    const exportData = await this.exportService.exportAllEdits();
+    this.state.isExporting = true;
+    this.state.exportProgress = null;
     
-    // Download files
-    this.exportService.downloadFAQsJSON(exportData);
-    this.exportService.downloadInstructions(exportData);
+    try {
+      const exportData = await this.exportService.exportAllEdits();
+      
+      // Use new ZIP export with progress tracking
+      await this.exportService.downloadAsZip(exportData, (progress: ExportProgress) => {
+        this.state.exportProgress = progress;
+      });
+      
+      this.notificationService.exportSuccess(Object.keys(exportData.htmlContent).length);
+      this.state.showExportDialog = false;
+    } catch (error: any) {
+      const errorMessage = error?.message || 'Unknown error occurred during export';
+      this.notificationService.exportError(errorMessage);
+      console.error('Export error:', error);
+    } finally {
+      this.state.isExporting = false;
+      this.state.exportProgress = null;
+    }
+  }
+
+  async exportSeparateFiles(): Promise<void> {
+    this.state.isExporting = true;
     
-    // Download HTML files with delay
-    setTimeout(() => {
-      this.exportService.downloadHTMLFiles(exportData);
-    }, 1000);
-    
-    this.state.showExportDialog = false;
+    try {
+      const exportData = await this.exportService.exportAllEdits();
+      
+      // Download files separately (legacy method)
+      this.exportService.downloadFAQsJSON(exportData);
+      this.exportService.downloadInstructions(exportData);
+      
+      // Download HTML files with delay
+      setTimeout(() => {
+        this.exportService.downloadHTMLFiles(exportData);
+      }, 1000);
+      
+      this.notificationService.exportSuccess(Object.keys(exportData.htmlContent).length + 2);
+      this.state.showExportDialog = false;
+    } catch (error: any) {
+      const errorMessage = error?.message || 'Unknown error occurred during export';
+      this.notificationService.exportError(errorMessage);
+      console.error('Export error:', error);
+    } finally {
+      this.state.isExporting = false;
+    }
   }
 
   async exportJSON(): Promise<void> {
-    const exportData = await this.exportService.exportAllEdits();
-    this.exportService.downloadAsJSON(exportData);
-    this.state.showExportDialog = false;
+    this.state.isExporting = true;
+    
+    try {
+      const exportData = await this.exportService.exportAllEdits();
+      this.exportService.downloadAsJSON(exportData);
+      this.notificationService.exportSuccess(1);
+      this.state.showExportDialog = false;
+    } catch (error: any) {
+      const errorMessage = error?.message || 'Unknown error occurred during export';
+      this.notificationService.exportError(errorMessage);
+      console.error('Export JSON error:', error);
+    } finally {
+      this.state.isExporting = false;
+    }
   }
 
   triggerFileInput(): void {
@@ -430,5 +727,382 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
     
     console.log('✅ Content prepared for editing (original HTML preserved):', prepared);
     return prepared; // Don't even trim - preserve exact original content
+  }
+
+  // HTML Editor Enhancement Functions
+
+  /**
+   * Format HTML content using js-beautify
+   */
+  formatHTML(): void {
+    if (!this.editorContent.trim()) {
+      this.notificationService.warning('No content to format');
+      return;
+    }
+
+    try {
+      const formatted = html_beautify(this.editorContent, {
+        indent_size: 2,
+        wrap_line_length: 100,
+        preserve_newlines: true,
+        max_preserve_newlines: 2,
+        indent_inner_html: true,
+        unformatted: ['pre', 'code'],
+        extra_liners: ['head', 'body', '/html']
+      });
+
+      this.editorContent = formatted;
+      this.onEditorContentChange();
+      this.notificationService.success('HTML formatted successfully');
+    } catch (error) {
+      console.error('HTML formatting error:', error);
+      this.notificationService.error('Failed to format HTML');
+    }
+  }
+
+  /**
+   * Wrap selected text with HTML tags (with smart toggle and undo support)
+   */
+  wrapSelectedText(startTag: string, endTag: string): void {
+    const textarea = this.htmlSourceEditor.nativeElement;
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    
+    // 关键修复：使用 textarea 的实际内容，确保数据源一致
+    const textareaContent = textarea.value;
+    const selectedText = textareaContent.substring(start, end);
+    
+    // Save current state for undo before making changes
+    const currentSelection = {
+      start: start,
+      end: end
+    };
+    this.undoRedoManager.saveState(textareaContent, currentSelection, 'Text formatting');
+
+    // Smart tag detection and toggle using consistent data source
+    const result = this.smartTagToggle(start, end, startTag, endTag, selectedText, textareaContent);
+    
+    // 直接更新 textarea 和组件属性
+    textarea.value = result.newContent;
+    this.editorContent = result.newContent;
+
+    // 立即设置新的光标位置
+    textarea.setSelectionRange(result.newCursorPos, result.newCursorPos);
+    textarea.focus();
+
+    // Mark as having changes and update UI
+    this.state.hasChanges = true;
+    this.state.saveError = null;
+    this.updatePreview();
+
+    // Trigger auto-save
+    this.contentChangeSubject.next(this.editorContent);
+  }
+
+  /**
+   * Smart tag toggle - detects existing tags and toggles them
+   */
+  private smartTagToggle(start: number, end: number, startTag: string, endTag: string, selectedText: string, textareaContent: string): 
+    { newContent: string, newCursorPos: number } {
+    
+    const beforeCursor = textareaContent.substring(0, start);
+    const afterCursor = textareaContent.substring(end);
+
+    // Strategy 1: Check if selection includes the tags themselves
+    if (selectedText.startsWith(startTag) && selectedText.endsWith(endTag)) {
+      // User selected text including tags, remove the tags
+      const innerText = selectedText.substring(startTag.length, selectedText.length - endTag.length);
+      const newContent = beforeCursor + innerText + afterCursor;
+      return {
+        newContent,
+        newCursorPos: start + innerText.length
+      };
+    }
+
+    // Strategy 2: Check if selection is immediately surrounded by tags
+    const startTagLength = startTag.length;
+    const endTagLength = endTag.length;
+    
+    const beforeTagStart = Math.max(0, start - startTagLength);
+    const afterTagEnd = Math.min(this.editorContent.length, end + endTagLength);
+    
+    const possibleStartTag = this.editorContent.substring(beforeTagStart, start);
+    const possibleEndTag = this.editorContent.substring(end, afterTagEnd);
+
+    if (possibleStartTag === startTag && possibleEndTag === endTag) {
+      // Remove existing tags that immediately surround the selection
+      const newContent = this.editorContent.substring(0, beforeTagStart) + 
+                        selectedText + 
+                        this.editorContent.substring(afterTagEnd);
+      
+      return {
+        newContent,
+        newCursorPos: beforeTagStart + selectedText.length
+      };
+    }
+
+    // Strategy 3: Check if we're inside existing tags (broader search)
+    const surroundingTags = this.findSurroundingTags(start, end, startTag, endTag, textareaContent);
+    if (surroundingTags) {
+      // Remove the surrounding tags
+      const newContent = textareaContent.substring(0, surroundingTags.startTagStart) + 
+                        surroundingTags.innerContent + 
+                        textareaContent.substring(surroundingTags.endTagEnd);
+      
+      return {
+        newContent,
+        newCursorPos: surroundingTags.startTagStart + surroundingTags.innerContent.length
+      };
+    }
+
+    // Strategy 4: Add new tags
+    let wrappedText: string;
+    let newCursorPos: number;
+
+    if (selectedText) {
+      // Wrap selected text - place cursor after the wrapped content
+      wrappedText = `${startTag}${selectedText}${endTag}`;
+      newCursorPos = start + startTag.length + selectedText.length + endTag.length;
+    } else {
+      // Insert tag pair with cursor in the middle for typing
+      wrappedText = `${startTag}${endTag}`;
+      newCursorPos = start + startTag.length;
+    }
+
+    const newContent = beforeCursor + wrappedText + afterCursor;
+    
+    return { newContent, newCursorPos };
+  }
+
+  /**
+   * Find surrounding tags around the current selection
+   */
+  private findSurroundingTags(start: number, end: number, startTag: string, endTag: string, textareaContent: string): 
+    { startTagStart: number, startTagEnd: number, endTagStart: number, endTagEnd: number, innerContent: string } | null {
+    
+    const searchRadius = 200; // Search within 200 characters
+    const searchStart = Math.max(0, start - searchRadius);
+    const searchEnd = Math.min(textareaContent.length, end + searchRadius);
+    const searchArea = textareaContent.substring(searchStart, searchEnd);
+    
+    // Find the last occurrence of startTag before cursor
+    const relativeStart = start - searchStart;
+    const relativeEnd = end - searchStart;
+    
+    let lastStartTag = -1;
+    let pos = 0;
+    while ((pos = searchArea.indexOf(startTag, pos)) !== -1 && pos < relativeStart) {
+      lastStartTag = pos;
+      pos += startTag.length;
+    }
+    
+    if (lastStartTag === -1) return null;
+    
+    // Find the first occurrence of endTag after cursor
+    const firstEndTag = searchArea.indexOf(endTag, relativeEnd);
+    if (firstEndTag === -1) return null;
+    
+    // Validate that these tags actually surround our selection
+    const startTagEnd = lastStartTag + startTag.length;
+    if (startTagEnd <= relativeStart && firstEndTag >= relativeEnd) {
+      return {
+        startTagStart: searchStart + lastStartTag,
+        startTagEnd: searchStart + startTagEnd,
+        endTagStart: searchStart + firstEndTag,
+        endTagEnd: searchStart + firstEndTag + endTag.length,
+        innerContent: searchArea.substring(startTagEnd, firstEndTag)
+      };
+    }
+    
+    return null;
+  }
+
+  /**
+   * Insert a link with prompt for URL
+   */
+  insertLink(): void {
+    const textarea = this.htmlSourceEditor.nativeElement;
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selectedText = this.editorContent.substring(start, end);
+
+    const url = prompt('Enter URL:', 'https://');
+    if (url === null) return; // User cancelled
+
+    const linkText = selectedText || 'Link text';
+    const linkHtml = `<a href="${url}" target="_blank">${linkText}</a>`;
+
+    this.editorContent = this.editorContent.substring(0, start) + 
+                        linkHtml + 
+                        this.editorContent.substring(end);
+
+    this.onEditorContentChange();
+
+    // Focus and position cursor
+    setTimeout(() => {
+      textarea.focus();
+      const newPos = start + linkHtml.length;
+      textarea.setSelectionRange(newPos, newPos);
+    }, 0);
+
+    this.notificationService.success('Link inserted');
+  }
+
+  /**
+   * Insert a new paragraph
+   */
+  insertParagraph(): void {
+    const textarea = this.htmlSourceEditor.nativeElement;
+    const cursorPos = textarea.selectionStart;
+    
+    const paragraphHtml = '<p></p>';
+    this.editorContent = this.editorContent.substring(0, cursorPos) + 
+                        paragraphHtml + 
+                        this.editorContent.substring(cursorPos);
+
+    this.onEditorContentChange();
+
+    // Position cursor inside the paragraph tags
+    setTimeout(() => {
+      textarea.focus();
+      const newPos = cursorPos + 3; // Position after <p>
+      textarea.setSelectionRange(newPos, newPos);
+    }, 0);
+  }
+
+  /**
+   * Insert a heading with selection for level
+   */
+  insertHeading(): void {
+    const level = prompt('Enter heading level (1-6):', '2');
+    if (level === null) return;
+
+    const headingLevel = parseInt(level, 10);
+    if (isNaN(headingLevel) || headingLevel < 1 || headingLevel > 6) {
+      this.notificationService.warning('Please enter a number between 1 and 6');
+      return;
+    }
+
+    const textarea = this.htmlSourceEditor.nativeElement;
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selectedText = this.editorContent.substring(start, end);
+
+    const headingText = selectedText || 'Heading text';
+    const headingHtml = `<h${headingLevel}>${headingText}</h${headingLevel}>`;
+
+    this.editorContent = this.editorContent.substring(0, start) + 
+                        headingHtml + 
+                        this.editorContent.substring(end);
+
+    this.onEditorContentChange();
+
+    setTimeout(() => {
+      textarea.focus();
+      const newPos = start + headingHtml.length;
+      textarea.setSelectionRange(newPos, newPos);
+    }, 0);
+
+    this.notificationService.success(`H${headingLevel} heading inserted`);
+  }
+
+  // Undo/Redo System Integration
+
+
+  /**
+   * Perform undo operation
+   */
+  performUndo(): void {
+    const previousState = this.undoRedoManager.undo();
+    if (previousState) {
+      this.isUndoRedoOperation = true;
+      this.editorContent = previousState.content;
+      this.onEditorContentChange();
+      this.isUndoRedoOperation = false;
+
+      // Restore selection
+      setTimeout(() => {
+        if (this.htmlSourceEditor?.nativeElement) {
+          const textarea = this.htmlSourceEditor.nativeElement;
+          textarea.focus();
+          textarea.setSelectionRange(previousState.selection.start, previousState.selection.end);
+        }
+      }, 0);
+
+      this.notificationService.info(`Undid: ${previousState.description}`);
+    } else {
+      this.notificationService.warning('Nothing to undo');
+    }
+  }
+
+  /**
+   * Perform redo operation
+   */
+  performRedo(): void {
+    const nextState = this.undoRedoManager.redo();
+    if (nextState) {
+      this.isUndoRedoOperation = true;
+      this.editorContent = nextState.content;
+      this.onEditorContentChange();
+      this.isUndoRedoOperation = false;
+
+      // Restore selection
+      setTimeout(() => {
+        if (this.htmlSourceEditor?.nativeElement) {
+          const textarea = this.htmlSourceEditor.nativeElement;
+          textarea.focus();
+          textarea.setSelectionRange(nextState.selection.start, nextState.selection.end);
+        }
+      }, 0);
+
+      this.notificationService.info(`Redid: ${nextState.description}`);
+    } else {
+      this.notificationService.warning('Nothing to redo');
+    }
+  }
+
+  /**
+   * Get undo/redo status for UI
+   */
+  getUndoRedoStatus(): { canUndo: boolean, canRedo: boolean, historySize: number } {
+    return this.undoRedoManager.getHistoryInfo();
+  }
+
+  /**
+   * Check if undo is available
+   */
+  canUndo(): boolean {
+    return this.undoRedoManager.canUndo();
+  }
+
+  /**
+   * Check if redo is available
+   */
+  canRedo(): boolean {
+    return this.undoRedoManager.canRedo();
+  }
+
+  /**
+   * Initialize undo state when FAQ is loaded
+   */
+  private initializeUndoState(): void {
+    if (this.editorContent && this.htmlSourceEditor?.nativeElement) {
+      const textarea = this.htmlSourceEditor.nativeElement;
+      const selection = {
+        start: textarea.selectionStart || 0,
+        end: textarea.selectionEnd || 0
+      };
+      // Wait a bit for the content to be fully set in the textarea
+      setTimeout(() => {
+        this.undoRedoManager.saveState(this.editorContent, selection, 'Initial state');
+      }, 100);
+    }
+  }
+
+  /**
+   * Clear undo history (call when switching FAQs)
+   */
+  private clearUndoHistory(): void {
+    this.undoRedoManager.clear();
   }
 }

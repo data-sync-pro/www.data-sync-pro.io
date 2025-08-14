@@ -78,13 +78,16 @@
         <div class="toolbar-actions">
           <button class="btn btn-sm btn-success" 
                   (click)="saveFAQ()"
-                  [disabled]="!state.hasChanges || state.isSaving">
+                  [disabled]="!state.hasChanges || state.isSaving"
+                  title="Save changes (Ctrl+S)">
+            <span *ngIf="state.isSaving" class="spinner"></span>
             {{ state.isSaving ? 'Saving...' : 'Save' }}
           </button>
           <button class="btn btn-sm btn-secondary" 
-                  (click)="discardChanges()"
-                  [disabled]="!state.hasChanges">
-            Discard Changes
+                  (click)="resetCurrentFAQ()"
+                  [disabled]="!state.selectedFAQ"
+                  title="Reset current FAQ to original content">
+            Reset
           </button>
         </div>
       </div>
@@ -114,6 +117,93 @@
         <div class="loading-indicator" *ngIf="state.isLoading">
           <p>Loading content...</p>
         </div>
+        
+        <!-- HTML Editor Toolbar -->
+        <div class="html-editor-toolbar" *ngIf="!state.isLoading">
+          <div class="toolbar-group">
+            <button class="btn btn-sm btn-secondary" 
+                    (click)="formatHTML()"
+                    title="Format HTML (Ctrl+Shift+F)"
+                    [disabled]="!editorContent">
+              <span class="btn-icon">🎨</span>
+              Format
+            </button>
+          </div>
+          
+          <div class="toolbar-separator"></div>
+          
+          <div class="toolbar-group">
+            <button class="btn btn-sm btn-secondary" 
+                    (click)="performUndo()"
+                    title="Undo (Ctrl+Z)"
+                    [disabled]="!canUndo()">
+              <span class="btn-icon">↶</span>
+              Undo
+            </button>
+            <button class="btn btn-sm btn-secondary" 
+                    (click)="performRedo()"
+                    title="Redo (Ctrl+Y)"
+                    [disabled]="!canRedo()">
+              <span class="btn-icon">↷</span>
+              Redo
+            </button>
+          </div>
+          
+          <div class="toolbar-separator"></div>
+          
+          <div class="toolbar-group">
+            <button class="btn btn-sm btn-secondary" 
+                    (click)="wrapSelectedText('<strong>', '</strong>')"
+                    title="Bold (Ctrl+B)">
+              <span class="btn-icon"><strong>B</strong></span>
+            </button>
+            <button class="btn btn-sm btn-secondary" 
+                    (click)="wrapSelectedText('<em>', '</em>')"
+                    title="Italic (Ctrl+I)">
+              <span class="btn-icon"><em>I</em></span>
+            </button>
+            <button class="btn btn-sm btn-secondary" 
+                    (click)="wrapSelectedText('<u>', '</u>')"
+                    title="Underline (Ctrl+U)">
+              <span class="btn-icon"><u>U</u></span>
+            </button>
+          </div>
+          
+          <div class="toolbar-separator"></div>
+          
+          <div class="toolbar-group">
+            <button class="btn btn-sm btn-secondary" 
+                    (click)="insertLink()"
+                    title="Insert Link (Ctrl+K)">
+              <span class="btn-icon">🔗</span>
+              Link
+            </button>
+            <button class="btn btn-sm btn-secondary" 
+                    (click)="wrapSelectedText('<code>', '</code>')"
+                    title="Code">
+              <span class="btn-icon">&lt;/&gt;</span>
+              Code
+            </button>
+          </div>
+          
+          <div class="toolbar-separator"></div>
+          
+          <div class="toolbar-group">
+            <button class="btn btn-sm btn-info" 
+                    (click)="insertParagraph()"
+                    title="New Paragraph">
+              <span class="btn-icon">¶</span>
+              P
+            </button>
+            <button class="btn btn-sm btn-info" 
+                    (click)="insertHeading()"
+                    title="Insert Heading">
+              <span class="btn-icon">H</span>
+              Heading
+            </button>
+          </div>
+        </div>
+        
         <textarea 
           #htmlSourceEditor
           class="html-source-editor" 
@@ -170,17 +260,61 @@
 
 <!-- Export Dialog -->
 <div class="modal" *ngIf="state.showExportDialog" (click)="state.showExportDialog = false">
-  <div class="modal-content" (click)="$event.stopPropagation()">
-    <h2>Export Options</h2>
-    <div class="export-options">
-      <button class="btn btn-primary" (click)="exportAll()">
-        Export All (FAQ + HTML files)
-      </button>
-      <button class="btn btn-secondary" (click)="exportJSON()">
-        Export as Single JSON
+  <div class="modal-content export-modal" (click)="$event.stopPropagation()">
+    <h2>Export FAQ Edits</h2>
+    
+    <!-- Export Progress -->
+    <div *ngIf="state.isExporting" class="export-progress">
+      <div class="progress-header">
+        <h3>{{ state.exportProgress?.step || 'Preparing export...' }}</h3>
+        <span class="progress-percentage">{{ state.exportProgress?.percentage || 0 }}%</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" [style.width.%]="state.exportProgress?.percentage || 0"></div>
+      </div>
+      <div class="progress-details" *ngIf="state.exportProgress">
+        {{ state.exportProgress.current }} / {{ state.exportProgress.total }} files processed
+      </div>
+    </div>
+    
+    <!-- Export Options -->
+    <div class="export-options" *ngIf="!state.isExporting">
+      <div class="export-option recommended">
+        <h4>📦 ZIP Archive (Recommended)</h4>
+        <p>Download all files in a single ZIP archive. Easiest to manage and deploy.</p>
+        <button class="btn btn-primary" (click)="exportAll()">
+          <span class="btn-icon">📦</span>
+          Export as ZIP
+        </button>
+      </div>
+      
+      <div class="export-option">
+        <h4>📄 Individual Files</h4>
+        <p>Download FAQ JSON, HTML files, and instructions separately.</p>
+        <button class="btn btn-secondary" (click)="exportSeparateFiles()">
+          <span class="btn-icon">📄</span>
+          Export Separate Files
+        </button>
+      </div>
+      
+      <div class="export-option">
+        <h4>🔗 JSON Only</h4>
+        <p>Download only the FAQ data in JSON format (for backup or analysis).</p>
+        <button class="btn btn-secondary" (click)="exportJSON()">
+          <span class="btn-icon">🔗</span>
+          Export JSON Data
+        </button>
+      </div>
+    </div>
+    
+    <!-- Action Buttons -->
+    <div class="modal-actions">
+      <button class="btn btn-secondary" 
+              (click)="state.showExportDialog = false"
+              [disabled]="state.isExporting">
+        {{ state.isExporting ? 'Please wait...' : 'Cancel' }}
       </button>
     </div>
-    <button class="btn btn-secondary" (click)="state.showExportDialog = false">Cancel</button>
   </div>
 </div>
 

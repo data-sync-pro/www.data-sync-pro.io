@@ -4,6 +4,9 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { MatButtonModule } from '@angular/material/button';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 import { CookieConsentComponent } from './cookie-consent/cookie-consent.component';
 import { HomeComponent } from './home/home.component';
@@ -40,6 +43,9 @@ import { FaqEditorComponent } from './faq-editor/faq-editor.component';
     HttpClientModule,
     AppRoutingModule,
     MatButtonModule,
+    MatSnackBarModule,
+    MatDialogModule,
+    MatProgressSpinnerModule,
     MatExpansionModule,
     FormsModule,
     BrowserAnimationsModule,

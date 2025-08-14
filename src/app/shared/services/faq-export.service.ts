@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { FAQStorageService, EditedFAQ } from './faq-storage.service';
 import { FAQService } from './faq.service';
 import { FAQItem } from '../models/faq.model';
+import JSZip from 'jszip';
 
 export interface ExportData {
   metadata: {
@@ -12,6 +13,13 @@ export interface ExportData {
   };
   faqs: any[];
   htmlContent: { [key: string]: string };
+}
+
+export interface ExportProgress {
+  step: string;
+  current: number;
+  total: number;
+  percentage: number;
 }
 
 @Injectable({
@@ -112,22 +120,54 @@ export class FAQExportService {
     });
   }
 
-  async downloadAsZip(data: ExportData): Promise<void> {
-    // Note: For ZIP functionality, we would need to install JSZip library
-    // For now, we'll download files separately
-    console.warn('ZIP download not yet implemented. Downloading files separately.');
-    
-    // Download main FAQ JSON
-    this.downloadFAQsJSON(data);
-    
-    // Download HTML files with a small delay between each
-    const entries = Object.entries(data.htmlContent);
-    for (let i = 0; i < entries.length; i++) {
-      const [fileName, content] = entries[i];
-      setTimeout(() => {
-        const blob = new Blob([content], { type: 'text/html' });
-        this.downloadFile(blob, fileName);
-      }, i * 100);
+  async downloadAsZip(data: ExportData, progressCallback?: (progress: ExportProgress) => void): Promise<void> {
+    const zip = new JSZip();
+    const totalItems = Object.keys(data.htmlContent).length + 3; // HTML files + JSON + instructions + metadata
+    let currentItem = 0;
+
+    const updateProgress = (step: string) => {
+      currentItem++;
+      if (progressCallback) {
+        progressCallback({
+          step,
+          current: currentItem,
+          total: totalItems,
+          percentage: Math.round((currentItem / totalItems) * 100)
+        });
+      }
+    };
+
+    try {
+      // Add FAQ data JSON
+      const faqsJson = JSON.stringify(data.faqs, null, 2);
+      zip.file('faqs.json', faqsJson);
+      updateProgress('Adding FAQ data');
+
+      // Add HTML files
+      for (const [fileName, content] of Object.entries(data.htmlContent)) {
+        zip.file(`html-content/${fileName}`, content);
+        updateProgress(`Adding ${fileName}`);
+      }
+
+      // Add instructions
+      const instructions = this.generateUpdateInstructions(data);
+      zip.file('UPDATE_INSTRUCTIONS.txt', instructions);
+      updateProgress('Adding instructions');
+
+      // Add metadata
+      const metadata = JSON.stringify(data.metadata, null, 2);
+      zip.file('export-metadata.json', metadata);
+      updateProgress('Adding metadata');
+
+      // Generate ZIP
+      const zipContent = await zip.generateAsync({ type: 'blob' });
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
+      const fileName = `faq-export-${timestamp}.zip`;
+
+      this.downloadFile(zipContent, fileName);
+    } catch (error: any) {
+      console.error('Error creating ZIP file:', error);
+      throw new Error(`Failed to create ZIP file: ${error?.message || 'Unknown error'}`);
     }
   }
 

@@ -48,6 +48,6 @@ a {
 body.recipe-page app-footer {
   display: none;
 }
-  
 
-  
+// Import notification styles
+@import './styles/notification.scss';
