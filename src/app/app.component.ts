@@ -8,6 +8,8 @@ import { AnalyticsService } from './analytics.service';
   templateUrl: './app.component.html',
 })
 export class AppComponent implements OnInit {
+  showHeaderFooter = true;
+  
   constructor(
     private analyticsService: AnalyticsService,
     private router: Router
@@ -17,6 +19,9 @@ export class AppComponent implements OnInit {
     this.router.events
       .pipe(filter((event: RouterEvent): event is NavigationEnd => event instanceof NavigationEnd))
       .subscribe((event: NavigationEnd) => {
+        // Hide header and footer on FAQ editor page
+        this.showHeaderFooter = !event.url.includes('/faq-editor');
+        
         if (this.analyticsService.userConsented) {
           this.analyticsService.trackPageView(event.urlAfterRedirects);
         }

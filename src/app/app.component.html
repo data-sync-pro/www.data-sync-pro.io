@@ -1,6 +1,6 @@
-<app-header></app-header>
+<app-header *ngIf="showHeaderFooter"></app-header>
 <app-offline-indicator></app-offline-indicator>
 <router-outlet></router-outlet>
-<app-scroll-to-top></app-scroll-to-top>
+<app-scroll-to-top *ngIf="showHeaderFooter"></app-scroll-to-top>
 <app-cookie-consent></app-cookie-consent>
-<app-footer></app-footer>
+<app-footer *ngIf="showHeaderFooter"></app-footer>

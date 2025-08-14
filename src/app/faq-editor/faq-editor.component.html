@@ -94,36 +94,32 @@
 
       <!-- FAQ Metadata -->
       <div class="faq-metadata">
-        <div class="form-group">
-          <label>Question:</label>
-          <input type="text" 
-                 class="form-control"
-                 [(ngModel)]="currentQuestion"
-                 (input)="state.hasChanges = true">
-        </div>
-        
-        <div class="form-group">
-          <label>Category:</label>
-          <select class="form-control"
-                  [(ngModel)]="currentCategory"
-                  (change)="state.hasChanges = true">
-            <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
-          </select>
+        <div class="form-row">
+          <div class="form-group question-field">
+            <label>Question:</label>
+            <input type="text" 
+                   class="form-control"
+                   [(ngModel)]="currentQuestion"
+                   (input)="state.hasChanges = true">
+          </div>
+          
+          <div class="form-group category-field">
+            <label>Category:</label>
+            <select class="form-control"
+                    [(ngModel)]="currentCategory"
+                    (change)="state.hasChanges = true">
+              <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+            </select>
+          </div>
         </div>
       </div>
 
-      <!-- HTML Source Code Editor -->
-      <div class="editor-content">
-        <div class="loading-indicator" *ngIf="state.isLoading">
-          <p>Loading content...</p>
-        </div>
-        
-        <!-- HTML Editor Toolbar -->
-        <div class="html-editor-toolbar" *ngIf="!state.isLoading">
+      <!-- HTML Editor Toolbar -->
+      <div class="html-editor-toolbar" *ngIf="!state.isLoading && state.selectedFAQ">
           <div class="toolbar-group">
             <button class="btn btn-sm btn-secondary" 
                     (click)="formatHTML()"
-                    title="Format HTML (Ctrl+Shift+F)"
+                    title="Format HTML (Alt+Shift+F)"
                     [disabled]="!editorContent">
               <span class="btn-icon">🎨</span>
               Format
@@ -202,6 +198,12 @@
               Heading
             </button>
           </div>
+      </div>
+
+      <!-- HTML Source Code Editor -->
+      <div class="editor-content" *ngIf="state.selectedFAQ">
+        <div class="loading-indicator" *ngIf="state.isLoading">
+          <p>Loading content...</p>
         </div>
         
         <textarea 
@@ -212,7 +214,8 @@
           (input)="onEditorContentChange()"
           placeholder="HTML source code will appear here..."
           rows="20"
-          spellcheck="false"></textarea>
+          spellcheck="false"
+          wrap="soft"></textarea>
       </div>
     </div>
 

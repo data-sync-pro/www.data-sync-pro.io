@@ -28,7 +28,8 @@
       "Bash(cmd /c \"dir D:\\www.data-sync-pro.io\\src\\assets\\recipes\\auto*\")",
       "Bash(powershell:*)",
       "Bash(npm install:*)",
-      "Bash(ng generate component:*)"
+      "Bash(ng generate component:*)",
+      "Bash(start http://localhost:4201/faq-editor)"
     ],
     "deny": []
   }

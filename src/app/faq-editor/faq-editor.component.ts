@@ -207,8 +207,8 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
     
     // HTML formatting and text editing shortcuts (only when textarea is focused)
     if (isTextareaFocused && this.state.selectedFAQ) {
-      // Ctrl+Shift+F for HTML format
-      if ((event.ctrlKey || event.metaKey) && event.shiftKey && event.key === 'F') {
+      // Alt+Shift+F for HTML format (VS Code standard)
+      if (event.altKey && event.shiftKey && event.key === 'F') {
         event.preventDefault();
         this.formatHTML();
         return;
