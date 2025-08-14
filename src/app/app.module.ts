@@ -19,6 +19,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { ScrollToTopComponent } from './scroll-to-top/scroll-to-top.component';
 import { SharedModule } from './shared/shared.module';
 import { ServiceWorkerModule } from '@angular/service-worker';
+import { FaqEditorComponent } from './faq-editor/faq-editor.component';
 
 @NgModule({
   declarations: [
@@ -31,7 +32,8 @@ import { ServiceWorkerModule } from '@angular/service-worker';
     SolutionsComponent,
     RulesEnginesComponent,
     CookieConsentComponent,
-    ScrollToTopComponent
+    ScrollToTopComponent,
+    FaqEditorComponent
   ],
   imports: [
     BrowserModule,

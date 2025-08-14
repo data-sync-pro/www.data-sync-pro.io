@@ -1,0 +1,202 @@
+<div class="faq-editor-container">
+  <!-- Header Bar -->
+  <div class="editor-header">
+    <h1 class="editor-title">FAQ Editor</h1>
+    
+    <div class="editor-stats">
+      <span class="stat-item">
+        <strong>{{ faqList.length }}</strong> Total FAQs
+      </span>
+      <span class="stat-item edited">
+        <strong>{{ getEditedCount() }}</strong> Edited
+      </span>
+      <span class="stat-item" *ngIf="state.lastSaved">
+        Last saved: {{ formatDate(state.lastSaved) }}
+      </span>
+    </div>
+
+    <div class="editor-actions">
+      <button class="btn btn-secondary" (click)="state.showVersionHistory = true" 
+              [disabled]="!state.selectedFAQ">
+        Version History
+      </button>
+      <button class="btn btn-secondary" (click)="state.showImportDialog = true">
+        Import
+      </button>
+      <button class="btn btn-primary" (click)="state.showExportDialog = true"
+              [disabled]="getEditedCount() === 0">
+        Export ({{ getEditedCount() }})
+      </button>
+      <button class="btn btn-danger" (click)="clearAllEdits()"
+              [disabled]="getEditedCount() === 0">
+        Clear All
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Content Area -->
+  <div class="editor-main">
+    <!-- Left Sidebar - FAQ List -->
+    <div class="faq-list-panel">
+      <!-- Search and Filter -->
+      <div class="list-controls">
+        <input type="text" 
+               class="search-input"
+               placeholder="Search FAQs..."
+               [(ngModel)]="searchQuery"
+               (input)="filterFAQs()">
+        
+        <select class="category-filter"
+                [(ngModel)]="selectedCategory"
+                (change)="filterFAQs()">
+          <option value="">All Categories</option>
+          <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+        </select>
+      </div>
+
+      <!-- FAQ List -->
+      <div class="faq-list">
+        <div class="faq-item"
+             *ngFor="let faq of filteredFAQs"
+             [class.selected]="state.selectedFAQ?.id === faq.id"
+             [class.edited]="isEdited(faq)"
+             (click)="selectFAQ(faq)">
+          <div class="faq-item-header">
+            <span class="faq-id">{{ faq.name }}</span>
+            <span class="edit-indicator" *ngIf="isEdited(faq)">✏️</span>
+          </div>
+          <div class="faq-question">{{ faq.question }}</div>
+          <div class="faq-category">{{ faq.category }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Middle - Editor -->
+    <div class="editor-panel" *ngIf="state.selectedFAQ">
+      <div class="editor-toolbar">
+        <h2>Edit FAQ</h2>
+        <div class="toolbar-actions">
+          <button class="btn btn-sm btn-success" 
+                  (click)="saveFAQ()"
+                  [disabled]="!state.hasChanges || state.isSaving">
+            {{ state.isSaving ? 'Saving...' : 'Save' }}
+          </button>
+          <button class="btn btn-sm btn-secondary" 
+                  (click)="discardChanges()"
+                  [disabled]="!state.hasChanges">
+            Discard Changes
+          </button>
+        </div>
+      </div>
+
+      <!-- FAQ Metadata -->
+      <div class="faq-metadata">
+        <div class="form-group">
+          <label>Question:</label>
+          <input type="text" 
+                 class="form-control"
+                 [(ngModel)]="currentQuestion"
+                 (input)="state.hasChanges = true">
+        </div>
+        
+        <div class="form-group">
+          <label>Category:</label>
+          <select class="form-control"
+                  [(ngModel)]="currentCategory"
+                  (change)="state.hasChanges = true">
+            <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- HTML Source Code Editor -->
+      <div class="editor-content">
+        <div class="loading-indicator" *ngIf="state.isLoading">
+          <p>Loading content...</p>
+        </div>
+        <textarea 
+          #htmlSourceEditor
+          class="html-source-editor" 
+          [class.hidden]="state.isLoading"
+          [(ngModel)]="editorContent"
+          (input)="onEditorContentChange()"
+          placeholder="HTML source code will appear here..."
+          rows="20"
+          spellcheck="false"></textarea>
+      </div>
+    </div>
+
+    <!-- Right - Preview -->
+    <div class="preview-panel" *ngIf="state.selectedFAQ">
+      <h3>Preview</h3>
+      <div class="preview-content" [innerHTML]="previewContent"></div>
+    </div>
+  </div>
+
+  <!-- No Selection Message -->
+  <div class="no-selection" *ngIf="!state.selectedFAQ">
+    <p>Select a FAQ from the list to start editing</p>
+  </div>
+
+  <!-- Storage Stats -->
+  <div class="storage-stats">
+    <div class="storage-bar">
+      <div class="storage-used" [style.width.%]="storageStats.percentage"></div>
+    </div>
+    <span class="storage-text">
+      Storage: {{ formatBytes(storageStats.used) }} / {{ formatBytes(storageStats.available) }}
+    </span>
+  </div>
+</div>
+
+<!-- Version History Modal -->
+<div class="modal" *ngIf="state.showVersionHistory" (click)="state.showVersionHistory = false">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <h2>Version History</h2>
+    <div class="version-list">
+      <div class="version-item" *ngFor="let version of versionHistory">
+        <div class="version-info">
+          <strong>Version {{ version.version }}</strong>
+          <span>{{ version.timestamp | date:'medium' }}</span>
+        </div>
+        <button class="btn btn-sm btn-primary" (click)="restoreVersion(version)">
+          Restore
+        </button>
+      </div>
+    </div>
+    <button class="btn btn-secondary" (click)="state.showVersionHistory = false">Close</button>
+  </div>
+</div>
+
+<!-- Export Dialog -->
+<div class="modal" *ngIf="state.showExportDialog" (click)="state.showExportDialog = false">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <h2>Export Options</h2>
+    <div class="export-options">
+      <button class="btn btn-primary" (click)="exportAll()">
+        Export All (FAQ + HTML files)
+      </button>
+      <button class="btn btn-secondary" (click)="exportJSON()">
+        Export as Single JSON
+      </button>
+    </div>
+    <button class="btn btn-secondary" (click)="state.showExportDialog = false">Cancel</button>
+  </div>
+</div>
+
+<!-- Import Dialog -->
+<div class="modal" *ngIf="state.showImportDialog" (click)="state.showImportDialog = false">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <h2>Import FAQ Data</h2>
+    <p>Select a previously exported JSON file to import:</p>
+    <input type="file" 
+           #fileInput
+           accept=".json"
+           style="display: none"
+           (change)="importFile($event)">
+    <button class="btn btn-primary" (click)="triggerFileInput()">
+      Choose File
+    </button>
+    <button class="btn btn-secondary" (click)="state.showImportDialog = false">Cancel</button>
+  </div>
+</div>

@@ -590,7 +590,7 @@ export class FAQService implements OnDestroy {
   }
 
   /**
-   * 更新FAQ项目
+   * Update FAQ item
    */
   updateFAQItem(id: string, updates: Partial<FAQItem>): void {
     const currentFAQs = this.faqsCache$.value;
@@ -598,6 +598,24 @@ export class FAQService implements OnDestroy {
       faq.id === id ? { ...faq, ...updates } : faq
     );
     this.faqsCache$.next(updatedFAQs);
+  }
+
+  /**
+   * Get all FAQs synchronously
+   */
+  getAllFAQs(): FAQItem[] {
+    return this.faqsCache$.value;
+  }
+
+  /**
+   * Get FAQ content by ID
+   */
+  getFAQContentById(id: string): Observable<SafeHtml> {
+    const faq = this.faqsCache$.value.find(f => f.id === id);
+    if (!faq) {
+      return of(this.sanitizer.bypassSecurityTrustHtml('<p>FAQ not found</p>'));
+    }
+    return this.getFAQContent(faq.answerPath);
   }
 
   /**

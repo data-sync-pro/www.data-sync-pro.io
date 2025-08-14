@@ -18,12 +18,14 @@ export interface SourceFAQRecord {
  */
 export interface FAQItem {
   id: string;
+  name?: string;
+  seqNo?: string | null;
   question: string;
   answer: string;
-  answerPath?: string;
+  answerPath: string;
   safeAnswer?: SafeHtml;
   category: string;
-  subCategory: string | null;
+  subCategory?: string | null;
   isExpanded?: boolean;
   userRating?: boolean | null;
   viewCount?: number;

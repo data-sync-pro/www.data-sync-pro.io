@@ -1311,7 +1311,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
   private readonly overviewSectionConfigs = [
     {
       id: 'use-case',
-      title: 'Use Case',
+      title: 'Description',
       icon: 'lightbulb',
       elementId: 'recipe-use-case',
       contentType: 'use-case-highlight',
@@ -1413,16 +1413,6 @@ export class RecipesComponent implements OnInit, OnDestroy {
       componentName: 'app-recipe-download',
       isVisible: () => !!this.currentRecipe?.downloadableExecutable,
       getData: () => this.currentRecipe?.downloadableExecutable,
-      isLegacy: true
-    },
-    {
-      id: 'installation-guide',
-      title: 'Installation Guide',
-      icon: 'install_desktop',
-      elementId: 'recipe-installation-guide',
-      contentType: 'text',
-      isVisible: () => !!this.currentRecipe?.downloadableExecutable,
-      getData: () => 'Instructions for installing and configuring the downloaded executable.',
       isLegacy: true
     },
     {
