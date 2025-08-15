@@ -733,27 +733,4 @@
   (selectedResult)="handleSearchSelect($event)"
 ></app-search-overlay>
 
-<!-- FAQ Editor Floating Button -->
-<button class="fab-edit-button" 
-        (click)="toggleEditorMode()"
-        title="FAQ Editor"
-        *ngIf="canShowEditor()">
-  <span class="fab-icon">✏️</span>
-</button>
 
-<!-- Password Dialog -->
-<div class="password-overlay" *ngIf="showPasswordDialog" (click)="showPasswordDialog = false">
-  <div class="password-dialog" (click)="$event.stopPropagation()">
-    <h2>Enter Editor Password</h2>
-    <input type="password" 
-           [(ngModel)]="editorPassword" 
-           placeholder="Password"
-           (keyup.enter)="checkPassword()"
-           class="password-input">
-    <div class="dialog-actions">
-      <button class="btn btn-primary" (click)="checkPassword()">Enter</button>
-      <button class="btn btn-secondary" (click)="showPasswordDialog = false">Cancel</button>
-    </div>
-    <div class="password-error" *ngIf="passwordError">{{ passwordError }}</div>
-  </div>
-</div>

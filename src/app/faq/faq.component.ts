@@ -105,12 +105,6 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
   // Search overlay initial query
   searchOverlayInitialQuery = '';
 
-  // Editor mode properties
-  showPasswordDialog = false;
-  editorPassword = '';
-  passwordError = '';
-  private readonly EDITOR_PASSWORD = 'faq2024!';
-  private readonly EDITOR_SESSION_KEY = 'faq_editor_auth';
 
   current: CurrentState = {
     category: '',
@@ -2466,55 +2460,6 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
-  // Editor mode methods
-  canShowEditor(): boolean {
-    // Only show editor button when not on mobile and not in search mode
-    return !this.ui.isMobile && !this.search.isActive;
-  }
-
-  toggleEditorMode(): void {
-    const isAuthenticated = this.checkEditorSession();
-    
-    if (isAuthenticated) {
-      this.navigateToEditor();
-    } else {
-      this.showPasswordDialog = true;
-      this.passwordError = '';
-      this.editorPassword = '';
-    }
-  }
-
-  checkPassword(): void {
-    if (this.editorPassword === this.EDITOR_PASSWORD) {
-      // Store authentication in session storage
-      sessionStorage.setItem(this.EDITOR_SESSION_KEY, Date.now().toString());
-      this.showPasswordDialog = false;
-      this.navigateToEditor();
-    } else {
-      this.passwordError = 'Invalid password. Please try again.';
-      this.editorPassword = '';
-    }
-  }
-
-  private checkEditorSession(): boolean {
-    const authTime = sessionStorage.getItem(this.EDITOR_SESSION_KEY);
-    if (!authTime) return false;
-    
-    const sessionTime = parseInt(authTime);
-    const now = Date.now();
-    const sessionDuration = 2 * 60 * 60 * 1000; // 2 hours
-    
-    if (now - sessionTime > sessionDuration) {
-      sessionStorage.removeItem(this.EDITOR_SESSION_KEY);
-      return false;
-    }
-    
-    return true;
-  }
-
-  private navigateToEditor(): void {
-    this.router.navigate(['/faq-editor']);
-  }
 
 }
 
