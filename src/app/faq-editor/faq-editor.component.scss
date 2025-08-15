@@ -243,14 +243,21 @@
     position: sticky;
     top: 0;
     z-index: 10;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1rem;
     background: #f8f9fa;
     border-bottom: 2px solid #e0e0e0;
-    flex-wrap: wrap;
     box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    
+    .toolbar-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      flex-wrap: wrap;
+      
+      &:not(:last-child) {
+        border-bottom: 1px solid #e9ecef;
+      }
+    }
       
     .toolbar-group {
       display: flex;
@@ -262,26 +269,50 @@
       width: 1px;
       height: 24px;
       background: #dee2e6;
-      margin: 0 0.5rem;
+      margin: 0 0.25rem;
     }
     
     .btn {
+      padding: 0.25rem 0.5rem;
+      font-size: 0.8rem;
+      min-width: auto;
+      line-height: 1.2;
+      
       &.btn-info {
         background: #17a2b8;
         color: white;
+        border-color: #17a2b8;
         
         &:hover:not(:disabled) {
           background: #138496;
+          border-color: #117a8b;
+        }
+      }
+      
+      &.btn-secondary {
+        background: #6c757d;
+        color: white;
+        border-color: #6c757d;
+        
+        &:hover:not(:disabled) {
+          background: #5a6268;
+          border-color: #545b62;
         }
       }
       
       .btn-icon {
         font-size: 0.875rem;
-        margin-right: 0.25rem;
+        display: inline-block;
+        vertical-align: middle;
         
         strong, em, u {
           font-size: 0.875rem;
         }
+      }
+      
+      // Compact button style for icon-only buttons
+      &:not(:has(text)) {
+        padding: 0.25rem 0.4rem;
       }
     }
   }

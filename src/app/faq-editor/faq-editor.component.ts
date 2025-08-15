@@ -400,7 +400,6 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
   private smartAutoSaveTimer: any;
   private undoRedoManager = new UndoRedoManager();
   private isUndoRedoOperation = false;
-  private isFormattingOperation = false;
   
   faqList: FAQItem[] = [];
   filteredFAQs: FAQItem[] = [];
@@ -770,45 +769,16 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   /**
-   * Set content in the editor DOM without triggering change events
+   * Set content in the editor DOM (used for fallback scenarios)
    */
-  private setEditorContent(content: string, preserveCursor = false): void {
+  private setEditorContent(content: string): void {
     if (this.htmlSourceEditor?.nativeElement) {
       this.isUndoRedoOperation = true;
       
-      // Save current selection if we need to preserve cursor
-      let savedSelection: { range: Range } | null = null;
-      if (preserveCursor) {
-        try {
-          const selection = window.getSelection();
-          if (selection && selection.rangeCount > 0) {
-            savedSelection = {
-              range: selection.getRangeAt(0).cloneRange()
-            };
-          }
-        } catch (error) {
-          console.warn('Could not save selection:', error);
-        }
-      }
-      
+      // For fallback scenarios, directly set innerHTML
       this.htmlSourceEditor.nativeElement.innerHTML = content;
       this.editorContent = content;
       this.updatePreview();
-      
-      // Restore selection if preserved
-      if (preserveCursor && savedSelection) {
-        setTimeout(() => {
-          try {
-            const selection = window.getSelection();
-            if (selection && savedSelection) {
-              selection.removeAllRanges();
-              selection.addRange(savedSelection.range);
-            }
-          } catch (error) {
-            console.warn('Could not restore preserved selection:', error);
-          }
-        }, 10);
-      }
       
       // Reset flag after a short delay to allow event propagation
       setTimeout(() => {
@@ -829,20 +799,10 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
     this.state.hasChanges = true;
     this.state.saveError = null;
     
-    // Get current content from DOM
-    const currentContent = this.getCurrentEditorContent();
-    
     // Update preview immediately
     this.updatePreview();
     
-    // Save state for undo/redo with appropriate operation type
-    const operationType = this.isFormattingOperation ? 'format' : 'user';
-    const description = this.isFormattingOperation ? 'Text formatting' : 'Content edit';
-    
-    // Only save state if it's a meaningful change
-    if (!this.isFormattingOperation) {
-      this.undoRedoManager.saveState(currentContent, description, operationType);
-    }
+    // Native contenteditable handles undo history automatically
     
     // Trigger smart auto-save with debounced content update
     this.debouncedContentUpdate();
@@ -867,10 +827,6 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
 
   resetCurrentFAQ(): void {
     if (!this.state.selectedFAQ) return;
-
-    // Save current state to undo system before resetting
-    const currentContent = this.getCurrentEditorContent();
-    this.undoRedoManager.saveState(currentContent, 'Before FAQ reset', 'user', true);
 
     console.log('Resetting current FAQ to original content');
     this.selectFAQ(this.state.selectedFAQ);
@@ -1116,6 +1072,42 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
     return prepared;
   }
 
+  // Utility Functions
+  
+  /**
+   * Escape HTML special characters to prevent XSS
+   */
+  private escapeHtml(text: string): string {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+  
+  /**
+   * Basic URL validation
+   */
+  private isValidUrl(url: string): boolean {
+    try {
+      // Allow relative URLs, absolute URLs, and common protocols
+      const urlPattern = /^(https?:\/\/|mailto:|tel:|#|\.?\/)/i;
+      return url.length > 0 && (urlPattern.test(url) || url.startsWith('/') || url.startsWith('./') || url.startsWith('../'));
+    } catch {
+      return false;
+    }
+  }
+  
+  /**
+   * Sanitize URL to prevent javascript: and other dangerous protocols
+   */
+  private sanitizeUrl(url: string): string {
+    // Remove dangerous protocols
+    const dangerousProtocols = /^(javascript|data|vbscript):/i;
+    if (dangerousProtocols.test(url)) {
+      return '#invalid-url';
+    }
+    return url;
+  }
+
   // HTML Editor Enhancement Functions
 
   /**
@@ -1129,71 +1121,57 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     try {
-      // Save current state before formatting
-      this.undoRedoManager.saveState(currentContent, 'Before format', 'user', true);
-      
-      const formatted = html_beautify(currentContent, {
+      let formatted = html_beautify(currentContent, {
         indent_size: 2,
+        indent_level: 0,
         wrap_line_length: 100,
         preserve_newlines: true,
         max_preserve_newlines: 2,
-        indent_inner_html: true,
+        indent_inner_html: false,
         unformatted: ['pre', 'code'],
         extra_liners: ['head', 'body', '/html']
       });
-
-      // Set formatted content
-      this.isFormattingOperation = true;
-      this.setEditorContent(formatted);
       
-      // Save formatted state
-      this.undoRedoManager.saveState(formatted, 'HTML formatted', 'format', true);
+      // Remove any leading whitespace to prevent first-line indentation
+      formatted = formatted.replace(/^\s+/, '');
+
+      // Use execCommand to make the format operation undoable
+      this.focusEditor();
+      
+      // Select all content
+      document.execCommand('selectAll', false);
+      
+      // Insert the formatted content (this creates an undo point)
+      document.execCommand('insertHTML', false, formatted);
       
       this.state.hasChanges = true;
+      this.updatePreview();
       this.debouncedContentUpdate();
-      
-      setTimeout(() => {
-        this.isFormattingOperation = false;
-      }, 100);
       
       this.notificationService.success('HTML formatted successfully');
     } catch (error) {
       console.error('HTML formatting error:', error);
       this.notificationService.error('Failed to format HTML');
-      this.isFormattingOperation = false;
     }
   }
 
 
   /**
-   * Wrap selected text with HTML tags (improved implementation)
+   * Wrap selected text with HTML tags using native commands
    */
   wrapSelectedText(startTag: string, endTag: string): void {
-    const editorElement = this.htmlSourceEditor.nativeElement;
-    const currentContent = this.getCurrentEditorContent();
-    
-    // Save current state for undo
-    this.undoRedoManager.saveState(currentContent, 'Before text formatting', 'user');
-
     // Focus the editor to ensure execCommand works
     this.focusEditor();
 
-    // Set formatting flag to avoid recursive content change handling
-    this.isFormattingOperation = true;
-
     // Map HTML tags to execCommand commands
     let command = '';
-    let description = 'Text formatting';
     
     if (startTag === '<strong>' && endTag === '</strong>') {
       command = 'bold';
-      description = 'Bold formatting';
     } else if (startTag === '<em>' && endTag === '</em>') {
       command = 'italic';
-      description = 'Italic formatting';
     } else if (startTag === '<u>' && endTag === '</u>') {
       command = 'underline';
-      description = 'Underline formatting';
     } else if (startTag === '<code>' && endTag === '</code>') {
       // Code formatting requires special handling
       this.toggleCodeFormat();
@@ -1202,29 +1180,19 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
 
     if (command) {
       try {
-        // Execute the formatting command
+        // Execute the formatting command (automatically creates undo point)
         document.execCommand(command, false);
         
         // Mark as having changes
         this.state.hasChanges = true;
         this.state.saveError = null;
         
-        // Update and save formatted state
-        setTimeout(() => {
-          const formattedContent = this.getCurrentEditorContent();
-          this.editorContent = formattedContent;
-          this.undoRedoManager.saveState(formattedContent, description, 'format', true);
-          
-          this.updatePreview();
-          this.debouncedContentUpdate();
-          this.isFormattingOperation = false;
-        }, 50);
+        // Update preview
+        this.updatePreview();
+        this.debouncedContentUpdate();
       } catch (error) {
         console.error('Formatting error:', error);
-        this.isFormattingOperation = false;
       }
-    } else {
-      this.isFormattingOperation = false;
     }
   }
 
@@ -1234,30 +1202,21 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
   private toggleCodeFormat(): void {
     const selection = window.getSelection();
     if (selection && selection.rangeCount > 0) {
-      const range = selection.getRangeAt(0);
-      const selectedText = range.toString();
+      const selectedText = selection.toString();
       
       if (selectedText) {
-        // Create code element
-        const codeElement = document.createElement('code');
-        codeElement.textContent = selectedText;
+        // Escape HTML to prevent code injection
+        const escapedText = this.escapeHtml(selectedText);
+        const codeHTML = `<code>${escapedText}</code>`;
         
-        // Replace selection with code element
-        range.deleteContents();
-        range.insertNode(codeElement);
-        
-        // Update content and save state
-        const newContent = this.getCurrentEditorContent();
-        this.editorContent = newContent;
-        this.undoRedoManager.saveState(newContent, 'Code formatting', 'format', true);
+        // Use insertHTML to make it undoable
+        document.execCommand('insertHTML', false, codeHTML);
         
         this.state.hasChanges = true;
         this.updatePreview();
         this.debouncedContentUpdate();
       }
     }
-    
-    this.isFormattingOperation = false;
   }
 
 
@@ -1274,26 +1233,29 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
     const selectedText = selection.toString();
     const url = prompt('Enter URL:', 'https://');
     if (url === null) return; // User cancelled
-
-    // Save state before insertion
-    const currentContent = this.getCurrentEditorContent();
-    this.undoRedoManager.saveState(currentContent, 'Before link insertion', 'user');
+    
+    // Validate and sanitize URL
+    const trimmedUrl = url.trim();
+    if (!trimmedUrl || !this.isValidUrl(trimmedUrl)) {
+      this.notificationService.warning('Please enter a valid URL');
+      return;
+    }
+    
+    const sanitizedUrl = this.sanitizeUrl(trimmedUrl);
+    if (sanitizedUrl === '#invalid-url') {
+      this.notificationService.warning('Invalid or dangerous URL detected');
+      return;
+    }
 
     try {
+      // Escape HTML in link text to prevent XSS
       const linkText = selectedText || 'Link text';
-      const linkElement = document.createElement('a');
-      linkElement.href = url;
-      linkElement.target = '_blank';
-      linkElement.textContent = linkText;
-
-      const range = selection.getRangeAt(0);
-      range.deleteContents();
-      range.insertNode(linkElement);
-
-      // Update state and save
-      const newContent = this.getCurrentEditorContent();
-      this.editorContent = newContent;
-      this.undoRedoManager.saveState(newContent, 'Link inserted', 'user', true);
+      const escapedLinkText = this.escapeHtml(linkText);
+      const escapedUrl = this.escapeHtml(sanitizedUrl);
+      const linkHTML = `<a href="${escapedUrl}" target="_blank">${escapedLinkText}</a>`;
+      
+      // Use insertHTML to make it undoable
+      document.execCommand('insertHTML', false, linkHTML);
       
       this.state.hasChanges = true;
       this.updatePreview();
@@ -1310,30 +1272,9 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
    * Insert a new paragraph
    */
   insertParagraph(): void {
-    const selection = window.getSelection();
-    if (!selection || selection.rangeCount === 0) return;
-
-    // Save state before insertion
-    const currentContent = this.getCurrentEditorContent();
-    this.undoRedoManager.saveState(currentContent, 'Before paragraph insertion', 'user');
-
     try {
-      const paragraphElement = document.createElement('p');
-      paragraphElement.innerHTML = '&nbsp;'; // Non-breaking space for cursor positioning
-
-      const range = selection.getRangeAt(0);
-      range.insertNode(paragraphElement);
-      
-      // Position cursor inside the paragraph
-      range.setStart(paragraphElement, 0);
-      range.setEnd(paragraphElement, 0);
-      selection.removeAllRanges();
-      selection.addRange(range);
-
-      // Update state
-      const newContent = this.getCurrentEditorContent();
-      this.editorContent = newContent;
-      this.undoRedoManager.saveState(newContent, 'Paragraph inserted', 'user', true);
+      // Use insertHTML to make it undoable
+      document.execCommand('insertHTML', false, '<p>&nbsp;</p>');
       
       this.state.hasChanges = true;
       this.updatePreview();
@@ -1357,33 +1298,17 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     const selection = window.getSelection();
-    if (!selection || selection.rangeCount === 0) return;
-
-    // Save state before insertion
-    const currentContent = this.getCurrentEditorContent();
-    this.undoRedoManager.saveState(currentContent, 'Before heading insertion', 'user');
+    if (!selection) return;
 
     try {
       const selectedText = selection.toString();
       const headingText = selectedText || 'Heading text';
+      // Escape HTML to prevent XSS
+      const escapedHeadingText = this.escapeHtml(headingText);
+      const headingHTML = `<h${headingLevel}>${escapedHeadingText}</h${headingLevel}>`;
       
-      const headingElement = document.createElement(`h${headingLevel}`);
-      headingElement.textContent = headingText;
-
-      const range = selection.getRangeAt(0);
-      range.deleteContents();
-      range.insertNode(headingElement);
-      
-      // Position cursor after the heading
-      range.setStartAfter(headingElement);
-      range.collapse(true);
-      selection.removeAllRanges();
-      selection.addRange(range);
-
-      // Update state
-      const newContent = this.getCurrentEditorContent();
-      this.editorContent = newContent;
-      this.undoRedoManager.saveState(newContent, `H${headingLevel} heading inserted`, 'user', true);
+      // Use insertHTML to make it undoable
+      document.execCommand('insertHTML', false, headingHTML);
       
       this.state.hasChanges = true;
       this.updatePreview();
@@ -1396,48 +1321,255 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
-  // Undo/Redo System Integration
-
+  /**
+   * Insert unordered list
+   */
+  insertUnorderedList(): void {
+    this.focusEditor();
+    document.execCommand('insertUnorderedList', false);
+    this.state.hasChanges = true;
+    this.updatePreview();
+    this.debouncedContentUpdate();
+  }
 
   /**
-   * Perform undo operation
+   * Insert ordered list
    */
-  performUndo(): void {
-    const previousState = this.undoRedoManager.undo();
-    if (previousState) {
-      // Set content without triggering change events
-      this.setEditorContent(previousState.content);
-      
-      // Restore cursor position after DOM is updated
-      setTimeout(() => {
-        this.undoRedoManager.restoreSelection(previousState);
-        this.focusEditor();
-      }, 20);
+  insertOrderedList(): void {
+    this.focusEditor();
+    document.execCommand('insertOrderedList', false);
+    this.state.hasChanges = true;
+    this.updatePreview();
+    this.debouncedContentUpdate();
+  }
 
-      // Silent undo - no notification needed
-    } else {
-      this.notificationService.warning('Nothing to undo');
+  /**
+   * Indent selected content
+   */
+  indent(): void {
+    this.focusEditor();
+    document.execCommand('indent', false);
+    this.state.hasChanges = true;
+    this.updatePreview();
+    this.debouncedContentUpdate();
+  }
+
+  /**
+   * Outdent selected content
+   */
+  outdent(): void {
+    this.focusEditor();
+    document.execCommand('outdent', false);
+    this.state.hasChanges = true;
+    this.updatePreview();
+    this.debouncedContentUpdate();
+  }
+
+  /**
+   * Clear all formatting from selected text
+   */
+  clearFormatting(): void {
+    this.focusEditor();
+    document.execCommand('removeFormat', false);
+    this.state.hasChanges = true;
+    this.updatePreview();
+    this.debouncedContentUpdate();
+  }
+
+  /**
+   * Align text left
+   */
+  alignLeft(): void {
+    this.focusEditor();
+    document.execCommand('justifyLeft', false);
+    this.state.hasChanges = true;
+    this.updatePreview();
+    this.debouncedContentUpdate();
+  }
+
+  /**
+   * Align text center
+   */
+  alignCenter(): void {
+    this.focusEditor();
+    document.execCommand('justifyCenter', false);
+    this.state.hasChanges = true;
+    this.updatePreview();
+    this.debouncedContentUpdate();
+  }
+
+  /**
+   * Align text right
+   */
+  alignRight(): void {
+    this.focusEditor();
+    document.execCommand('justifyRight', false);
+    this.state.hasChanges = true;
+    this.updatePreview();
+    this.debouncedContentUpdate();
+  }
+
+  /**
+   * Insert blockquote
+   */
+  insertBlockquote(): void {
+    this.focusEditor();
+    
+    const selection = window.getSelection();
+    if (selection && selection.rangeCount > 0) {
+      const selectedText = selection.toString() || 'Quote text';
+      // Escape HTML to prevent XSS
+      const escapedText = this.escapeHtml(selectedText);
+      const quoteHTML = `<blockquote>${escapedText}</blockquote>`;
+      document.execCommand('insertHTML', false, quoteHTML);
+      
+      this.state.hasChanges = true;
+      this.updatePreview();
+      this.debouncedContentUpdate();
     }
   }
 
   /**
-   * Perform redo operation
+   * Insert horizontal rule
+   */
+  insertHorizontalRule(): void {
+    this.focusEditor();
+    document.execCommand('insertHorizontalRule', false);
+    this.state.hasChanges = true;
+    this.updatePreview();
+    this.debouncedContentUpdate();
+  }
+
+  /**
+   * Insert table with specified rows and columns
+   */
+  insertTable(): void {
+    const rowsInput = prompt('Enter total number of rows (including header):', '3');
+    const colsInput = prompt('Enter number of columns:', '3');
+    
+    if (rowsInput === null || colsInput === null) return;
+    
+    const totalRows = parseInt(rowsInput, 10);
+    const colCount = parseInt(colsInput, 10);
+    
+    // Validation
+    if (isNaN(totalRows) || isNaN(colCount) || totalRows < 1 || colCount < 1) {
+      this.notificationService.warning('Please enter valid numbers for rows and columns');
+      return;
+    }
+    
+    if (totalRows > 20 || colCount > 10) {
+      this.notificationService.warning('Table size too large. Maximum: 20 rows x 10 columns');
+      return;
+    }
+    
+    // Build table HTML
+    let tableHTML = '<table border="1" style="border-collapse: collapse; width: 100%; margin: 1em 0;">';
+    
+    // Always include header row for better accessibility
+    tableHTML += '<thead><tr>';
+    for (let c = 0; c < colCount; c++) {
+      const escapedHeader = this.escapeHtml(`Header ${c + 1}`);
+      tableHTML += `<th style="padding: 8px; border: 1px solid #ddd; background-color: #f5f5f5; font-weight: bold;">${escapedHeader}</th>`;
+    }
+    tableHTML += '</tr></thead>';
+    
+    // Add data rows (total rows - 1 header row)
+    const dataRows = Math.max(0, totalRows - 1);
+    if (dataRows > 0) {
+      tableHTML += '<tbody>';
+      for (let r = 0; r < dataRows; r++) {
+        tableHTML += '<tr>';
+        for (let c = 0; c < colCount; c++) {
+          const cellText = this.escapeHtml(`Cell ${r + 1},${c + 1}`);
+          tableHTML += `<td style="padding: 8px; border: 1px solid #ddd;">${cellText}</td>`;
+        }
+        tableHTML += '</tr>';
+      }
+      tableHTML += '</tbody>';
+    }
+    
+    tableHTML += '</table>';
+    
+    this.focusEditor();
+    document.execCommand('insertHTML', false, tableHTML);
+    
+    this.state.hasChanges = true;
+    this.updatePreview();
+    this.debouncedContentUpdate();
+    
+    const actualRows = Math.max(1, totalRows); // At least header row
+    this.notificationService.success(`${actualRows}x${colCount} table inserted (1 header + ${dataRows} data rows)`);
+  }
+
+  // Undo/Redo System Integration
+
+
+  /**
+   * Perform undo operation using native browser undo
+   */
+  performUndo(): void {
+    // Focus the editor first
+    this.focusEditor();
+    
+    // Use native browser undo
+    const success = document.execCommand('undo', false);
+    
+    if (success) {
+      // Update content from DOM after undo
+      this.editorContent = this.getCurrentEditorContent();
+      this.state.hasChanges = true;
+      this.updatePreview();
+      this.debouncedContentUpdate();
+    } else {
+      // Fallback to custom undo manager if native fails
+      const previousState = this.undoRedoManager.undo();
+      if (previousState) {
+        // Set content without triggering change events
+        this.setEditorContent(previousState.content);
+        
+        // Restore cursor position after DOM is updated
+        setTimeout(() => {
+          this.undoRedoManager.restoreSelection(previousState);
+          this.focusEditor();
+        }, 20);
+      } else {
+        this.notificationService.warning('Nothing to undo');
+      }
+    }
+  }
+
+  /**
+   * Perform redo operation using native browser redo
    */
   performRedo(): void {
-    const nextState = this.undoRedoManager.redo();
-    if (nextState) {
-      // Set content without triggering change events
-      this.setEditorContent(nextState.content);
-      
-      // Restore cursor position after DOM is updated
-      setTimeout(() => {
-        this.undoRedoManager.restoreSelection(nextState);
-        this.focusEditor();
-      }, 20);
-
-      // Silent redo - no notification needed
+    // Focus the editor first
+    this.focusEditor();
+    
+    // Use native browser redo
+    const success = document.execCommand('redo', false);
+    
+    if (success) {
+      // Update content from DOM after redo
+      this.editorContent = this.getCurrentEditorContent();
+      this.state.hasChanges = true;
+      this.updatePreview();
+      this.debouncedContentUpdate();
     } else {
-      this.notificationService.warning('Nothing to redo');
+      // Fallback to custom undo manager if native fails
+      const nextState = this.undoRedoManager.redo();
+      if (nextState) {
+        // Set content without triggering change events
+        this.setEditorContent(nextState.content);
+        
+        // Restore cursor position after DOM is updated
+        setTimeout(() => {
+          this.undoRedoManager.restoreSelection(nextState);
+          this.focusEditor();
+        }, 20);
+      } else {
+        this.notificationService.warning('Nothing to redo');
+      }
     }
   }
 
@@ -1449,36 +1581,38 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   /**
-   * Check if undo is available
+   * Check if undo is available (always true with contenteditable)
    */
   canUndo(): boolean {
-    return this.undoRedoManager.canUndo();
+    // With native contenteditable, undo is usually available
+    // We can't reliably check the native undo stack
+    return true;
   }
 
   /**
-   * Check if redo is available
+   * Check if redo is available (always true with contenteditable)
    */
   canRedo(): boolean {
-    return this.undoRedoManager.canRedo();
+    // With native contenteditable, redo might be available
+    // We can't reliably check the native redo stack
+    return true;
   }
 
   /**
    * Initialize undo state when FAQ is loaded
    */
   private initializeUndoState(): void {
-    // Wait for content to be fully set in the editor
-    setTimeout(() => {
-      const currentContent = this.getCurrentEditorContent();
-      if (currentContent) {
-        this.undoRedoManager.saveState(currentContent, 'Initial state', 'system', true);
-      }
-    }, 150);
+    // Native contenteditable handles its own undo history
+    // We only need to clear any previous custom history
+    this.undoRedoManager.clear();
   }
 
   /**
    * Clear undo history (call when switching FAQs)
    */
   private clearUndoHistory(): void {
+    // Native contenteditable will reset its own history when content changes
+    // Clear our fallback manager just in case
     this.undoRedoManager.clear();
   }
 }

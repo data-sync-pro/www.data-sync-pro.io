@@ -116,87 +116,159 @@
 
       <!-- HTML Editor Toolbar -->
       <div class="html-editor-toolbar" *ngIf="!state.isLoading && state.selectedFAQ">
-          <div class="toolbar-group">
-            <button class="btn btn-sm btn-secondary" 
-                    (click)="formatHTML()"
-                    title="Format HTML (Alt+Shift+F)"
-                    [disabled]="!editorContent">
-              <span class="btn-icon">🎨</span>
-              Format
-            </button>
+          <!-- Row 1: Basic Operations -->
+          <div class="toolbar-row">
+            <div class="toolbar-group">
+              <button class="btn btn-sm btn-secondary" 
+                      (click)="performUndo()"
+                      title="Undo (Ctrl+Z)"
+                      [disabled]="!canUndo()">
+                <span class="btn-icon">↶</span>
+              </button>
+              <button class="btn btn-sm btn-secondary" 
+                      (click)="performRedo()"
+                      title="Redo (Ctrl+Y)"
+                      [disabled]="!canRedo()">
+                <span class="btn-icon">↷</span>
+              </button>
+            </div>
+            
+            <div class="toolbar-separator"></div>
+            
+            <div class="toolbar-group">
+              <button class="btn btn-sm btn-secondary" 
+                      (click)="clearFormatting()"
+                      title="Clear Formatting">
+                <span class="btn-icon">🧹</span>
+                Clear
+              </button>
+              <button class="btn btn-sm btn-secondary" 
+                      (click)="formatHTML()"
+                      title="Format HTML (Alt+Shift+F)"
+                      [disabled]="!editorContent">
+                <span class="btn-icon">🎨</span>
+                Format
+              </button>
+            </div>
+            
+            <div class="toolbar-separator"></div>
+            
+            <div class="toolbar-group">
+              <button class="btn btn-sm btn-secondary" 
+                      (click)="wrapSelectedText('<strong>', '</strong>')"
+                      title="Bold (Ctrl+B)">
+                <span class="btn-icon"><strong>B</strong></span>
+              </button>
+              <button class="btn btn-sm btn-secondary" 
+                      (click)="wrapSelectedText('<em>', '</em>')"
+                      title="Italic (Ctrl+I)">
+                <span class="btn-icon"><em>I</em></span>
+              </button>
+              <button class="btn btn-sm btn-secondary" 
+                      (click)="wrapSelectedText('<u>', '</u>')"
+                      title="Underline (Ctrl+U)">
+                <span class="btn-icon"><u>U</u></span>
+              </button>
+              <button class="btn btn-sm btn-secondary" 
+                      (click)="wrapSelectedText('<code>', '</code>')"
+                      title="Inline Code">
+                <span class="btn-icon">&lt;/&gt;</span>
+              </button>
+            </div>
+            
+            <div class="toolbar-separator"></div>
+            
+            <div class="toolbar-group">
+              <button class="btn btn-sm btn-secondary" 
+                      (click)="alignLeft()"
+                      title="Align Left">
+                <span class="btn-icon">⬅</span>
+              </button>
+              <button class="btn btn-sm btn-secondary" 
+                      (click)="alignCenter()"
+                      title="Align Center">
+                <span class="btn-icon">⬌</span>
+              </button>
+              <button class="btn btn-sm btn-secondary" 
+                      (click)="alignRight()"
+                      title="Align Right">
+                <span class="btn-icon">➡</span>
+              </button>
+            </div>
           </div>
           
-          <div class="toolbar-separator"></div>
-          
-          <div class="toolbar-group">
-            <button class="btn btn-sm btn-secondary" 
-                    (click)="performUndo()"
-                    title="Undo (Ctrl+Z)"
-                    [disabled]="!canUndo()">
-              <span class="btn-icon">↶</span>
-              Undo
-            </button>
-            <button class="btn btn-sm btn-secondary" 
-                    (click)="performRedo()"
-                    title="Redo (Ctrl+Y)"
-                    [disabled]="!canRedo()">
-              <span class="btn-icon">↷</span>
-              Redo
-            </button>
-          </div>
-          
-          <div class="toolbar-separator"></div>
-          
-          <div class="toolbar-group">
-            <button class="btn btn-sm btn-secondary" 
-                    (click)="wrapSelectedText('<strong>', '</strong>')"
-                    title="Bold (Ctrl+B)">
-              <span class="btn-icon"><strong>B</strong></span>
-            </button>
-            <button class="btn btn-sm btn-secondary" 
-                    (click)="wrapSelectedText('<em>', '</em>')"
-                    title="Italic (Ctrl+I)">
-              <span class="btn-icon"><em>I</em></span>
-            </button>
-            <button class="btn btn-sm btn-secondary" 
-                    (click)="wrapSelectedText('<u>', '</u>')"
-                    title="Underline (Ctrl+U)">
-              <span class="btn-icon"><u>U</u></span>
-            </button>
-          </div>
-          
-          <div class="toolbar-separator"></div>
-          
-          <div class="toolbar-group">
-            <button class="btn btn-sm btn-secondary" 
-                    (click)="insertLink()"
-                    title="Insert Link (Ctrl+K)">
-              <span class="btn-icon">🔗</span>
-              Link
-            </button>
-            <button class="btn btn-sm btn-secondary" 
-                    (click)="wrapSelectedText('<code>', '</code>')"
-                    title="Code">
-              <span class="btn-icon">&lt;/&gt;</span>
-              Code
-            </button>
-          </div>
-          
-          <div class="toolbar-separator"></div>
-          
-          <div class="toolbar-group">
-            <button class="btn btn-sm btn-info" 
-                    (click)="insertParagraph()"
-                    title="New Paragraph">
-              <span class="btn-icon">¶</span>
-              P
-            </button>
-            <button class="btn btn-sm btn-info" 
-                    (click)="insertHeading()"
-                    title="Insert Heading">
-              <span class="btn-icon">H</span>
-              Heading
-            </button>
+          <!-- Row 2: Advanced Operations -->
+          <div class="toolbar-row">
+            <div class="toolbar-group">
+              <button class="btn btn-sm btn-info" 
+                      (click)="insertHeading()"
+                      title="Insert Heading">
+                <span class="btn-icon">H</span>
+                Heading
+              </button>
+              <button class="btn btn-sm btn-info" 
+                      (click)="insertParagraph()"
+                      title="New Paragraph">
+                <span class="btn-icon">¶</span>
+                Para
+              </button>
+              <button class="btn btn-sm btn-info" 
+                      (click)="insertBlockquote()"
+                      title="Blockquote">
+                <span class="btn-icon">❝</span>
+                Quote
+              </button>
+            </div>
+            
+            <div class="toolbar-separator"></div>
+            
+            <div class="toolbar-group">
+              <button class="btn btn-sm btn-info" 
+                      (click)="insertUnorderedList()"
+                      title="Bullet List">
+                <span class="btn-icon">•</span>
+                List
+              </button>
+              <button class="btn btn-sm btn-info" 
+                      (click)="insertOrderedList()"
+                      title="Numbered List">
+                <span class="btn-icon">1.</span>
+                Num
+              </button>
+              <button class="btn btn-sm btn-secondary" 
+                      (click)="outdent()"
+                      title="Decrease Indent">
+                <span class="btn-icon">⇤</span>
+              </button>
+              <button class="btn btn-sm btn-secondary" 
+                      (click)="indent()"
+                      title="Increase Indent">
+                <span class="btn-icon">⇥</span>
+              </button>
+            </div>
+            
+            <div class="toolbar-separator"></div>
+            
+            <div class="toolbar-group">
+              <button class="btn btn-sm btn-info" 
+                      (click)="insertLink()"
+                      title="Insert Link (Ctrl+K)">
+                <span class="btn-icon">🔗</span>
+                Link
+              </button>
+              <button class="btn btn-sm btn-info" 
+                      (click)="insertTable()"
+                      title="Insert Table">
+                <span class="btn-icon">⊞</span>
+                Table
+              </button>
+              <button class="btn btn-sm btn-info" 
+                      (click)="insertHorizontalRule()"
+                      title="Horizontal Line">
+                <span class="btn-icon">—</span>
+                Line
+              </button>
+            </div>
           </div>
       </div>
 

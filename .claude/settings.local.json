@@ -29,7 +29,9 @@
       "Bash(powershell:*)",
       "Bash(npm install:*)",
       "Bash(ng generate component:*)",
-      "Bash(start http://localhost:4201/faq-editor)"
+      "Bash(start http://localhost:4201/faq-editor)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:beautifier.io)"
     ],
     "deny": []
   }
