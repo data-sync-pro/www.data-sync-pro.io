@@ -50,7 +50,7 @@
     "Category__c": "General",
     "SubCategory__c": null,
     "SeqNo__c": null,
-    "Question__c": "How does DSP ensure security and privacy?",
+    "Question__c": "How does DSP ensure security?",
     "Answer__c": "general-dsp-security-privacy.html"
   },
   {
