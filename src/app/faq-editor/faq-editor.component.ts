@@ -397,7 +397,6 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
   private destroy$ = new Subject<void>();
   private autoSaveTimer: any;
   private contentChangeSubject = new Subject<string>();
-  private smartAutoSaveTimer: any;
   private undoRedoManager = new UndoRedoManager();
   private isUndoRedoOperation = false;
   
@@ -560,10 +559,6 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
       clearInterval(this.autoSaveTimer);
     }
     
-    if (this.smartAutoSaveTimer) {
-      clearTimeout(this.smartAutoSaveTimer);
-    }
-    
     // Save any pending changes
     if (this.state.hasChanges && this.state.selectedFAQ) {
       this.saveFAQ();
@@ -623,32 +618,36 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
     this.currentQuestion = faq.question;
     this.currentCategory = faq.category;
     
+    // Clear preview immediately to prevent showing old content
+    this.previewContent = this.sanitizer.bypassSecurityTrustHtml('');
+    
     // Clear undo history when switching FAQs
     this.clearUndoHistory();
     
     // Load edited content if exists (should be original HTML source)
     const edited = this.editedFAQs.get(faq.id);
     if (edited) {
-      // For WYSIWYG editor, set HTML content directly to DOM
-      this.editorContent = edited.answer;
+      // Convert edited content to URL format for editor display
+      const editableContent = this.convertImgsToUrls(edited.answer);
+      this.editorContent = editableContent;
       this.currentQuestion = edited.question;
       this.currentCategory = edited.category;
       
       // Set content directly in DOM after view init
       setTimeout(() => {
         if (this.htmlSourceEditor?.nativeElement) {
-          this.htmlSourceEditor.nativeElement.innerHTML = this.editorContent;
+          this.htmlSourceEditor.nativeElement.innerHTML = editableContent;
         }
+        
+        console.log('✅ Edited HTML content set for WYSIWYG editor (with image URLs):', editableContent);
+        this.state.isLoading = false;
+        
+        // Initialize undo state
+        this.initializeUndoState();
+        
+        // Update preview AFTER DOM content is set
+        this.updatePreview();
       }, 0);
-      
-      console.log('✅ Edited HTML content set for WYSIWYG editor:', this.editorContent);
-      this.state.isLoading = false;
-      
-      // Initialize undo state
-      this.initializeUndoState();
-      
-      // Update preview
-      this.updatePreview();
     } else {
       // Load original content
       this.loadOriginalContent(faq);
@@ -678,23 +677,36 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
             if (this.htmlSourceEditor?.nativeElement) {
               this.htmlSourceEditor.nativeElement.innerHTML = editableContent;
             }
+            
+            console.log('✅ HTML content set in WYSIWYG editor');
+            console.log('📄 Content now in editor:', editableContent);
+            this.state.isLoading = false;
+            
+            // Initialize undo state
+            this.initializeUndoState();
+            
+            // Update preview AFTER DOM content is set
+            this.updatePreview();
           }, 0);
-          
-          console.log('✅ HTML content set in WYSIWYG editor');
-          console.log('📄 Content now in editor:', editableContent);
-          this.state.isLoading = false;
-          
-          // Initialize undo state
-          this.initializeUndoState();
-          
-          // Update preview
-          this.updatePreview();
         },
         error: (error) => {
           console.error('❌ Error loading raw HTML content:', error);
           this.editorContent = '<p>Error loading content</p>';
-          this.state.isLoading = false;
-          this.updatePreviewFromFAQService(faq);
+          
+          // Set error content in DOM and update preview
+          setTimeout(() => {
+            if (this.htmlSourceEditor?.nativeElement) {
+              this.htmlSourceEditor.nativeElement.innerHTML = this.editorContent;
+            }
+            
+            this.state.isLoading = false;
+            
+            // Update preview with error content or fallback to FAQ service
+            this.updatePreview();
+            
+            // Fallback to FAQ service preview if available
+            this.updatePreviewFromFAQService(faq);
+          }, 0);
         }
       });
   }
@@ -707,7 +719,13 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
     
     // For WYSIWYG editor, get HTML content directly from contenteditable
     const editorElement = this.htmlSourceEditor.nativeElement;
-    const htmlContent = editorElement.innerHTML || this.editorContent;
+    const editorContent = editorElement.innerHTML || this.editorContent;
+    
+    // Convert URL format back to img tags for saving
+    const htmlContent = this.convertUrlsToImgs(editorContent);
+    
+    console.log('💾 Saving content - Editor:', editorContent);
+    console.log('💾 Saving content - Converted:', htmlContent);
     
     const faqData: Partial<EditedFAQ> = {
       faqId: this.state.selectedFAQ.id,
@@ -799,30 +817,28 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
     this.state.hasChanges = true;
     this.state.saveError = null;
     
-    // Update preview immediately
+    // Get current content from DOM immediately for consistency
+    const currentContent = this.getCurrentEditorContent();
+    this.editorContent = currentContent;
+    
+    // Update preview immediately with the same content
     this.updatePreview();
     
     // Native contenteditable handles undo history automatically
     
-    // Trigger smart auto-save with debounced content update
-    this.debouncedContentUpdate();
+    // Trigger smart auto-save with immediate content update (no debouncing for sync)
+    this.contentChangeSubject.next(currentContent);
   }
 
   /**
-   * Debounced content update to avoid frequent re-renders
+   * Immediate content update (legacy method kept for compatibility)
+   * Now performs immediate sync without debouncing delays
    */
   private debouncedContentUpdate(): void {
-    // Clear any existing timer
-    if (this.smartAutoSaveTimer) {
-      clearTimeout(this.smartAutoSaveTimer);
-    }
-    
-    // Update editorContent for auto-save with debouncing
-    this.smartAutoSaveTimer = setTimeout(() => {
-      const currentContent = this.getCurrentEditorContent();
-      this.editorContent = currentContent;
-      this.contentChangeSubject.next(currentContent);
-    }, 300); // Increased delay for better typing experience
+    // Immediate update - no more delays that cause sync issues
+    const currentContent = this.getCurrentEditorContent();
+    this.editorContent = currentContent;
+    this.contentChangeSubject.next(currentContent);
   }
 
   resetCurrentFAQ(): void {
@@ -837,13 +853,24 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
 
 
   /**
-   * Update preview using simple sanitization (fallback method)
+   * Update preview using current DOM content as single source of truth
    */
   private updatePreview(): void {
-    // For WYSIWYG editor, use content directly
+    // Always use current DOM content to ensure preview matches exactly what will be saved
     const editorElement = this.htmlSourceEditor?.nativeElement;
-    const htmlContent = editorElement?.innerHTML || this.editorContent;
-    this.previewContent = this.sanitizer.bypassSecurityTrustHtml(htmlContent);
+    const editorContent = editorElement?.innerHTML || this.editorContent;
+    
+    // Convert URL format to img tags for preview display
+    const previewContent = this.convertUrlsToImgs(editorContent);
+    
+    // Update internal state to match DOM for consistency
+    this.editorContent = editorContent;
+    
+    console.log('🔍 Preview update - Editor content:', editorContent);
+    console.log('🔍 Preview update - Preview content:', previewContent);
+    
+    // Update preview with converted content (shows actual images)
+    this.previewContent = this.sanitizer.bypassSecurityTrustHtml(previewContent);
   }
 
   /**
@@ -1053,12 +1080,12 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
 
 
   /**
-   * Prepare content for editing - now using WYSIWYG contenteditable
+   * Prepare content for editing - convert images to URL format for easier editing
    */
   private prepareContentForEditing(content: string): string {
     console.log('🔍 Original content received:', content);
     
-    // For WYSIWYG editor, just clean up and return HTML directly
+    // For editor, clean up and convert images to URL format
     let prepared = content
       // Remove potential security threats
       .replace(/<script[^>]*>.*?<\/script>/gi, '')
@@ -1068,8 +1095,48 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
       .replace(/<div[^>]*>\s*<\/div>/gi, '')
       .trim();
     
-    console.log('✅ Content prepared for WYSIWYG editing:', prepared);
+    // Convert images to editable URL format for the editor
+    prepared = this.convertImgsToUrls(prepared);
+    
+    console.log('✅ Content prepared for editing (with image URLs):', prepared);
     return prepared;
+  }
+
+  // Image Handling Functions
+  
+  /**
+   * Convert <img> tags to editable URL format for editor display
+   */
+  private convertImgsToUrls(content: string): string {
+    // Replace <img> tags with [IMG: url] format for easier editing
+    return content.replace(/<img[^>]*\ssrc=["']([^"']+)["'][^>]*>/gi, (match, src) => {
+      return `<span class="image-url-placeholder" contenteditable="false">[IMG: ${src}]</span>`;
+    });
+  }
+  
+  /**
+   * Convert [IMG: url] format back to <img> tags for preview and saving
+   */
+  private convertUrlsToImgs(content: string): string {
+    // Replace [IMG: url] format back to <img> tags
+    return content.replace(/<span[^>]*class=["']image-url-placeholder["'][^>]*>\[IMG:\s*([^\]]+)\]<\/span>/gi, (match, src) => {
+      return `<img src="${src.trim()}" >`;
+    });
+  }
+  
+  /**
+   * Extract image URLs from content for validation
+   */
+  private extractImageUrls(content: string): string[] {
+    const imgRegex = /<img[^>]*\ssrc=["']([^"']+)["'][^>]*>/gi;
+    const urls: string[] = [];
+    let match;
+    
+    while ((match = imgRegex.exec(content)) !== null) {
+      urls.push(match[1]);
+    }
+    
+    return urls;
   }
 
   // Utility Functions
