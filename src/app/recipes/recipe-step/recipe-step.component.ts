@@ -64,11 +64,29 @@ import { RecipeWalkthroughStep, RecipeStepConfig, RecipeStepMedia } from '../../
             <div class="config-fields">
               <div class="field-group" *ngFor="let config of stepData.config; let i = index">
                 <label>{{ i + 1 }}. {{ config.field }}:</label>
-                <div class="field-value-container">
-                  <span class="field-value">{{ config.value }}</span>
-                  <button class="copy-btn" (click)="copyToClipboard($event, config.value)" title="Copy to clipboard">
-                    <mat-icon>content_copy</mat-icon>
-                  </button>
+                <div class="field-value-container" [class.checkbox-container]="isBoolean(config.field)">
+                  <!-- Check if field ends with ? (boolean field) -->
+                  <ng-container *ngIf="isBoolean(config.field); else textValue">
+                    <div class="slds-checkbox-container">
+                      <div class="slds-checkbox" [class.slds-checkbox--checked]="isTrueValue(config.value)">
+                        <input type="checkbox" 
+                               [checked]="isTrueValue(config.value)"
+                               disabled
+                               class="slds-checkbox__input">
+                        <span class="slds-checkbox__faux">
+                          <svg class="slds-checkbox__checkmark" *ngIf="isTrueValue(config.value)" viewBox="0 0 24 24">
+                            <path d="M9.86 18a1 1 0 0 1-.73-.32l-4.86-5.17a1.001 1.001 0 0 1 1.46-1.37l4.12 4.39 8.41-9.2a1 1 0 1 1 1.48 1.34l-9.14 10a1 1 0 0 1-.74.33z"/>
+                          </svg>
+                        </span>
+                      </div>
+                    </div>
+                  </ng-container>
+                  <ng-template #textValue>
+                    <span class="field-value">{{ config.value }}</span>
+                    <button class="copy-btn" (click)="copyToClipboard($event, config.value)" title="Copy to clipboard">
+                      <mat-icon>content_copy</mat-icon>
+                    </button>
+                  </ng-template>
                 </div>
               </div>
             </div>
@@ -266,11 +284,38 @@ import { RecipeWalkthroughStep, RecipeStepConfig, RecipeStepMedia } from '../../
     .media-default a:hover {
       text-decoration: underline;
     }
+    
+    .field-value-container.checkbox-container {
+      background: transparent;
+      padding: 8px 0;
+      justify-content: flex-start;
+    }
+    
   `],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class RecipeStepComponent {
   @Input() stepData: any;
+
+  /**
+   * Check if a field is a boolean field (ends with ?)
+   */
+  isBoolean(fieldName: string): boolean {
+    return !!(fieldName && fieldName.endsWith('?'));
+  }
+
+  /**
+   * Check if a value represents true (case-insensitive)
+   */
+  isTrueValue(value: any): boolean {
+    if (typeof value === 'boolean') {
+      return value;
+    }
+    if (typeof value === 'string') {
+      return value.toLowerCase() === 'true';
+    }
+    return false;
+  }
 
   copyToClipboard(event: Event, text: string): void {
     event.stopPropagation();

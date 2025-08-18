@@ -31,7 +31,8 @@
       "Bash(ng generate component:*)",
       "Bash(start http://localhost:4201/faq-editor)",
       "WebFetch(domain:github.com)",
-      "WebFetch(domain:beautifier.io)"
+      "WebFetch(domain:beautifier.io)",
+      "Bash(start http://localhost:4200/recipes)"
     ],
     "deny": []
   }

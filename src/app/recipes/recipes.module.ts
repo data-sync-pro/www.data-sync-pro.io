@@ -18,6 +18,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 // Routing
 import { RecipesRoutingModule } from './recipes-routing.module';
@@ -71,6 +72,7 @@ import { SharedModule } from '../shared/shared.module';
     MatFormFieldModule,
     MatInputModule,
     MatProgressSpinnerModule,
+    MatCheckboxModule,
     
     // Routing
     RecipesRoutingModule,

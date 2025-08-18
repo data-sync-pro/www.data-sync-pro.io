@@ -50,6 +50,9 @@ interface UIState {
   // Scroll-to-next-step control
   isTransitioningStep: boolean;
   lastStepTransitionTime: number;
+  // Two-scroll logic for bottom navigation
+  hasScrolledToBottomOnce: boolean;
+  hasScrolledToTopOnce: boolean;
   // Scroll hint display
   showScrollHint: boolean;
   scrollHintDirection: 'top' | 'bottom' | null;
@@ -109,6 +112,9 @@ export class RecipesComponent implements OnInit, OnDestroy {
     // Scroll-to-next-step control
     isTransitioningStep: false,
     lastStepTransitionTime: 0,
+    // Two-scroll logic for bottom navigation
+    hasScrolledToBottomOnce: false,
+    hasScrolledToTopOnce: false,
     // Scroll hint display
     showScrollHint: false,
     scrollHintDirection: null,
@@ -245,30 +251,40 @@ export class RecipesComponent implements OnInit, OnDestroy {
         return;
       }
 
-      // If scrolling down at bottom of Overview, switch to Walkthrough
+      // If scrolling down at bottom of Overview, implement two-scroll logic
       if (event.deltaY > 0 && this.isAtPageBottom()) {
-        this.ui.isTransitioningStep = true;
-        this.ui.lastStepTransitionTime = now;
-        
-        // Switch to Walkthrough tab at first step with animation
-        this.ui.currentWalkthroughStep = 0;
-        this.changeRecipeTab('walkthrough', true); // Enable animation
-        
-        // Scroll to first step section instead of top
-        setTimeout(() => {
-          const firstStepSectionId = this.getSectionIdFromWalkthroughStep(0);
-          if (firstStepSectionId) {
-            this.scrollToSection(firstStepSectionId);
-          } else {
-            // Fallback to top if section not found
-            this.scrollToTop();
-          }
-        }, 100); // Small delay to let animation start
-        
-        // Reset transition flag after animation completes
-        setTimeout(() => {
-          this.ui.isTransitioningStep = false;
-        }, 1000); // After animation (0.9s) + buffer
+        if (!this.ui.hasScrolledToBottomOnce) {
+          // First time reaching bottom - just mark it and don't transition
+          this.ui.hasScrolledToBottomOnce = true;
+          this.cdr.markForCheck();
+        } else {
+          // Second scroll action while at bottom - perform transition
+          this.ui.isTransitioningStep = true;
+          this.ui.lastStepTransitionTime = now;
+          
+          // Reset scroll tracking state
+          this.ui.hasScrolledToBottomOnce = false;
+          
+          // Switch to Walkthrough tab at first step with animation
+          this.ui.currentWalkthroughStep = 0;
+          this.changeRecipeTab('walkthrough', true); // Enable animation
+          
+          // Scroll to first step section instead of top
+          setTimeout(() => {
+            const firstStepSectionId = this.getSectionIdFromWalkthroughStep(0);
+            if (firstStepSectionId) {
+              this.scrollToSection(firstStepSectionId);
+            } else {
+              // Fallback to top if section not found
+              this.scrollToTop();
+            }
+          }, 100); // Small delay to let animation start
+          
+          // Reset transition flag after animation completes
+          setTimeout(() => {
+            this.ui.isTransitioningStep = false;
+          }, 1000); // After animation (0.9s) + buffer
+        }
       }
       return;
     }
@@ -318,37 +334,57 @@ export class RecipesComponent implements OnInit, OnDestroy {
       return; // Prevent further processing
     }
 
-    // Check if scrolling down and at bottom
+    // Check if scrolling down and at bottom - implement two-scroll logic
     if (event.deltaY > 0 && this.isAtPageBottom() && this.canGoToNextStep) {
-      this.ui.isTransitioningStep = true;
-      this.ui.lastStepTransitionTime = now;
-      
-      // Hide hint before transitioning
-      this.ui.showScrollHint = false;
-      
-      // Navigate to next step
-      this.goToNextWalkthroughStep();
-      
-      // Reset transition flag after animation - extended time to prevent hint from reappearing
-      setTimeout(() => {
-        this.ui.isTransitioningStep = false;
-      }, 1500);
+      if (!this.ui.hasScrolledToBottomOnce) {
+        // First time reaching bottom - just mark it and don't transition
+        this.ui.hasScrolledToBottomOnce = true;
+        this.cdr.markForCheck();
+      } else {
+        // Second scroll action while at bottom - perform transition
+        this.ui.isTransitioningStep = true;
+        this.ui.lastStepTransitionTime = now;
+        
+        // Reset scroll tracking state
+        this.ui.hasScrolledToBottomOnce = false;
+        
+        // Hide hint before transitioning
+        this.ui.showScrollHint = false;
+        
+        // Navigate to next step
+        this.goToNextWalkthroughStep();
+        
+        // Reset transition flag after animation - extended time to prevent hint from reappearing
+        setTimeout(() => {
+          this.ui.isTransitioningStep = false;
+        }, 1500);
+      }
     }
-    // Check if scrolling up and at top
+    // Check if scrolling up and at top - implement two-scroll logic  
     else if (event.deltaY < 0 && this.isAtPageTop() && this.canGoToPreviousStep) {
-      this.ui.isTransitioningStep = true;
-      this.ui.lastStepTransitionTime = now;
-      
-      // Hide hint before transitioning
-      this.ui.showScrollHint = false;
-      
-      // Navigate to previous step
-      this.goToPreviousWalkthroughStep();
-      
-      // Reset transition flag after animation - extended time to prevent hint from reappearing
-      setTimeout(() => {
-        this.ui.isTransitioningStep = false;
-      }, 1500);
+      if (!this.ui.hasScrolledToTopOnce) {
+        // First time reaching top - just mark it and don't transition
+        this.ui.hasScrolledToTopOnce = true;
+        this.cdr.markForCheck();
+      } else {
+        // Second scroll action while at top - perform transition
+        this.ui.isTransitioningStep = true;
+        this.ui.lastStepTransitionTime = now;
+        
+        // Reset scroll tracking state
+        this.ui.hasScrolledToTopOnce = false;
+        
+        // Hide hint before transitioning
+        this.ui.showScrollHint = false;
+        
+        // Navigate to previous step
+        this.goToPreviousWalkthroughStep();
+        
+        // Reset transition flag after animation - extended time to prevent hint from reappearing
+        setTimeout(() => {
+          this.ui.isTransitioningStep = false;
+        }, 1500);
+      }
     }
   }
 
@@ -735,6 +771,10 @@ export class RecipesComponent implements OnInit, OnDestroy {
       this.ui.activeRecipeTab = 'overview';
       this.ui.activeSectionId = 'use-case';
       this.ui.currentWalkthroughStep = 0;
+      
+      // Reset scroll tracking states when navigating to different recipe
+      this.ui.hasScrolledToBottomOnce = false;
+      this.ui.hasScrolledToTopOnce = false;
     }
     
     if (this.ui.isMobile) {
@@ -768,6 +808,10 @@ export class RecipesComponent implements OnInit, OnDestroy {
     // Clear active section when clicking on tab directly
     this.ui.activeSectionId = '';
     this.recipeTOC.currentSectionId = '';
+    
+    // Reset scroll tracking states when switching tabs
+    this.ui.hasScrolledToBottomOnce = false;
+    this.ui.hasScrolledToTopOnce = false;
     
     // Update URL with tab information
     this.updateUrlParams(tabName, null);
@@ -1670,6 +1714,11 @@ export class RecipesComponent implements OnInit, OnDestroy {
    * Handle scroll events and update active section
    */
   private handleOptimizedScroll(scrollPosition: number): void {
+    // Reset scroll tracking states when user leaves bottom/top areas
+    if (this.showRecipeDetails) {
+      this.resetScrollTrackingIfNeeded();
+    }
+    
     // Only update active section when viewing recipe details and auto-highlighting is enabled
     if (this.showRecipeDetails && this.ui.userHasScrolled && !this.ui.disableScrollHighlight) {
       this.updateActiveScrollElement(scrollPosition);
@@ -2036,6 +2085,11 @@ export class RecipesComponent implements OnInit, OnDestroy {
     if (this.ui.currentWalkthroughStep < steps.length - 1) {
       this.ui.stepAnimationDirection = 'forward';
       this.ui.currentWalkthroughStep++;
+      
+      // Reset scroll tracking states when navigating to new step
+      this.ui.hasScrolledToBottomOnce = false;
+      this.ui.hasScrolledToTopOnce = false;
+      
       this.syncTOCSectionWithWalkthrough();
       this.updateUrlParams('walkthrough', this.ui.currentWalkthroughStep);
       this.cdr.markForCheck();
@@ -2064,6 +2118,11 @@ export class RecipesComponent implements OnInit, OnDestroy {
     if (this.ui.currentWalkthroughStep > 0) {
       this.ui.stepAnimationDirection = 'backward';
       this.ui.currentWalkthroughStep--;
+      
+      // Reset scroll tracking states when navigating to new step
+      this.ui.hasScrolledToBottomOnce = false;
+      this.ui.hasScrolledToTopOnce = false;
+      
       this.syncTOCSectionWithWalkthrough();
       this.updateUrlParams('walkthrough', this.ui.currentWalkthroughStep);
       this.cdr.markForCheck();
@@ -2318,6 +2377,24 @@ export class RecipesComponent implements OnInit, OnDestroy {
         element.style.transition = originalTransition;
       }, 300);
     }, 1000);
+  }
+
+  /**
+   * Reset scroll tracking states if user has moved away from bottom/top areas
+   */
+  private resetScrollTrackingIfNeeded(): void {
+    const isAtBottom = this.isAtPageBottom();
+    const isAtTop = this.isAtPageTop();
+    
+    // Reset bottom tracking if user is no longer at bottom
+    if (!isAtBottom && this.ui.hasScrolledToBottomOnce) {
+      this.ui.hasScrolledToBottomOnce = false;
+    }
+    
+    // Reset top tracking if user is no longer at top  
+    if (!isAtTop && this.ui.hasScrolledToTopOnce) {
+      this.ui.hasScrolledToTopOnce = false;
+    }
   }
 
   // ==================== Compatibility Helper Methods ====================
