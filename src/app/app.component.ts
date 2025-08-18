@@ -19,8 +19,8 @@ export class AppComponent implements OnInit {
     this.router.events
       .pipe(filter((event: RouterEvent): event is NavigationEnd => event instanceof NavigationEnd))
       .subscribe((event: NavigationEnd) => {
-        // Hide header and footer on FAQ editor page
-        this.showHeaderFooter = !event.url.includes('/faq-editor');
+        // Hide header and footer on editor pages
+        this.showHeaderFooter = !event.url.includes('/faq-editor') && !event.url.includes('/recipe-editor');
         
         if (this.analyticsService.userConsented) {
           this.analyticsService.trackPageView(event.urlAfterRedirects);

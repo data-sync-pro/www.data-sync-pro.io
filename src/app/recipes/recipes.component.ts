@@ -1109,7 +1109,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
 
     if (this.currentRecipe) {
       pageTitle = `${this.currentRecipe.title} - Recipe - Data Sync Pro`;
-      pageDescription = this.currentRecipe.description || this.currentRecipe.usecase;
+      pageDescription = this.currentRecipe.overview || this.currentRecipe.description || this.currentRecipe.usecase || 'Recipe for Data Sync Pro';
     } else if (this.navigation.category) {
       const category = this.categories.find(cat => cat.name === this.navigation.category);
       if (category) {

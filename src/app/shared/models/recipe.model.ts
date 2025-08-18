@@ -1,6 +1,16 @@
 import { SafeHtml } from '@angular/platform-browser';
 
 /**
+ * General image for recipe (not tied to specific step)
+ */
+export interface RecipeGeneralImage {
+  type: 'image' | 'video' | 'gif';
+  url: string;
+  alt: string;
+  imageId?: string;
+}
+
+/**
  * Raw recipe data record (from JSON file)
  */
 export interface SourceRecipeRecord {
@@ -8,7 +18,9 @@ export interface SourceRecipeRecord {
   title: string;
   category: string;
   DSPVersions: string[];
-  usecase: string;
+  overview: string; // Replaces usecase with more detailed description
+  whenToUse?: string; // When to use this recipe
+  generalImages: RecipeGeneralImage[]; // Images not tied to specific steps
   prerequisites: RecipePrerequisiteItem[];
   direction: string;
   connection: string;
@@ -19,6 +31,7 @@ export interface SourceRecipeRecord {
   // Legacy fields for backward compatibility
   name?: string;
   description?: string;
+  usecase?: string; // Legacy field, use overview instead
   useCase?: string;
   tags?: string[];
   lastUpdated?: string;
@@ -50,6 +63,7 @@ export interface RecipeStepMedia {
   type: string;
   url: string;
   alt: string;
+  displayUrl?: string; // Cached blob URL for IndexedDB images
 }
 
 /**
@@ -152,8 +166,11 @@ export interface RecipeItem {
   title: string;
   category: string;
   DSPVersions: string[];
-  usecase: string;
-  safeUsecase?: SafeHtml;
+  overview: string; // Updated from usecase
+  safeOverview?: SafeHtml; // Safe HTML version of overview
+  whenToUse?: string;
+  safeWhenToUse?: SafeHtml;
+  generalImages: RecipeGeneralImage[];
   prerequisites: RecipePrerequisiteItem[];
   direction: string;
   safeDirection?: SafeHtml;
@@ -162,6 +179,10 @@ export interface RecipeItem {
   downloadableExecutables: RecipeDownloadableExecutable[];
   relatedRecipes: RecipeRelatedItem[];
   keywords: string[];
+  
+  // Legacy fields for backward compatibility
+  usecase?: string; // Legacy field, use overview instead
+  safeUsecase?: SafeHtml;
   
   // Legacy fields for backward compatibility
   name?: string;

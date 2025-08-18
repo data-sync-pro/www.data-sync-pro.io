@@ -133,6 +133,21 @@ export class RecipeService implements OnDestroy {
 
 
   /**
+   * Get recipe by ID
+   */
+  getRecipeById(id: string): Observable<RecipeItem> {
+    return this.recipesCache$.pipe(
+      map(recipes => {
+        const recipe = recipes.find(r => r.id === id);
+        if (!recipe) {
+          throw new Error(`Recipe not found: ${id}`);
+        }
+        return recipe;
+      })
+    );
+  }
+
+  /**
    * Load recipes from individual folders using dynamic discovery
    */
   private loadFolderRecipes(): Observable<SourceRecipeRecord[]> {
@@ -196,15 +211,18 @@ export class RecipeService implements OnDestroy {
    */
   private transformSingleRecord(record: SourceRecipeRecord): RecipeItem {
     // Check if this is a new format record (based on walkthrough being an array)
-    if (Array.isArray(record.walkthrough) && record.usecase && Array.isArray(record.prerequisites)) {
+    if (Array.isArray(record.walkthrough) && (record.overview || record.usecase) && Array.isArray(record.prerequisites)) {
       return {
         // New format fields
         id: record.id,
         title: record.title,
         category: record.category,
         DSPVersions: record.DSPVersions || [],
-        usecase: record.usecase,
-        safeUsecase: this.sanitizer.bypassSecurityTrustHtml(record.usecase),
+        overview: record.overview || record.usecase || '',
+        safeOverview: this.sanitizer.bypassSecurityTrustHtml(record.overview || record.usecase || ''),
+        whenToUse: record.whenToUse || '',
+        safeWhenToUse: record.whenToUse ? this.sanitizer.bypassSecurityTrustHtml(record.whenToUse) : undefined,
+        generalImages: record.generalImages || [],
         prerequisites: record.prerequisites || [],
         direction: record.direction || '',
         safeDirection: record.direction ? this.sanitizer.bypassSecurityTrustHtml(record.direction) : this.sanitizer.bypassSecurityTrustHtml(''),
@@ -213,6 +231,10 @@ export class RecipeService implements OnDestroy {
         downloadableExecutables: record.downloadableExecutables || [],
         relatedRecipes: record.relatedRecipes || [],
         keywords: record.keywords || [],
+        
+        // Legacy compatibility fields
+        usecase: record.usecase || record.overview || '',
+        safeUsecase: this.sanitizer.bypassSecurityTrustHtml(record.usecase || record.overview || ''),
         
         // Legacy compatibility fields
         name: record.name,
@@ -240,8 +262,11 @@ export class RecipeService implements OnDestroy {
         title: record.title,
         category: record.category,
         DSPVersions: [],
-        usecase: record.useCase || record.description || '',
-        safeUsecase: this.sanitizer.bypassSecurityTrustHtml(record.useCase || record.description || ''),
+        overview: record.useCase || record.description || '',
+        safeOverview: this.sanitizer.bypassSecurityTrustHtml(record.useCase || record.description || ''),
+        whenToUse: '',
+        safeWhenToUse: undefined,
+        generalImages: [],
         prerequisites: record.prerequisites as any || [],
         direction: '',
         safeDirection: this.sanitizer.bypassSecurityTrustHtml(''),
@@ -253,6 +278,10 @@ export class RecipeService implements OnDestroy {
         }] : [],
         relatedRecipes: [],
         keywords: record.tags || [],
+        
+        // Legacy compatibility fields
+        usecase: record.useCase || record.description || '',
+        safeUsecase: this.sanitizer.bypassSecurityTrustHtml(record.useCase || record.description || ''),
         
         // Legacy fields
         name: record.name,
@@ -396,10 +425,10 @@ export class RecipeService implements OnDestroy {
         matchedFields.push('description');
       }
 
-      // Usecase match (new format)
-      if (recipe.usecase.toLowerCase().includes(lowerQuery)) {
+      // Overview/Usecase match (new format)
+      if (recipe.overview?.toLowerCase().includes(lowerQuery) || recipe.usecase?.toLowerCase().includes(lowerQuery)) {
         score += 50;
-        matchedFields.push('usecase');
+        matchedFields.push('overview');
       }
 
       // Tags match (legacy)
@@ -444,7 +473,7 @@ export class RecipeService implements OnDestroy {
           relevanceScore: score,
           matchedFields,
           highlightedTitle: this.highlightKeywords(recipe.title, [query]),
-          highlightedDescription: this.highlightKeywords(recipe.description || recipe.usecase, [query])
+          highlightedDescription: this.highlightKeywords(recipe.overview || recipe.description || recipe.usecase || '', [query])
         });
       }
     });
