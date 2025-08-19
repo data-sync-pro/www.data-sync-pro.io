@@ -224,14 +224,7 @@
               <div class="general-images-list">
                 <div class="general-image-item" 
                      *ngFor="let image of currentRecipe.generalImages; let i = index; trackBy: trackByIndex">
-                  <div class="image-preview" *ngIf="image.url">
-                    <img [src]="image.url" 
-                         [alt]="image.alt" 
-                         class="preview-thumbnail clickable-image"
-                         (click)="openImagePreview(image.url, image.alt)"
-                         title="Click to enlarge">
-                  </div>
-                  <div class="image-details">
+                  <div class="media-row">
                     <select class="dsp-input"
                             [(ngModel)]="image.type"
                             (change)="onRecipeChange()">
@@ -241,23 +234,48 @@
                     </select>
                     <input type="text"
                            class="dsp-input"
+                           [(ngModel)]="image.url"
+                           (input)="onRecipeChange()"
+                           placeholder="URL or path">
+                    <input type="text"
+                           class="dsp-input"
                            [(ngModel)]="image.alt"
                            (input)="onRecipeChange()"
                            placeholder="Alt text or description">
+                    <button type="button" 
+                            class="btn btn-sm btn-danger"
+                            (click)="removeGeneralImage(i)">−</button>
                   </div>
-                  <button type="button" 
-                          class="btn btn-sm btn-danger"
-                          (click)="removeGeneralImage(i)">×</button>
+                  <!-- Image Preview for uploaded images -->
+                  <div class="media-preview" 
+                       *ngIf="image.type === 'image' && image.url && image.url.startsWith('images/')">
+                    <img [src]="image.displayUrl || image.url" 
+                         [alt]="image.alt"
+                         class="media-preview-image clickable-image"
+                         (click)="openImagePreview(image.displayUrl || image.url, image.alt)"
+                         title="Click to enlarge"
+                         (error)="onImageError($event)"
+                         (load)="loadImageForGeneralImage(image)">
+                  </div>
                 </div>
               </div>
               
-              <div class="general-image-upload-area"
+              <!-- Upload Area and Add Button -->
+              <div class="image-upload-area"
                    (dragover)="$event.preventDefault()"
                    (drop)="onGeneralImageDrop($event)">
                 <p>Drag and drop images here, or</p>
+                <input type="file"
+                       #generalImageInput
+                       accept="image/*,video/*"
+                       style="display: none"
+                       (change)="handleGeneralImageFile($any($event.target).files[0])">
                 <button type="button" 
-                        class="btn btn-secondary"
-                        (click)="addGeneralImage()">+ Add General Image</button>
+                        class="btn btn-sm btn-secondary"
+                        (click)="generalImageInput.click()">Upload File</button>
+                <button type="button" 
+                        class="btn btn-sm btn-secondary"
+                        (click)="addGeneralImage()">+ Add Media</button>
               </div>
             </div>
           </div>
@@ -414,19 +432,22 @@
                 </div>
               </div>
               
-              <!-- Image Upload -->
+              <!-- Upload Area and Add Button -->
               <div class="image-upload-area"
                    (dragover)="$event.preventDefault()"
                    (drop)="onImageDrop($event, i)">
                 <p>Drag and drop images here, or</p>
                 <input type="file"
                        #imageInput
-                       accept="image/*"
+                       accept="image/*,video/*"
                        style="display: none"
                        (change)="handleImageFile($any($event.target).files[0], i)">
                 <button type="button" 
                         class="btn btn-sm btn-secondary"
-                        (click)="imageInput.click()">Upload Image</button>
+                        (click)="imageInput.click()">Upload File</button>
+                <button type="button" 
+                        class="btn btn-sm btn-secondary"
+                        (click)="addMedia(i)">+ Add Media</button>
               </div>
             </div>
           </div>

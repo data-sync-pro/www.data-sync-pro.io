@@ -35,7 +35,8 @@
       "Bash(start http://localhost:4200/recipes)",
       "Bash(start http://localhost:4200/recipe-editor)",
       "Bash(start http://localhost:4200/faq-editor)",
-      "Bash(start http://localhost:4202/recipe-editor)"
+      "Bash(start http://localhost:4202/recipe-editor)",
+      "Bash(timeout:*)"
     ],
     "deny": []
   }

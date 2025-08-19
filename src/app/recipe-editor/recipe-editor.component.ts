@@ -679,6 +679,23 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
   }
   
   // Media management
+  addMedia(stepIndex: number): void {
+    if (!this.currentRecipe?.walkthrough?.[stepIndex]) return;
+    
+    const newMedia: RecipeStepMedia = {
+      type: 'image',
+      url: '',
+      alt: ''
+    };
+    
+    if (!this.currentRecipe.walkthrough[stepIndex].media) {
+      this.currentRecipe.walkthrough[stepIndex].media = [];
+    }
+    
+    this.currentRecipe.walkthrough[stepIndex].media.push(newMedia);
+    this.onRecipeChange();
+  }
+  
   async onImageDrop(event: DragEvent, stepIndex: number): Promise<void> {
     event.preventDefault();
     const files = event.dataTransfer?.files;
@@ -738,8 +755,10 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
     
     // Delete from IndexedDB if it's a stored image
     if (media.url.startsWith('images/')) {
-      const imageId = media.url.split('/')[1].split('_')[0] + '_' + media.url.split('/')[1].split('_')[1];
-      this.fileStorageService.deleteImage(imageId);
+      const fileName = media.url.replace('images/', '');
+      // For step media, the storage key is the base name (without extension)
+      const baseName = fileName.replace(/\.[^/.]+$/, '');
+      this.fileStorageService.deleteImage(baseName);
     }
     
     this.currentRecipe.walkthrough[stepIndex].media.splice(mediaIndex, 1);
@@ -1052,25 +1071,22 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
   }
 
   // General images management
-  async addGeneralImage(): Promise<void> {
+  addGeneralImage(): void {
     if (!this.currentRecipe) return;
     
-    // Trigger file input
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    input.multiple = true;
-    
-    input.onchange = async (event: any) => {
-      const files = event.target.files;
-      if (!files || files.length === 0) return;
-      
-      for (let i = 0; i < files.length; i++) {
-        await this.handleGeneralImageFile(files[i]);
-      }
+    // Add empty general image entry (like step media)
+    const newGeneralImage: RecipeGeneralImage = {
+      type: 'image',
+      url: '',
+      alt: ''
     };
     
-    input.click();
+    if (!this.currentRecipe.generalImages) {
+      this.currentRecipe.generalImages = [];
+    }
+    
+    this.currentRecipe.generalImages.push(newGeneralImage);
+    this.onRecipeChange();
   }
 
   async handleGeneralImageFile(file: File): Promise<void> {
@@ -1083,29 +1099,35 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
       return;
     }
     
-    // Generate unique ID for the image
-    const imageId = this.fileStorageService.generateImageId();
-    const imageName = `${imageId}_${file.name}`;
-    
-    // Store image in IndexedDB
-    await this.fileStorageService.storeImage(imageId, file);
-    
-    // Add to general images
-    const generalImage: RecipeGeneralImage = {
-      type: 'image',
-      url: `images/${imageName}`,
-      alt: file.name,
-      imageId: imageId
-    };
-    
-    if (!this.currentRecipe.generalImages) {
-      this.currentRecipe.generalImages = [];
+    try {
+      // Generate simple image name
+      const baseName = this.generateGeneralImageName(file);
+      const extension = file.name.split('.').pop()?.toLowerCase() || 'png';
+      const fullFileName = `${baseName}.${extension}`;
+      
+      // Store image in IndexedDB using the base name as key (like step media)
+      await this.fileStorageService.storeImage(baseName, file);
+      
+      // Add to general images with simple URL format
+      const generalImage: RecipeGeneralImage = {
+        type: 'image',
+        url: `images/${fullFileName}`,
+        alt: file.name.replace(/\.[^/.]+$/, ''), // Remove extension from alt text
+        imageId: baseName // Use baseName as imageId for deletion compatibility
+      };
+      
+      if (!this.currentRecipe.generalImages) {
+        this.currentRecipe.generalImages = [];
+      }
+      
+      this.currentRecipe.generalImages.push(generalImage);
+      this.onRecipeChange();
+      
+      this.notificationService.success(`General image added: ${fullFileName}`);
+    } catch (error) {
+      console.error('Error uploading general image:', error);
+      this.notificationService.error('Failed to upload general image');
     }
-    
-    this.currentRecipe.generalImages.push(generalImage);
-    this.onRecipeChange();
-    
-    this.notificationService.success('General image added');
   }
 
   removeGeneralImage(index: number): void {
@@ -1378,6 +1400,65 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
     return `image-${Date.now()}`;
   }
   
+  // Generate simple name for general images
+  private generateGeneralImageName(file: File): string {
+    try {
+      if (!this.currentRecipe) return 'general-image';
+      
+      // Get current general images count for indexing
+      const existingCount = this.currentRecipe.generalImages?.length || 0;
+      
+      // Create simple base name
+      const baseName = existingCount === 0 ? 'general-image' : `general-image-${existingCount + 1}`;
+      
+      // Ensure unique name within current recipe
+      return this.ensureUniqueGeneralImageName(baseName, '');
+    } catch (error) {
+      console.error('Error generating general image name:', error);
+      return 'general-image';
+    }
+  }
+  
+  // Ensure unique general image name within current recipe
+  private ensureUniqueGeneralImageName(baseName: string, extension: string): string {
+    if (!this.currentRecipe) return baseName;
+    
+    const usedNames = new Set<string>();
+    
+    // Collect all existing general image names in current recipe
+    if (this.currentRecipe.generalImages) {
+      this.currentRecipe.generalImages.forEach(image => {
+        if (image.url && image.url.startsWith('images/')) {
+          const fileName = image.url.replace('images/', '');
+          const nameWithoutExt = fileName.replace(/\.[^/.]+$/, '');
+          usedNames.add(nameWithoutExt);
+        }
+      });
+    }
+    
+    // Check if base name is unique
+    let finalName = baseName;
+    let counter = 2;
+    
+    while (usedNames.has(finalName)) {
+      if (baseName === 'general-image') {
+        finalName = `general-image-${counter}`;
+      } else {
+        // Extract number from baseName and increment
+        const match = baseName.match(/general-image-(\d+)/);
+        if (match) {
+          const currentNum = parseInt(match[1]);
+          finalName = `general-image-${currentNum + counter - 1}`;
+        } else {
+          finalName = `${baseName}-${counter}`;
+        }
+      }
+      counter++;
+    }
+    
+    return finalName;
+  }
+  
   // Image preview functionality
   openImagePreview(imageUrl: string, altText: string = ''): void {
     this.imagePreviewState = {
@@ -1439,6 +1520,24 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
       }
     } catch (error) {
       console.error('Error loading image for media:', error);
+    }
+  }
+  
+  // Load image for general image item asynchronously
+  async loadImageForGeneralImage(image: any): Promise<void> {
+    try {
+      if (image.url && image.url.startsWith('images/') && !image.displayUrl) {
+        const fileName = image.url.replace('images/', '');
+        const imageKey = fileName.replace(/\.[^/.]+$/, ''); // Remove extension
+        const imageFile = await this.fileStorageService.getImage(imageKey);
+        
+        if (imageFile) {
+          image.displayUrl = URL.createObjectURL(imageFile);
+          this.cdr.detectChanges(); // Trigger change detection
+        }
+      }
+    } catch (error) {
+      console.error('Error loading image for general image:', error);
     }
   }
   
@@ -1518,7 +1617,11 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
       DSPVersions: ['', ''],
       overview: '',
       whenToUse: '',
-      generalImages: [],
+      generalImages: [{
+        type: 'image',
+        url: '',
+        alt: ''
+      }],
       prerequisites: [{
         description: '',
         quickLinks: [{

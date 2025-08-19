@@ -8,6 +8,7 @@ export interface RecipeGeneralImage {
   url: string;
   alt: string;
   imageId?: string;
+  displayUrl?: string; // Runtime property for displaying blob URLs
 }
 
 /**
