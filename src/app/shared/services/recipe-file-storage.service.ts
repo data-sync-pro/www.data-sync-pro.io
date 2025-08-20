@@ -6,12 +6,19 @@ interface StoredImage {
   timestamp: number;
 }
 
+interface StoredJsonFile {
+  id: string;
+  file: File;
+  timestamp: number;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class RecipeFileStorageService {
   private dbName = 'RecipeEditorDB';
   private imageStoreName = 'images';
+  private jsonStoreName = 'jsonFiles';
   private db: IDBDatabase | null = null;
   private initPromise: Promise<IDBDatabase> | null = null;
   
@@ -26,7 +33,7 @@ export class RecipeFileStorageService {
     }
     
     this.initPromise = new Promise((resolve, reject) => {
-      const request = indexedDB.open(this.dbName, 1);
+      const request = indexedDB.open(this.dbName, 2);
       
       request.onerror = () => {
         console.error('Failed to open IndexedDB:', request.error);
@@ -41,12 +48,27 @@ export class RecipeFileStorageService {
       
       request.onupgradeneeded = (event) => {
         const db = (event.target as IDBOpenDBRequest).result;
+        const oldVersion = event.oldVersion;
+        const newVersion = event.newVersion;
         
-        // Create images store if it doesn't exist
-        if (!db.objectStoreNames.contains(this.imageStoreName)) {
-          const store = db.createObjectStore(this.imageStoreName, { keyPath: 'id' });
-          store.createIndex('timestamp', 'timestamp', { unique: false });
-          console.log('Created images object store');
+        console.log(`Upgrading IndexedDB from version ${oldVersion} to ${newVersion}`);
+        
+        // Version 1: Create images store (for new installations or upgrades from version 0)
+        if (oldVersion < 1) {
+          if (!db.objectStoreNames.contains(this.imageStoreName)) {
+            const store = db.createObjectStore(this.imageStoreName, { keyPath: 'id' });
+            store.createIndex('timestamp', 'timestamp', { unique: false });
+            console.log('Created images object store');
+          }
+        }
+        
+        // Version 2: Create JSON files store (for upgrades from version 1)
+        if (oldVersion < 2) {
+          if (!db.objectStoreNames.contains(this.jsonStoreName)) {
+            const store = db.createObjectStore(this.jsonStoreName, { keyPath: 'id' });
+            store.createIndex('timestamp', 'timestamp', { unique: false });
+            console.log('Created JSON files object store');
+          }
         }
       };
     });
@@ -372,5 +394,206 @@ export class RecipeFileStorageService {
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+  }
+  
+  /**
+   * Store a JSON file
+   */
+  async storeJsonFile(id: string, file: File): Promise<string> {
+    await this.init();
+    
+    return new Promise((resolve, reject) => {
+      if (!this.db) {
+        reject(new Error('Database not initialized'));
+        return;
+      }
+      
+      const transaction = this.db.transaction([this.jsonStoreName], 'readwrite');
+      const store = transaction.objectStore(this.jsonStoreName);
+      
+      const jsonData: StoredJsonFile = {
+        id,
+        file,
+        timestamp: Date.now()
+      };
+      
+      const request = store.put(jsonData);
+      
+      request.onsuccess = () => {
+        console.log(`JSON file stored successfully: ${id}`);
+        resolve(id);
+      };
+      
+      request.onerror = () => {
+        console.error(`Failed to store JSON file ${id}:`, request.error);
+        reject(request.error);
+      };
+    });
+  }
+  
+  /**
+   * Get a JSON file
+   */
+  async getJsonFile(id: string): Promise<File | null> {
+    await this.init();
+    
+    return new Promise((resolve, reject) => {
+      if (!this.db) {
+        reject(new Error('Database not initialized'));
+        return;
+      }
+      
+      const transaction = this.db.transaction([this.jsonStoreName], 'readonly');
+      const store = transaction.objectStore(this.jsonStoreName);
+      const request = store.get(id);
+      
+      request.onsuccess = () => {
+        const result = request.result as StoredJsonFile;
+        resolve(result ? result.file : null);
+      };
+      
+      request.onerror = () => {
+        console.error(`Failed to get JSON file ${id}:`, request.error);
+        reject(request.error);
+      };
+    });
+  }
+  
+  /**
+   * Delete a JSON file
+   */
+  async deleteJsonFile(id: string): Promise<boolean> {
+    await this.init();
+    
+    return new Promise((resolve, reject) => {
+      if (!this.db) {
+        reject(new Error('Database not initialized'));
+        return;
+      }
+      
+      const transaction = this.db.transaction([this.jsonStoreName], 'readwrite');
+      const store = transaction.objectStore(this.jsonStoreName);
+      const request = store.delete(id);
+      
+      request.onsuccess = () => {
+        console.log(`JSON file deleted successfully: ${id}`);
+        resolve(true);
+      };
+      
+      request.onerror = () => {
+        console.error(`Failed to delete JSON file ${id}:`, request.error);
+        resolve(false);
+      };
+    });
+  }
+  
+  /**
+   * Get all stored JSON file IDs
+   */
+  async getAllJsonFileIds(): Promise<string[]> {
+    await this.init();
+    
+    return new Promise((resolve, reject) => {
+      if (!this.db) {
+        reject(new Error('Database not initialized'));
+        return;
+      }
+      
+      const transaction = this.db.transaction([this.jsonStoreName], 'readonly');
+      const store = transaction.objectStore(this.jsonStoreName);
+      const request = store.getAllKeys();
+      
+      request.onsuccess = () => {
+        resolve(request.result as string[]);
+      };
+      
+      request.onerror = () => {
+        console.error('Failed to get all JSON file IDs:', request.error);
+        reject(request.error);
+      };
+    });
+  }
+  
+  /**
+   * Get all stored JSON files
+   */
+  async getAllJsonFiles(): Promise<StoredJsonFile[]> {
+    await this.init();
+    
+    return new Promise((resolve, reject) => {
+      if (!this.db) {
+        reject(new Error('Database not initialized'));
+        return;
+      }
+      
+      const transaction = this.db.transaction([this.jsonStoreName], 'readonly');
+      const store = transaction.objectStore(this.jsonStoreName);
+      const request = store.getAll();
+      
+      request.onsuccess = () => {
+        resolve(request.result as StoredJsonFile[]);
+      };
+      
+      request.onerror = () => {
+        console.error('Failed to get all JSON files:', request.error);
+        reject(request.error);
+      };
+    });
+  }
+  
+  /**
+   * Validate JSON file
+   */
+  validateJsonFile(file: File): { valid: boolean; error?: string } {
+    if (!file.type.includes('json') && !file.name.toLowerCase().endsWith('.json')) {
+      return { valid: false, error: 'Invalid file type. Only JSON files are allowed.' };
+    }
+    
+    const maxSize = 5 * 1024 * 1024; // 5MB for JSON files
+    if (file.size > maxSize) {
+      return { valid: false, error: `File too large. Maximum size is ${this.formatFileSize(maxSize)}.` };
+    }
+    
+    return { valid: true };
+  }
+  
+  /**
+   * Clear all JSON files
+   */
+  async clearAllJsonFiles(): Promise<boolean> {
+    await this.init();
+    
+    return new Promise((resolve, reject) => {
+      if (!this.db) {
+        reject(new Error('Database not initialized'));
+        return;
+      }
+      
+      const transaction = this.db.transaction([this.jsonStoreName], 'readwrite');
+      const store = transaction.objectStore(this.jsonStoreName);
+      const request = store.clear();
+      
+      request.onsuccess = () => {
+        console.log('All JSON files cleared successfully');
+        resolve(true);
+      };
+      
+      request.onerror = () => {
+        console.error('Failed to clear all JSON files:', request.error);
+        resolve(false);
+      };
+    });
+  }
+  
+  /**
+   * Sanitize filename
+   */
+  sanitizeFileName(fileName: string): string {
+    // Remove path separators and special characters
+    return fileName
+      .replace(/[\/\\:*?"<>|]/g, '') // Remove invalid filename characters
+      .replace(/\s+/g, '_') // Replace spaces with underscores
+      .replace(/\.+/g, '.') // Remove multiple dots
+      .replace(/^\.+|\.+$/g, ''); // Remove leading/trailing dots
   }
 }

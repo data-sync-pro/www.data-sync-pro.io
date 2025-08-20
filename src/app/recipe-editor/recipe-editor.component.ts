@@ -1051,6 +1051,135 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
     }
   }
   
+  // Downloadable Executables management
+  addDownloadableExecutable(): void {
+    if (!this.currentRecipe) return;
+    
+    if (!this.currentRecipe.downloadableExecutables) {
+      this.currentRecipe.downloadableExecutables = [];
+    }
+    
+    const newExecutable: RecipeDownloadableExecutable = {
+      filePath: ''
+    };
+    
+    this.currentRecipe.downloadableExecutables.push(newExecutable);
+    this.onRecipeChange();
+  }
+  
+  removeDownloadableExecutable(index: number): void {
+    if (!this.currentRecipe?.downloadableExecutables) return;
+    
+    const executable = this.currentRecipe.downloadableExecutables[index];
+    
+    // Delete from IndexedDB if it has a file
+    if (executable.filePath) {
+      const fileName = executable.filePath.replace('downloadExecutables/', '');
+      this.fileStorageService.deleteJsonFile(fileName);
+    }
+    
+    this.currentRecipe.downloadableExecutables.splice(index, 1);
+    this.onRecipeChange();
+  }
+  
+  async handleJsonFileUpload(file: File, index: number): Promise<void> {
+    if (!this.currentRecipe?.downloadableExecutables?.[index]) return;
+    
+    // Validate file
+    const validation = this.fileStorageService.validateJsonFile(file);
+    if (!validation.valid) {
+      this.notificationService.error(validation.error!);
+      return;
+    }
+    
+    try {
+      // Validate JSON content
+      const jsonContent = await this.readFileAsText(file);
+      try {
+        JSON.parse(jsonContent);
+      } catch (jsonError) {
+        this.notificationService.error('Invalid JSON file format');
+        return;
+      }
+      
+      // Sanitize filename
+      const fileName = this.fileStorageService.sanitizeFileName(file.name);
+      
+      // Store JSON file in IndexedDB
+      await this.fileStorageService.storeJsonFile(fileName, file);
+      
+      // Update executable reference
+      this.currentRecipe.downloadableExecutables[index].filePath = `downloadExecutables/${fileName}`;
+      this.onRecipeChange();
+      
+      this.notificationService.success(`JSON file uploaded: ${fileName}`);
+    } catch (error) {
+      console.error('Error uploading JSON file:', error);
+      this.notificationService.error('Failed to upload JSON file');
+    }
+  }
+  
+  async onJsonFileDrop(event: DragEvent, index: number): Promise<void> {
+    event.preventDefault();
+    const files = event.dataTransfer?.files;
+    if (!files || files.length === 0) return;
+    
+    const file = files[0];
+    await this.handleJsonFileUpload(file, index);
+  }
+  
+  onJsonFileDragOver(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    const target = event.target as HTMLElement;
+    const uploadArea = target.closest('.json-upload-area');
+    if (uploadArea) {
+      uploadArea.classList.add('drag-over');
+    }
+  }
+  
+  onJsonFileDragLeave(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    const target = event.target as HTMLElement;
+    const uploadArea = target.closest('.json-upload-area');
+    if (uploadArea) {
+      uploadArea.classList.remove('drag-over');
+    }
+  }
+  
+  triggerJsonFileInput(index: number): void {
+    const fileInput = document.querySelector(`#json-upload-${index}`) as HTMLInputElement;
+    if (fileInput) {
+      fileInput.click();
+    }
+  }
+  
+  async onJsonFileSelect(event: Event, index: number): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) return;
+    
+    const file = input.files[0];
+    await this.handleJsonFileUpload(file, index);
+    
+    // Reset input
+    input.value = '';
+  }
+  
+  getJsonFileName(executable: RecipeDownloadableExecutable): string {
+    if (!executable.filePath) return '';
+    return executable.filePath.replace('downloadExecutables/', '');
+  }
+  
+  private async readFileAsText(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = () => reject(reader.error);
+      reader.readAsText(file);
+    });
+  }
+  
   // Keywords management
   addKeyword(): void {
     if (!this.currentRecipe) return;
@@ -1067,6 +1196,30 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
     if (!this.currentRecipe?.keywords) return;
     
     this.currentRecipe.keywords.splice(index, 1);
+    this.onRecipeChange();
+  }
+  
+  // Related Recipes management
+  addRelatedRecipe(): void {
+    if (!this.currentRecipe) return;
+    
+    if (!this.currentRecipe.relatedRecipes) {
+      this.currentRecipe.relatedRecipes = [];
+    }
+    
+    const newRelated: RecipeRelatedItem = {
+      title: '',
+      url: ''
+    };
+    
+    this.currentRecipe.relatedRecipes.push(newRelated);
+    this.onRecipeChange();
+  }
+  
+  removeRelatedRecipe(index: number): void {
+    if (!this.currentRecipe?.relatedRecipes) return;
+    
+    this.currentRecipe.relatedRecipes.splice(index, 1);
     this.onRecipeChange();
   }
 
@@ -1271,6 +1424,7 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
     
     this.storageService.clearAll();
     this.fileStorageService.clearAll();
+    this.fileStorageService.clearAllJsonFiles();
     this.editedRecipeIds.clear();
     this.state.tabs = [];
     this.createNewTab();
@@ -1311,9 +1465,26 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
       const cleanRecipe = JSON.parse(JSON.stringify(recipe));
       
       // Remove any internal fields that shouldn't be in export
-      // Add more fields here as needed
       delete cleanRecipe.internalId;
       delete cleanRecipe.editorState;
+      
+      // Clean general images - remove displayUrl
+      if (cleanRecipe.generalImages) {
+        cleanRecipe.generalImages.forEach((image: any) => {
+          delete image.displayUrl;
+        });
+      }
+      
+      // Clean walkthrough step media - remove displayUrl
+      if (cleanRecipe.walkthrough) {
+        cleanRecipe.walkthrough.forEach((step: any) => {
+          if (step.media) {
+            step.media.forEach((media: any) => {
+              delete media.displayUrl;
+            });
+          }
+        });
+      }
       
       return cleanRecipe;
     } catch (error) {
@@ -1614,7 +1785,7 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
       id: '',
       title: 'New Recipe',
       category: 'Batch',
-      DSPVersions: ['', ''],
+      DSPVersions: [],
       overview: '',
       whenToUse: '',
       generalImages: [{
@@ -1629,7 +1800,7 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
           url: ''
         }]
       }],
-      direction: 'Current ⇒ Current',
+      direction: '',
       connection: '',
       walkthrough: [{
         step: '',

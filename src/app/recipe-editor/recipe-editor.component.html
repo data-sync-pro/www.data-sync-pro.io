@@ -217,6 +217,70 @@
             </div>
           </div>
 
+          <!-- Downloadable Executables -->
+          <div class="form-group">
+            <label>Downloadable Executables</label>
+            <div class="downloadable-executables">
+              <div class="downloadable-item" 
+                   *ngFor="let executable of currentRecipe.downloadableExecutables; let i = index; trackBy: trackByIndex">
+                <div class="json-upload-area"
+                     [class.has-json]="executable.filePath"
+                     (drop)="onJsonFileDrop($event, i)"
+                     (dragover)="onJsonFileDragOver($event)"
+                     (dragleave)="onJsonFileDragLeave($event)"
+                     (click)="triggerJsonFileInput(i)">
+                  <input type="file" 
+                         [id]="'json-upload-' + i"
+                         class="json-upload"
+                         accept=".json"
+                         style="display: none"
+                         (change)="onJsonFileSelect($event, i)">
+                  <div class="upload-placeholder" 
+                       [class.uploaded]="executable.filePath">
+                    <ng-container *ngIf="!executable.filePath">
+                      Click or drag to upload JSON file
+                    </ng-container>
+                    <ng-container *ngIf="executable.filePath">
+                      ✓ {{ getJsonFileName(executable) }}
+                    </ng-container>
+                  </div>
+                </div>
+                <button type="button" 
+                        class="btn btn-sm btn-danger"
+                        (click)="removeDownloadableExecutable(i)">−</button>
+              </div>
+              <button type="button" 
+                      class="btn btn-sm btn-secondary"
+                      (click)="addDownloadableExecutable()">+ Add File</button>
+            </div>
+          </div>
+
+          <!-- Related Recipes -->
+          <div class="form-group">
+            <label>Related Recipes</label>
+            <div class="dynamic-list">
+              <div class="related-item" 
+                   *ngFor="let related of currentRecipe.relatedRecipes; let i = index; trackBy: trackByIndex">
+                <input type="text"
+                       class="dsp-input"
+                       [(ngModel)]="related.title"
+                       (input)="onRecipeChange()"
+                       placeholder="Recipe Title">
+                <input type="text"
+                       class="dsp-input"
+                       [(ngModel)]="related.url"
+                       (input)="onRecipeChange()"
+                       placeholder="Recipe URL">
+                <button type="button" 
+                        class="btn btn-sm btn-danger"
+                        (click)="removeRelatedRecipe(i)">−</button>
+              </div>
+              <button type="button" 
+                      class="btn btn-sm btn-secondary"
+                      (click)="addRelatedRecipe()">+ Add Related Recipe</button>
+            </div>
+          </div>
+
           <!-- General Images -->
           <div class="form-group">
             <label>General Images</label>

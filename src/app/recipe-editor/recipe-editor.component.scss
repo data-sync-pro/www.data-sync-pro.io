@@ -960,6 +960,76 @@ select.dsp-input {
   }
 }
 
+// Downloadable Executables
+.downloadable-executables {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.downloadable-item {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.json-upload-area {
+  flex: 1;
+  min-height: 60px;
+  border: 2px dashed #dee2e6;
+  border-radius: 4px;
+  padding: 0.75rem;
+  background: #f8f9fa;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  position: relative;
+  
+  &:hover {
+    border-color: #6c757d;
+    background: #fff;
+  }
+  
+  &.drag-over {
+    border-color: #007bff;
+    background: #e7f3ff;
+  }
+  
+  &.has-json {
+    border-color: #28a745;
+    background: #f8fff9;
+  }
+}
+
+.json-upload {
+  display: none;
+}
+
+.upload-placeholder {
+  text-align: center;
+  color: #6c757d;
+  font-size: 0.9rem;
+  
+  &.uploaded {
+    color: #28a745;
+    font-weight: 500;
+  }
+}
+
+// Related Recipes
+.related-item {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  
+  input {
+    flex: 1;
+    
+    &:first-child {
+      min-width: 200px;
+    }
+  }
+}
+
 // Responsive design
 @media (max-width: 1200px) {
   .editor-main {

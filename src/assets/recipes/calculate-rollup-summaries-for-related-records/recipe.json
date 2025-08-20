@@ -3,7 +3,7 @@
   "title": "Calculate Rollup Summaries for Related Records",
   "category": "Triggers",
   "DSPVersions": [],
-  "usecase": "Automatically calculate and update rollup summary fields on a parent record whenever related child records are inserted, updated, or deleted. A trigger on the child object listens for DML events, aggregates relevant data (such as SUM, COUNT, MIN, MAX), and updates the parent record's summary fields accordingly.",
+  "usecase": "",
   "prerequisites": [
     {
       "description": "",
@@ -39,6 +39,14 @@
         {
           "field": "Executable Name",
           "value": "Account Self-Adaptive Trigger(Aggregations)"
+        },
+        {
+          "field": "Executable API Name",
+          "value": "Account_Self_Adaptive_Trigger_Aggregations"
+        },
+        {
+          "field": "Batchable?",
+          "value": "TRUE"
         }
       ],
       "media": [
@@ -55,15 +63,15 @@
       "config": [
         {
           "field": "Before Update Trigger?",
-          "value": "True"
+          "value": "TRUE"
         }
       ],
       "media": [
         {
           "type": "image",
-          "url": "images/triggers-trigger-settings-image.png",
+          "url": "images/triggers-trigger-settings-image.jpg",
           "alt": "",
-          "imageKey": "triggers-trigger-settings-image.png"
+          "imageKey": "triggers-trigger-settings-image.jpg"
         }
       ]
     },
@@ -73,21 +81,34 @@
       "media": [
         {
           "type": "image",
-          "url": "images/triggers-scoping-image.png",
+          "url": "images/triggers-scoping-image.jpg",
           "alt": "",
-          "imageKey": "triggers-scoping-image.png"
+          "imageKey": "triggers-scoping-image.jpg"
         }
       ]
     },
     {
       "step": "Match",
-      "config": [],
+      "config": [
+        {
+          "field": "Target Object API Name",
+          "value": "Account"
+        },
+        {
+          "field": "Target Matching Field",
+          "value": "Id"
+        },
+        {
+          "field": "Target Connection Name",
+          "value": "Current"
+        }
+      ],
       "media": [
         {
           "type": "image",
-          "url": "images/triggers-match-image.png",
+          "url": "images/triggers-match-image.jpg",
           "alt": "",
-          "imageKey": "triggers-match-image.png"
+          "imageKey": "triggers-match-image.jpg"
         }
       ]
     },
@@ -130,33 +151,47 @@
       "media": [
         {
           "type": "image",
-          "url": "images/triggers-mapping-image.png",
+          "url": "images/triggers-mapping-image.jpg",
           "alt": "",
-          "imageKey": "triggers-mapping-image.png"
+          "imageKey": "triggers-mapping-image.jpg"
         }
       ]
     },
     {
       "step": "Action",
-      "config": [],
+      "config": [
+        {
+          "field": "Target Object API Name",
+          "value": "Account"
+        },
+        {
+          "field": "Action",
+          "value": "Update"
+        }
+      ],
       "media": [
         {
           "type": "image",
-          "url": "images/triggers-action-button-settings-image.png",
+          "url": "images/triggers-action-image.jpg",
           "alt": "",
-          "imageKey": "triggers-action-button-settings-image.png"
+          "imageKey": "triggers-action-image.jpg"
         }
       ]
     },
     {
       "step": "Preview",
-      "config": [],
+      "config": [
+        {
+          "field": "SOQL Query",
+          "value": "SELECT Name, Type, Industry, Rating, AnnualRevenue, AccountNumber, Phone, Website, NumberOfEmployees, BillingCity, BillingState, Owner.Name FROM Account"
+        }
+      ],
       "media": [
         {
           "type": "image",
-          "url": "images/triggers-preview-image.png",
+          "url": "images/triggers-preview-image.jpg",
           "alt": "",
-          "imageKey": "triggers-preview-image.png"
+          "imageKey": "triggers-preview-image.jpg"
         }
       ]
     },
@@ -166,24 +201,22 @@
       "media": [
         {
           "type": "image",
-          "url": "images/triggers-preview-transformed-image.png",
+          "url": "images/triggers-preview-transformed-image.jpg",
           "alt": "",
-          "imageKey": "triggers-preview-transformed-image.png"
+          "imageKey": "triggers-preview-transformed-image.jpg"
         }
       ]
     }
   ],
-  "downloadableExecutables": [
-    {
-      "title": "",
-      "url": ""
-    }
-  ],
+  "downloadableExecutables": [],
   "relatedRecipes": [
     {
       "title": "",
       "url": ""
     }
   ],
-  "keywords": []
+  "keywords": [],
+  "overview": "Automatically calculate and update rollup summary fields on a parent record whenever related child records are inserted, updated, or deleted. A trigger on the child object listens for DML events, aggregates relevant data (such as SUM, COUNT, MIN, MAX), and updates the parent record's summary fields accordingly.",
+  "whenToUse": "",
+  "generalImages": []
 }

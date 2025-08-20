@@ -112,6 +112,49 @@ export class RecipeExportService {
           }
         }
         
+        // Process general images
+        if (recipe.generalImages) {
+          const imagesFolder = recipeFolder.folder('images');
+          
+          for (const image of recipe.generalImages) {
+            if (image.url && image.url.startsWith('images/')) {
+              try {
+                const imageName = image.url.split('/')[1];
+                const imageId = this.extractImageId(imageName);
+                
+                const imageFile = await fileStorage.getImage(imageId);
+                if (imageFile && imagesFolder) {
+                  imagesFolder.file(imageName, imageFile);
+                }
+              } catch (error) {
+                console.warn(`Failed to add general image ${image.url}:`, error);
+              }
+            }
+          }
+        }
+        
+        // Process downloadable executables (JSON files)
+        if (recipe.downloadableExecutables && recipe.downloadableExecutables.length > 0) {
+          const executablesFolder = recipeFolder.folder('downloadExecutables');
+          
+          for (const executable of recipe.downloadableExecutables) {
+            if (executable.filePath) {
+              try {
+                // Extract JSON file name from path
+                const fileName = executable.filePath.replace('downloadExecutables/', '');
+                
+                // Get JSON file from IndexedDB
+                const jsonFile = await fileStorage.getJsonFile(fileName);
+                if (jsonFile && executablesFolder) {
+                  executablesFolder.file(fileName, jsonFile);
+                }
+              } catch (error) {
+                console.warn(`Failed to add JSON file ${executable.filePath}:`, error);
+              }
+            }
+          }
+        }
+        
         processedCount++;
       }
       
