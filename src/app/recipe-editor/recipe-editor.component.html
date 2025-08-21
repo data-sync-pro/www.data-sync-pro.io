@@ -312,14 +312,29 @@
                   </div>
                   <!-- Image Preview for uploaded images -->
                   <div class="media-preview" 
-                       *ngIf="image.type === 'image' && image.url && image.url.startsWith('images/')">
-                    <img [src]="image.displayUrl || image.url" 
-                         [alt]="image.alt"
-                         class="media-preview-image clickable-image"
-                         (click)="openImagePreview(image.displayUrl || image.url, image.alt)"
-                         title="Click to enlarge"
-                         (error)="onImageError($event)"
-                         (load)="loadImageForGeneralImage(image)">
+                       *ngIf="image.type === 'image' && image.url && (image.url.startsWith('images/') || image.url.startsWith('assets/'))">
+                    <div *ngIf="image.displayUrl; else loadingGeneralImage">
+                      <img [src]="image.displayUrl" 
+                           [alt]="image.alt"
+                           class="media-preview-image clickable-image"
+                           (click)="openImagePreview(image.displayUrl, image.alt)"
+                           title="Click to enlarge"
+                           (error)="onImageError($event)">
+                    </div>
+                    <ng-template #loadingGeneralImage>
+                      <div class="image-loading-placeholder" 
+                           [class.missing]="isImageMissing(image)"
+                           (click)="handleMissingGeneralImage(image, i)"
+                           [title]="isImageMissing(image) ? 'Image missing - click to upload replacement' : 'Click to load image'">
+                        <span *ngIf="!isImageMissing(image)">📸 Loading image...</span>
+                        <span *ngIf="isImageMissing(image)">⚠️ Image missing - click to upload</span>
+                        <input type="file" 
+                               [id]="'missing-general-' + i"
+                               style="display: none"
+                               accept="image/*"
+                               (change)="replaceMissingGeneralImage($event, image, i)">
+                      </div>
+                    </ng-template>
                   </div>
                 </div>
               </div>
@@ -401,9 +416,12 @@
           <div class="step-item" 
                *ngFor="let step of currentRecipe.walkthrough; let i = index; trackBy: trackByIndex"
                [attr.data-step-index]="i">
-            <div class="step-header">
-              <h3>Step {{ i + 1 }}</h3>
-              <div class="step-actions">
+            <div class="step-header" (click)="toggleStep(i)">
+              <div class="step-title-section">
+                <span class="step-toggle-icon">{{ isStepExpanded(i) ? '▼' : '▶' }}</span>
+                <h3>{{ getStepTitle(step, i) }}</h3>
+              </div>
+              <div class="step-actions" (click)="$event.stopPropagation()">
                 <button type="button" 
                         class="btn btn-sm btn-secondary"
                         [disabled]="i === 0"
@@ -418,15 +436,26 @@
               </div>
             </div>
 
-            <div class="form-group">
-              <label>Step Name</label>
-              <select class="dsp-input"
-                      [(ngModel)]="step.step"
-                      (change)="onRecipeChange()">
-                <option value="">Select step</option>
-                <option *ngFor="let option of stepOptions" [value]="option">{{ option }}</option>
-              </select>
-            </div>
+            <div class="step-content" *ngIf="isStepExpanded(i)">
+              <div class="form-group">
+                <label>Step Name</label>
+                <select class="dsp-input"
+                        [(ngModel)]="step.step"
+                        (change)="onStepSelectionChange(step, i)">
+                  <option value="">Select step</option>
+                  <option *ngFor="let option of stepOptions" [value]="option">{{ option }}</option>
+                </select>
+              </div>
+
+              <div class="form-group" *ngIf="step.step === 'Custom'">
+                <label>Custom Step Name</label>
+                <input type="text" 
+                       class="dsp-input"
+                       [(ngModel)]="customStepNames[i]"
+                       (input)="onCustomStepNameChange(i)"
+                       placeholder="Enter custom step name"
+                       #customStepInput>
+              </div>
 
             <!-- Configuration -->
             <div class="config-section">
@@ -483,16 +512,31 @@
                           class="btn btn-sm btn-danger"
                           (click)="removeMedia(i, j)">−</button>
                 </div>
-                <!-- Image Preview for uploaded images -->
+                <!-- Image Preview for uploaded images and assets images -->
                 <div class="media-preview" 
-                     *ngIf="media.type === 'image' && media.url && media.url.startsWith('images/')">
-                  <img [src]="media.displayUrl || media.url" 
-                       [alt]="media.alt"
-                       class="media-preview-image clickable-image"
-                       (click)="openImagePreview(media.displayUrl || media.url, media.alt)"
-                       title="Click to enlarge"
-                       (error)="onImageError($event)"
-                       (load)="loadImageForMedia(media)">
+                     *ngIf="media.type === 'image' && media.url && (media.url.startsWith('images/') || media.url.startsWith('assets/'))">
+                  <div *ngIf="media.displayUrl; else loadingImage">
+                    <img [src]="media.displayUrl" 
+                         [alt]="media.alt"
+                         class="media-preview-image clickable-image"
+                         (click)="openImagePreview(media.displayUrl, media.alt)"
+                         title="Click to enlarge"
+                         (error)="onImageError($event)">
+                  </div>
+                  <ng-template #loadingImage>
+                    <div class="image-loading-placeholder" 
+                         [class.missing]="isImageMissing(media)"
+                         (click)="handleMissingImage(media, i)"
+                         [title]="isImageMissing(media) ? 'Image missing - click to upload replacement' : 'Click to load image'">
+                      <span *ngIf="!isImageMissing(media)">📸 Loading image...</span>
+                      <span *ngIf="isImageMissing(media)">⚠️ Image missing - click to upload</span>
+                      <input type="file" 
+                             [id]="'missing-media-' + i"
+                             style="display: none"
+                             accept="image/*"
+                             (change)="replaceMissingImage($event, media, i)">
+                    </div>
+                  </ng-template>
                 </div>
               </div>
               
@@ -513,6 +557,7 @@
                         class="btn btn-sm btn-secondary"
                         (click)="addMedia(i)">+ Add Media</button>
               </div>
+            </div>
             </div>
           </div>
 
