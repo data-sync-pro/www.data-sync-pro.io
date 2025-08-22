@@ -1,9 +1,11 @@
 {
-  "id": "auto_close-stagnant-cases",
+  "id": "auto‑close-stagnant-cases",
   "title": "Auto‑Close Stagnant Cases",
   "category": "Batch",
   "DSPVersions": [],
-  "usecase": "Automatically close any open Cases that have not been updated for 10 business days. A nightly batch job fetches Cases based on Status and LastModifiedDate, then sets Status to Closed.",
+  "overview": "Automatically close any open Cases that have not been updated for 10 business days. A nightly batch job fetches Cases based on Status and LastModifiedDate, then sets Status to Closed.",
+  "whenToUse": "",
+  "generalImages": [],
   "prerequisites": [
     {
       "description": "",
@@ -39,6 +41,14 @@
         {
           "field": "Executable Name",
           "value": "Auto‑Close Stagnant Cases"
+        },
+        {
+          "field": "Executable API Name",
+          "value": "Auto_Close_Stagnant_Cases"
+        },
+        {
+          "field": "Batchable?",
+          "value": "TRUE"
         }
       ],
       "media": [
@@ -61,9 +71,9 @@
       "media": [
         {
           "type": "image",
-          "url": "images/batch-retrieve-image.png",
+          "url": "images/batch-retrieve-image-2.jpg",
           "alt": "",
-          "imageKey": "batch-retrieve-image.png"
+          "imageKey": "batch-retrieve-image-2.jpg"
         }
       ]
     },
@@ -78,21 +88,30 @@
       "media": [
         {
           "type": "image",
-          "url": "images/batch-scoping-image.png",
+          "url": "images/batch-scoping-image-2.jpg",
           "alt": "",
-          "imageKey": "batch-scoping-image.png"
+          "imageKey": "batch-scoping-image-2.jpg"
         }
       ]
     },
     {
       "step": "Match",
-      "config": [],
+      "config": [
+        {
+          "field": "Target Object API Name",
+          "value": "Case"
+        },
+        {
+          "field": "Target Matching Field",
+          "value": "Id"
+        }
+      ],
       "media": [
         {
           "type": "image",
-          "url": "images/batch-match-image.png",
+          "url": "images/batch-match-image-2.jpg",
           "alt": "",
-          "imageKey": "batch-match-image.png"
+          "imageKey": "batch-match-image-2.jpg"
         }
       ]
     },
@@ -101,15 +120,15 @@
       "config": [
         {
           "field": "Status",
-          "value": "\"Closed\""
+          "value": ""
         }
       ],
       "media": [
         {
           "type": "image",
-          "url": "images/batch-mapping-image.png",
+          "url": "images/batch-mapping-image-2.jpg",
           "alt": "",
-          "imageKey": "batch-mapping-image.png"
+          "imageKey": "batch-mapping-image-2.jpg"
         }
       ]
     },
@@ -119,34 +138,9 @@
       "media": [
         {
           "type": "image",
-          "url": "images/batch-step-image.png",
+          "url": "images/batch-action-image-2.jpg",
           "alt": "",
-          "imageKey": "batch-step-image.png"
-        }
-      ]
-    },
-    {
-      "step": "Create Scheduler",
-      "config": [
-        {
-          "field": "Schedule Name",
-          "value": "Daily Auto‑Close Stagnant Cases"
-        },
-        {
-          "field": "Frequency",
-          "value": "Daily"
-        },
-        {
-          "field": "Preferred Start Time",
-          "value": "01:00:00"
-        }
-      ],
-      "media": [
-        {
-          "type": "image",
-          "url": "images/batch-create-scheduler-image.png",
-          "alt": "",
-          "imageKey": "batch-create-scheduler-image.png"
+          "imageKey": "batch-action-image-2.jpg"
         }
       ]
     }
