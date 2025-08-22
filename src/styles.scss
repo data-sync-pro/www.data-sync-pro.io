@@ -47,6 +47,25 @@ a {
   }
 }
 
+// FAQ content table styles
+.faq-content table,
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1em 0;
+  
+  th {
+    padding: 8px;
+    border: 1px solid #ddd;
+    background-color: #f5f5f5;
+  }
+  
+  td {
+    padding: 8px;
+    border: 1px solid #ddd;
+  }
+}
+
 // Hide footer on recipe detail pages
 body.recipe-page app-footer {
   display: none;

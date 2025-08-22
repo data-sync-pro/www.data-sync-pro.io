@@ -14,7 +14,7 @@
     "Category__c": "General",
     "SubCategory__c": null,
     "SeqNo__c": null,
-    "Question__c": "What are the five rules engines in DSP, and what is each used for?",
+    "Question__c": "What are the five rules engines in DSP, and what are they used for?",
     "Answer__c": "general-five-dsp-engines.html"
   },
   {
@@ -59,7 +59,7 @@
     "Category__c": "General",
     "SubCategory__c": null,
     "SeqNo__c": null,
-    "Question__c": "How is Data Sync Pro licensed, and what factors determine pricing?",
+    "Question__c": "How is Data Sync Pro priced?",
     "Answer__c": "general-dsp-licensing-pricing.html"
   },
   {
@@ -68,7 +68,7 @@
     "Category__c": "General",
     "SubCategory__c": null,
     "SeqNo__c": null,
-    "Question__c": "What are the three core user personas included in the Data Sync Pro package?",
+    "Question__c": "What are the three core user personas in Data Sync Pro?",
     "Answer__c": "general-three-user-personas.html"
   },
   {
@@ -77,7 +77,7 @@
     "Category__c": "General",
     "SubCategory__c": null,
     "SeqNo__c": null,
-    "Question__c": "How do the different DSP rules engines—Batch, Data List, Action Button, Data Loader, and Triggers—compare in terms of similarities and differences?",
+    "Question__c": "How do DSP’s rules engines compare?",
     "Answer__c": "general-dsp-rules-engines-compare.html"
   },
   {
@@ -122,7 +122,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Batch",
     "SeqNo__c": null,
-    "Question__c": "Why choose Data Sync Pro's Batch?",
+    "Question__c": "Why Data Sync Pro's Batch?",
     "Answer__c": "rules-engines-batch-why-dsp-batch.html"
   },
   {
@@ -131,7 +131,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Batch",
     "SeqNo__c": null,
-    "Question__c": "What technologies are used to build the Batch rules engine in DSP?",
+    "Question__c": "What technologies are used to build the #Batch engine?",
     "Answer__c": "rules-engines-batch-batch-technologies-used.html"
   },
   {
@@ -140,7 +140,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Batch",
     "SeqNo__c": null,
-    "Question__c": "What are the common use cases for DSP's Batch?",
+    "Question__c": "What are the common use cases for #Batch?",
     "Answer__c": "rules-engines-batch-batch-use-cases.html"
   },
   {
@@ -149,7 +149,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Batch",
     "SeqNo__c": null,
-    "Question__c": "How efficiently does Batch handle large data volumes?",
+    "Question__c": "How efficiently does #Batch handle large data volumes?",
     "Answer__c": "rules-engines-batch-batch-large-volumes.html"
   },
   {
@@ -158,7 +158,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Batch",
     "SeqNo__c": null,
-    "Question__c": "How do I create a Batch Executable?",
+    "Question__c": "Where do I create a #Batch Executable?",
     "Answer__c": "rules-engines-batch-create-batch-executable.html"
   },
   {
@@ -167,7 +167,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Batch",
     "SeqNo__c": null,
-    "Question__c": "Does Batch only support cross-org data migrations?",
+    "Question__c": "Does #Batch only support cross-org data migrations?",
     "Answer__c": "rules-engines-batch-batch-cross-org.html"
   },
   {
@@ -248,7 +248,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Batch",
     "SeqNo__c": null,
-    "Question__c": "How are logs tracked for a Batch execution?",
+    "Question__c": "How are logs tracked for running a #Batch Executable?",
     "Answer__c": "rules-engines-batch-batch-logs-tracked.html"
   },
   {
@@ -302,7 +302,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Batch",
     "SeqNo__c": null,
-    "Question__c": "What is the best approach to test a Batch Executable with a small data sample before running it on the full dataset?",
+    "Question__c": "How can I test a Batch Executable on a small sample before running it on the full dataset?",
     "Answer__c": "rules-engines-batch-test-batch-with-sample.html"
   },
   {
@@ -311,7 +311,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Batch",
     "SeqNo__c": null,
-    "Question__c": "How can I break down a complex batch job with multiple actions into manageable parts?",
+    "Question__c": "What’s the best way to implement a complex Batch job with multiple actions?",
     "Answer__c": "rules-engines-batch-break-down-complex-batch.html"
   },
   {
@@ -320,7 +320,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Batch",
     "SeqNo__c": null,
-    "Question__c": "What are the advantages of combining a blank update batch with a self-adaptive trigger?",
+    "Question__c": "What are the advantages of pairing a blank update batch with a self-adaptive trigger?",
     "Answer__c": "rules-engines-batch-blank-update-batch-advantages.html"
   },
   {
@@ -329,7 +329,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Data List",
     "SeqNo__c": null,
-    "Question__c": "What is a Data List in Data Sync Pro?",
+    "Question__c": "What is a #Data List?",
     "Answer__c": "rules-engines-data-list-what-is-data-list.html"
   },
   {

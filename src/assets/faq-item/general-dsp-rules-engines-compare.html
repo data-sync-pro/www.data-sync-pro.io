@@ -1,61 +1,54 @@
-
-  <p>
-    The <strong>#Batch</strong>, <strong>#Data List</strong>, and <strong>#Trigger</strong> rules engines in DSP are
-    <strong>Direction-based</strong>, meaning they take input from a <strong>source
-    object</strong>, <strong>apply transformations</strong>, and perform an <strong>action on a target object</strong>. The
-    <strong>#Data Loader</strong> is similar to <strong>#Batch </strong> but is <strong>Connection-based</strong>, 
-    meaning its source data comes from a CSV upload rather than a source object. The <strong>#Action Button</strong>
-    can be either <strong>Direction-based</strong> or <strong>Connection-based</strong>:
-  </p>
-
-  <ul>
-    <li>
-      <strong>Connection-based Action Button</strong> - Acts as a global action
-      with no input data.
-    </li>
-    <li>
-      <strong>Direction-based Action Button</strong> - Functions as a record
-      action, using the current record from a Lightning record page as input.
-    </li>
-  </ul>
-
-  <p>
-    While these rules engines share similar sub-processes, the key difference
-    lies in how they receive input:
-  </p>
-
-  <ul>
-    <li>
-      <strong>Batch</strong> - Processes all records retrieved by the Retrieve
-      query.
-    </li>
-    <li>
-      <strong>Data List</strong> - Displays query results to users, allowing
-      manual record selection before execution.
-    </li>
-    <li>
-      <strong>Triggers</strong> - Executes when Salesforce DML events occur,
-      using the triggering records as input.
-    </li>
-    <li>
-      <strong>Action Button</strong>
-      <ul>
-        <li><strong>Connection-based:</strong> No input data.</li>
-        <li>
-          <strong>Direction-based:</strong> Uses the current record from the
-          Lightning record page.
-        </li>
-      </ul>
-    </li>
-    <li>
-      <strong>Data Loader</strong> - Uses uploaded CSV data as input instead of
-      querying a source object.
-    </li>
-  </ul>
-
-  <p>
-    Despite their differences in input handling, all DSP rules engines follow
-    a structured process, <strong>enabling powerful automation</strong> and <strong>transformation
-    capabilities</strong>.
-  </p>
-
+<p>
+  All DSP rules engines share a structured process for automation and
+  transformation, but they differ mainly in how they take input:
+</p>
+<p></p>
+<ul>
+  <li>
+    <p><strong>Batch</strong> – Runs on records retrieved by a query.</p>
+  </li>
+  <li>
+    <p>
+      <strong>Actionable Data List</strong> – Shows query results to users, who
+      can then select which records to act on.
+    </p>
+  </li>
+  <li>
+    <p>
+      <strong>Triggers</strong> – Fire automatically when Salesforce DML events
+      occur (insert, update, delete, undelete) on the source object.
+    </p>
+  </li>
+  <li>
+    <p><strong>Action Button</strong> –</p>
+    <ul>
+      <li>
+        <p>
+          <em>Connection-based</em>: Runs as a global action with no input data.
+        </p>
+      </li>
+      <li>
+        <p>
+          <em>Direction-based</em>: Uses the current record from a Lightning
+          page as input.
+        </p>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p>
+      <strong>Data Loader</strong> – Similar to Batch, but takes input from an
+      uploaded CSV instead of a query.
+    </p>
+  </li>
+</ul>
+<p></p>
+<p>
+  👉 <strong>In short:</strong> All DSP rules engines orchestrate data in the
+  same way—by defining an input, applying logic, and performing an action on the
+  target. What differs is how they receive their input:
+  <strong>Batch, Data List, and Triggers</strong> use a source object;
+  <strong>Data Loader</strong> uses a CSV file; and
+  <strong>Action Buttons</strong> can be configured to use either no input
+  (global) or the current record (direction-based).
+</p>
