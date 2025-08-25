@@ -80,6 +80,12 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
     zoomLevel: 1
   };
   
+  // Step expansion state
+  expandedSteps: Set<number> = new Set();
+  
+  // Custom step names storage
+  customStepNames: { [index: number]: string } = {};
+  
   // Step options from Recipe Producer
   stepOptions = [
     'Action',
@@ -99,7 +105,8 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
     'Scoping',
     'Trigger Settings',
     'Variable',
-    'Verify'
+    'Verify',
+    'Custom'
   ];
   
   // Predefined fields for autocomplete by step type
@@ -476,6 +483,7 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
     this.state.tabs.push(tab);
     this.state.activeTabId = tab.id;
     this.currentRecipe = newRecipe;
+    this.initializeExpandedSteps();
     this.triggerPreviewUpdate();
   }
   
@@ -494,7 +502,11 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
     tab.isActive = true;
     this.state.activeTabId = tabId;
     this.currentRecipe = tab.recipe;
+    this.initializeExpandedSteps();
     this.triggerPreviewUpdate();
+    
+    // Load all images for this recipe tab
+    this.loadAllImagesForRecipe(tab.recipe);
   }
   
   closeTab(tabId: string): void {
@@ -563,8 +575,12 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
           this.state.tabs.push(tab);
           this.state.activeTabId = tab.id;
           this.currentRecipe = sourceRecipe;
+          this.initializeExpandedSteps();
           this.triggerPreviewUpdate();
           this.state.isLoading = false;
+          
+          // Load all images for this recipe
+          this.loadAllImagesForRecipe(sourceRecipe);
         },
         error: (error) => {
           console.error('Error loading recipe:', error);
@@ -632,6 +648,11 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
     }
     
     this.currentRecipe.walkthrough.push(newStep);
+    
+    // Expand the new step by default
+    const newStepIndex = this.currentRecipe.walkthrough.length - 1;
+    this.expandedSteps.add(newStepIndex);
+    
     this.onRecipeChange();
   }
   
@@ -639,6 +660,10 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
     if (!this.currentRecipe?.walkthrough) return;
     
     this.currentRecipe.walkthrough.splice(index, 1);
+    
+    // Update custom step names indexes
+    this.reindexCustomStepNames();
+    
     this.onRecipeChange();
   }
   
@@ -647,6 +672,22 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
     
     const steps = this.currentRecipe.walkthrough;
     [steps[index - 1], steps[index]] = [steps[index], steps[index - 1]];
+    
+    // Swap custom step names too
+    if (this.customStepNames[index] !== undefined || this.customStepNames[index - 1] !== undefined) {
+      const temp = this.customStepNames[index];
+      this.customStepNames[index] = this.customStepNames[index - 1];
+      this.customStepNames[index - 1] = temp;
+      
+      // Clean up undefined entries
+      if (this.customStepNames[index] === undefined) {
+        delete this.customStepNames[index];
+      }
+      if (this.customStepNames[index - 1] === undefined) {
+        delete this.customStepNames[index - 1];
+      }
+    }
+    
     this.onRecipeChange();
   }
   
@@ -655,6 +696,22 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
     
     const steps = this.currentRecipe.walkthrough;
     [steps[index], steps[index + 1]] = [steps[index + 1], steps[index]];
+    
+    // Swap custom step names too
+    if (this.customStepNames[index] !== undefined || this.customStepNames[index + 1] !== undefined) {
+      const temp = this.customStepNames[index];
+      this.customStepNames[index] = this.customStepNames[index + 1];
+      this.customStepNames[index + 1] = temp;
+      
+      // Clean up undefined entries
+      if (this.customStepNames[index] === undefined) {
+        delete this.customStepNames[index];
+      }
+      if (this.customStepNames[index + 1] === undefined) {
+        delete this.customStepNames[index + 1];
+      }
+    }
+    
     this.onRecipeChange();
   }
   
@@ -731,17 +788,35 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
       // Store image in IndexedDB using the base name as key
       await this.fileStorageService.storeImage(baseName, file);
       
-      // Add to step media
+      // Add to step media with immediate displayUrl generation
       const media: RecipeStepMedia = {
         type: 'image',
         url: `images/${fullFileName}`,
         alt: file.name.replace(/\.[^/.]+$/, '') // Remove extension from alt text
       };
       
+      // Generate displayUrl immediately for instant preview
+      try {
+        console.log(`Attempting to generate displayUrl for baseName: ${baseName}`);
+        const imageFile = await this.fileStorageService.getImage(baseName);
+        if (imageFile) {
+          const displayUrl = URL.createObjectURL(imageFile);
+          (media as any).displayUrl = displayUrl;
+          console.log(`Successfully generated displayUrl: ${displayUrl} for baseName: ${baseName}`);
+        } else {
+          console.warn(`No image file found for baseName: ${baseName}`);
+        }
+      } catch (error) {
+        console.error('Failed to generate immediate displayUrl:', error);
+      }
+      
       this.currentRecipe.walkthrough[stepIndex].media.push(media);
       this.onRecipeChange();
       
       this.notificationService.success(`Image uploaded: ${fullFileName}`);
+      
+      // Trigger change detection to update UI
+      this.cdr.detectChanges();
     } catch (error) {
       console.error('Error uploading image:', error);
       this.notificationService.error('Failed to upload image');
@@ -1222,6 +1297,268 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
     this.currentRecipe.relatedRecipes.splice(index, 1);
     this.onRecipeChange();
   }
+  
+  // Step expansion management
+  toggleStep(index: number): void {
+    if (this.expandedSteps.has(index)) {
+      this.expandedSteps.delete(index);
+    } else {
+      this.expandedSteps.add(index);
+    }
+  }
+  
+  isStepExpanded(index: number): boolean {
+    return this.expandedSteps.has(index);
+  }
+  
+  getStepTitle(step: any, index: number): string {
+    if (step.step && step.step.trim() !== '') {
+      if (step.step === 'Custom') {
+        // Return custom name if available, otherwise default
+        return this.customStepNames[index] || 'Custom Step';
+      }
+      return step.step;
+    }
+    return `Step ${index + 1}`;
+  }
+  
+  private initializeExpandedSteps(): void {
+    this.expandedSteps.clear();
+    this.customStepNames = {};
+    
+    if (this.currentRecipe?.walkthrough) {
+      // All steps are expanded by default and restore custom step names
+      for (let i = 0; i < this.currentRecipe.walkthrough.length; i++) {
+        this.expandedSteps.add(i);
+        
+        // Restore custom step names - check if step is not in predefined options
+        const step = this.currentRecipe.walkthrough[i];
+        if (step.step && !this.stepOptions.includes(step.step)) {
+          // This is a custom step - store the name and set step to 'Custom'
+          this.customStepNames[i] = step.step;
+          step.step = 'Custom';
+        }
+      }
+    }
+  }
+  
+  onStepSelectionChange(step: any, index: number): void {
+    if (step.step === 'Custom') {
+      // Initialize custom name if not exists
+      if (!this.customStepNames[index]) {
+        this.customStepNames[index] = '';
+      }
+      // Auto-focus the custom input (will be handled in template)
+    } else {
+      // Clear custom name if switching away from Custom
+      delete this.customStepNames[index];
+    }
+    this.onRecipeChange();
+  }
+  
+  onCustomStepNameChange(index: number): void {
+    this.onRecipeChange();
+  }
+  
+  isCustomStep(step: any): boolean {
+    return step.step === 'Custom';
+  }
+  
+  
+  private reindexCustomStepNames(): void {
+    if (!this.currentRecipe?.walkthrough) return;
+    
+    const newCustomStepNames: { [index: number]: string } = {};
+    
+    // Re-map custom step names based on current step positions
+    this.currentRecipe.walkthrough.forEach((step, index) => {
+      if (step.step === 'Custom' && this.customStepNames[index]) {
+        newCustomStepNames[index] = this.customStepNames[index];
+      }
+    });
+    
+    this.customStepNames = newCustomStepNames;
+  }
+  
+  // Check for missing images after importing a recipe
+  private async checkMissingImagesAfterImport(recipe: SourceRecipeRecord): Promise<void> {
+    const missingImages: string[] = [];
+    
+    try {
+      // Check walkthrough step media images
+      if (recipe.walkthrough) {
+        for (const step of recipe.walkthrough) {
+          if (step.media) {
+            for (const media of step.media) {
+              if (media.type === 'image' && media.url && media.url.startsWith('images/')) {
+                const fileName = media.url.replace('images/', '');
+                const imageKey = fileName.replace(/\.[^/.]+$/, '');
+                
+                const exists = await this.fileStorageService.imageExists(imageKey);
+                if (!exists) {
+                  missingImages.push(media.url);
+                }
+              }
+            }
+          }
+        }
+      }
+      
+      // Check general images
+      if (recipe.generalImages) {
+        for (const image of recipe.generalImages) {
+          if (image.url && image.url.startsWith('images/')) {
+            const fileName = image.url.replace('images/', '');
+            const imageKey = fileName.replace(/\.[^/.]+$/, '');
+            
+            const exists = await this.fileStorageService.imageExists(imageKey);
+            if (!exists) {
+              missingImages.push(image.url);
+            }
+          }
+        }
+      }
+      
+      // Report missing images
+      if (missingImages.length > 0) {
+        console.warn(`Missing ${missingImages.length} images after import:`, missingImages);
+        this.notificationService.warning(
+          `导入的Recipe缺少 ${missingImages.length} 张图片。点击图片占位符可重新上传。`
+        );
+      } else {
+        console.log('All images are available after import');
+      }
+    } catch (error) {
+      console.error('Error checking missing images:', error);
+    }
+  }
+
+  /**
+   * Check if an image is missing from IndexedDB
+   */
+  public isImageMissing(media: any): boolean {
+    if (!media || !media.url || !media.url.startsWith('images/')) {
+      return false;
+    }
+    
+    // If displayUrl exists, image is loaded successfully
+    if (media.displayUrl) {
+      return false;
+    }
+    
+    // Consider it missing if no displayUrl and it's an uploaded image
+    return true;
+  }
+
+  /**
+   * Handle missing step media image - trigger file input
+   */
+  public handleMissingImage(media: any, stepIndex: number): void {
+    const fileInput = document.getElementById(`missing-media-${stepIndex}`) as HTMLInputElement;
+    if (fileInput) {
+      fileInput.click();
+    }
+  }
+
+  /**
+   * Handle missing general image - trigger file input
+   */
+  public handleMissingGeneralImage(image: any, imageIndex: number): void {
+    const fileInput = document.getElementById(`missing-general-${imageIndex}`) as HTMLInputElement;
+    if (fileInput) {
+      fileInput.click();
+    }
+  }
+
+  /**
+   * Replace missing step media image with new upload
+   */
+  public async replaceMissingImage(event: Event, media: any, stepIndex: number): Promise<void> {
+    const target = event.target as HTMLInputElement;
+    if (!target.files || target.files.length === 0) return;
+    
+    const file = target.files[0];
+    
+    try {
+      // Validate file
+      const validation = this.fileStorageService.validateImageFile(file);
+      if (!validation.valid) {
+        this.notificationService.error(validation.error || 'Invalid file');
+        return;
+      }
+      
+      // Generate new image ID and store
+      const imageId = this.fileStorageService.generateImageId();
+      const originalName = this.fileStorageService.sanitizeFileName(file.name);
+      const imageName = `${imageId}_${originalName}`;
+      
+      await this.fileStorageService.storeImage(imageId, file);
+      
+      // Update media object
+      media.url = `images/${imageName}`;
+      
+      // Generate display URL immediately
+      const displayUrl = URL.createObjectURL(file);
+      (media as any).displayUrl = displayUrl;
+      
+      // Mark recipe as changed
+      this.onRecipeChange();
+      
+      this.notificationService.success('Image replaced successfully');
+      
+      // Clear file input
+      target.value = '';
+      
+    } catch (error) {
+      console.error('Error replacing missing image:', error);
+      this.notificationService.error('Failed to replace image');
+    }
+  }
+
+  /**
+   * Replace missing general image with new upload
+   */
+  public async replaceMissingGeneralImage(event: Event, image: any, imageIndex: number): Promise<void> {
+    const target = event.target as HTMLInputElement;
+    if (!target.files || target.files.length === 0) return;
+    
+    const file = target.files[0];
+    
+    try {
+      // Validate file
+      const validation = this.fileStorageService.validateImageFile(file);
+      if (!validation.valid) {
+        this.notificationService.error(validation.error || 'Invalid file');
+        return;
+      }
+      
+      // Generate new image ID and store
+      const imageId = this.fileStorageService.generateImageId();
+      const originalName = this.fileStorageService.sanitizeFileName(file.name);
+      const imageName = `${imageId}_${originalName}`;
+      
+      await this.fileStorageService.storeImage(imageId, file);
+      
+      // Update image object
+      image.url = `images/${imageName}`;
+      
+      // Generate display URL immediately
+      const displayUrl = URL.createObjectURL(file);
+      (image as any).displayUrl = displayUrl;
+      
+      // Mark recipe as changed
+      this.onRecipeChange();
+      
+      this.notificationService.success('Image replaced successfully');
+      
+      // Clear file input
+      target.value = '';
+      
+    } catch (error) {
+      console.error('Error replacing missing general image:', error);
+      this.notificationService.error('Failed to replace image');
+    }
+  }
 
   // General images management
   addGeneralImage(): void {
@@ -1261,13 +1598,28 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
       // Store image in IndexedDB using the base name as key (like step media)
       await this.fileStorageService.storeImage(baseName, file);
       
-      // Add to general images with simple URL format
+      // Add to general images with immediate displayUrl generation
       const generalImage: RecipeGeneralImage = {
         type: 'image',
         url: `images/${fullFileName}`,
         alt: file.name.replace(/\.[^/.]+$/, ''), // Remove extension from alt text
         imageId: baseName // Use baseName as imageId for deletion compatibility
       };
+      
+      // Generate displayUrl immediately for instant preview
+      try {
+        console.log(`Attempting to generate displayUrl for general image baseName: ${baseName}`);
+        const imageFile = await this.fileStorageService.getImage(baseName);
+        if (imageFile) {
+          const displayUrl = URL.createObjectURL(imageFile);
+          (generalImage as any).displayUrl = displayUrl;
+          console.log(`Successfully generated displayUrl for general image: ${displayUrl}`);
+        } else {
+          console.warn(`No image file found for general image baseName: ${baseName}`);
+        }
+      } catch (error) {
+        console.error('Failed to generate immediate displayUrl for general image:', error);
+      }
       
       if (!this.currentRecipe.generalImages) {
         this.currentRecipe.generalImages = [];
@@ -1277,6 +1629,9 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
       this.onRecipeChange();
       
       this.notificationService.success(`General image added: ${fullFileName}`);
+      
+      // Trigger change detection to update UI
+      this.cdr.detectChanges();
     } catch (error) {
       console.error('Error uploading general image:', error);
       this.notificationService.error('Failed to upload general image');
@@ -1406,7 +1761,12 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
       this.state.tabs.push(tab);
       this.state.activeTabId = tab.id;
       this.currentRecipe = imported;
+      this.initializeExpandedSteps();
       this.triggerPreviewUpdate();
+      
+      // Load all images for imported recipe and check for missing images
+      await this.loadAllImagesForRecipe(imported);
+      this.checkMissingImagesAfterImport(imported);
       
       this.notificationService.success('Recipe imported successfully');
     } else {
@@ -1462,26 +1822,36 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
       if (!recipe) return null;
       
       // Create a deep copy to avoid modifying original data
-      const cleanRecipe = JSON.parse(JSON.stringify(recipe));
+      // Use structuredClone if available, fallback to JSON method
+      const cleanRecipe = typeof structuredClone !== 'undefined' 
+        ? structuredClone(recipe)
+        : JSON.parse(JSON.stringify(recipe));
       
       // Remove any internal fields that shouldn't be in export
       delete cleanRecipe.internalId;
       delete cleanRecipe.editorState;
       
-      // Clean general images - remove displayUrl
+      // Clean general images - remove displayUrl safely
       if (cleanRecipe.generalImages) {
-        cleanRecipe.generalImages.forEach((image: any) => {
-          delete image.displayUrl;
+        cleanRecipe.generalImages = cleanRecipe.generalImages.map((image: any) => {
+          const { displayUrl, ...cleanImage } = image;
+          return cleanImage;
         });
       }
       
-      // Clean walkthrough step media - remove displayUrl
+      // Clean walkthrough step media - remove displayUrl safely and handle custom step names
       if (cleanRecipe.walkthrough) {
-        cleanRecipe.walkthrough.forEach((step: any) => {
+        cleanRecipe.walkthrough.forEach((step: any, index: number) => {
           if (step.media) {
-            step.media.forEach((media: any) => {
-              delete media.displayUrl;
+            step.media = step.media.map((media: any) => {
+              const { displayUrl, ...cleanMedia } = media;
+              return cleanMedia;
             });
+          }
+          
+          // If this is a custom step, replace step field with actual custom name
+          if (step.step === 'Custom' && this.customStepNames[index]) {
+            step.step = this.customStepNames[index];
           }
         });
       }
@@ -1679,14 +2049,36 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
   // Load image for media item asynchronously
   async loadImageForMedia(media: any): Promise<void> {
     try {
-      if (media.url && media.url.startsWith('images/') && !media.displayUrl) {
+      if (!media.url) return;
+
+      // Check if it's an assets path (static image)
+      if (media.url.startsWith('assets/') || this.isAssetsImagePath(media.url)) {
+        const assetsUrl = this.normalizeAssetsImageUrl(media.url);
+        console.log(`Loading assets image: ${assetsUrl}`);
+        
+        // For assets images, use the URL directly
+        media.displayUrl = assetsUrl;
+        console.log(`Successfully loaded assets media image: ${assetsUrl}`);
+        this.cdr.detectChanges();
+        return;
+      }
+
+      // Handle IndexedDB images (uploaded images)
+      if (media.url.startsWith('images/')) {
         const fileName = media.url.replace('images/', '');
         const imageKey = fileName.replace(/\.[^/.]+$/, ''); // Remove extension
+        
+        console.log(`Loading image for media with key: ${imageKey}`);
+        
         const imageFile = await this.fileStorageService.getImage(imageKey);
         
         if (imageFile) {
-          media.displayUrl = URL.createObjectURL(imageFile);
+          const displayUrl = URL.createObjectURL(imageFile);
+          media.displayUrl = displayUrl;
+          console.log(`Successfully loaded media image: ${displayUrl}`);
           this.cdr.detectChanges(); // Trigger change detection
+        } else {
+          console.warn(`No image file found for media key: ${imageKey}`);
         }
       }
     } catch (error) {
@@ -1697,14 +2089,36 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
   // Load image for general image item asynchronously
   async loadImageForGeneralImage(image: any): Promise<void> {
     try {
-      if (image.url && image.url.startsWith('images/') && !image.displayUrl) {
+      if (!image.url) return;
+
+      // Check if it's an assets path (static image)
+      if (image.url.startsWith('assets/') || this.isAssetsImagePath(image.url)) {
+        const assetsUrl = this.normalizeAssetsImageUrl(image.url);
+        console.log(`Loading assets general image: ${assetsUrl}`);
+        
+        // For assets images, use the URL directly
+        image.displayUrl = assetsUrl;
+        console.log(`Successfully loaded assets general image: ${assetsUrl}`);
+        this.cdr.detectChanges();
+        return;
+      }
+
+      // Handle IndexedDB images (uploaded images)
+      if (image.url.startsWith('images/')) {
         const fileName = image.url.replace('images/', '');
         const imageKey = fileName.replace(/\.[^/.]+$/, ''); // Remove extension
+        
+        console.log(`Loading general image with key: ${imageKey}`);
+        
         const imageFile = await this.fileStorageService.getImage(imageKey);
         
         if (imageFile) {
-          image.displayUrl = URL.createObjectURL(imageFile);
+          const displayUrl = URL.createObjectURL(imageFile);
+          image.displayUrl = displayUrl;
+          console.log(`Successfully loaded general image: ${displayUrl}`);
           this.cdr.detectChanges(); // Trigger change detection
+        } else {
+          console.warn(`No image file found for general image key: ${imageKey}`);
         }
       }
     } catch (error) {
@@ -1717,6 +2131,71 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
     const img = event.target as HTMLImageElement;
     img.style.display = 'none';
     console.warn('Failed to load image:', img.src);
+  }
+
+  /**
+   * Check if image URL is an assets path (relative path from recipe JSON)
+   */
+  private isAssetsImagePath(url: string): boolean {
+    // Check if it's a relative image path that should be converted to assets path
+    return url.startsWith('images/') && !url.includes('blob:') && !!this.currentRecipe?.id;
+  }
+
+  /**
+   * Convert relative image path to full assets URL
+   */
+  private normalizeAssetsImageUrl(url: string): string {
+    if (url.startsWith('assets/')) {
+      return url; // Already a full assets path
+    }
+    
+    // Convert relative images/ path to full assets path using current recipe ID
+    if (url.startsWith('images/') && this.currentRecipe?.id) {
+      return `assets/recipes/${this.currentRecipe.id}/${url}`;
+    }
+    
+    return url;
+  }
+
+  /**
+   * Load all images for the current recipe
+   */
+  async loadAllImagesForRecipe(recipe?: SourceRecipeRecord): Promise<void> {
+    const targetRecipe = recipe || this.currentRecipe;
+    if (!targetRecipe) return;
+
+    console.log('Loading all images for recipe:', targetRecipe.title);
+
+    try {
+      // Load walkthrough step media images
+      if (targetRecipe.walkthrough && targetRecipe.walkthrough.length > 0) {
+        for (const step of targetRecipe.walkthrough) {
+          if (step.media && step.media.length > 0) {
+            for (const media of step.media) {
+              if (media.type === 'image' && media.url && (media.url.startsWith('images/') || media.url.startsWith('assets/'))) {
+                await this.loadImageForMedia(media);
+              }
+            }
+          }
+        }
+      }
+
+      // Load general images
+      if (targetRecipe.generalImages && targetRecipe.generalImages.length > 0) {
+        for (const image of targetRecipe.generalImages) {
+          if (image.url && (image.url.startsWith('images/') || image.url.startsWith('assets/'))) {
+            await this.loadImageForGeneralImage(image);
+          }
+        }
+      }
+
+      console.log('All images loaded for recipe:', targetRecipe.title);
+      
+      // Trigger change detection to update UI
+      this.cdr.detectChanges();
+    } catch (error) {
+      console.error('Error loading all images for recipe:', error);
+    }
   }
   
   // Update image names when content changes (category, step names)

@@ -1,11 +1,12 @@
 <p>Data Sync Pro processes all data entirely within your Salesforce org and enforces Salesforce’s native security model—ensuring complete control and privacy.</p>
 <p><strong>Local Data Processing</strong><br>
-All processing runs natively in Apex within the subscriber’s Salesforce org where DSP is installed; no services are hosted outside your org.</p>
+All processing runs natively in Apex within the subscriber’s Salesforce org where DSP is installed, no services are hosted outside your org.&nbsp;</p><p><strong>Remote Actions</strong><br>
+For remote connection actions, DSP relies on Salesforce’s built-in Named Credentials. Credentials remain fully managed by you and are never exposed to third parties.</p>
 <p><strong>User Access to Record-Based Rules</strong><br>
-DSP manages all rules as records within packaged custom objects and fully enforces Salesforce’s object-, field-, and record-level security. The package includes three permission sets:</p>
+DSP manages all rules as records within packaged custom objects and fully enforces Salesforce’s object-, field-, and record-level security. The package includes three core permission sets:</p>
 <ul>
 <li>
-<p><strong>DSP: Data Sync Pro Starter</strong> – Minimal access to packaged code and objects. With read access to Executable records, users can run those rules except for executing batches.</p>
+<p><strong>DSP: Data Sync Pro Starter</strong> – Minimal access to packaged code and objects. With additional read access to Executable records, users can run those rules except for executing batches.</p>
 </li>
 <li>
 <p><strong>DSP: Data Sync Pro App User</strong> – Can run asynchronous rules (e.g., Batch jobs, Data Loaders) if granted explicit access to the relevant Executable records.</p>
