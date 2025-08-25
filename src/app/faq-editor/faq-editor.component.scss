@@ -783,12 +783,30 @@
   padding: 1rem;
   overflow-y: auto;
   
-  h3 {
-    margin: 0 0 1rem 0;
-    font-size: 1.125rem;
-    color: #333;
+  .preview-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
     padding-bottom: 0.5rem;
     border-bottom: 1px solid #e0e0e0;
+    
+    h3 {
+      margin: 0;
+      font-size: 1.125rem;
+      color: #333;
+    }
+    
+    .preview-toggle {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.875rem;
+      
+      .btn-icon {
+        font-size: 1rem;
+      }
+    }
   }
   
   .preview-content {
@@ -835,6 +853,38 @@
       img {
         max-width: 100%;
         height: auto;
+      }
+    }
+  }
+  
+  .source-code-content {
+    font-size: 14px;
+    line-height: 1.4;
+    
+    pre {
+      background: #f8f9fa;
+      border: 1px solid #e9ecef;
+      border-radius: 6px;
+      padding: 1rem;
+      margin: 0;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', monospace;
+      font-size: 13px;
+      line-height: 1.5;
+      color: #495057;
+      max-height: 600px;
+      overflow-y: auto;
+      
+      code {
+        background: transparent;
+        padding: 0;
+        border-radius: 0;
+        font-size: inherit;
+        color: inherit;
+        white-space: pre-wrap;
+        word-break: break-all;
       }
     }
   }

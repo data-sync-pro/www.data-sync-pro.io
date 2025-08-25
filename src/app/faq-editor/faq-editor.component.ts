@@ -403,6 +403,8 @@ interface EditorState {
   // Tab management
   tabs: FAQTab[];
   activeTabId: string | null;
+  // Preview mode
+  previewMode: 'rendered' | 'source';
 }
 
 @Component({
@@ -440,7 +442,9 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
     exportProgress: null,
     // Tab management
     tabs: [],
-    activeTabId: null
+    activeTabId: null,
+    // Preview mode
+    previewMode: 'rendered'
   };
   
   searchQuery = '';
@@ -2354,6 +2358,62 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
       }
     } catch (error) {
       console.warn('Could not position cursor in paragraph:', error);
+    }
+  }
+
+  // ========================
+  // Preview Mode Methods
+  // ========================
+
+  /**
+   * Toggle between rendered preview and export source code view
+   */
+  togglePreviewMode(): void {
+    this.state.previewMode = this.state.previewMode === 'rendered' ? 'source' : 'rendered';
+  }
+
+  /**
+   * Get the HTML source code as it would appear in export
+   * This replicates the exact processing done in saveFAQ() method
+   */
+  getExportSourceCode(): string {
+    if (!this.htmlSourceEditor?.nativeElement) {
+      return '<!-- No content loaded -->';
+    }
+
+    // Get raw editor content - same as in saveFAQ()
+    const editorElement = this.htmlSourceEditor.nativeElement;
+    const rawEditorContent = editorElement.innerHTML || this.editorContent;
+    
+    // Apply the same processing as in saveFAQ() method
+    const cleanedContent = this.cleanEditorContent(rawEditorContent);
+    const exportContent = this.convertUrlsToImgs(cleanedContent);
+    
+    // Format for display (basic HTML formatting)
+    return this.formatHTMLForDisplay(exportContent);
+  }
+
+  /**
+   * Format HTML content for readable display in source view
+   */
+  private formatHTMLForDisplay(content: string): string {
+    if (!content) return '';
+    
+    try {
+      // Use js-beautify to format the HTML for better readability
+      return html_beautify(content, {
+        indent_size: 2,
+        indent_level: 0,
+        wrap_line_length: 80,
+        preserve_newlines: true,
+        max_preserve_newlines: 2,
+        indent_inner_html: true,
+        unformatted: ['pre', 'code'],
+        extra_liners: ['head', 'body', '/html']
+      });
+    } catch (error) {
+      console.warn('Error formatting HTML for display:', error);
+      return content; // Return unformatted content if formatting fails
     }
   }
 }

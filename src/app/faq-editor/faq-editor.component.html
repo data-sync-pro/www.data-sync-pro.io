@@ -367,8 +367,23 @@
 
     <!-- Right - Preview -->
     <div class="preview-panel" *ngIf="state.selectedFAQ">
-      <h3>Preview</h3>
-      <div class="preview-content" [innerHTML]="previewContent" appSimpleZoomable></div>
+      <div class="preview-header">
+        <h3>Preview</h3>
+        <button class="btn btn-sm btn-secondary preview-toggle"
+                (click)="togglePreviewMode()"
+                [title]="state.previewMode === 'rendered' ? 'Show Export Source Code' : 'Show Rendered Preview'">
+          <span class="btn-icon">{{ state.previewMode === 'rendered' ? '{ }' : '👁' }}</span>
+          {{ state.previewMode === 'rendered' ? 'Show Source' : 'Show Preview' }}
+        </button>
+      </div>
+      <div class="preview-content" 
+           *ngIf="state.previewMode === 'rendered'"
+           [innerHTML]="previewContent" 
+           appSimpleZoomable></div>
+      <div class="source-code-content" 
+           *ngIf="state.previewMode === 'source'">
+        <pre><code>{{ getExportSourceCode() }}</code></pre>
+      </div>
     </div>
   </div>
 
