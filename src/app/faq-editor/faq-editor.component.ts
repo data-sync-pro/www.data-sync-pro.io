@@ -370,6 +370,17 @@ class UndoRedoManager {
   }
 }
 
+interface FAQTab {
+  id: string;
+  title: string;
+  faq: FAQItem;
+  hasChanges: boolean;
+  isActive: boolean;
+  editorContent: string;
+  currentQuestion: string;
+  currentCategory: string;
+}
+
 interface EditorState {
   selectedFAQ: FAQItem | null;
   isEditing: boolean;
@@ -383,6 +394,9 @@ interface EditorState {
   saveError: string | null;
   isExporting: boolean;
   exportProgress: ExportProgress | null;
+  // Tab management
+  tabs: FAQTab[];
+  activeTabId: string | null;
 }
 
 @Component({
@@ -417,7 +431,10 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
     showImportDialog: false,
     saveError: null,
     isExporting: false,
-    exportProgress: null
+    exportProgress: null,
+    // Tab management
+    tabs: [],
+    activeTabId: null
   };
   
   searchQuery = '';
@@ -607,6 +624,13 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   selectFAQ(faq: FAQItem): void {
+    // Use tab system if tabs are enabled
+    if (this.state.tabs.length > 0 || true) { // Always use tab system
+      this.loadFAQToTab(faq);
+      return;
+    }
+
+    // Legacy single FAQ mode (kept for compatibility)
     // Save current FAQ if there are changes
     if (this.state.hasChanges && this.state.selectedFAQ) {
       this.saveFAQ();
@@ -628,10 +652,10 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
     const edited = this.editedFAQs.get(faq.id);
     if (edited) {
       // Convert edited content to URL format for editor display
-      const editableContent = this.convertImgsToUrls(edited.answer);
+      const editableContent = this.convertImgsToUrls(edited!.answer);
       this.editorContent = editableContent;
-      this.currentQuestion = edited.question;
-      this.currentCategory = edited.category;
+      this.currentQuestion = edited!.question;
+      this.currentCategory = edited!.category;
       
       // Set content directly in DOM after view init
       setTimeout(() => {
@@ -832,12 +856,16 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
 
   /**
    * Immediate content update (legacy method kept for compatibility)
-   * Now performs immediate sync without debouncing delays
+   * Now performs immediate sync without debouncing delays and supports tabs
    */
   private debouncedContentUpdate(): void {
     // Immediate update - no more delays that cause sync issues
     const currentContent = this.getCurrentEditorContent();
     this.editorContent = currentContent;
+    
+    // Update current tab if using tab system
+    this.onTabContentChange();
+    
     this.contentChangeSubject.next(currentContent);
   }
 
@@ -1681,5 +1709,306 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
     // Native contenteditable will reset its own history when content changes
     // Clear our fallback manager just in case
     this.undoRedoManager.clear();
+  }
+
+  // ========================
+  // Tab Management Methods
+  // ========================
+
+  /**
+   * Create a new FAQ tab
+   */
+  createNewTab(): void {
+    const newFAQ: FAQItem & { isNew?: boolean } = {
+      id: this.generateUUID(),
+      name: `new-faq-${Date.now()}`,
+      question: 'New FAQ Question',
+      category: this.categories.length > 0 ? this.categories[0] : 'General',
+      answerPath: '',
+      answer: '',
+      isNew: true
+    };
+
+    const tab: FAQTab = {
+      id: this.generateUUID(),
+      title: 'New FAQ',
+      faq: newFAQ,
+      hasChanges: false,
+      isActive: true,
+      editorContent: '',
+      currentQuestion: newFAQ.question,
+      currentCategory: newFAQ.category
+    };
+
+    // Deactivate other tabs
+    this.state.tabs.forEach(t => t.isActive = false);
+
+    this.state.tabs.push(tab);
+    this.state.activeTabId = tab.id;
+    
+    // Set current editing context
+    this.state.selectedFAQ = newFAQ;
+    this.editorContent = '';
+    this.currentQuestion = newFAQ.question;
+    this.currentCategory = newFAQ.category;
+    this.state.hasChanges = false;
+
+    // Clear editor
+    setTimeout(() => {
+      if (this.htmlSourceEditor?.nativeElement) {
+        this.htmlSourceEditor.nativeElement.innerHTML = '';
+      }
+      this.clearUndoHistory();
+      this.updatePreview();
+    }, 0);
+  }
+
+  /**
+   * Select a tab and switch to it
+   */
+  selectTab(tabId: string): void {
+    const tab = this.state.tabs.find(t => t.id === tabId);
+    if (!tab) return;
+
+    // Save current tab if has changes
+    const currentTab = this.getCurrentTab();
+    if (currentTab && currentTab.hasChanges) {
+      this.saveCurrentTabContent();
+    }
+
+    // Switch to selected tab
+    this.state.tabs.forEach(t => t.isActive = false);
+    tab.isActive = true;
+    this.state.activeTabId = tabId;
+
+    // Load tab content
+    this.loadTabContent(tab);
+  }
+
+  /**
+   * Close a tab
+   */
+  closeTab(tabId: string): void {
+    const tabIndex = this.state.tabs.findIndex(t => t.id === tabId);
+    if (tabIndex === -1) return;
+
+    const tab = this.state.tabs[tabIndex];
+
+    // Confirm if has unsaved changes
+    if (tab.hasChanges) {
+      if (!confirm('This tab has unsaved changes. Close anyway?')) {
+        return;
+      }
+    }
+
+    // Remove tab
+    this.state.tabs.splice(tabIndex, 1);
+
+    // If was active tab, activate another
+    if (tab.isActive && this.state.tabs.length > 0) {
+      const newActiveIndex = Math.min(tabIndex, this.state.tabs.length - 1);
+      this.selectTab(this.state.tabs[newActiveIndex].id);
+    } else if (this.state.tabs.length === 0) {
+      // No tabs left, clear the editor
+      this.state.selectedFAQ = null;
+      this.state.activeTabId = null;
+      this.editorContent = '';
+      this.currentQuestion = '';
+      this.currentCategory = '';
+      this.state.hasChanges = false;
+      if (this.htmlSourceEditor?.nativeElement) {
+        this.htmlSourceEditor.nativeElement.innerHTML = '';
+      }
+      this.clearUndoHistory();
+      this.previewContent = this.sanitizer.bypassSecurityTrustHtml('');
+    }
+  }
+
+  /**
+   * Load FAQ into a new tab or switch to existing tab
+   */
+  loadFAQToTab(faq: FAQItem): void {
+    // Check if already open in a tab
+    const existingTab = this.state.tabs.find(t => t.faq.id === faq.id);
+    if (existingTab) {
+      this.selectTab(existingTab.id);
+      return;
+    }
+
+    // Create new tab
+    const tab: FAQTab = {
+      id: this.generateUUID(),
+      title: faq.question.length > 30 ? faq.question.substring(0, 30) + '...' : faq.question,
+      faq: faq,
+      hasChanges: false,
+      isActive: true,
+      editorContent: '',
+      currentQuestion: faq.question,
+      currentCategory: faq.category
+    };
+
+    // Deactivate other tabs
+    this.state.tabs.forEach(t => t.isActive = false);
+
+    this.state.tabs.push(tab);
+    this.state.activeTabId = tab.id;
+
+    // Load content into tab
+    this.loadTabContent(tab);
+  }
+
+  /**
+   * Load content into a tab
+   */
+  private loadTabContent(tab: FAQTab): void {
+    this.state.selectedFAQ = tab.faq;
+    this.state.isLoading = true;
+    this.currentQuestion = tab.currentQuestion;
+    this.currentCategory = tab.currentCategory;
+
+    // Clear preview immediately
+    this.previewContent = this.sanitizer.bypassSecurityTrustHtml('');
+
+    // Clear undo history when switching tabs
+    this.clearUndoHistory();
+
+    // Load edited content if exists
+    const edited = this.editedFAQs.get(tab.faq.id);
+    if (edited) {
+      const editableContent = this.convertImgsToUrls(edited.answer);
+      this.editorContent = editableContent;
+      tab.editorContent = editableContent;
+      tab.currentQuestion = edited.question;
+      tab.currentCategory = edited.category;
+      this.currentQuestion = edited.question;
+      this.currentCategory = edited.category;
+
+      setTimeout(() => {
+        if (this.htmlSourceEditor?.nativeElement) {
+          this.htmlSourceEditor.nativeElement.innerHTML = editableContent;
+        }
+        this.state.isLoading = false;
+        this.initializeUndoState();
+        this.updatePreview();
+      }, 0);
+    } else if ((tab.faq as any).isNew) {
+      // New FAQ tab
+      this.editorContent = '';
+      tab.editorContent = '';
+      
+      setTimeout(() => {
+        if (this.htmlSourceEditor?.nativeElement) {
+          this.htmlSourceEditor.nativeElement.innerHTML = '';
+        }
+        this.state.isLoading = false;
+        this.initializeUndoState();
+        this.updatePreview();
+      }, 0);
+    } else {
+      // Load original content
+      this.loadOriginalContentForTab(tab);
+    }
+
+    this.state.hasChanges = tab.hasChanges;
+  }
+
+  /**
+   * Load original content for a tab
+   */
+  private loadOriginalContentForTab(tab: FAQTab): void {
+    this.loadRawHTMLForEditing(tab.faq.answerPath)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (rawHtmlContent) => {
+          const editableContent = this.prepareContentForEditing(rawHtmlContent);
+          this.editorContent = editableContent;
+          tab.editorContent = editableContent;
+
+          setTimeout(() => {
+            if (this.htmlSourceEditor?.nativeElement) {
+              this.htmlSourceEditor.nativeElement.innerHTML = editableContent;
+            }
+            this.state.isLoading = false;
+            this.initializeUndoState();
+            this.updatePreview();
+          }, 0);
+        },
+        error: (error) => {
+          console.error('Error loading original content for tab:', error);
+          this.state.isLoading = false;
+        }
+      });
+  }
+
+  /**
+   * Save current tab content
+   */
+  private saveCurrentTabContent(): void {
+    const currentTab = this.getCurrentTab();
+    if (currentTab && this.htmlSourceEditor?.nativeElement) {
+      currentTab.editorContent = this.htmlSourceEditor.nativeElement.innerHTML;
+      currentTab.currentQuestion = this.currentQuestion;
+      currentTab.currentCategory = this.currentCategory;
+      currentTab.hasChanges = this.state.hasChanges;
+    }
+  }
+
+  /**
+   * Get current active tab
+   */
+  private getCurrentTab(): FAQTab | undefined {
+    return this.state.tabs.find(t => t.id === this.state.activeTabId);
+  }
+
+  /**
+   * Override selectFAQ to use tab system
+   */
+  selectFAQOverride(faq: FAQItem): void {
+    this.loadFAQToTab(faq);
+  }
+
+  /**
+   * Handle tab changes - mark tab as changed
+   */
+  onTabContentChange(): void {
+    const currentTab = this.getCurrentTab();
+    if (currentTab) {
+      currentTab.hasChanges = true;
+      currentTab.editorContent = this.editorContent;
+      currentTab.currentQuestion = this.currentQuestion;
+      currentTab.currentCategory = this.currentCategory;
+      
+      // Update tab title if question changed
+      if (this.currentQuestion && this.currentQuestion !== currentTab.faq.question) {
+        currentTab.title = this.currentQuestion.length > 30 
+          ? this.currentQuestion.substring(0, 30) + '...' 
+          : this.currentQuestion;
+      }
+    }
+  }
+
+  /**
+   * Generate UUID for tabs
+   */
+  private generateUUID(): string {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+      const r = Math.random() * 16 | 0;
+      const v = c === 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
+  }
+
+  /**
+   * Track by function for tab iteration
+   */
+  trackByTabIndex(index: number): number {
+    return index;
+  }
+
+  /**
+   * Check if there are unsaved changes in any tab
+   */
+  hasUnsavedTabChanges(): boolean {
+    return this.state.tabs.some(t => t.hasChanges);
   }
 }

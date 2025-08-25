@@ -40,6 +40,27 @@
     </div>
   </div>
 
+  <!-- Tabs Container -->
+  <div class="tabs-container">
+    <div class="tabs">
+      <!-- Existing tabs -->
+      <div class="tab" 
+           *ngFor="let tab of state.tabs; trackBy: trackByTabIndex"
+           [class.active]="tab.isActive"
+           [class.has-changes]="tab.hasChanges"
+           (click)="selectTab(tab.id)">
+        <span class="tab-title">{{ tab.title }}</span>
+        <span class="changes-indicator" *ngIf="tab.hasChanges">●</span>
+        <button class="close-tab" 
+                *ngIf="state.tabs.length > 1"
+                (click)="closeTab(tab.id); $event.stopPropagation()">×</button>
+      </div>
+      
+      <!-- Add FAQ button -->
+      <button class="add-tab" (click)="createNewTab()">+ Add FAQ</button>
+    </div>
+  </div>
+
   <!-- Main Content Area -->
   <div class="editor-main">
     <!-- Left Sidebar - FAQ List -->
@@ -77,6 +98,14 @@
       </div>
     </div>
 
+    <!-- No Selection States - moved inside editor-main -->
+    <div class="no-selection" *ngIf="!state.selectedFAQ && state.tabs.length === 0">
+      <p>Select a FAQ or create new</p>
+    </div>
+
+    <div class="tab-mode-no-selection" *ngIf="!state.selectedFAQ && state.tabs.length > 0">
+    </div>
+
     <!-- Middle - Editor -->
     <div class="editor-panel" *ngIf="state.selectedFAQ">
       <div class="editor-toolbar">
@@ -106,14 +135,14 @@
             <input type="text" 
                    class="form-control"
                    [(ngModel)]="currentQuestion"
-                   (input)="state.hasChanges = true">
+                   (input)="state.hasChanges = true; onTabContentChange()">
           </div>
           
           <div class="form-group category-field">
             <label>Category:</label>
             <select class="form-control"
                     [(ngModel)]="currentCategory"
-                    (change)="state.hasChanges = true">
+                    (change)="state.hasChanges = true; onTabContentChange()">
               <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
             </select>
           </div>
@@ -300,11 +329,6 @@
       <h3>Preview</h3>
       <div class="preview-content" [innerHTML]="previewContent" appSimpleZoomable></div>
     </div>
-  </div>
-
-  <!-- No Selection Message -->
-  <div class="no-selection" *ngIf="!state.selectedFAQ">
-    <p>Select a FAQ from the list to start editing</p>
   </div>
 
   <!-- Storage Stats -->

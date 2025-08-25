@@ -115,6 +115,97 @@
   }
 }
 
+// Tabs
+.tabs-container {
+  background-color: #e9ecef;
+  border-bottom: 1px solid #dee2e6;
+  overflow-x: auto;
+
+  .tabs {
+    display: flex;
+    align-items: center;
+    padding: 0 1rem;
+    min-height: 3rem;
+
+    .tab {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background-color: #fff;
+      border: 1px solid #dee2e6;
+      border-bottom: none;
+      cursor: pointer;
+      margin-right: 2px;
+      border-radius: 4px 4px 0 0;
+      transition: all 0.2s;
+      min-width: 150px;
+      max-width: 200px;
+
+      &:hover {
+        background-color: #f8f9fa;
+      }
+
+      &.active {
+        background-color: #4CAF50;
+        color: white;
+        border-color: #4CAF50;
+      }
+
+      &.has-changes {
+        .changes-indicator {
+          color: #ff9800;
+          font-weight: bold;
+        }
+
+        &.active .changes-indicator {
+          color: #90ee90;
+        }
+      }
+
+      .tab-title {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        flex: 1;
+      }
+
+      .close-tab {
+        background: none;
+        border: none;
+        color: inherit;
+        font-size: 1.2rem;
+        cursor: pointer;
+        padding: 0;
+        margin-left: 0.5rem;
+        opacity: 0.7;
+
+        &:hover {
+          opacity: 1;
+        }
+      }
+    }
+
+    .add-tab {
+      background: none;
+      border: 1px dashed #6c757d;
+      color: #6c757d;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-left: 1rem;
+      font-size: 0.875rem;
+      flex-shrink: 0;
+
+      &:hover {
+        background-color: #f8f9fa;
+        border-color: #495057;
+        color: #495057;
+      }
+    }
+  }
+}
+
 // Main Content Area
 .editor-main {
   display: flex;
@@ -134,12 +225,15 @@
     padding: 1rem;
     border-bottom: 1px solid #e0e0e0;
     
-    .search-input {
+    .search-input,
+    .category-filter {
       width: 100%;
       padding: 0.5rem;
       border: 1px solid #ddd;
       border-radius: 4px;
-      margin-bottom: 0.5rem;
+      background: white;
+      box-sizing: border-box;
+      font-size: 0.875rem;
       
       &:focus {
         outline: none;
@@ -147,17 +241,8 @@
       }
     }
     
-    .category-filter {
-      width: 100%;
-      padding: 0.5rem;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      background: white;
-      
-      &:focus {
-        outline: none;
-        border-color: #4CAF50;
-      }
+    .search-input {
+      margin-bottom: 0.5rem;
     }
   }
 
@@ -620,14 +705,22 @@
   }
 }
 
-// No Selection
+// No Selection States
 .no-selection {
   flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #999;
+  color: #6c757d;
   font-size: 1.125rem;
+
+  p {
+    margin: 0;
+  }
+}
+
+.tab-mode-no-selection {
+  flex: 1;
 }
 
 // Storage Stats
