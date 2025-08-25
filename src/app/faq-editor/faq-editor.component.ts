@@ -381,6 +381,12 @@ interface FAQTab {
   currentCategory: string;
 }
 
+interface FAQTitleItem {
+  id: string;
+  faqId: string;
+  title: string;
+}
+
 interface EditorState {
   selectedFAQ: FAQItem | null;
   isEditing: boolean;
@@ -447,6 +453,9 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
   previewContent: SafeHtml = '';
   
   storageStats = { used: 0, available: 0, percentage: 0 };
+  
+  // Tooltip state
+  showTooltip: 'created' | 'edited' | null = null;
 
   constructor(
     private http: HttpClient,
@@ -743,12 +752,16 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
     
     // For WYSIWYG editor, get HTML content directly from contenteditable
     const editorElement = this.htmlSourceEditor.nativeElement;
-    const editorContent = editorElement.innerHTML || this.editorContent;
+    const rawEditorContent = editorElement.innerHTML || this.editorContent;
+    
+    // Clean the content to remove any unwanted elements or text
+    const cleanedContent = this.cleanEditorContent(rawEditorContent);
     
     // Convert URL format back to img tags for saving
-    const htmlContent = this.convertUrlsToImgs(editorContent);
+    const htmlContent = this.convertUrlsToImgs(cleanedContent);
     
-    console.log('💾 Saving content - Editor:', editorContent);
+    console.log('💾 Saving content - Raw:', rawEditorContent);
+    console.log('💾 Saving content - Cleaned:', cleanedContent);
     console.log('💾 Saving content - Converted:', htmlContent);
     
     const faqData: Partial<EditedFAQ> = {
@@ -1060,8 +1073,122 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
     return this.editedFAQs.size;
   }
 
+  getCreatedCount(): number {
+    // Count FAQs that don't exist in the original FAQ list (new FAQs)
+    let createdCount = 0;
+    const originalFAQIds = new Set(this.faqList.map(f => f.id));
+    
+    this.editedFAQs.forEach((editedFAQ) => {
+      if (!originalFAQIds.has(editedFAQ.faqId)) {
+        createdCount++;
+      }
+    });
+    
+    return createdCount;
+  }
+
+  getEditedExistingCount(): number {
+    // Count FAQs that exist in the original FAQ list (edited existing FAQs)
+    let editedCount = 0;
+    const originalFAQIds = new Set(this.faqList.map(f => f.id));
+    
+    this.editedFAQs.forEach((editedFAQ) => {
+      if (originalFAQIds.has(editedFAQ.faqId)) {
+        editedCount++;
+      }
+    });
+    
+    return editedCount;
+  }
+
+  getCreatedFAQTitles(): FAQTitleItem[] {
+    const originalFAQIds = new Set(this.faqList.map(f => f.id));
+    const items: FAQTitleItem[] = [];
+    
+    this.editedFAQs.forEach((editedFAQ) => {
+      if (!originalFAQIds.has(editedFAQ.faqId)) {
+        // Truncate long titles to prevent tooltip overflow
+        const truncatedTitle = editedFAQ.question.length > 60 
+          ? editedFAQ.question.substring(0, 60) + '...' 
+          : editedFAQ.question;
+        items.push({
+          id: editedFAQ.id,
+          faqId: editedFAQ.faqId,
+          title: truncatedTitle
+        });
+      }
+    });
+    
+    // Sort alphabetically and limit to 10 items
+    return items.sort((a, b) => a.title.localeCompare(b.title)).slice(0, 10);
+  }
+
+  getEditedExistingFAQTitles(): FAQTitleItem[] {
+    const originalFAQIds = new Set(this.faqList.map(f => f.id));
+    const items: FAQTitleItem[] = [];
+    
+    this.editedFAQs.forEach((editedFAQ) => {
+      if (originalFAQIds.has(editedFAQ.faqId)) {
+        // Truncate long titles to prevent tooltip overflow
+        const truncatedTitle = editedFAQ.question.length > 60 
+          ? editedFAQ.question.substring(0, 60) + '...' 
+          : editedFAQ.question;
+        items.push({
+          id: editedFAQ.id,
+          faqId: editedFAQ.faqId,
+          title: truncatedTitle
+        });
+      }
+    });
+    
+    // Sort alphabetically and limit to 10 items
+    return items.sort((a, b) => a.title.localeCompare(b.title)).slice(0, 10);
+  }
+
   isEdited(faq: FAQItem): boolean {
     return this.editedFAQs.has(faq.id);
+  }
+
+  /**
+   * Handle click on FAQ title in tooltip
+   */
+  onTooltipFAQClick(faqId: string): void {
+    // Hide tooltip immediately
+    this.showTooltip = null;
+    
+    const editedFAQ = this.editedFAQs.get(faqId);
+    if (!editedFAQ) {
+      console.error('FAQ not found:', faqId);
+      this.notificationService.error('FAQ not found', 'Unable to locate the selected FAQ');
+      return;
+    }
+
+    const originalFAQIds = new Set(this.faqList.map(f => f.id));
+    
+    if (originalFAQIds.has(faqId)) {
+      // This is an edited existing FAQ - find the original FAQ
+      const originalFAQ = this.faqList.find(f => f.id === faqId);
+      if (originalFAQ) {
+        this.selectFAQ(originalFAQ);
+      } else {
+        console.error('Original FAQ not found:', faqId);
+        this.notificationService.error('FAQ not found', 'Unable to locate the original FAQ');
+      }
+    } else {
+      // This is a new FAQ - create a mock FAQItem for loading
+      const mockFAQItem: FAQItem = {
+        id: editedFAQ.faqId,
+        name: editedFAQ.faqId,
+        question: editedFAQ.question,
+        category: editedFAQ.category,
+        subCategory: editedFAQ.subCategory,
+        answerPath: '',
+        answer: ''
+      };
+      
+      // Load the new FAQ into a tab
+      this.loadFAQToTab(mockFAQItem);
+    }
   }
 
   formatBytes(bytes: number): string {
@@ -1748,15 +1875,17 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
     
     // Set current editing context
     this.state.selectedFAQ = newFAQ;
-    this.editorContent = '';
+    this.editorContent = '<p></p>';
     this.currentQuestion = newFAQ.question;
     this.currentCategory = newFAQ.category;
     this.state.hasChanges = false;
 
-    // Clear editor
+    // Set default paragraph structure for new FAQ
     setTimeout(() => {
       if (this.htmlSourceEditor?.nativeElement) {
-        this.htmlSourceEditor.nativeElement.innerHTML = '';
+        this.htmlSourceEditor.nativeElement.innerHTML = '<p></p>';
+        // Position cursor inside the paragraph
+        this.positionCursorInParagraph();
       }
       this.clearUndoHistory();
       this.updatePreview();
@@ -1892,13 +2021,15 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
         this.updatePreview();
       }, 0);
     } else if ((tab.faq as any).isNew) {
-      // New FAQ tab
-      this.editorContent = '';
-      tab.editorContent = '';
+      // New FAQ tab with default paragraph structure
+      this.editorContent = '<p></p>';
+      tab.editorContent = '<p></p>';
       
       setTimeout(() => {
         if (this.htmlSourceEditor?.nativeElement) {
-          this.htmlSourceEditor.nativeElement.innerHTML = '';
+          this.htmlSourceEditor.nativeElement.innerHTML = '<p></p>';
+          // Position cursor inside the paragraph
+          this.positionCursorInParagraph();
         }
         this.state.isLoading = false;
         this.initializeUndoState();
@@ -2010,5 +2141,219 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
    */
   hasUnsavedTabChanges(): boolean {
     return this.state.tabs.some(t => t.hasChanges);
+  }
+
+  /**
+   * Clean editor content by removing unwanted elements and text
+   */
+  private cleanEditorContent(content: string): string {
+    if (!content) return content;
+    
+    // Create a temporary DOM element to parse and clean the HTML
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = content;
+    
+    // Remove any text nodes that contain "faq-editor"
+    this.removeUnwantedTextNodes(tempDiv, 'faq-editor');
+    
+    // Remove data-start and data-end attributes and inline styles from all elements
+    this.removeUnwantedAttributes(tempDiv, ['data-start', 'data-end', 'style']);
+    
+    // Additional clean up of specific inline styles if needed
+    this.cleanInlineStyles(tempDiv);
+    
+    // Remove ALL span tags while preserving their content
+    this.removeAllSpanTags(tempDiv);
+    
+    // Remove any elements that might be editor-specific
+    this.removeEditorElements(tempDiv);
+    
+    // Remove empty tags after cleaning
+    this.removeEmptyTags(tempDiv);
+    
+    return tempDiv.innerHTML;
+  }
+
+  /**
+   * Remove text nodes containing unwanted text
+   */
+  private removeUnwantedTextNodes(element: Element, unwantedText: string): void {
+    const walker = document.createTreeWalker(
+      element,
+      NodeFilter.SHOW_TEXT,
+      null
+    );
+    
+    const textNodesToRemove: Node[] = [];
+    let node;
+    
+    while (node = walker.nextNode()) {
+      if (node.textContent?.includes(unwantedText)) {
+        textNodesToRemove.push(node);
+      }
+    }
+    
+    textNodesToRemove.forEach(textNode => {
+      textNode.parentNode?.removeChild(textNode);
+    });
+  }
+
+  /**
+   * Remove unwanted attributes from all elements
+   */
+  private removeUnwantedAttributes(element: Element, attributesToRemove: string[]): void {
+    const allElements = element.querySelectorAll('*');
+    
+    allElements.forEach(el => {
+      attributesToRemove.forEach(attr => {
+        el.removeAttribute(attr);
+      });
+    });
+    
+    // Also remove from the root element
+    attributesToRemove.forEach(attr => {
+      element.removeAttribute(attr);
+    });
+  }
+
+  /**
+   * Remove elements that are editor-specific
+   */
+  private removeEditorElements(element: Element): void {
+    // Remove elements with editor-specific classes or attributes
+    const editorSelectors = [
+      '.faq-editor-container',
+      '.editor-header', 
+      '.editor-brand',
+      '[contenteditable]',
+      '.html-wysiwyg-editor'
+    ];
+    
+    editorSelectors.forEach(selector => {
+      const elementsToRemove = element.querySelectorAll(selector);
+      elementsToRemove.forEach(el => {
+        // If it's the root element, keep its content but remove the wrapper
+        if (el === element) {
+          return;
+        }
+        el.remove();
+      });
+    });
+  }
+
+  /**
+   * Remove empty tags after cleaning styles and attributes
+   */
+  private removeEmptyTags(element: Element): void {
+    // Define tags that should be removed if they become empty after cleaning
+    // Note: Only remove truly unnecessary tags, preserve semantic and structural tags
+    const emptyTagsToRemove = ['span', 'font'];
+    
+    emptyTagsToRemove.forEach(tagName => {
+      const elements = Array.from(element.querySelectorAll(tagName));
+      
+      elements.forEach(el => {
+        // Check if element is empty (no text content and no meaningful children)
+        const hasText = (el.textContent?.trim().length ?? 0) > 0;
+        const hasImportantChildren = el.querySelector('img, br, hr, input, textarea, select');
+        
+        if (!hasText && !hasImportantChildren) {
+          // Move any children to parent before removing
+          while (el.firstChild) {
+            el.parentNode?.insertBefore(el.firstChild, el);
+          }
+          el.remove();
+        }
+      });
+    });
+  }
+
+  /**
+   * Clean specific inline styles that are commonly added by editors
+   */
+  private cleanInlineStyles(element: Element): void {
+    const elementsWithStyle = element.querySelectorAll('[style]');
+    
+    elementsWithStyle.forEach(el => {
+      const currentStyle = el.getAttribute('style') || '';
+      
+      // Define unwanted style patterns commonly added by editors
+      const unwantedStylePatterns = [
+        /color:\s*rgb\(51,\s*51,\s*51\)/gi,  // Specific gray color
+        /font-family:\s*[^;]*Roboto[^;]*/gi,  // Roboto font family
+        /font-family:\s*[^;]*sans-serif[^;]*/gi,  // Generic sans-serif
+      ];
+      
+      let cleanedStyle = currentStyle;
+      
+      // Remove unwanted style patterns
+      unwantedStylePatterns.forEach(pattern => {
+        cleanedStyle = cleanedStyle.replace(pattern, '');
+      });
+      
+      // Clean up extra semicolons and spaces
+      cleanedStyle = cleanedStyle
+        .replace(/;\s*;/g, ';')  // Remove double semicolons
+        .replace(/^;\s*/, '')    // Remove leading semicolon
+        .replace(/\s*;\s*$/, '') // Remove trailing semicolon
+        .trim();
+      
+      // If no styles remain, remove the attribute entirely
+      if (!cleanedStyle) {
+        el.removeAttribute('style');
+      } else {
+        el.setAttribute('style', cleanedStyle);
+      }
+    });
+  }
+
+  /**
+   * Remove ALL span tags while preserving their content
+   */
+  private removeAllSpanTags(element: Element): void {
+    // Get all span elements - we need to process from innermost to outermost
+    // to handle nested spans correctly
+    let spanElements = Array.from(element.querySelectorAll('span'));
+    
+    // Process spans in reverse order (deepest first) to avoid DOM mutation issues
+    spanElements.reverse().forEach(span => {
+      // Create document fragment to hold span content
+      const fragment = document.createDocumentFragment();
+      
+      // Move all child nodes from span to fragment
+      while (span.firstChild) {
+        fragment.appendChild(span.firstChild);
+      }
+      
+      // Insert the fragment content before the span
+      span.parentNode?.insertBefore(fragment, span);
+      
+      // Remove the empty span
+      span.remove();
+    });
+  }
+
+  /**
+   * Position cursor inside the first paragraph for new FAQs
+   */
+  private positionCursorInParagraph(): void {
+    if (!this.htmlSourceEditor?.nativeElement) return;
+    
+    try {
+      const firstParagraph = this.htmlSourceEditor.nativeElement.querySelector('p');
+      if (firstParagraph) {
+        const selection = window.getSelection();
+        const range = document.createRange();
+        range.setStart(firstParagraph, 0);
+        range.collapse(true);
+        selection?.removeAllRanges();
+        selection?.addRange(range);
+        
+        // Focus the editor
+        this.htmlSourceEditor.nativeElement.focus();
+      }
+    } catch (error) {
+      console.warn('Could not position cursor in paragraph:', error);
+    }
   }
 }

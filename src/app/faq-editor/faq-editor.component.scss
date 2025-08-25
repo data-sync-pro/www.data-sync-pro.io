@@ -1,5 +1,17 @@
 // Removed Quill import - using plain textarea now
 
+// Tooltip animation keyframes
+@keyframes tooltipFadeInDown {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-4px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
 .faq-editor-container {
   display: flex;
   flex-direction: column;
@@ -103,8 +115,131 @@
         font-weight: 600;
       }
       
+      &.created strong {
+        color: #2196F3;
+      }
+      
       &.edited strong {
         color: #4CAF50;
+      }
+      
+      // Tooltip functionality
+      &.tooltip-container {
+        position: relative;
+        cursor: help;
+        padding: 8px 12px;
+        margin: -8px -12px;
+        border-radius: 4px;
+        transition: background-color 0.2s ease;
+        
+        &:hover {
+          z-index: 1000;
+          background-color: rgba(0, 0, 0, 0.05);
+        }
+        
+        .tooltip-content {
+          position: absolute;
+          top: 100%;
+          left: 50%;
+          transform: translateX(-50%);
+          margin-top: 8px;
+          background: #333;
+          color: white;
+          padding: 12px 16px;
+          border-radius: 6px;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+          white-space: nowrap;
+          min-width: 200px;
+          max-width: 350px;
+          z-index: 1001;
+          font-size: 13px;
+          line-height: 1.4;
+          animation: tooltipFadeInDown 0.2s ease-out;
+          
+          // Arrow pointing up
+          &::before {
+            content: '';
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 6px solid transparent;
+            border-bottom-color: #333;
+          }
+          
+          .tooltip-header {
+            font-weight: 600;
+            margin-bottom: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding-bottom: 4px;
+          }
+          
+          .tooltip-item {
+            padding: 2px 0;
+            white-space: normal;
+            word-wrap: break-word;
+            
+            &:not(:last-child) {
+              border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+              padding-bottom: 4px;
+              margin-bottom: 4px;
+            }
+            
+            // Clickable tooltip items
+            &.clickable {
+              cursor: pointer;
+              transition: all 0.2s ease;
+              border-radius: 3px;
+              padding: 4px 6px;
+              margin: 2px -6px;
+              position: relative;
+              
+              &:hover {
+                background: rgba(255, 255, 255, 0.15);
+                transform: translateX(2px);
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+              }
+              
+              &:active {
+                background: rgba(255, 255, 255, 0.25);
+                transform: translateX(1px);
+                transition: all 0.1s ease;
+              }
+              
+              // Override border for clickable items
+              &:not(:last-child) {
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                padding-bottom: 6px;
+                margin-bottom: 6px;
+              }
+            }
+          }
+          
+          .tooltip-more {
+            margin-top: 8px;
+            padding-top: 4px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            font-style: italic;
+            opacity: 0.8;
+          }
+        }
+        
+        // Different colors for different tooltips
+        &.created .tooltip-content {
+          background: #1976D2;
+          
+          &::before {
+            border-bottom-color: #1976D2;
+          }
+        }
+        
+        &.edited .tooltip-content {
+          background: #388E3C;
+          
+          &::before {
+            border-bottom-color: #388E3C;
+          }
+        }
       }
     }
   }

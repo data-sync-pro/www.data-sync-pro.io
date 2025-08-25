@@ -13,8 +13,41 @@
       <span class="stat-item">
         <strong>{{ faqList.length }}</strong> Total FAQs
       </span>
-      <span class="stat-item edited">
-        <strong>{{ getEditedCount() }}</strong> Edited
+      <span class="stat-item created tooltip-container" 
+            *ngIf="getCreatedCount() > 0"
+            (mouseenter)="showTooltip = 'created'" 
+            (mouseleave)="showTooltip = null">
+        <strong>{{ getCreatedCount() }}</strong> Created
+        <div class="tooltip-content" *ngIf="showTooltip === 'created'">
+          <div class="tooltip-header">Created FAQs:</div>
+          <div class="tooltip-item clickable" 
+               *ngFor="let item of getCreatedFAQTitles()"
+               (click)="onTooltipFAQClick(item.faqId); $event.stopPropagation()"
+               title="Click to edit this FAQ">
+            {{ item.title }}
+          </div>
+          <div class="tooltip-more" *ngIf="getCreatedCount() > 10">
+            ...and {{ getCreatedCount() - 10 }} more
+          </div>
+        </div>
+      </span>
+      <span class="stat-item edited tooltip-container" 
+            *ngIf="getEditedExistingCount() > 0"
+            (mouseenter)="showTooltip = 'edited'" 
+            (mouseleave)="showTooltip = null">
+        <strong>{{ getEditedExistingCount() }}</strong> Edited
+        <div class="tooltip-content" *ngIf="showTooltip === 'edited'">
+          <div class="tooltip-header">Edited FAQs:</div>
+          <div class="tooltip-item clickable" 
+               *ngFor="let item of getEditedExistingFAQTitles()"
+               (click)="onTooltipFAQClick(item.faqId); $event.stopPropagation()"
+               title="Click to edit this FAQ">
+            {{ item.title }}
+          </div>
+          <div class="tooltip-more" *ngIf="getEditedExistingCount() > 10">
+            ...and {{ getEditedExistingCount() - 10 }} more
+          </div>
+        </div>
       </span>
       <span class="stat-item" *ngIf="state.lastSaved">
         Last saved: {{ formatDate(state.lastSaved) }}
@@ -31,7 +64,15 @@
       </button>
       <button class="btn btn-primary" (click)="state.showExportDialog = true"
               [disabled]="getEditedCount() === 0">
-        Export ({{ getEditedCount() }})
+        <span *ngIf="getCreatedCount() > 0 && getEditedExistingCount() > 0">
+          Export ({{ getCreatedCount() }} new, {{ getEditedExistingCount() }} edited)
+        </span>
+        <span *ngIf="getCreatedCount() > 0 && getEditedExistingCount() === 0">
+          Export ({{ getCreatedCount() }} new)
+        </span>
+        <span *ngIf="getCreatedCount() === 0 && getEditedExistingCount() > 0">
+          Export ({{ getEditedExistingCount() }} edited)
+        </span>
       </button>
       <button class="btn btn-danger" (click)="clearAllEdits()"
               [disabled]="getEditedCount() === 0">
