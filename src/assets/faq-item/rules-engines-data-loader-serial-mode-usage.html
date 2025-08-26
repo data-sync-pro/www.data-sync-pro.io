@@ -1,30 +1,4 @@
-
-    <p>
-      <strong>Serial mode</strong> should be used when processing records sequentially is necessary 
-      to <strong>prevent record locking issues</strong>, <strong>ensure data integrity</strong>, 
-      or <strong>maintain the correct execution order</strong>. It is particularly useful in scenarios
-       where multiple records update the same parent record or when actions depend on the completion 
-      of previous records.
-    </p>
-    <p><strong>Key Considerations:</strong></p>
-    <ul>
-      <li><strong>Prevents Record Locking</strong> - Reduces the likelihood of lock
-          contention, especially when updating or inserting related records.</li>
-    
-      <li><strong>Ensures Order of Execution</strong> - Processes records one at a
-          time rather than in parallel, which is beneficial for workflows that require
-          strict sequencing.</li>
-    
-      <li><strong>Potential Performance Impact</strong> - Since records are processed
-          sequentially, execution time may increase compared to parallel processing.</li>
-    
-      <li><strong>Use for Dependent Transactions</strong> - Ideal when data dependencies
-          exist between records that must be processed in a specific order.</li>
-    </ul>    
-    <p>
-      Enabling serial mode ensures <strong>safer execution</strong> in these cases, 
-      but it should be used selectively based on the needs of the batch process. 
-    </p>
+<p>Serial mode processes records sequentially rather than in parallel. This reduces the likelihood of record locking issues, maintains the correct order of execution, and ensures safer handling of dependent transactions—for example, when multiple records update the same parent record or when later actions rely on earlier updates. The trade-off is slower performance, as processing takes longer compared to parallel execution. For most use cases, parallel mode is faster, but enabling serial mode is recommended selectively when data integrity or dependency order outweighs speed.</p>
   
   
-<img src="assets/image/rules-engines-data-loader-serial-mode-usage/rules-engines-data-loader-serial-mode-usage.jpg" />
+<img src="assets/image/rules-engines-data-loader-serial-mode-usage/rules-engines-data-loader-serial-mode-usage.jpg">

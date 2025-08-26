@@ -50,14 +50,16 @@ export class FAQExportService {
     editedExistingFAQs.forEach(faq => {
       const fileName = this.getHTMLFileName(faq.faqId);
       if (fileName) {
-        htmlContent[fileName] = this.cleanHTMLContent(faq.answer);
+        const cleanedContent = this.cleanHTMLContent(faq.answer);
+        htmlContent[fileName] = this.decodeHTMLEntities(cleanedContent);
       }
     });
     
     // Add HTML content for new FAQs
     newFAQs.forEach(faq => {
       const fileName = this.generateHTMLFileNameForNewFAQ(faq);
-      htmlContent[fileName] = this.cleanHTMLContent(faq.answer);
+      const cleanedContent = this.cleanHTMLContent(faq.answer);
+      htmlContent[fileName] = this.decodeHTMLEntities(cleanedContent);
     });
 
     const totalItemCount = allFAQs.length + newFAQs.length;
@@ -263,29 +265,8 @@ export class FAQExportService {
             return;
           }
 
-          // Convert back to EditedFAQ format
-          const editedFAQs: EditedFAQ[] = [];
-          
-          for (const faq of data.faqs) {
-            const htmlFileName = faq.Answer__c;
-            const htmlContent = data.htmlContent[htmlFileName];
-            
-            if (htmlContent) {
-              editedFAQs.push({
-                id: `${faq.Id}_imported_${Date.now()}`,
-                faqId: faq.Id,
-                question: faq.Question__c,
-                answer: htmlContent,
-                category: faq.Category__c,
-                subCategory: faq.SubCategory__c,
-                timestamp: Date.now(),
-                version: 1
-              });
-            }
-          }
-
-          // Import to storage
-          const success = await this.storageService.importEdits(editedFAQs);
+          // Convert and import the data
+          const success = await this.processImportData(data);
           resolve(success);
         } catch (error) {
           console.error('Error importing JSON:', error);
@@ -300,6 +281,129 @@ export class FAQExportService {
 
       reader.readAsText(file);
     });
+  }
+
+  async importFromZip(file: File): Promise<boolean> {
+    try {
+      console.log('Starting ZIP import for file:', file.name);
+      
+      // Read the ZIP file
+      const zip = new JSZip();
+      const zipContent = await zip.loadAsync(file);
+      
+      // Extract and parse faqs.json
+      const faqsJsonFile = zipContent.file('faqs.json');
+      if (!faqsJsonFile) {
+        console.error('faqs.json not found in ZIP file');
+        return false;
+      }
+      
+      const faqsJsonContent = await faqsJsonFile.async('string');
+      let faqsData: any[];
+      
+      try {
+        faqsData = JSON.parse(faqsJsonContent);
+      } catch (error) {
+        console.error('Invalid JSON in faqs.json:', error);
+        return false;
+      }
+      
+      // Extract HTML content files
+      const htmlContent: { [key: string]: string } = {};
+      const htmlFolder = zipContent.folder('html-content');
+      
+      if (htmlFolder) {
+        // Process each HTML file in the html-content folder
+        for (const [relativePath, file] of Object.entries(htmlFolder.files)) {
+          if (file && !file.dir && relativePath.endsWith('.html')) {
+            const fileName = relativePath.split('/').pop() || relativePath;
+            const htmlFileContent = await file.async('string');
+            htmlContent[fileName] = htmlFileContent;
+            console.log(`Extracted HTML file: ${fileName}`);
+          }
+        }
+      }
+      
+      // Extract metadata (optional)
+      let metadata: any = {
+        exportDate: new Date().toISOString(),
+        version: this.EXPORT_VERSION,
+        itemCount: faqsData.length,
+        editedCount: faqsData.length
+      };
+      
+      const metadataFile = zipContent.file('export-metadata.json');
+      if (metadataFile) {
+        try {
+          const metadataContent = await metadataFile.async('string');
+          metadata = JSON.parse(metadataContent);
+        } catch (error) {
+          console.warn('Could not parse metadata, using defaults:', error);
+        }
+      }
+      
+      // Construct ExportData object
+      const data: ExportData = {
+        metadata,
+        faqs: faqsData,
+        htmlContent
+      };
+      
+      // Validate the extracted data
+      if (!this.validateExportData(data)) {
+        console.error('Invalid export data format in ZIP file');
+        return false;
+      }
+      
+      console.log(`ZIP import: Found ${faqsData.length} FAQs and ${Object.keys(htmlContent).length} HTML files`);
+      
+      // Process and import the data
+      const success = await this.processImportData(data);
+      
+      if (success) {
+        console.log('ZIP import completed successfully');
+      } else {
+        console.error('ZIP import failed during data processing');
+      }
+      
+      return success;
+      
+    } catch (error) {
+      console.error('Error importing ZIP file:', error);
+      return false;
+    }
+  }
+
+  private async processImportData(data: ExportData): Promise<boolean> {
+    try {
+      // Convert back to EditedFAQ format
+      const editedFAQs: EditedFAQ[] = [];
+      
+      for (const faq of data.faqs) {
+        const htmlFileName = faq.Answer__c;
+        const htmlContent = data.htmlContent[htmlFileName];
+        
+        if (htmlContent) {
+          editedFAQs.push({
+            id: `${faq.Id}_imported_${Date.now()}`,
+            faqId: faq.Id,
+            question: faq.Question__c,
+            answer: this.decodeHTMLEntities(htmlContent),
+            category: faq.Category__c,
+            subCategory: faq.SubCategory__c,
+            timestamp: Date.now(),
+            version: 1
+          });
+        }
+      }
+
+      // Import to storage
+      const success = await this.storageService.importEdits(editedFAQs);
+      return success;
+    } catch (error) {
+      console.error('Error processing import data:', error);
+      return false;
+    }
   }
 
   private validateExportData(data: any): data is ExportData {
@@ -356,192 +460,137 @@ Notes:
   }
 
   /**
-   * Clean HTML content by removing unwanted text and attributes
+   * Clean HTML content by removing unwanted text and attributes using string operations
+   * This avoids DOM manipulation that causes HTML entity encoding
    */
-  private cleanHTMLContent(content: string): string {
+  public cleanHTMLContent(content: string): string {
     if (!content) return content;
     
-    // Create a temporary DOM element to parse and clean the HTML
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = content;
+    let cleaned = content;
     
-    // Remove any text nodes that contain "faq-editor"
-    this.removeUnwantedTextNodes(tempDiv, 'faq-editor');
+    // Remove unwanted text nodes that contain "faq-editor"
+    cleaned = this.removeUnwantedTextNodesString(cleaned, 'faq-editor');
     
-    // Remove data-start and data-end attributes and inline styles from all elements
-    this.removeUnwantedAttributes(tempDiv, ['data-start', 'data-end', 'style']);
-    
-    // Additional clean up of specific inline styles if needed
-    this.cleanInlineStyles(tempDiv);
+    // Remove all attributes from all elements except img src
+    cleaned = this.removeUnwantedAttributesString(cleaned);
     
     // Remove ALL span tags while preserving their content
-    this.removeAllSpanTags(tempDiv);
+    cleaned = this.removeAllSpanTagsString(cleaned);
     
     // Remove any elements that might be editor-specific
-    this.removeEditorElements(tempDiv);
+    cleaned = this.removeEditorElementsString(cleaned);
     
-    // Remove empty tags after cleaning
-    this.removeEmptyTags(tempDiv);
+    // Remove empty tags after cleaning (recursively)
+    cleaned = this.removeEmptyTagsString(cleaned);
     
-    return tempDiv.innerHTML;
+    return cleaned;
   }
 
+
   /**
-   * Remove text nodes containing unwanted text
+   * Decode HTML entities to actual characters
    */
-  private removeUnwantedTextNodes(element: Element, unwantedText: string): void {
-    const walker = document.createTreeWalker(
-      element,
-      NodeFilter.SHOW_TEXT,
-      null
-    );
+  public decodeHTMLEntities(content: string): string {
+    if (!content) return content;
     
-    const textNodesToRemove: Node[] = [];
-    let node;
+    // Map of HTML entities to their corresponding characters
+    const entityMap: { [key: string]: string } = {
+      '&amp;': '&',
+      '&lt;': '<', 
+      '&gt;': '>',
+      '&quot;': '"',
+      '&#39;': "'",
+      '&apos;': "'",
+      '&nbsp;': ' ',  // Convert to regular space
+      '&mdash;': '—',
+      '&ndash;': '–',
+      '&hellip;': '…',
+      '&copy;': '©',
+      '&reg;': '®',
+      '&trade;': '™'
+    };
     
-    while (node = walker.nextNode()) {
-      if (node.textContent?.includes(unwantedText)) {
-        textNodesToRemove.push(node);
-      }
+    let decoded = content;
+    
+    // Replace named entities
+    for (const [entity, char] of Object.entries(entityMap)) {
+      decoded = decoded.replace(new RegExp(entity, 'g'), char);
     }
     
-    textNodesToRemove.forEach(textNode => {
-      textNode.parentNode?.removeChild(textNode);
+    // Handle numeric character references like &#39; &#8217; etc.
+    decoded = decoded.replace(/&#(\d+);/g, (match, dec) => {
+      return String.fromCharCode(parseInt(dec, 10));
     });
+    
+    // Handle hexadecimal character references like &#x27; &#x2019; etc.
+    decoded = decoded.replace(/&#x([0-9a-fA-F]+);/g, (match, hex) => {
+      return String.fromCharCode(parseInt(hex, 16));
+    });
+    
+    return decoded;
   }
 
   /**
-   * Remove unwanted attributes from all elements
+   * String-based methods to avoid HTML entity encoding
    */
-  private removeUnwantedAttributes(element: Element, attributesToRemove: string[]): void {
-    const allElements = element.querySelectorAll('*');
-    
-    allElements.forEach(el => {
-      attributesToRemove.forEach(attr => {
-        el.removeAttribute(attr);
-      });
-    });
-    
-    // Also remove from the root element
-    attributesToRemove.forEach(attr => {
-      element.removeAttribute(attr);
-    });
+  
+  private removeUnwantedTextNodesString(content: string, unwantedText: string): string {
+    // Remove text content containing the unwanted text
+    return content.replace(new RegExp(unwantedText, 'gi'), '');
   }
-
-  /**
-   * Remove elements that are editor-specific
-   */
-  private removeEditorElements(element: Element): void {
-    // Remove elements with editor-specific classes or attributes
-    const editorSelectors = [
-      '.faq-editor-container',
-      '.editor-header',
-      '.editor-brand',
-      '[contenteditable]',
-      '.html-wysiwyg-editor'
-    ];
-    
-    editorSelectors.forEach(selector => {
-      const elementsToRemove = element.querySelectorAll(selector);
-      elementsToRemove.forEach(el => {
-        // If it's the root element, keep its content but remove the wrapper
-        if (el === element) {
-          return;
+  
+  private removeUnwantedAttributesString(content: string): string {
+    // Remove all attributes from all tags except img src
+    return content.replace(/<(\w+)([^>]*?)>/gi, (match, tagName, attributes) => {
+      if (tagName.toLowerCase() === 'img') {
+        // For img tags, only keep src attribute
+        const srcMatch = attributes.match(/\s+src\s*=\s*["']([^"']*?)["']/i);
+        if (srcMatch) {
+          return `<${tagName} src="${srcMatch[1]}">`;
         }
-        el.remove();
-      });
-    });
-  }
-
-  /**
-   * Remove empty tags after cleaning styles and attributes
-   */
-  private removeEmptyTags(element: Element): void {
-    // Define tags that should be removed if they become empty after cleaning
-    // Note: Only remove truly unnecessary tags, preserve semantic and structural tags
-    const emptyTagsToRemove = ['span', 'font'];
-    
-    emptyTagsToRemove.forEach(tagName => {
-      const elements = Array.from(element.querySelectorAll(tagName));
-      
-      elements.forEach(el => {
-        // Check if element is empty (no text content and no meaningful children)
-        const hasText = (el.textContent?.trim().length ?? 0) > 0;
-        const hasImportantChildren = el.querySelector('img, br, hr, input, textarea, select');
-        
-        if (!hasText && !hasImportantChildren) {
-          // Move any children to parent before removing
-          while (el.firstChild) {
-            el.parentNode?.insertBefore(el.firstChild, el);
-          }
-          el.remove();
-        }
-      });
-    });
-  }
-
-  /**
-   * Clean specific inline styles that are commonly added by editors
-   */
-  private cleanInlineStyles(element: Element): void {
-    const elementsWithStyle = element.querySelectorAll('[style]');
-    
-    elementsWithStyle.forEach(el => {
-      const currentStyle = el.getAttribute('style') || '';
-      
-      // Define unwanted style patterns commonly added by editors
-      const unwantedStylePatterns = [
-        /color:\s*rgb\(51,\s*51,\s*51\)/gi,  // Specific gray color
-        /font-family:\s*[^;]*Roboto[^;]*/gi,  // Roboto font family
-        /font-family:\s*[^;]*sans-serif[^;]*/gi,  // Generic sans-serif
-      ];
-      
-      let cleanedStyle = currentStyle;
-      
-      // Remove unwanted style patterns
-      unwantedStylePatterns.forEach(pattern => {
-        cleanedStyle = cleanedStyle.replace(pattern, '');
-      });
-      
-      // Clean up extra semicolons and spaces
-      cleanedStyle = cleanedStyle
-        .replace(/;\s*;/g, ';')  // Remove double semicolons
-        .replace(/^;\s*/, '')    // Remove leading semicolon
-        .replace(/\s*;\s*$/, '') // Remove trailing semicolon
-        .trim();
-      
-      // If no styles remain, remove the attribute entirely
-      if (!cleanedStyle) {
-        el.removeAttribute('style');
+        return `<${tagName}>`;
       } else {
-        el.setAttribute('style', cleanedStyle);
+        // For all other tags, remove all attributes
+        return `<${tagName}>`;
       }
     });
+  }
+  
+  private removeAllSpanTagsString(content: string): string {
+    // Remove span tags but preserve their content
+    return content.replace(/<\/?span[^>]*>/gi, '');
+  }
+  
+  private removeEditorElementsString(content: string): string {
+    // Remove editor-specific elements
+    let cleaned = content;
+    
+    // Remove elements with editor-specific classes or attributes
+    cleaned = cleaned.replace(/<[^>]*class\s*=\s*["'][^"']*(?:faq-editor|editor-|html-wysiwyg)[^"']*["'][^>]*>.*?<\/[^>]+>/gis, '');
+    cleaned = cleaned.replace(/<[^>]*contenteditable[^>]*>.*?<\/[^>]+>/gis, '');
+    
+    return cleaned;
+  }
+  
+  private removeEmptyTagsString(content: string): string {
+    let cleaned = content;
+    let hasChanges = false;
+    
+    do {
+      hasChanges = false;
+      const beforeLength = cleaned.length;
+      
+      // Remove empty tags (but preserve self-closing important tags)
+      // First handle paired tags that are completely empty
+      cleaned = cleaned.replace(/<((?!(?:br|hr|img|input|textarea|select|iframe|video|audio|canvas|svg|area|base|col|embed|link|meta|param|source|track|wbr)\b)\w+)[^>]*>\s*<\/\1>/gi, '');
+      
+      // Then handle tags that only contain whitespace or &nbsp;
+      cleaned = cleaned.replace(/<((?!(?:br|hr|img|input|textarea|select|iframe|video|audio|canvas|svg|area|base|col|embed|link|meta|param|source|track|wbr)\b)\w+)[^>]*>(?:\s|&nbsp;)*<\/\1>/gi, '');
+      
+      hasChanges = cleaned.length !== beforeLength;
+    } while (hasChanges);
+    
+    return cleaned;
   }
 
-  /**
-   * Remove ALL span tags while preserving their content
-   */
-  private removeAllSpanTags(element: Element): void {
-    // Get all span elements - we need to process from innermost to outermost
-    // to handle nested spans correctly
-    let spanElements = Array.from(element.querySelectorAll('span'));
-    
-    // Process spans in reverse order (deepest first) to avoid DOM mutation issues
-    spanElements.reverse().forEach(span => {
-      // Create document fragment to hold span content
-      const fragment = document.createDocumentFragment();
-      
-      // Move all child nodes from span to fragment
-      while (span.firstChild) {
-        fragment.appendChild(span.firstChild);
-      }
-      
-      // Insert the fragment content before the span
-      span.parentNode?.insertBefore(fragment, span);
-      
-      // Remove the empty span
-      span.remove();
-    });
-  }
 }

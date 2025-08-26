@@ -1,42 +1,14 @@
-
-  <p>Here's how you can grant users access to a <strong>#Trigger</strong> in DSP:</p>
-  <ol>
-    <li>
-      <strong>Access to Executables</strong>: DSP <strong>#triggers </strong>are specified in
-      Executables. Therefore, to grant users access to the <strong>#triggers,</strong> they must
-      first have <strong>access to the Executables</strong> where the triggers are defined.
-    </li>
-    <li>
-      <strong>Grant</strong> "<strong>DSP: Data Sync Pro Starter</strong>" <strong>Permission Set</strong> :
-      Assign the "<strong>DSP: Data Sync Pro Starter</strong>" permission set to <strong>all internal
-      users</strong>. This permission set provides the <strong>essential bare minimum access</strong> to
-      the package objects and components needed to work with DSP <strong>#triggers</strong>.
-    </li>
-    <li>
-      <strong>Automatic Field Enablement</strong> : When enabling any trigger
-      event for the first time, DSP automatically enables the "<strong>All Internal
-      Users Have Read Access?</strong>" field. This creates a sharing record that grants
-      all internal users read access to the current Executable. You can disable
-      this checkbox at any time to revoke access for all internal users.
-    </li>
-    <li>
-      <strong>Bypass Trigger Custom Permissions</strong> : Use the "<strong>Bypass
-      Triggers Custom Permissions</strong>" field to assign <strong>specific bypass permissions</strong>
-      to users, such as data migration users, who are assigned one of the
-      defined custom permissions.
-    </li>
-    <li>
-      <strong>Required Custom Permissions</strong> : Lastly, the "<strong>Required
-      Custom Permissions to Execute</strong>" field allows you to specify the <strong>custom
-      permissions</strong> required for users to execute the <strong>#triggers </strong>defined in the
-      Executable.
-    </li>
-  </ol>
-  <p>
-    These configurations offer <strong>security</strong> by ensuring that only
-    authorized users can access and execute the <strong>#triggers,</strong> while also providing
-    <strong>flexibility</strong> to tailor access levels and permissions based
-    on <strong>user personas</strong>
-    or specific use cases like data migration.
-  </p>
-
+<p>In DSP, #Trigger access is controlled through <b>Executables</b> and <b>permissions</b>. You can manage it in the following ways:</p><ul>
+<li>
+<p><strong>Permission Set</strong> – Assign the <strong>“DSP: Data Sync Pro Starter”</strong> permission set to all internal users. This provides the essential minimum access needed to work with #Trigger.</p>
+</li>
+<li>
+<p><strong>Executable Access</strong> – When a trigger event is enabled, DSP automatically checks <strong>“All Internal Users Have Read Access?”</strong> and creates a sharing record giving all internal users read access to the Executable. You can uncheck this at any time to revoke access.</p>
+</li>
+<li>
+<p><strong>Bypass Permissions</strong> – Use <strong>“Bypass Triggers Custom Permissions”</strong> to let certain users (e.g., data migration users) skip trigger execution if they hold a defined permission.</p>
+</li>
+<li>
+<p><strong>Required Permissions</strong> – Use <strong>“Required Custom Permissions to Execute”</strong> to restrict execution so only users with specific custom permissions can run the #Trigger.</p>
+</li>
+</ul><p><strong>Summary:</strong> These options let you <strong>secure access</strong> so only authorized users can execute triggers, while also giving you the <strong>flexibility</strong> to tailor access for different roles or use cases.</p>

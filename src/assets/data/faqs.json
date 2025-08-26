@@ -176,7 +176,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Batch",
     "SeqNo__c": null,
-    "Question__c": "What permissions are required to execute a Batch?",
+    "Question__c": "What permissions are required to execute a #Batch?",
     "Answer__c": "rules-engines-batch-batch-permissions-needed.html"
   },
   {
@@ -338,7 +338,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Data List",
     "SeqNo__c": null,
-    "Question__c": "Why DSP Data List?",
+    "Question__c": "Why #Data List?",
     "Answer__c": "rules-engines-data-list-why-dsp-data-list.html"
   },
   {
@@ -347,7 +347,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Data List",
     "SeqNo__c": null,
-    "Question__c": "How do I create an Actionable Data List?",
+    "Question__c": "How do I create an Actionable #Data List?",
     "Answer__c": "rules-engines-data-list-create-actionable-data-list.html"
   },
   {
@@ -356,7 +356,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Data List",
     "SeqNo__c": null,
-    "Question__c": "What are the two essential components of a Actionable Data List?",
+    "Question__c": "What are the two essential components of a Actionable #Data List?",
     "Answer__c": "rules-engines-data-list-two-components-data-list.html"
   },
   {
@@ -383,7 +383,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Data List",
     "SeqNo__c": null,
-    "Question__c": "What permissions are required to access a Data List, view its data, and execute its actions?",
+    "Question__c": "What permissions are needed to use a #Data List?",
     "Answer__c": "rules-engines-data-list-data-list-permissions.html"
   },
   {
@@ -392,7 +392,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Data List",
     "SeqNo__c": null,
-    "Question__c": "How do I embed Data Lists into a Lightning page?",
+    "Question__c": "How do I add a #Data List to a Lightning page?",
     "Answer__c": "rules-engines-data-list-embed-data-lists-lightning.html"
   },
   {
@@ -401,7 +401,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Data List",
     "SeqNo__c": null,
-    "Question__c": "How can I customize the Label, Variant, and Icon of an action?",
+    "Question__c": "How can I customize the appearance of a #Data List action?",
     "Answer__c": "rules-engines-data-list-customize-action-ui.html"
   },
   {
@@ -410,7 +410,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Data List",
     "SeqNo__c": null,
-    "Question__c": "Can I prompt users for confirmation before executing an action after they click the action button?",
+    "Question__c": "Can I prompt users for confirmation before executing an action?",
     "Answer__c": "rules-engines-data-list-action-confirmation-prompt.html"
   },
   {
@@ -437,7 +437,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Data List",
     "SeqNo__c": null,
-    "Question__c": "Why group multiple Executable Data Lists into a Pipeline?",
+    "Question__c": "What are the benefits of grouping multiple #Data Lists into a Pipeline?",
     "Answer__c": "rules-engines-data-list-group-data-lists.html"
   },
   {
@@ -446,7 +446,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Data List",
     "SeqNo__c": null,
-    "Question__c": "How can I consolidate multiple Executable actions into a single Data List?",
+    "Question__c": "How do I merge actions from multiple Executables into one #Data List?",
     "Answer__c": "rules-engines-data-list-consolidate-data-list-actions.html"
   },
   {
@@ -455,7 +455,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Data List",
     "SeqNo__c": null,
-    "Question__c": "How can I specify the related lists for each row in a data list?",
+    "Question__c": "How can I configure row-level related lists in a #Data List?",
     "Answer__c": "rules-engines-data-list-specify-related-lists.html"
   },
   {
@@ -464,7 +464,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Data List",
     "SeqNo__c": null,
-    "Question__c": "What are the benefits of replacing the default 'New Record' function in a Data List with a custom action?",
+    "Question__c": "What advantages does a custom ‘New Record’ action have over the default in a #Data List?",
     "Answer__c": "rules-engines-data-list-replace-new-record.html"
   },
   {
@@ -473,7 +473,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Data List",
     "SeqNo__c": null,
-    "Question__c": "Can I set up a Data Loader as a List Action in my Data List?",
+    "Question__c": "Can I launch a Data Loader directly from a #Data List?",
     "Answer__c": "rules-engines-data-list-data-loader-list-action.html"
   },
   {
@@ -482,7 +482,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Data List",
     "SeqNo__c": null,
-    "Question__c": "What permissions can be set for accessing and interacting with query results in a Data List?",
+    "Question__c": "What permissions can I configure for query results in a #Data List?",
     "Answer__c": "rules-engines-data-list-data-list-query-permissions.html"
   },
   {
@@ -491,7 +491,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Data List",
     "SeqNo__c": null,
-    "Question__c": "How can I configure records to open in the Lightning record page when clicked in a Data List?",
+    "Question__c": "Can I choose to open records in the Lightning record page instead of raw view?",
     "Answer__c": "rules-engines-data-list-open-record-in-lightning.html"
   },
   {
@@ -500,7 +500,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Data List",
     "SeqNo__c": null,
-    "Question__c": "How can end users customize the query in a Data List—such as selecting fields, filtering, or sorting?",
+    "Question__c": "How do I enable Query Manager in a #Data List?",
     "Answer__c": "rules-engines-data-list-end-user-query-customization.html"
   },
   {
@@ -509,7 +509,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Data List",
     "SeqNo__c": null,
-    "Question__c": "Can Data Lists be extended and customized within custom LWC components?",
+    "Question__c": "What’s the way to inject custom actions into Pipeline Data Lists?",
     "Answer__c": "rules-engines-data-list-extend-data-lists-lwc.html"
   },
   {
@@ -518,7 +518,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Data List",
     "SeqNo__c": null,
-    "Question__c": "How can I enable horizontal scrolling for a data list?",
+    "Question__c": "How do I make a #Data List scroll horizontally?",
     "Answer__c": "rules-engines-data-list-horizontal-scrolling-data-list.html"
   },
   {
@@ -527,7 +527,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Data List",
     "SeqNo__c": null,
-    "Question__c": "How can I configure a Data List to retrieve data from a remote Salesforce org?",
+    "Question__c": "How do I set up a #Data List to pull data from a remote Salesforce org?",
     "Answer__c": "rules-engines-data-list-remote-org-data-list.html"
   },
   {
@@ -536,7 +536,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Action Button",
     "SeqNo__c": null,
-    "Question__c": "What is an Action Button in Data Sync Pro?",
+    "Question__c": "What is an #Action Button?",
     "Answer__c": "rules-engines-action-button-what-is-action-button.html"
   },
   {
@@ -545,7 +545,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Action Button",
     "SeqNo__c": null,
-    "Question__c": "Why Data Sync Pro Action Button?",
+    "Question__c": "Why #Action Button?",
     "Answer__c": "rules-engines-action-button-why-dsp-action-button.html"
   },
   {
@@ -554,7 +554,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Action Button",
     "SeqNo__c": null,
-    "Question__c": "How can I create an Action Button?",
+    "Question__c": "How do I create an #Action Button?",
     "Answer__c": "rules-engines-action-button-create-action-button.html"
   },
   {
@@ -563,7 +563,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Action Button",
     "SeqNo__c": null,
-    "Question__c": "How can I customize the Label, Variant, and Icon of an action?",
+    "Question__c": "How can I customize the appearance of an #Action Button?",
     "Answer__c": "rules-engines-action-button-customize-action-ui.html"
   },
   {
@@ -572,7 +572,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Action Button",
     "SeqNo__c": null,
-    "Question__c": "Can I prompt users for confirmation before executing an action after they click the action button?",
+    "Question__c": "Can I prompt users for confirmation before executing an action?",
     "Answer__c": "rules-engines-action-button-action-confirmation-prompt.html"
   },
   {
@@ -581,7 +581,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Action Button",
     "SeqNo__c": null,
-    "Question__c": "Can I display transformed field values on screen and allow users to edit them before execution?",
+    "Question__c": "How can users review and edit field values before running an action?",
     "Answer__c": "rules-engines-action-button-display-transformed-values.html"
   },
   {
@@ -590,7 +590,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Action Button",
     "SeqNo__c": null,
-    "Question__c": "Why group multiple Executable Action Buttons into a Pipeline?",
+    "Question__c": "What are the benefits of grouping multiple #Action Buttons into a Pipeline?",
     "Answer__c": "rules-engines-action-button-group-action-buttons.html"
   },
   {
@@ -599,7 +599,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Action Button",
     "SeqNo__c": null,
-    "Question__c": "Can I make a series of actions with a single button click?",
+    "Question__c": "How can I execute multiple actions with one #Action Button?",
     "Answer__c": "rules-engines-action-button-series-actions-one-click.html"
   },
   {
@@ -608,7 +608,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Action Button",
     "SeqNo__c": null,
-    "Question__c": "How can I grant users access to an Action Button?",
+    "Question__c": "What permissions are needed to use a #Action Button?",
     "Answer__c": "rules-engines-action-button-action-button-access.html"
   },
   {
@@ -617,7 +617,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Data Loader",
     "SeqNo__c": null,
-    "Question__c": "How does the Data Loader work in DSP?",
+    "Question__c": "What is #Data Loader?",
     "Answer__c": "rules-engines-data-loader-data-loader-overview.html"
   },
   {
@@ -626,7 +626,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Data Loader",
     "SeqNo__c": null,
-    "Question__c": "How can I create a Data Loader?",
+    "Question__c": "How do I create a #Data Loader?",
     "Answer__c": "rules-engines-data-loader-create-data-loader.html"
   },
   {
@@ -635,7 +635,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Data Loader",
     "SeqNo__c": null,
-    "Question__c": "Can I load data to a different org?",
+    "Question__c": "Can I use #Data Loader to load data into another Salesforce org?",
     "Answer__c": "rules-engines-data-loader-load-data-different-org.html"
   },
   {
@@ -644,7 +644,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Data Loader",
     "SeqNo__c": null,
-    "Question__c": "How are execution logs recorded in a Data Loader process?",
+    "Question__c": "How are execution logs tracked in a #Data Loader process?",
     "Answer__c": "rules-engines-data-loader-data-loader-logs.html"
   },
   {
@@ -653,7 +653,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Data Loader",
     "SeqNo__c": null,
-    "Question__c": "Since CSV columns are stored as strings, how does Data Loader handle data type conversion?",
+    "Question__c": "How does a #Data Loader handle data type conversion for CSV cells stored as strings?",
     "Answer__c": "rules-engines-data-loader-data-loader-type-conversion.html"
   },
   {
@@ -662,7 +662,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Data Loader",
     "SeqNo__c": null,
-    "Question__c": "How can I grant users access to a Data Loader?",
+    "Question__c": "What permissions are needed to use a #Data Loader?",
     "Answer__c": "rules-engines-data-loader-data-loader-access.html"
   },
   {
@@ -680,7 +680,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Data Loader",
     "SeqNo__c": null,
-    "Question__c": "When should the serial mode be used?",
+    "Question__c": "When should I enable serial mode?",
     "Answer__c": "rules-engines-data-loader-serial-mode-usage.html"
   },
   {
@@ -689,7 +689,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Data Loader",
     "SeqNo__c": null,
-    "Question__c": "Can I re-execute only the failed batches without reloading the entire dataset?",
+    "Question__c": "How can I retry only the failed data load batches without reloading the whole dataset?",
     "Answer__c": "rules-engines-data-loader-re-execute-failed-load.html"
   },
   {
@@ -707,7 +707,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Data Loader",
     "SeqNo__c": null,
-    "Question__c": "Can I make a Data Load fail if a column is missing from the source file?",
+    "Question__c": "Can I make a load fail if a column is missing from the source file?",
     "Answer__c": "rules-engines-data-loader-fail-on-missing-column.html"
   },
   {
@@ -716,7 +716,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Data Loader",
     "SeqNo__c": null,
-    "Question__c": "Can I set up my Data Loader as a List Action in a Data List?",
+    "Question__c": "Is it possible to run a #Data Loader from a #Data List as a list action?",
     "Answer__c": "rules-engines-data-loader-loader-as-list-action.html"
   },
   {
@@ -725,7 +725,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Triggers",
     "SeqNo__c": null,
-    "Question__c": "How does the DSP Trigger Rules Engine work?",
+    "Question__c": "How does #Trigger work?",
     "Answer__c": "rules-engines-triggers-trigger-rules-engine.html"
   },
   {
@@ -734,7 +734,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Triggers",
     "SeqNo__c": null,
-    "Question__c": "Why Data Sync Pro Trigger?",
+    "Question__c": "Why #Trigger?",
     "Answer__c": "rules-engines-triggers-why-dsp-trigger.html"
   },
   {
@@ -743,7 +743,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Triggers",
     "SeqNo__c": null,
-    "Question__c": "Which trigger events are supported?",
+    "Question__c": "What events are supported by #Trigger?",
     "Answer__c": "rules-engines-triggers-trigger-events-supported.html"
   },
   {
@@ -752,7 +752,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Triggers",
     "SeqNo__c": null,
-    "Question__c": "What is a Self-Adaptive Trigger?",
+    "Question__c": "What is a Self-Adaptive #Trigger?",
     "Answer__c": "rules-engines-triggers-self-adaptive-trigger.html"
   },
   {
@@ -761,7 +761,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Triggers",
     "SeqNo__c": null,
-    "Question__c": "How can I set up a Self-Adaptive Trigger?",
+    "Question__c": "How to create Self-Adaptive #Trigger?",
     "Answer__c": "rules-engines-triggers-setup-self-adaptive-trigger.html"
   },
   {
@@ -770,7 +770,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Triggers",
     "SeqNo__c": null,
-    "Question__c": "How can I perform aggregation calculations in a Self-Adaptive Trigger?",
+    "Question__c": "How can I calculate rollup summaries using a Self-Adaptive #Trigger?",
     "Answer__c": "rules-engines-triggers-aggregation-self-adaptive.html"
   },
   {
@@ -788,7 +788,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Triggers",
     "SeqNo__c": null,
-    "Question__c": "What is a Trigger Action?",
+    "Question__c": "What is a #Trigger Action?",
     "Answer__c": "rules-engines-triggers-what-is-trigger-action.html"
   },
   {
@@ -797,7 +797,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Triggers",
     "SeqNo__c": null,
-    "Question__c": "How can I set up a Trigger Action?",
+    "Question__c": "How to create a #Trigger Action?",
     "Answer__c": "rules-engines-triggers-setup-trigger-action.html"
   },
   {
@@ -806,7 +806,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Triggers",
     "SeqNo__c": null,
-    "Question__c": "What is the execution flow of a DSP Trigger?",
+    "Question__c": "What is the execution flow of a #Trigger?",
     "Answer__c": "rules-engines-triggers-dsp-trigger-flow.html"
   },
   {
@@ -815,7 +815,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Triggers",
     "SeqNo__c": null,
-    "Question__c": "How is recursive execution managed in update triggers?",
+    "Question__c": "How can I prevent recursive execution in update triggers?",
     "Answer__c": "rules-engines-triggers-recursive-update-triggers.html"
   },
   {
@@ -824,7 +824,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Triggers",
     "SeqNo__c": null,
-    "Question__c": "How to manage the execution order of DSP triggers?",
+    "Question__c": "How can I manage the execution order of #Triggers?",
     "Answer__c": "rules-engines-triggers-trigger-execution-order.html"
   },
   {
@@ -833,7 +833,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Triggers",
     "SeqNo__c": null,
-    "Question__c": "How can I grant users access to a Trigger?",
+    "Question__c": "How do I manage user access to a #Trigger?",
     "Answer__c": "rules-engines-triggers-trigger-access.html"
   },
   {
@@ -842,7 +842,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Triggers",
     "SeqNo__c": null,
-    "Question__c": "Salesforce requires that at least one line of code in an Apex Trigger be covered by test classes before deploying to production—how can I achieve this?",
+    "Question__c": "Salesforce requires at least one line of test coverage in an Apex Trigger—how can I achieve this?",
     "Answer__c": "rules-engines-triggers-test-coverage-trigger.html"
   },
   {

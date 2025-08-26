@@ -1,55 +1,8 @@
-
-    <p>
-      To create an <strong>#Action Button</strong> in Data Sync Pro (DSP), start
-      by creating an <strong>Executable</strong>—either
-      <strong>Direction-based</strong> for record actions or
-      <strong>Connection-based</strong> for global actions. Once created, DSP
-      provides a <strong>guided interface</strong> to configure each step of the
-      action logic:
-    </p>
-  
-    <h3><strong>Guided Steps for Defining an Action Button</strong></h3>
-    <ol>
-      <li>
-        <strong>Scoping</strong> - Refine the retrieved dataset using
-        in-memory filters and optional joins with other datasets for multi-source
-        enrichment.
-      </li>
-      <li>
-        <strong>Match</strong> - Identify target records using matching
-        rules. Supports insert-only logic, multi-field matching via
-        transformations, and merge-specific logic.
-      </li>
-      <li>
-        <strong>Mapping</strong> - Apply formulas and expressions to assign
-        and transform target field values. Features auto-validation, relational
-        field support, and a comprehensive function library.
-      </li>
-      <li>
-        <strong>Action</strong> - Define the operations to be performed,
-        such as Insert, Update, Upsert, Delete, Merge, Lead Convert, Send Email,
-        and more. Configure behavior options like “<strong>Skip Record Update if No
-        Changes</strong>” and writeback.
-      </li>
-    </ol>
-  
-    <h3><strong>Additional Action on Target Settings:</strong></h3>
-    <ul>
-      <li>
-        <strong>Action on Target</strong> - Configures how the action behaves,
-        including button label and style, visibility as list or row action (or
-        both), confirmation prompt, and editable fields before execution.
-      </li>
-      <li>
-        <strong>Lightning Placement Options</strong> - <strong>#Action Buttons </strong>can be
-        embedded as a Quick Action, a standalone
-        Executable Action Button, or grouped using Pipeline Action Buttons.
-      </li>
-    </ul>
-    <p>
-      📌 This structured, intuitive interface ensures your <strong>#Action Buttons </strong>are
-      <strong>modular</strong>, <strong>reusable</strong>, and fully aligned with your business logic—<strong>without
-      writing any code</strong>. 
-    </p>
-  
-  
+<p>An #Action Button is created as an Executable, either:</p><ul>
+<li>
+<p><strong>Direction-Based</strong> for record actions</p>
+</li>
+<li>
+<p><strong>Connection-Based</strong> for global actions</p>
+</li>
+</ul><p>Once created, DSP provides a guided interface—covering steps like <strong>Scope, Match, Mapping, and Action</strong>, along with additional <em>Action on Target</em> settings—to configure the button into a powerful, reusable action.</p><p>To <strong>add</strong> an #Action Button on a record page, place the LWC <strong>“Executable Action Button”</strong> or <strong>“Pipeline Action Buttons”</strong> in Lightning App Builder and provide the Executable API Name or Pipeline API Name.</p><p>To use it as a <strong>Quick Action</strong>, create a Quick Action from the Source Object’s <em>Buttons, Links, and Actions</em> setup, choose <strong>Lightning Web Component</strong> as the Action Type, select <code>pushtopics:executableQuickAction</code>, and set the Executable API Name as the Name.</p>

@@ -183,8 +183,18 @@
             <label>Category:</label>
             <select class="form-control"
                     [(ngModel)]="currentCategory"
-                    (change)="state.hasChanges = true; onTabContentChange()">
+                    (change)="onCategoryChange()">
               <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+            </select>
+          </div>
+          
+          <div class="form-group subcategory-field" *ngIf="subCategories.length > 0">
+            <label>Sub Category:</label>
+            <select class="form-control"
+                    [(ngModel)]="currentSubCategory"
+                    (change)="onSubCategoryChange()">
+              <option value="">-- No Sub Category --</option>
+              <option *ngFor="let subCat of subCategories" [value]="subCat">{{ subCat }}</option>
             </select>
           </div>
         </div>
@@ -481,15 +491,29 @@
 <div class="modal" *ngIf="state.showImportDialog" (click)="state.showImportDialog = false">
   <div class="modal-content" (click)="$event.stopPropagation()">
     <h2>Import FAQ Data</h2>
-    <p>Select a previously exported JSON file to import:</p>
+    <p>Select a previously exported file to import:</p>
+    <div class="import-info">
+      <div class="file-type-info">
+        <strong>Supported formats:</strong>
+        <ul>
+          <li><strong>.json</strong> - Single JSON file with FAQ data</li>
+          <li><strong>.zip</strong> - Complete export package with JSON and HTML files</li>
+        </ul>
+      </div>
+    </div>
     <input type="file" 
            #fileInput
-           accept=".json"
+           accept=".json,.zip"
            style="display: none"
            (change)="importFile($event)">
-    <button class="btn btn-primary" (click)="triggerFileInput()">
-      Choose File
-    </button>
-    <button class="btn btn-secondary" (click)="state.showImportDialog = false">Cancel</button>
+    <div class="modal-actions">
+      <button class="btn btn-primary" (click)="triggerFileInput()">
+        <span class="btn-icon">📁</span>
+        Choose File
+      </button>
+      <button class="btn btn-secondary" (click)="state.showImportDialog = false">
+        Cancel
+      </button>
+    </div>
   </div>
 </div>

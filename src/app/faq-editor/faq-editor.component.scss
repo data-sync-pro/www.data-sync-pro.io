@@ -1121,6 +1121,50 @@
   }
 }
 
+// Import Dialog Styles
+.import-info {
+  margin: 1.5rem 0;
+  padding: 1rem;
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  
+  .file-type-info {
+    ul {
+      margin: 0.5rem 0 0 0;
+      padding-left: 1.2rem;
+      
+      li {
+        margin: 0.3rem 0;
+        line-height: 1.4;
+        
+        strong {
+          color: #2c5aa0;
+          font-weight: 600;
+        }
+      }
+    }
+  }
+}
+
+.modal-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  align-items: center;
+  margin-top: 1.5rem;
+  
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    
+    .btn-icon {
+      font-size: 1.1em;
+    }
+  }
+}
+
 // Spinner animation
 .spinner {
   display: inline-block;

@@ -1,58 +1,21 @@
-
-    <p>
-      Data Sync Pro (DSP) <strong>#Triggers</strong> offer a simplified yet powerful approach 
-      to Salesforce automation through a record-based rules engine. 
-      DSP leverages intuitive, record-based configurations and bulkified transformation, 
-      making automation significantly easier to manage and scale compared to 
-      traditional metadata-driven approaches.
-    </p>
-    <p>
-      <strong>Key Benefits:</strong>
-    </p>
-    <ol>
-      <li>
-        <strong>No-Code, Record-Based Trigger Rules</strong><br />
-        DSP empowers users to define trigger logic via a user-friendly, intuitive 
-        interface using declarative formulas and expressions. This modular, no-code 
-        approach eliminates complex coding, substantially reduces development time, 
-        and ensures flexibility. 
-        <em>(Note: While trigger logic itself is no-code, a minimal one-time setup 
-        with Salesforce Apex Triggers is required.)</em>
-      </li>
-      <li>
-        <strong>Bulkified Transformation (Simplified Trigger Design)</strong><br />
-        DSP automatically manages bulk data operations, enabling users to define 
-        trigger logic as if working with just one record—significantly simplifying 
-        trigger development. For example, relational fields like 
-        <code>Parent__r.Field_x__c</code> can be referenced directly within DSP 
-        formulas and expressions, without manually writing queries or managing 
-        complex Apex collections.
-      </li>
-      <li>
-        <strong>Dynamic Scoping and Criteria</strong><br />
-        DSP processes only those records matching defined criteria for specified 
-        trigger events, efficiently handling the scoped data.
-      </li>
-      <li>
-        <strong>Flexible Actions</strong><br />
-        DSP offers comprehensive automation capabilities—including validations, 
-        field recalculations, cross-object DML operations, email notifications, 
-        and more—providing robust and flexible business process automation.
-      </li>
-      <li>
-        <strong>Execution Order and Granular Control</strong><br />
-        DSP provides precise control over trigger execution order, user permissions, 
-        selective bypass options, and recursion handling, allowing fine-tuned 
-        alignment with specific business requirements.
-      </li>
-    </ol>
-    <p>
-      By combining a <strong>no-code</strong>, <strong>record-based rules engine</strong> 
-      (with minimal one-time Apex Trigger integration), <strong>efficient 
-      bulkified transformations</strong>, and a <strong>highly 
-      modular design</strong>, DSP <strong>#Triggers </strong>dramatically simplify 
-      Salesforce automation—delivering exceptional scalability, flexibility, 
-      ease of maintenance, and minimizing long-term tech debt.
-    </p>
-  
-  
+<p>DSP #Trigger is a <strong>rules-driven, modular framework</strong> that simplifies Salesforce automation and validation. Instead of writing Apex or building Record-Triggered Flows, you configure Executable records that are dynamically injected into execution whenever a trigger event occurs. This approach makes automation easier to design, scale, and maintain, while ensuring all logic runs in a bulkified, governor-limit–aware manner.</p><p><strong>Key Benefits:</strong></p><ul>
+<li>
+<p><strong>Rules-Driven Trigger Logic</strong><br>
+Define trigger rules declaratively with formulas and expressions. #Trigger logic is modular, metadata-driven, and injected dynamically at runtime.</p>
+</li>
+<li>
+<p><strong>Bulkified by Design</strong><br>DSP automatically manages bulk processing so you can define rules as if working with a single record. You can directly reference fields on parent objects (e.g., <code>Parent__r.GrandParent__r.Field__c</code>) and use advanced functions like <code>VLOOKUP</code> or <code>AGG</code>, making even complex transformations straightforward—without writing custom SOQL or handling Apex collections.</p>
+</li>
+<li>
+<p><strong>Dynamic Scoping and Criteria</strong><br>
+Triggered records are evaluated against scoping rules so only the relevant subset is processed, improving efficiency and precision.</p>
+</li>
+<li>
+<p><strong>Flexible Actions</strong><br>
+Executables can perform validations, recalculate fields, insert, update, or delete related records, send notifications, publish platform events or more.</p>
+</li>
+<li>
+<p><strong>Execution Order and Control</strong><br>
+DSP gives administrators fine-grained control over execution order, selective bypass options, recursion handling, and user-level permissions, ensuring flexible configurations that address even complex business requirements in enterprise environments.</p>
+</li>
+</ul><p>By combining a <strong>rules-driven framework</strong>, <strong>bulkified execution</strong>, and <strong>metadata-driven injection</strong>, DSP #Trigger makes Salesforce automation and validation far more scalable, flexible, and maintainable, while reducing complexity and <b>significantly</b> <b>minimizing long-term technical debt</b>.</p>

@@ -7,7 +7,7 @@ import { HttpClient } from '@angular/common/http';
 import { FAQService } from '../shared/services/faq.service';
 import { FAQStorageService, EditedFAQ } from '../shared/services/faq-storage.service';
 import { FAQExportService, ExportData, ExportProgress } from '../shared/services/faq-export.service';
-import { FAQItem } from '../shared/models/faq.model';
+import { FAQItem, FAQCategory } from '../shared/models/faq.model';
 import { NotificationService } from '../shared/services/notification.service';
 import { html_beautify } from 'js-beautify';
 
@@ -379,6 +379,7 @@ interface FAQTab {
   editorContent: string;
   currentQuestion: string;
   currentCategory: string;
+  currentSubCategory: string;
 }
 
 interface FAQTitleItem {
@@ -450,10 +451,13 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
   searchQuery = '';
   selectedCategory = '';
   categories: string[] = [];
+  subCategories: string[] = [];
+  categoriesData: FAQCategory[] = [];
   
   editorContent = '';
   currentQuestion = '';
   currentCategory = '';
+  currentSubCategory = '';
   previewContent: SafeHtml = '';
   
   storageStats = { used: 0, available: 0, percentage: 0 };
@@ -615,13 +619,56 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   private extractCategories(): void {
-    const categorySet = new Set<string>();
-    this.faqList.forEach(faq => {
-      if (faq.category) {
-        categorySet.add(faq.category);
-      }
-    });
-    this.categories = Array.from(categorySet).sort();
+    // Get categories with subcategories from FAQ service
+    this.faqService.getCategories()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(categoriesData => {
+        this.categoriesData = categoriesData;
+        this.categories = categoriesData.map(cat => cat.name).sort();
+        
+        // Update subcategories for current selected category
+        this.updateSubCategories();
+      });
+  }
+
+  /**
+   * Update subcategories based on current selected category
+   */
+  private updateSubCategories(): void {
+    if (!this.currentCategory) {
+      this.subCategories = [];
+      return;
+    }
+
+    const categoryData = this.categoriesData.find(cat => cat.name === this.currentCategory);
+    if (categoryData && categoryData.subCategories.length > 0) {
+      this.subCategories = categoryData.subCategories.map(sub => sub.name).sort();
+    } else {
+      this.subCategories = [];
+    }
+  }
+
+  /**
+   * Handle category change - update subcategories and clear invalid subcategory
+   */
+  onCategoryChange(): void {
+    this.updateSubCategories();
+    
+    // Clear subcategory if it's not valid for the new category
+    if (this.currentSubCategory && !this.subCategories.includes(this.currentSubCategory)) {
+      this.currentSubCategory = '';
+    }
+    
+    this.state.hasChanges = true;
+    this.onTabContentChange();
+  }
+
+  /**
+   * Handle subcategory change
+   */
+  onSubCategoryChange(): void {
+    this.state.hasChanges = true;
+    this.onTabContentChange();
   }
 
   private updateStorageStats(): void {
@@ -654,6 +701,10 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
     this.state.isLoading = true; // Show loading indicator
     this.currentQuestion = faq.question;
     this.currentCategory = faq.category;
+    this.currentSubCategory = faq.subCategory || '';
+    
+    // Update subcategories for the selected category
+    this.updateSubCategories();
     
     // Clear preview immediately to prevent showing old content
     this.previewContent = this.sanitizer.bypassSecurityTrustHtml('');
@@ -669,6 +720,7 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
       this.editorContent = editableContent;
       this.currentQuestion = edited!.question;
       this.currentCategory = edited!.category;
+      this.currentSubCategory = edited!.subCategory || '';
       
       // Set content directly in DOM after view init
       setTimeout(() => {
@@ -773,7 +825,7 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
       question: this.currentQuestion,
       answer: htmlContent,
       category: this.currentCategory,
-      subCategory: this.state.selectedFAQ.subCategory || undefined
+      subCategory: this.currentSubCategory || undefined
     };
 
     this.storageService.saveFAQ(faqData).then(success => {
@@ -906,7 +958,10 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
     const editorContent = editorElement?.innerHTML || this.editorContent;
     
     // Convert URL format to img tags for preview display
-    const previewContent = this.convertUrlsToImgs(editorContent);
+    let previewContent = this.convertUrlsToImgs(editorContent);
+    
+    // Decode HTML entities in preview content to show actual characters
+    previewContent = this.decodeHTMLEntities(previewContent);
     
     // Update internal state to match DOM for consistency
     this.editorContent = editorContent;
@@ -1048,13 +1103,36 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
     if (!input.files || input.files.length === 0) return;
     
     const file = input.files[0];
-    const success = await this.exportService.importFromJSON(file);
+    const fileName = file.name.toLowerCase();
     
-    if (success) {
-      this.loadEditedFAQs();
-      alert('Import successful!');
-    } else {
-      alert('Import failed. Please check the file format.');
+    let success = false;
+    let importType = '';
+    
+    try {
+      if (fileName.endsWith('.json')) {
+        importType = 'JSON';
+        success = await this.exportService.importFromJSON(file);
+      } else if (fileName.endsWith('.zip')) {
+        importType = 'ZIP';
+        success = await this.exportService.importFromZip(file);
+      } else {
+        alert('Unsupported file format. Please select a .json or .zip file.');
+        this.state.showImportDialog = false;
+        input.value = '';
+        return;
+      }
+      
+      if (success) {
+        this.loadEditedFAQs();
+        this.notificationService.success(`${importType} import completed successfully!`);
+        console.log(`${importType} import successful for file:`, file.name);
+      } else {
+        this.notificationService.error(`${importType} import failed. Please check the file format and content.`);
+        console.error(`${importType} import failed for file:`, file.name);
+      }
+    } catch (error) {
+      console.error('Error during import:', error);
+      this.notificationService.error(`Import failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
     
     this.state.showImportDialog = false;
@@ -1185,7 +1263,7 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
         name: editedFAQ.faqId,
         question: editedFAQ.question,
         category: editedFAQ.category,
-        subCategory: editedFAQ.subCategory,
+        subCategory: editedFAQ.subCategory || undefined,
         answerPath: '',
         answer: ''
       };
@@ -1244,8 +1322,11 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
   private prepareContentForEditing(content: string): string {
     console.log('🔍 Original content received:', content);
     
+    // Decode HTML entities first to show actual characters in the editor
+    let prepared = this.decodeHTMLEntities(content);
+    
     // For editor, clean up and convert images to URL format
-    let prepared = content
+    prepared = prepared
       // Remove potential security threats
       .replace(/<script[^>]*>.*?<\/script>/gi, '')
       .replace(/<style[^>]*>.*?<\/style>/gi, '')
@@ -1259,6 +1340,49 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
     
     console.log('✅ Content prepared for editing (with image URLs):', prepared);
     return prepared;
+  }
+
+  /**
+   * Decode HTML entities to actual characters (same as export service)
+   */
+  private decodeHTMLEntities(content: string): string {
+    if (!content) return content;
+    
+    // Map of HTML entities to their corresponding characters
+    const entityMap: { [key: string]: string } = {
+      '&amp;': '&',
+      '&lt;': '<', 
+      '&gt;': '>',
+      '&quot;': '"',
+      '&#39;': "'",
+      '&apos;': "'",
+      '&nbsp;': ' ',  // Convert to regular space
+      '&mdash;': '—',
+      '&ndash;': '–',
+      '&hellip;': '…',
+      '&copy;': '©',
+      '&reg;': '®',
+      '&trade;': '™'
+    };
+    
+    let decoded = content;
+    
+    // Replace named entities
+    for (const [entity, char] of Object.entries(entityMap)) {
+      decoded = decoded.replace(new RegExp(entity, 'g'), char);
+    }
+    
+    // Handle numeric character references like &#39; &#8217; etc.
+    decoded = decoded.replace(/&#(\d+);/g, (match, dec) => {
+      return String.fromCharCode(parseInt(dec, 10));
+    });
+    
+    // Handle hexadecimal character references like &#x27; &#x2019; etc.
+    decoded = decoded.replace(/&#x([0-9a-fA-F]+);/g, (match, hex) => {
+      return String.fromCharCode(parseInt(hex, 16));
+    });
+    
+    return decoded;
   }
 
   // Image Handling Functions
@@ -1277,10 +1401,17 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
    * Convert [IMG: url] format back to <img> tags for preview and saving
    */
   private convertUrlsToImgs(content: string): string {
-    // Replace [IMG: url] format back to <img> tags
-    return content.replace(/<span[^>]*class=["']image-url-placeholder["'][^>]*>\[IMG:\s*([^\]]+)\]<\/span>/gi, (match, src) => {
+    // First, replace [IMG: url] format with span tags back to <img> tags
+    let result = content.replace(/<span[^>]*class=["']image-url-placeholder["'][^>]*>\[IMG:\s*([^\]]+)\]<\/span>/gi, (match, src) => {
       return `<img src="${src.trim()}" >`;
     });
+    
+    // Then, handle plain text [IMG: url] format (after span tags are removed by cleaning)
+    result = result.replace(/\[IMG:\s*([^\]]+)\]/gi, (match, src) => {
+      return `<img src="${src.trim()}" >`;
+    });
+    
+    return result;
   }
   
   /**
@@ -1868,7 +1999,8 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
       isActive: true,
       editorContent: '',
       currentQuestion: newFAQ.question,
-      currentCategory: newFAQ.category
+      currentCategory: newFAQ.category,
+      currentSubCategory: ''
     };
 
     // Deactivate other tabs
@@ -1882,6 +2014,7 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
     this.editorContent = '<p></p>';
     this.currentQuestion = newFAQ.question;
     this.currentCategory = newFAQ.category;
+    this.currentSubCategory = '';
     this.state.hasChanges = false;
 
     // Set default paragraph structure for new FAQ
@@ -1948,6 +2081,8 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
       this.editorContent = '';
       this.currentQuestion = '';
       this.currentCategory = '';
+      this.currentSubCategory = '';
+      this.subCategories = [];
       this.state.hasChanges = false;
       if (this.htmlSourceEditor?.nativeElement) {
         this.htmlSourceEditor.nativeElement.innerHTML = '';
@@ -1977,7 +2112,8 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
       isActive: true,
       editorContent: '',
       currentQuestion: faq.question,
-      currentCategory: faq.category
+      currentCategory: faq.category,
+      currentSubCategory: faq.subCategory || ''
     };
 
     // Deactivate other tabs
@@ -1998,6 +2134,10 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
     this.state.isLoading = true;
     this.currentQuestion = tab.currentQuestion;
     this.currentCategory = tab.currentCategory;
+    this.currentSubCategory = tab.currentSubCategory;
+
+    // Update subcategories for the selected category
+    this.updateSubCategories();
 
     // Clear preview immediately
     this.previewContent = this.sanitizer.bypassSecurityTrustHtml('');
@@ -2013,8 +2153,10 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
       tab.editorContent = editableContent;
       tab.currentQuestion = edited.question;
       tab.currentCategory = edited.category;
+      tab.currentSubCategory = edited.subCategory || '';
       this.currentQuestion = edited.question;
       this.currentCategory = edited.category;
+      this.currentSubCategory = edited.subCategory || '';
 
       setTimeout(() => {
         if (this.htmlSourceEditor?.nativeElement) {
@@ -2084,6 +2226,7 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
       currentTab.editorContent = this.htmlSourceEditor.nativeElement.innerHTML;
       currentTab.currentQuestion = this.currentQuestion;
       currentTab.currentCategory = this.currentCategory;
+      currentTab.currentSubCategory = this.currentSubCategory;
       currentTab.hasChanges = this.state.hasChanges;
     }
   }
@@ -2112,6 +2255,7 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
       currentTab.editorContent = this.editorContent;
       currentTab.currentQuestion = this.currentQuestion;
       currentTab.currentCategory = this.currentCategory;
+      currentTab.currentSubCategory = this.currentSubCategory;
       
       // Update tab title if question changed
       if (this.currentQuestion && this.currentQuestion !== currentTab.faq.question) {
@@ -2148,194 +2292,98 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   /**
-   * Clean editor content by removing unwanted elements and text
+   * Clean editor content by removing unwanted elements and text using string operations
+   * This avoids DOM manipulation that causes HTML entity encoding
    */
   private cleanEditorContent(content: string): string {
     if (!content) return content;
     
-    // Create a temporary DOM element to parse and clean the HTML
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = content;
+    let cleaned = content;
     
-    // Remove any text nodes that contain "faq-editor"
-    this.removeUnwantedTextNodes(tempDiv, 'faq-editor');
+    // Remove unwanted text nodes that contain "faq-editor"
+    cleaned = this.removeUnwantedTextNodesString(cleaned, 'faq-editor');
     
-    // Remove data-start and data-end attributes and inline styles from all elements
-    this.removeUnwantedAttributes(tempDiv, ['data-start', 'data-end', 'style']);
-    
-    // Additional clean up of specific inline styles if needed
-    this.cleanInlineStyles(tempDiv);
+    // Remove all attributes from all elements except img src
+    cleaned = this.removeUnwantedAttributesString(cleaned);
     
     // Remove ALL span tags while preserving their content
-    this.removeAllSpanTags(tempDiv);
+    cleaned = this.removeAllSpanTagsString(cleaned);
     
     // Remove any elements that might be editor-specific
-    this.removeEditorElements(tempDiv);
+    cleaned = this.removeEditorElementsString(cleaned);
     
-    // Remove empty tags after cleaning
-    this.removeEmptyTags(tempDiv);
+    // Remove empty tags after cleaning (recursively)
+    cleaned = this.removeEmptyTagsString(cleaned);
     
-    return tempDiv.innerHTML;
+    return cleaned;
   }
 
-  /**
-   * Remove text nodes containing unwanted text
-   */
-  private removeUnwantedTextNodes(element: Element, unwantedText: string): void {
-    const walker = document.createTreeWalker(
-      element,
-      NodeFilter.SHOW_TEXT,
-      null
-    );
-    
-    const textNodesToRemove: Node[] = [];
-    let node;
-    
-    while (node = walker.nextNode()) {
-      if (node.textContent?.includes(unwantedText)) {
-        textNodesToRemove.push(node);
-      }
-    }
-    
-    textNodesToRemove.forEach(textNode => {
-      textNode.parentNode?.removeChild(textNode);
-    });
-  }
+
 
   /**
-   * Remove unwanted attributes from all elements
+   * String-based methods to avoid HTML entity encoding
    */
-  private removeUnwantedAttributes(element: Element, attributesToRemove: string[]): void {
-    const allElements = element.querySelectorAll('*');
-    
-    allElements.forEach(el => {
-      attributesToRemove.forEach(attr => {
-        el.removeAttribute(attr);
-      });
-    });
-    
-    // Also remove from the root element
-    attributesToRemove.forEach(attr => {
-      element.removeAttribute(attr);
-    });
+  
+  private removeUnwantedTextNodesString(content: string, unwantedText: string): string {
+    // Remove text content containing the unwanted text
+    // This is a simplified version - in practice might need more sophisticated text node detection
+    return content.replace(new RegExp(unwantedText, 'gi'), '');
   }
-
-  /**
-   * Remove elements that are editor-specific
-   */
-  private removeEditorElements(element: Element): void {
-    // Remove elements with editor-specific classes or attributes
-    const editorSelectors = [
-      '.faq-editor-container',
-      '.editor-header', 
-      '.editor-brand',
-      '[contenteditable]',
-      '.html-wysiwyg-editor'
-    ];
-    
-    editorSelectors.forEach(selector => {
-      const elementsToRemove = element.querySelectorAll(selector);
-      elementsToRemove.forEach(el => {
-        // If it's the root element, keep its content but remove the wrapper
-        if (el === element) {
-          return;
+  
+  private removeUnwantedAttributesString(content: string): string {
+    // Remove all attributes from all tags except img src
+    return content.replace(/<(\w+)([^>]*?)>/gi, (match, tagName, attributes) => {
+      if (tagName.toLowerCase() === 'img') {
+        // For img tags, only keep src attribute
+        const srcMatch = attributes.match(/\s+src\s*=\s*["']([^"']*?)["']/i);
+        if (srcMatch) {
+          return `<${tagName} src="${srcMatch[1]}">`;
         }
-        el.remove();
-      });
-    });
-  }
-
-  /**
-   * Remove empty tags after cleaning styles and attributes
-   */
-  private removeEmptyTags(element: Element): void {
-    // Define tags that should be removed if they become empty after cleaning
-    // Note: Only remove truly unnecessary tags, preserve semantic and structural tags
-    const emptyTagsToRemove = ['span', 'font'];
-    
-    emptyTagsToRemove.forEach(tagName => {
-      const elements = Array.from(element.querySelectorAll(tagName));
-      
-      elements.forEach(el => {
-        // Check if element is empty (no text content and no meaningful children)
-        const hasText = (el.textContent?.trim().length ?? 0) > 0;
-        const hasImportantChildren = el.querySelector('img, br, hr, input, textarea, select');
-        
-        if (!hasText && !hasImportantChildren) {
-          // Move any children to parent before removing
-          while (el.firstChild) {
-            el.parentNode?.insertBefore(el.firstChild, el);
-          }
-          el.remove();
-        }
-      });
-    });
-  }
-
-  /**
-   * Clean specific inline styles that are commonly added by editors
-   */
-  private cleanInlineStyles(element: Element): void {
-    const elementsWithStyle = element.querySelectorAll('[style]');
-    
-    elementsWithStyle.forEach(el => {
-      const currentStyle = el.getAttribute('style') || '';
-      
-      // Define unwanted style patterns commonly added by editors
-      const unwantedStylePatterns = [
-        /color:\s*rgb\(51,\s*51,\s*51\)/gi,  // Specific gray color
-        /font-family:\s*[^;]*Roboto[^;]*/gi,  // Roboto font family
-        /font-family:\s*[^;]*sans-serif[^;]*/gi,  // Generic sans-serif
-      ];
-      
-      let cleanedStyle = currentStyle;
-      
-      // Remove unwanted style patterns
-      unwantedStylePatterns.forEach(pattern => {
-        cleanedStyle = cleanedStyle.replace(pattern, '');
-      });
-      
-      // Clean up extra semicolons and spaces
-      cleanedStyle = cleanedStyle
-        .replace(/;\s*;/g, ';')  // Remove double semicolons
-        .replace(/^;\s*/, '')    // Remove leading semicolon
-        .replace(/\s*;\s*$/, '') // Remove trailing semicolon
-        .trim();
-      
-      // If no styles remain, remove the attribute entirely
-      if (!cleanedStyle) {
-        el.removeAttribute('style');
+        return `<${tagName}>`;
       } else {
-        el.setAttribute('style', cleanedStyle);
+        // For all other tags, remove all attributes
+        return `<${tagName}>`;
       }
     });
+  }
+  
+  private removeAllSpanTagsString(content: string): string {
+    // Remove span tags but preserve their content
+    return content.replace(/<\/?span[^>]*>/gi, '');
+  }
+  
+  private removeEditorElementsString(content: string): string {
+    // Remove editor-specific elements
+    let cleaned = content;
+    
+    // Remove elements with editor-specific classes or attributes
+    cleaned = cleaned.replace(/<[^>]*class\s*=\s*["'][^"']*(?:faq-editor|editor-|html-wysiwyg)[^"']*["'][^>]*>.*?<\/[^>]+>/gis, '');
+    cleaned = cleaned.replace(/<[^>]*contenteditable[^>]*>.*?<\/[^>]+>/gis, '');
+    
+    return cleaned;
+  }
+  
+  private removeEmptyTagsString(content: string): string {
+    let cleaned = content;
+    let hasChanges = false;
+    
+    do {
+      hasChanges = false;
+      const beforeLength = cleaned.length;
+      
+      // Remove empty tags (but preserve self-closing important tags)
+      // First handle paired tags that are completely empty
+      cleaned = cleaned.replace(/<((?!(?:br|hr|img|input|textarea|select|iframe|video|audio|canvas|svg|area|base|col|embed|link|meta|param|source|track|wbr)\b)\w+)[^>]*>\s*<\/\1>/gi, '');
+      
+      // Then handle tags that only contain whitespace or &nbsp;
+      cleaned = cleaned.replace(/<((?!(?:br|hr|img|input|textarea|select|iframe|video|audio|canvas|svg|area|base|col|embed|link|meta|param|source|track|wbr)\b)\w+)[^>]*>(?:\s|&nbsp;)*<\/\1>/gi, '');
+      
+      hasChanges = cleaned.length !== beforeLength;
+    } while (hasChanges);
+    
+    return cleaned;
   }
 
-  /**
-   * Remove ALL span tags while preserving their content
-   */
-  private removeAllSpanTags(element: Element): void {
-    // Get all span elements - we need to process from innermost to outermost
-    // to handle nested spans correctly
-    let spanElements = Array.from(element.querySelectorAll('span'));
-    
-    // Process spans in reverse order (deepest first) to avoid DOM mutation issues
-    spanElements.reverse().forEach(span => {
-      // Create document fragment to hold span content
-      const fragment = document.createDocumentFragment();
-      
-      // Move all child nodes from span to fragment
-      while (span.firstChild) {
-        fragment.appendChild(span.firstChild);
-      }
-      
-      // Insert the fragment content before the span
-      span.parentNode?.insertBefore(fragment, span);
-      
-      // Remove the empty span
-      span.remove();
-    });
-  }
 
   /**
    * Position cursor inside the first paragraph for new FAQs
@@ -2374,7 +2422,7 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
 
   /**
    * Get the HTML source code as it would appear in export
-   * This replicates the exact processing done in saveFAQ() method
+   * Uses the same cleaning logic as the actual export to ensure consistency
    */
   getExportSourceCode(): string {
     if (!this.htmlSourceEditor?.nativeElement) {
@@ -2385,12 +2433,19 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
     const editorElement = this.htmlSourceEditor.nativeElement;
     const rawEditorContent = editorElement.innerHTML || this.editorContent;
     
-    // Apply the same processing as in saveFAQ() method
+    // First clean using component's method (removes editor-specific elements)
     const cleanedContent = this.cleanEditorContent(rawEditorContent);
-    const exportContent = this.convertUrlsToImgs(cleanedContent);
+    // Convert URL format back to img tags
+    const withImages = this.convertUrlsToImgs(cleanedContent);
+    
+    // Then apply the same cleaning as export service for consistency
+    const exportContent = this.exportService.cleanHTMLContent(withImages);
+    
+    // Apply HTML entity decoding to match actual export behavior
+    const decodedContent = this.exportService.decodeHTMLEntities(exportContent);
     
     // Format for display (basic HTML formatting)
-    return this.formatHTMLForDisplay(exportContent);
+    return this.formatHTMLForDisplay(decodedContent);
   }
 
   /**
