@@ -186,9 +186,10 @@ export class FAQExportService {
     });
   }
 
-  async downloadAsZip(data: ExportData, progressCallback?: (progress: ExportProgress) => void): Promise<void> {
+  async downloadAsZip(data: ExportData, progressCallback?: (progress: ExportProgress) => void, tempImages?: Map<string, File>): Promise<void> {
     const zip = new JSZip();
-    const totalItems = Object.keys(data.htmlContent).length + 3; // HTML files + JSON + instructions + metadata
+    const imageCount = tempImages ? tempImages.size : 0;
+    const totalItems = Object.keys(data.htmlContent).length + 3 + imageCount; // HTML files + JSON + instructions + metadata + images
     let currentItem = 0;
 
     const updateProgress = (step: string) => {
@@ -216,8 +217,18 @@ export class FAQExportService {
         updateProgress(`Adding ${fileName}`);
       }
 
-      // Add instructions
-      const instructions = this.generateUpdateInstructions(data);
+      // Add temporary images if provided
+      if (tempImages && tempImages.size > 0) {
+        for (const [imagePath, imageFile] of tempImages.entries()) {
+          // Create the directory structure: src/assets/image/[faq-id]/
+          const zipImagePath = `src/${imagePath}`;
+          zip.file(zipImagePath, imageFile);
+          updateProgress(`Adding image ${imageFile.name}`);
+        }
+      }
+
+      // Add instructions (updated to include image instructions)
+      const instructions = this.generateUpdateInstructions(data, tempImages);
       zip.file('UPDATE_INSTRUCTIONS.txt', instructions);
       updateProgress('Adding instructions');
 
@@ -415,13 +426,41 @@ export class FAQExportService {
       typeof data.htmlContent === 'object';
   }
 
-  generateUpdateInstructions(data: ExportData): string {
+  generateUpdateInstructions(data: ExportData, tempImages?: Map<string, File>): string {
+    const imageInstructions = tempImages && tempImages.size > 0 ? `
+
+3. Update Image Files:
+   - Copy all image files from src/assets/image/ to your project's src/assets/image/ directory
+   - The following image files are included:
+${Array.from(tempImages.entries()).map(([path, file]) => `     - ${path} (${file.name})`).join('\n')}
+   - Ensure the directory structure is preserved: src/assets/image/[faq-id]/[faq-id]-[sequence].[ext]
+
+4. Rebuild the Application:
+   - Run: npm run build
+   - Test the changes locally: npm start
+
+5. Commit Changes:
+   - git add src/assets/data/faqs.json
+   - git add src/assets/faq-item/
+   - git add src/assets/image/
+   - git commit -m "Update FAQ content and images from editor"` : `
+
+3. Rebuild the Application:
+   - Run: npm run build
+   - Test the changes locally: npm start
+
+4. Commit Changes:
+   - git add src/assets/data/faqs.json
+   - git add src/assets/faq-item/
+   - git commit -m "Update FAQ content from editor"`;
+
     const instructions = `
 FAQ Export Update Instructions
 ===============================
 Export Date: ${data.metadata.exportDate}
 Total FAQs: ${data.metadata.itemCount}
-Edited FAQs: ${data.metadata.editedCount}
+Edited FAQs: ${data.metadata.editedCount}${tempImages ? `
+Total Images: ${tempImages.size}` : ''}
 
 How to Update Your Codebase:
 -----------------------------
@@ -432,29 +471,22 @@ How to Update Your Codebase:
 2. Update HTML Content:
    - Copy all exported HTML files to src/assets/faq-item/
    - The following files need to be updated:
-${Object.keys(data.htmlContent).map(file => `     - ${file}`).join('\n')}
-
-3. Rebuild the Application:
-   - Run: npm run build
-   - Test the changes locally: npm start
-
-4. Commit Changes:
-   - git add src/assets/data/faqs.json
-   - git add src/assets/faq-item/
-   - git commit -m "Update FAQ content from editor"
+${Object.keys(data.htmlContent).map(file => `     - ${file}`).join('\n')}${imageInstructions}
 
 Notes:
 ------
 - Make sure to backup existing files before replacing
 - Review all changes before committing to version control
-- Test thoroughly in development before deploying to production
+- Test thoroughly in development before deploying to production${tempImages && tempImages.size > 0 ? `
+- Image files are organized by FAQ ID to avoid conflicts
+- Image paths in HTML content use [IMG: assets/image/...] format for proper linking` : ''}
 `;
 
     return instructions;
   }
 
-  downloadInstructions(data: ExportData): void {
-    const instructions = this.generateUpdateInstructions(data);
+  downloadInstructions(data: ExportData, tempImages?: Map<string, File>): void {
+    const instructions = this.generateUpdateInstructions(data, tempImages);
     const blob = new Blob([instructions], { type: 'text/plain' });
     this.downloadFile(blob, 'UPDATE_INSTRUCTIONS.txt');
   }

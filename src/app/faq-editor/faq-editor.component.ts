@@ -416,6 +416,7 @@ interface EditorState {
 export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('htmlSourceEditor', { static: false }) htmlSourceEditor!: ElementRef;
   @ViewChild('fileInput', { static: false }) fileInput!: ElementRef;
+  @ViewChild('imageInput', { static: false }) imageInput!: ElementRef;
   
   private destroy$ = new Subject<void>();
   private autoSaveTimer: any;
@@ -464,6 +465,10 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
   
   // Tooltip state
   showTooltip: 'created' | 'edited' | null = null;
+  
+  // Temporary image storage for uploaded images
+  private tempImageMap = new Map<string, File>();
+  private tempImageUrls = new Map<string, string>();
 
   constructor(
     private http: HttpClient,
@@ -597,6 +602,9 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
     if (this.state.hasChanges && this.state.selectedFAQ) {
       this.saveFAQ();
     }
+    
+    // Clean up temporary image URLs
+    this.cleanupTempImageUrls();
   }
 
 
@@ -813,8 +821,8 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
     // Clean the content to remove any unwanted elements or text
     const cleanedContent = this.cleanEditorContent(rawEditorContent);
     
-    // Convert URL format back to img tags for saving
-    const htmlContent = this.convertUrlsToImgs(cleanedContent);
+    // Convert URL format back to img tags for saving (use actual paths, not blob URLs)
+    const htmlContent = this.convertUrlsToImgs(cleanedContent, true);
     
     console.log('💾 Saving content - Raw:', rawEditorContent);
     console.log('💾 Saving content - Cleaned:', cleanedContent);
@@ -957,7 +965,7 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
     const editorElement = this.htmlSourceEditor?.nativeElement;
     const editorContent = editorElement?.innerHTML || this.editorContent;
     
-    // Convert URL format to img tags for preview display
+    // Convert URL format to img tags for preview display (use blob URLs for temporary images)
     let previewContent = this.convertUrlsToImgs(editorContent);
     
     // Decode HTML entities in preview content to show actual characters
@@ -1034,10 +1042,10 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
     try {
       const exportData = await this.exportService.exportAllEdits();
       
-      // Use new ZIP export with progress tracking
+      // Use new ZIP export with progress tracking and temporary images
       await this.exportService.downloadAsZip(exportData, (progress: ExportProgress) => {
         this.state.exportProgress = progress;
-      });
+      }, this.tempImageMap);
       
       this.notificationService.exportSuccess(Object.keys(exportData.htmlContent).length);
       this.state.showExportDialog = false;
@@ -1399,16 +1407,41 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
   
   /**
    * Convert [IMG: url] format back to <img> tags for preview and saving
+   * Now supports temporary uploaded images
    */
-  private convertUrlsToImgs(content: string): string {
+  private convertUrlsToImgs(content: string, forExport: boolean = false): string {
     // First, replace [IMG: url] format with span tags back to <img> tags
     let result = content.replace(/<span[^>]*class=["']image-url-placeholder["'][^>]*>\[IMG:\s*([^\]]+)\]<\/span>/gi, (match, src) => {
-      return `<img src="${src.trim()}" >`;
+      const imagePath = src.trim();
+      
+      if (forExport) {
+        // For export, use the actual image path
+        return `<img src="${imagePath}" >`;
+      } else {
+        // For preview, check if this is a temporary uploaded image
+        const tempUrl = this.tempImageUrls.get(imagePath);
+        if (tempUrl) {
+          return `<img src="${tempUrl}" data-temp-path="${imagePath}" >`;
+        }
+        return `<img src="${imagePath}" >`;
+      }
     });
     
     // Then, handle plain text [IMG: url] format (after span tags are removed by cleaning)
     result = result.replace(/\[IMG:\s*([^\]]+)\]/gi, (match, src) => {
-      return `<img src="${src.trim()}" >`;
+      const imagePath = src.trim();
+      
+      if (forExport) {
+        // For export, use the actual image path
+        return `<img src="${imagePath}" >`;
+      } else {
+        // For preview, check if this is a temporary uploaded image
+        const tempUrl = this.tempImageUrls.get(imagePath);
+        if (tempUrl) {
+          return `<img src="${tempUrl}" data-temp-path="${imagePath}" >`;
+        }
+        return `<img src="${imagePath}" >`;
+      }
     });
     
     return result;
@@ -2435,8 +2468,8 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
     
     // First clean using component's method (removes editor-specific elements)
     const cleanedContent = this.cleanEditorContent(rawEditorContent);
-    // Convert URL format back to img tags
-    const withImages = this.convertUrlsToImgs(cleanedContent);
+    // Convert URL format back to img tags (use actual paths for source code preview)
+    const withImages = this.convertUrlsToImgs(cleanedContent, true);
     
     // Then apply the same cleaning as export service for consistency
     const exportContent = this.exportService.cleanHTMLContent(withImages);
@@ -2470,5 +2503,202 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
       console.warn('Error formatting HTML for display:', error);
       return content; // Return unformatted content if formatting fails
     }
+  }
+
+  // ========================
+  // Image Upload Methods
+  // ========================
+
+  /**
+   * Trigger image upload dialog
+   */
+  triggerImageUpload(): void {
+    if (!this.state.selectedFAQ) {
+      this.notificationService.warning('Please select an FAQ first');
+      return;
+    }
+    this.imageInput.nativeElement.click();
+  }
+
+  /**
+   * Handle image file selection
+   */
+  handleImageSelection(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) return;
+
+    const file = input.files[0];
+    
+    // Validate file
+    if (!this.validateImageFile(file)) {
+      input.value = ''; // Clear the input
+      return;
+    }
+
+    try {
+      // Generate image reference path
+      const imagePath = this.generateImageReference(file);
+      
+      // Store the file temporarily
+      this.storeTemporaryImage(imagePath, file);
+      
+      // Insert image placeholder in editor
+      this.insertImagePlaceholder(imagePath);
+      
+      this.notificationService.success('Image inserted successfully');
+    } catch (error) {
+      console.error('Error handling image selection:', error);
+      this.notificationService.error('Failed to insert image');
+    }
+
+    // Clear the input for next selection
+    input.value = '';
+  }
+
+  /**
+   * Validate image file (size, type, etc.)
+   */
+  private validateImageFile(file: File): boolean {
+    // Check file type
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+    if (!validTypes.includes(file.type)) {
+      this.notificationService.warning('Please select a valid image file (JPG, PNG, GIF, WEBP)');
+      return false;
+    }
+
+    // Check file size (2MB limit)
+    const maxSize = 2 * 1024 * 1024; // 2MB in bytes
+    if (file.size > maxSize) {
+      this.notificationService.warning('Image size must be less than 2MB');
+      return false;
+    }
+
+    return true;
+  }
+
+  /**
+   * Generate image reference path using answerPath prefix for consistent naming
+   */
+  private generateImageReference(file: File): string {
+    if (!this.state.selectedFAQ) {
+      throw new Error('No FAQ selected');
+    }
+
+    let filePrefix: string;
+    
+    // Use answerPath prefix if available (for existing FAQs)
+    if (this.state.selectedFAQ.answerPath) {
+      filePrefix = this.getAnswerPathPrefix(this.state.selectedFAQ.answerPath);
+    } else {
+      // For new FAQs without answerPath, generate from question title
+      const questionTitle = this.currentQuestion || this.state.selectedFAQ.question;
+      if (!questionTitle || !questionTitle.trim()) {
+        throw new Error('FAQ question title is required for image naming');
+      }
+      filePrefix = this.generateSlugFromTitle(questionTitle);
+    }
+
+    const fileExtension = this.getFileExtension(file.name);
+    const sequence = this.getNextImageSequence(filePrefix);
+    
+    return `assets/image/${filePrefix}/${filePrefix}-${sequence}.${fileExtension}`;
+  }
+
+  /**
+   * Get file extension from filename
+   */
+  private getFileExtension(filename: string): string {
+    return filename.split('.').pop()?.toLowerCase() || 'jpg';
+  }
+
+  /**
+   * Convert question title to slug format for consistent naming
+   */
+  private generateSlugFromTitle(title: string): string {
+    return title
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, '')  // Remove special characters except spaces and hyphens
+      .trim()
+      .replace(/\s+/g, '-')          // Replace spaces with hyphens
+      .replace(/-+/g, '-')           // Merge multiple hyphens
+      .replace(/^-|-$/g, '')         // Remove leading/trailing hyphens
+      .substring(0, 50);             // Limit length to 50 characters
+  }
+
+  /**
+   * Get the prefix from answerPath by removing .html extension
+   */
+  private getAnswerPathPrefix(answerPath: string): string {
+    if (!answerPath) return '';
+    // Remove .html extension (case insensitive) to get the prefix
+    return answerPath.replace(/\.html$/i, '');
+  }
+
+  /**
+   * Get next available image sequence number for current FAQ using file prefix
+   */
+  private getNextImageSequence(filePrefix: string): number {
+    let maxSequence = 0;
+    
+    // Check existing temporary images for this file prefix
+    for (const path of this.tempImageMap.keys()) {
+      if (path.includes(`/${filePrefix}/${filePrefix}-`)) {
+        const match = path.match(new RegExp(`/${filePrefix}/${filePrefix}-(\\d+)\\.`));
+        if (match) {
+          const sequence = parseInt(match[1], 10);
+          maxSequence = Math.max(maxSequence, sequence);
+        }
+      }
+    }
+    
+    return maxSequence + 1;
+  }
+
+  /**
+   * Store image file temporarily with generated path
+   */
+  private storeTemporaryImage(imagePath: string, file: File): void {
+    // Store the file
+    this.tempImageMap.set(imagePath, file);
+    
+    // Create object URL for preview
+    const objectUrl = URL.createObjectURL(file);
+    this.tempImageUrls.set(imagePath, objectUrl);
+    
+    console.log('Stored temporary image:', imagePath, 'File size:', file.size);
+  }
+
+  /**
+   * Insert image placeholder in the editor
+   */
+  private insertImagePlaceholder(imagePath: string): void {
+    this.focusEditor();
+    
+    // Create image placeholder in the format expected by existing system
+    const placeholder = `<span class="image-url-placeholder" contenteditable="false">[IMG: ${imagePath}]</span>`;
+    
+    // Use execCommand to make it undoable
+    document.execCommand('insertHTML', false, placeholder);
+    
+    this.state.hasChanges = true;
+    this.updatePreview();
+    this.debouncedContentUpdate();
+  }
+
+  /**
+   * Clean up temporary image URLs to prevent memory leaks
+   */
+  private cleanupTempImageUrls(): void {
+    for (const url of this.tempImageUrls.values()) {
+      URL.revokeObjectURL(url);
+    }
+    this.tempImageUrls.clear();
+  }
+
+  /**
+   * Get temporary images for export
+   */
+  getTempImages(): Map<string, File> {
+    return this.tempImageMap;
   }
 }

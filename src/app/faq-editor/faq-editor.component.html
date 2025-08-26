@@ -149,6 +149,13 @@
 
     <!-- Middle - Editor -->
     <div class="editor-panel" *ngIf="state.selectedFAQ">
+      <!-- Hidden image input for image upload functionality -->
+      <input type="file" 
+             #imageInput
+             accept=".jpg,.jpeg,.png,.gif,.webp"
+             style="display: none"
+             (change)="handleImageSelection($event)">
+      
       <div class="editor-toolbar">
         <h2>Edit FAQ</h2>
         <div class="toolbar-actions">
@@ -341,6 +348,12 @@
                       title="Insert Link (Ctrl+K)">
                 <span class="btn-icon">🔗</span>
                 Link
+              </button>
+              <button class="btn btn-sm btn-info" 
+                      (click)="triggerImageUpload()"
+                      title="Insert Image">
+                <span class="btn-icon">📷</span>
+                Image
               </button>
               <button class="btn btn-sm btn-info" 
                       (click)="insertTable()"
