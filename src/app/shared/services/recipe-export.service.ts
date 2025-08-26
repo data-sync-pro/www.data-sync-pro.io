@@ -332,6 +332,174 @@ export class RecipeExportService {
   }
   
   /**
+   * Import recipes from ZIP file with images and resources
+   */
+  async importFromZip(
+    file: File, 
+    fileStorage: RecipeFileStorageService,
+    progressCallback?: (progress: ExportProgress) => void
+  ): Promise<SourceRecipeRecord[]> {
+    try {
+      // Check if JSZip is available
+      if (typeof JSZip === 'undefined') {
+        throw new Error('JSZip library not available');
+      }
+      
+      console.log('Starting ZIP import for file:', file.name);
+      
+      // Read and extract ZIP file
+      const zip = new JSZip();
+      const zipContent = await zip.loadAsync(file);
+      
+      const importedRecipes: SourceRecipeRecord[] = [];
+      const folders = Object.keys(zipContent.files)
+        .filter(path => path.includes('/') && !path.startsWith('__MACOSX'))
+        .map(path => path.split('/')[0])
+        .filter((folder, index, self) => self.indexOf(folder) === index);
+      
+      let processedCount = 0;
+      const totalSteps = folders.length;
+      
+      // Update progress helper
+      const updateProgress = (step: string) => {
+        processedCount++;
+        if (progressCallback) {
+          progressCallback({
+            step,
+            current: processedCount,
+            total: totalSteps,
+            percentage: Math.round((processedCount / totalSteps) * 100)
+          });
+        }
+      };
+      
+      // Process each recipe folder
+      for (const folder of folders) {
+        try {
+          updateProgress(`Processing: ${folder}`);
+          
+          // Get recipe.json file
+          const recipeJsonFile = zipContent.file(`${folder}/recipe.json`);
+          if (!recipeJsonFile) {
+            console.warn(`No recipe.json found in folder: ${folder}`);
+            continue;
+          }
+          
+          // Parse recipe JSON
+          const recipeJsonContent = await recipeJsonFile.async('string');
+          const recipe = JSON.parse(recipeJsonContent) as SourceRecipeRecord;
+          
+          // Validate recipe
+          if (!this.validateRecipe(recipe)) {
+            console.warn(`Invalid recipe in folder: ${folder}`);
+            continue;
+          }
+          
+          // Process images
+          const imagesFolder = zipContent.folder(`${folder}/images`);
+          if (imagesFolder) {
+            const imageFiles = Object.keys(zipContent.files)
+              .filter(path => path.startsWith(`${folder}/images/`) && !path.endsWith('/'));
+            
+            for (const imagePath of imageFiles) {
+              const imageFile = zipContent.file(imagePath);
+              if (imageFile) {
+                try {
+                  const imageName = imagePath.split('/').pop()!;
+                  const imageBlob = await imageFile.async('blob');
+                  
+                  // Extract image ID from filename
+                  const imageId = this.extractImageId(imageName);
+                  
+                  // Create File object from blob
+                  const imageFileObj = new File([imageBlob], imageName, { type: this.getImageMimeType(imageName) });
+                  
+                  // Store image in IndexedDB
+                  await fileStorage.storeImage(imageId, imageFileObj);
+                  console.log(`Stored image: ${imageName}`);
+                } catch (error) {
+                  console.warn(`Failed to import image: ${imagePath}`, error);
+                }
+              }
+            }
+          }
+          
+          // Process downloadable executables (JSON files)
+          const executablesFolder = zipContent.folder(`${folder}/downloadExecutables`);
+          if (executablesFolder) {
+            const jsonFiles = Object.keys(zipContent.files)
+              .filter(path => path.startsWith(`${folder}/downloadExecutables/`) && path.endsWith('.json'));
+            
+            for (const jsonPath of jsonFiles) {
+              const jsonFile = zipContent.file(jsonPath);
+              if (jsonFile) {
+                try {
+                  const fileName = jsonPath.split('/').pop()!;
+                  const jsonBlob = await jsonFile.async('blob');
+                  
+                  // Create File object from blob
+                  const jsonFileObj = new File([jsonBlob], fileName, { type: 'application/json' });
+                  
+                  // Store JSON file in IndexedDB
+                  await fileStorage.storeJsonFile(fileName, jsonFileObj);
+                  console.log(`Stored JSON file: ${fileName}`);
+                } catch (error) {
+                  console.warn(`Failed to import JSON file: ${jsonPath}`, error);
+                }
+              }
+            }
+          }
+          
+          // Add to imported recipes
+          importedRecipes.push(recipe);
+          console.log(`Successfully imported recipe: ${recipe.title}`);
+          
+        } catch (error) {
+          console.error(`Error processing folder ${folder}:`, error);
+        }
+      }
+      
+      // Final progress update
+      if (progressCallback) {
+        progressCallback({
+          step: 'Import complete',
+          current: totalSteps,
+          total: totalSteps,
+          percentage: 100
+        });
+      }
+      
+      if (importedRecipes.length === 0) {
+        this.notificationService.error('No valid recipes found in ZIP file');
+      } else {
+        this.notificationService.success(`Imported ${importedRecipes.length} recipe${importedRecipes.length > 1 ? 's' : ''} from ZIP`);
+      }
+      
+      return importedRecipes;
+      
+    } catch (error) {
+      console.error('Error importing from ZIP:', error);
+      this.notificationService.error('Failed to import from ZIP file');
+      return [];
+    }
+  }
+  
+  /**
+   * Get MIME type from file extension
+   */
+  private getImageMimeType(filename: string): string {
+    const ext = filename.split('.').pop()?.toLowerCase();
+    switch (ext) {
+      case 'png': return 'image/png';
+      case 'jpg':
+      case 'jpeg': return 'image/jpeg';
+      case 'gif': return 'image/gif';
+      case 'webp': return 'image/webp';
+      default: return 'image/png';
+    }
+  }
+  
+  /**
    * Generate recipe ID from title
    */
   generateRecipeId(title: string): string {

@@ -13,8 +13,45 @@
       <span class="stat-item">
         <strong>{{ recipeList.length }}</strong> Total Recipes
       </span>
-      <span class="stat-item edited">
-        <strong>{{ editedRecipeIds.size }}</strong> Edited
+      <span class="stat-item created tooltip-container" 
+            *ngIf="getCreatedCount() > 0"
+            (mouseenter)="showTooltip = 'created'" 
+            (mouseleave)="showTooltip = null">
+        <strong>{{ getCreatedCount() }}</strong> Created
+        <div class="tooltip-content" *ngIf="showTooltip === 'created'"
+             (mouseenter)="showTooltip = 'created'"
+             (mouseleave)="showTooltip = null">
+          <div class="tooltip-header">Created Recipes:</div>
+          <div class="tooltip-item clickable" 
+               *ngFor="let item of getCreatedRecipeTitles()"
+               (click)="onTooltipRecipeClick(item.recipeId); $event.stopPropagation()"
+               title="Click to edit this recipe">
+            {{ item.title }}
+          </div>
+          <div class="tooltip-more" *ngIf="getCreatedCount() > 10">
+            ...and {{ getCreatedCount() - 10 }} more
+          </div>
+        </div>
+      </span>
+      <span class="stat-item edited tooltip-container" 
+            *ngIf="getEditedExistingCount() > 0"
+            (mouseenter)="showTooltip = 'edited'" 
+            (mouseleave)="showTooltip = null">
+        <strong>{{ getEditedExistingCount() }}</strong> Edited
+        <div class="tooltip-content" *ngIf="showTooltip === 'edited'"
+             (mouseenter)="showTooltip = 'edited'"
+             (mouseleave)="showTooltip = null">
+          <div class="tooltip-header">Edited Recipes:</div>
+          <div class="tooltip-item clickable" 
+               *ngFor="let item of getEditedExistingRecipeTitles()"
+               (click)="onTooltipRecipeClick(item.recipeId); $event.stopPropagation()"
+               title="Click to edit this recipe">
+            {{ item.title }}
+          </div>
+          <div class="tooltip-more" *ngIf="getEditedExistingCount() > 10">
+            ...and {{ getEditedExistingCount() - 10 }} more
+          </div>
+        </div>
       </span>
       <span class="stat-item" *ngIf="state.lastSaved">
         Last saved: {{ state.lastSaved | date:'short' }}
@@ -22,24 +59,52 @@
     </div>
 
     <div class="editor-actions">
-      <button class="btn btn-secondary" (click)="triggerImport()">
-        Import Recipe
+      <button class="btn btn-secondary" 
+              (click)="triggerImport()"
+              [disabled]="state.isImporting">
+        <span *ngIf="!state.isImporting">Import Recipe</span>
+        <span *ngIf="state.isImporting">Importing...</span>
       </button>
       <button class="btn btn-primary" (click)="exportCurrentRecipe()"
-              [disabled]="!currentRecipe">
+              [disabled]="!currentRecipe || state.isImporting">
         Export Current
       </button>
       <button class="btn btn-primary" (click)="exportAllRecipes()"
-              [disabled]="editedRecipeIds.size === 0">
+              [disabled]="editedRecipeIds.size === 0 || state.isImporting">
         Export All ({{ editedRecipeIds.size }})
       </button>
       <button class="btn btn-success" (click)="saveAllTabs()"
-              [disabled]="!hasUnsavedChanges()">
+              [disabled]="!hasUnsavedChanges() || state.isImporting">
         Save All
       </button>
-      <button class="btn btn-danger" (click)="clearAllData()">
+      <button class="btn btn-danger" 
+              (click)="clearAllData()"
+              [disabled]="state.isImporting">
         Clear All Data
       </button>
+    </div>
+  </div>
+
+  <!-- Import Progress Bar -->
+  <div class="import-progress-overlay" 
+       *ngIf="state.isImporting"
+       [ngClass]="{'show': state.isImporting}">
+    <div class="import-progress-dialog">
+      <h3>Importing Recipes</h3>
+      <div class="progress-bar-container" *ngIf="state.importProgress">
+        <div class="progress-bar">
+          <div class="progress-fill" 
+               [style.width.%]="state.importProgress.percentage"></div>
+        </div>
+        <div class="progress-text">
+          {{ state.importProgress.step }} ({{ state.importProgress.current }}/{{ state.importProgress.total }})
+        </div>
+        <div class="progress-percentage">{{ state.importProgress.percentage }}%</div>
+      </div>
+      <div class="loading-spinner" *ngIf="!state.importProgress">
+        <div class="spinner"></div>
+        <div>Reading ZIP file...</div>
+      </div>
     </div>
   </div>
 
@@ -590,7 +655,7 @@
   <!-- Hidden file input for import -->
   <input type="file" 
          #fileInput
-         accept=".json"
+         accept=".json,.zip"
          style="display: none"
          (change)="importRecipe($event)">
 

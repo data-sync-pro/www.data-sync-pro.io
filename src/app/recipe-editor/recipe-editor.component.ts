@@ -17,6 +17,7 @@ import {
   RecipeRelatedItem,
   RecipeGeneralImage
 } from '../shared/models/recipe.model';
+import { ExportProgress } from '../shared/services/recipe-export.service';
 
 interface RecipeTab {
   id: string;
@@ -26,12 +27,20 @@ interface RecipeTab {
   isActive: boolean;
 }
 
+interface RecipeTitleItem {
+  id: string;
+  recipeId: string;
+  title: string;
+}
+
 interface EditorState {
   tabs: RecipeTab[];
   activeTabId: string | null;
   isLoading: boolean;
   isSaving: boolean;
   lastSaved: Date | null;
+  isImporting: boolean;
+  importProgress: ExportProgress | null;
 }
 
 @Component({
@@ -60,7 +69,9 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
     activeTabId: null,
     isLoading: false,
     isSaving: false,
-    lastSaved: null
+    lastSaved: null,
+    isImporting: false,
+    importProgress: null
   };
   
   // Search and filter
@@ -85,6 +96,9 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
   
   // Custom step names storage
   customStepNames: { [index: number]: string } = {};
+  
+  // Tooltip state
+  showTooltip: string | null = null;
   
   // Step options from Recipe Producer
   stepOptions = [
@@ -1743,38 +1757,118 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
     if (!input.files || input.files.length === 0) return;
     
     const file = input.files[0];
-    const imported = await this.exportService.importRecipe(file);
+    const fileName = file.name.toLowerCase();
     
-    if (imported) {
-      // Create new tab with imported recipe
-      const tab: RecipeTab = {
-        id: this.generateUUID(),
-        title: imported.title,
-        recipe: imported,
-        hasChanges: true,
-        isActive: true
-      };
+    // Check if it's a ZIP file or JSON file
+    if (fileName.endsWith('.zip')) {
+      // Handle ZIP import
+      this.state.isImporting = true;
+      this.state.importProgress = null;
       
-      // Deactivate other tabs
-      this.state.tabs.forEach(t => t.isActive = false);
+      try {
+        // Import recipes from ZIP with progress tracking
+        const importedRecipes = await this.exportService.importFromZip(
+          file,
+          this.fileStorageService,
+          (progress) => this.updateImportProgress(progress)
+        );
+        
+        if (importedRecipes && importedRecipes.length > 0) {
+          // Create tabs for all imported recipes
+          let firstTabId: string | null = null;
+          
+          for (const recipe of importedRecipes) {
+            const tab: RecipeTab = {
+              id: this.generateUUID(),
+              title: recipe.title,
+              recipe: recipe,
+              hasChanges: true,
+              isActive: false
+            };
+            
+            if (!firstTabId) {
+              firstTabId = tab.id;
+              tab.isActive = true;
+            }
+            
+            this.state.tabs.push(tab);
+            
+            // Load images for each recipe
+            await this.loadAllImagesForRecipe(recipe);
+          }
+          
+          // Deactivate all existing tabs and activate the first imported one
+          if (firstTabId) {
+            this.state.tabs.forEach(t => {
+              if (t.id !== firstTabId) {
+                t.isActive = false;
+              }
+            });
+            this.state.activeTabId = firstTabId;
+            const activeTab = this.state.tabs.find(t => t.id === firstTabId);
+            if (activeTab) {
+              this.currentRecipe = activeTab.recipe;
+              this.initializeExpandedSteps();
+              this.triggerPreviewUpdate();
+            }
+          }
+          
+          this.notificationService.success(
+            `Successfully imported ${importedRecipes.length} recipe${importedRecipes.length > 1 ? 's' : ''}`
+          );
+        }
+      } catch (error) {
+        console.error('Error importing ZIP:', error);
+        this.notificationService.error('Failed to import ZIP file');
+      } finally {
+        this.state.isImporting = false;
+        this.state.importProgress = null;
+      }
+    } else if (fileName.endsWith('.json')) {
+      // Handle single JSON import (existing logic)
+      const imported = await this.exportService.importRecipe(file);
       
-      this.state.tabs.push(tab);
-      this.state.activeTabId = tab.id;
-      this.currentRecipe = imported;
-      this.initializeExpandedSteps();
-      this.triggerPreviewUpdate();
-      
-      // Load all images for imported recipe and check for missing images
-      await this.loadAllImagesForRecipe(imported);
-      this.checkMissingImagesAfterImport(imported);
-      
-      this.notificationService.success('Recipe imported successfully');
+      if (imported) {
+        // Create new tab with imported recipe
+        const tab: RecipeTab = {
+          id: this.generateUUID(),
+          title: imported.title,
+          recipe: imported,
+          hasChanges: true,
+          isActive: true
+        };
+        
+        // Deactivate other tabs
+        this.state.tabs.forEach(t => t.isActive = false);
+        
+        this.state.tabs.push(tab);
+        this.state.activeTabId = tab.id;
+        this.currentRecipe = imported;
+        this.initializeExpandedSteps();
+        this.triggerPreviewUpdate();
+        
+        // Load all images for imported recipe and check for missing images
+        await this.loadAllImagesForRecipe(imported);
+        this.checkMissingImagesAfterImport(imported);
+        
+        this.notificationService.success('Recipe imported successfully');
+      } else {
+        this.notificationService.error('Failed to import recipe');
+      }
     } else {
-      this.notificationService.error('Failed to import recipe');
+      this.notificationService.error('Please select a .json or .zip file');
     }
     
     // Reset input
     input.value = '';
+  }
+  
+  /**
+   * Update import progress in state
+   */
+  private updateImportProgress(progress: ExportProgress): void {
+    this.state.importProgress = progress;
+    this.cdr.markForCheck();
   }
   
   clearAllData(): void {
@@ -1799,6 +1893,166 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
   
   hasUnsavedChanges(): boolean {
     return this.state.tabs.some(t => t.hasChanges);
+  }
+  
+  /**
+   * Get count of created recipes (new recipes not in original list)
+   */
+  getCreatedCount(): number {
+    const editedRecipes = this.storageService.getAllEditedRecipes();
+    const originalRecipeIds = new Set(this.recipeList.map(r => r.id));
+    
+    let createdCount = 0;
+    editedRecipes.forEach(recipe => {
+      if (recipe.id && !originalRecipeIds.has(recipe.id)) {
+        createdCount++;
+      }
+    });
+    
+    return createdCount;
+  }
+  
+  /**
+   * Get count of modified existing recipes
+   */
+  getEditedExistingCount(): number {
+    const editedRecipes = this.storageService.getAllEditedRecipes();
+    const originalRecipeIds = new Set(this.recipeList.map(r => r.id));
+    
+    let editedCount = 0;
+    editedRecipes.forEach(recipe => {
+      if (recipe.id && originalRecipeIds.has(recipe.id)) {
+        editedCount++;
+      }
+    });
+    
+    return editedCount;
+  }
+  
+  /**
+   * Get list of created recipe titles for tooltip
+   */
+  getCreatedRecipeTitles(): RecipeTitleItem[] {
+    const editedRecipes = this.storageService.getAllEditedRecipes();
+    const originalRecipeIds = new Set(this.recipeList.map(r => r.id));
+    const items: RecipeTitleItem[] = [];
+    
+    editedRecipes.forEach(recipe => {
+      if (recipe.id && recipe.title && !originalRecipeIds.has(recipe.id)) {
+        // Truncate long titles to prevent tooltip overflow
+        const truncatedTitle = recipe.title.length > 50 
+          ? recipe.title.substring(0, 50) + '...' 
+          : recipe.title;
+          
+        items.push({
+          id: recipe.id,
+          recipeId: recipe.id,
+          title: truncatedTitle
+        });
+      }
+    });
+    
+    // Sort alphabetically and limit to 10 items
+    return items.sort((a, b) => a.title.localeCompare(b.title)).slice(0, 10);
+  }
+  
+  /**
+   * Get list of modified existing recipe titles for tooltip
+   */
+  getEditedExistingRecipeTitles(): RecipeTitleItem[] {
+    const editedRecipes = this.storageService.getAllEditedRecipes();
+    const originalRecipeIds = new Set(this.recipeList.map(r => r.id));
+    const items: RecipeTitleItem[] = [];
+    
+    editedRecipes.forEach(recipe => {
+      if (recipe.id && recipe.title && originalRecipeIds.has(recipe.id)) {
+        // Truncate long titles to prevent tooltip overflow
+        const truncatedTitle = recipe.title.length > 50 
+          ? recipe.title.substring(0, 50) + '...' 
+          : recipe.title;
+          
+        items.push({
+          id: recipe.id,
+          recipeId: recipe.id,
+          title: truncatedTitle
+        });
+      }
+    });
+    
+    // Sort alphabetically and limit to 10 items
+    return items.sort((a, b) => a.title.localeCompare(b.title)).slice(0, 10);
+  }
+  
+  /**
+   * Get list of edited recipe titles for tooltip (legacy method, kept for compatibility)
+   */
+  getEditedRecipeTitles(): RecipeTitleItem[] {
+    const editedRecipes = this.storageService.getAllEditedRecipes();
+    const items: RecipeTitleItem[] = [];
+    
+    editedRecipes.forEach(recipe => {
+      if (recipe.id && recipe.title) {
+        // Truncate long titles to prevent tooltip overflow
+        const truncatedTitle = recipe.title.length > 60 
+          ? recipe.title.substring(0, 60) + '...' 
+          : recipe.title;
+          
+        items.push({
+          id: recipe.id,
+          recipeId: recipe.id,
+          title: truncatedTitle
+        });
+      }
+    });
+    
+    // Sort alphabetically and limit to 10 items
+    return items.sort((a, b) => a.title.localeCompare(b.title)).slice(0, 10);
+  }
+  
+  /**
+   * Handle click on recipe title in tooltip
+   */
+  onTooltipRecipeClick(recipeId: string): void {
+    // Hide tooltip immediately
+    this.showTooltip = null;
+    
+    // First check if the recipe is already open in a tab
+    const existingTab = this.state.tabs.find(tab => tab.recipe.id === recipeId);
+    if (existingTab) {
+      // Switch to existing tab
+      this.selectTab(existingTab.id);
+      return;
+    }
+    
+    // Load the recipe from storage
+    const editedRecipes = this.storageService.getAllEditedRecipes();
+    const recipe = editedRecipes.find(r => r.id === recipeId);
+    
+    if (recipe) {
+      // Create new tab with the recipe
+      const tab: RecipeTab = {
+        id: this.generateUUID(),
+        title: recipe.title,
+        recipe: recipe,
+        hasChanges: true,
+        isActive: true
+      };
+      
+      // Deactivate other tabs
+      this.state.tabs.forEach(t => t.isActive = false);
+      
+      this.state.tabs.push(tab);
+      this.state.activeTabId = tab.id;
+      this.currentRecipe = recipe;
+      this.initializeExpandedSteps();
+      this.triggerPreviewUpdate();
+      
+      // Load images for the recipe
+      this.loadAllImagesForRecipe(recipe);
+      
+    } else {
+      this.notificationService.error('Recipe not found', 'Unable to locate the selected recipe');
+    }
   }
   
   private updateJsonPreview(): void {
