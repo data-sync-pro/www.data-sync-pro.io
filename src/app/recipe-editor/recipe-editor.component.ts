@@ -99,6 +99,7 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
   
   // Tooltip state
   showTooltip: string | null = null;
+  private tooltipHideTimeout: any;
   
   // Step options from Recipe Producer
   stepOptions = [
@@ -2007,6 +2008,29 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
     
     // Sort alphabetically and limit to 10 items
     return items.sort((a, b) => a.title.localeCompare(b.title)).slice(0, 10);
+  }
+  
+  /**
+   * Handle tooltip enter with delay cancellation
+   */
+  onTooltipEnter(type: string): void {
+    // Cancel any pending hide timeout
+    if (this.tooltipHideTimeout) {
+      clearTimeout(this.tooltipHideTimeout);
+      this.tooltipHideTimeout = null;
+    }
+    this.showTooltip = type;
+  }
+  
+  /**
+   * Handle tooltip leave with delay
+   */
+  onTooltipLeave(): void {
+    // Set a delay before hiding the tooltip
+    this.tooltipHideTimeout = setTimeout(() => {
+      this.showTooltip = null;
+      this.tooltipHideTimeout = null;
+    }, 300); // 300ms delay
   }
   
   /**

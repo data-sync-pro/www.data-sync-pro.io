@@ -15,12 +15,12 @@
       </span>
       <span class="stat-item created tooltip-container" 
             *ngIf="getCreatedCount() > 0"
-            (mouseenter)="showTooltip = 'created'" 
-            (mouseleave)="showTooltip = null">
+            (mouseenter)="onTooltipEnter('created')" 
+            (mouseleave)="onTooltipLeave()">
         <strong>{{ getCreatedCount() }}</strong> Created
         <div class="tooltip-content" *ngIf="showTooltip === 'created'"
-             (mouseenter)="showTooltip = 'created'"
-             (mouseleave)="showTooltip = null">
+             (mouseenter)="onTooltipEnter('created')"
+             (mouseleave)="onTooltipLeave()">
           <div class="tooltip-header">Created Recipes:</div>
           <div class="tooltip-item clickable" 
                *ngFor="let item of getCreatedRecipeTitles()"
@@ -35,12 +35,12 @@
       </span>
       <span class="stat-item edited tooltip-container" 
             *ngIf="getEditedExistingCount() > 0"
-            (mouseenter)="showTooltip = 'edited'" 
-            (mouseleave)="showTooltip = null">
+            (mouseenter)="onTooltipEnter('edited')" 
+            (mouseleave)="onTooltipLeave()">
         <strong>{{ getEditedExistingCount() }}</strong> Edited
         <div class="tooltip-content" *ngIf="showTooltip === 'edited'"
-             (mouseenter)="showTooltip = 'edited'"
-             (mouseleave)="showTooltip = null">
+             (mouseenter)="onTooltipEnter('edited')"
+             (mouseleave)="onTooltipLeave()">
           <div class="tooltip-header">Edited Recipes:</div>
           <div class="tooltip-item clickable" 
                *ngFor="let item of getEditedExistingRecipeTitles()"
