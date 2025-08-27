@@ -1,40 +1,9 @@
+<p>It defines a shared SOQL filter applied to all Executables in the Pipeline. This ensures consistent data retrieval while letting each Executable add its own filters.</p><p><strong>Benefits:</strong></p><ul>
+<li>
+<p>Standardizes data retrieval across Executables.</p>
+</li>
+<li>
+<p>Reduces redundancy by avoiding repeated filters</p></li>
+</ul><p><strong>Tip:</strong> When editing an Executable’s Retrieve query, temporarily remove the shared criteria, make your changes, then reapply it to avoid conflicts.</p>
 
-  <p>
-    The "<strong>Additional Retrieve Criteria</strong>" field on a Pipeline allows you to define
-    a shared <strong>SOQL filter</strong> that applies to all <strong>Executables</strong> within the Pipeline.
-    This ensures that each Executable retrieves data that meets the <strong>common
-    criteria</strong> while still respecting its own individual filters.
-  </p>
-
-  <p>
-    <strong>Key Benefits:</strong>
-  </p>
-  <ul>
-    <li>
-      <strong>Standardizes data</strong> retrieval across multiple Executables in a Pipeline.
-    </li>
-    <li>
-      Minimizes redundancy by <strong>avoiding repeated filter definitions</strong> in each
-      Executable.
-    </li>
-    <li>
-      <strong>Enhances flexibility</strong>, as Executables can still apply additional filters
-      specific to their processing needs.
-    </li>
-  </ul>
-  <p>
-    <strong>Editing Consideration:</strong>
-  </p>
-  <ul>
-    <li>
-      When editing the Retrieve query for an Executable within a Pipeline that
-      has "<strong>Additional Retrieve Criteria</strong>", it is best to temporarily remove the
-      shared criteria, make the necessary updates, and then reapply the
-      "<strong>Additional Retrieve Criteria</strong>" once the edits are complete. This prevents
-      unintended query conflicts and ensures smooth execution.
-    </li>
-  </ul>
-
-      <img src="assets/image/process-steps-retrieve-additional-retrieve-criteria/process-steps-retrieve-additional-retrieve-criteria.jpg" />     
-
-
+      <img src="assets/image/process-steps-retrieve-additional-retrieve-criteria/process-steps-retrieve-additional-retrieve-criteria.jpg">
