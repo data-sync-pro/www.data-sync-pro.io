@@ -1,7 +1,10 @@
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { SourceRecipeRecord } from '../models/recipe.model';
 import { RecipeFileStorageService } from './recipe-file-storage.service';
+import { RecipeStorageService } from './recipe-storage.service';
 import { NotificationService } from './notification.service';
+import { firstValueFrom } from 'rxjs';
 
 declare const JSZip: any;
 
@@ -18,17 +21,93 @@ export interface ExportProgress {
 export class RecipeExportService {
   
   constructor(
-    private notificationService: NotificationService
+    private http: HttpClient,
+    private notificationService: NotificationService,
+    private storageService: RecipeStorageService
   ) {}
+  
+  /**
+   * Fetch original file (image or executable) from assets folder
+   */
+  private async fetchOriginalFile(filePath: string): Promise<File | null> {
+    try {
+      const response = await firstValueFrom(this.http.get(filePath, { responseType: 'blob' }));
+      
+      // Extract filename from path
+      const filename = filePath.split('/').pop() || 'file';
+      
+      // Convert blob to File object
+      const file = new File([response], filename, { 
+        type: response.type || 'application/octet-stream' 
+      });
+      
+      return file;
+    } catch (error) {
+      console.warn(`Failed to fetch original file ${filePath}:`, error);
+      return null;
+    }
+  }
+
+  /**
+   * Get the actual folder ID for a recipe (handling ID vs folder name mismatch)
+   */
+  private getFolderIdForRecipe(recipe: SourceRecipeRecord): string {
+    // Check if recipe has the stored folder ID
+    if ((recipe as any).__folderId) {
+      return (recipe as any).__folderId;
+    }
+    
+    // Map known problematic recipe IDs to correct folder names
+    const idToFolderMap: { [key: string]: string } = {
+      'auto‑close-stagnant-cases': 'auto_close-stagnant-cases'
+    };
+    
+    return idToFolderMap[recipe.id] || recipe.id;
+  }
+
+  /**
+   * Get file with fallback: try IndexedDB first, then original file path
+   */
+  private async getFileWithFallback(
+    fileStorage: RecipeFileStorageService, 
+    imageId: string, 
+    recipe: SourceRecipeRecord,
+    relativePath: string,
+    isImage: boolean = true
+  ): Promise<File | null> {
+    try {
+      // First try to get from IndexedDB (for edited files)
+      const indexedFile = isImage 
+        ? await fileStorage.getImage(imageId) 
+        : await fileStorage.getJsonFile(imageId);
+      
+      if (indexedFile) {
+        return indexedFile;
+      }
+      
+      // Build original file path using correct folder ID
+      const folderId = this.getFolderIdForRecipe(recipe);
+      const originalPath = `assets/recipes/${folderId}/${relativePath}`;
+      
+      // Fallback to original file from assets
+      return await this.fetchOriginalFile(originalPath);
+    } catch (error) {
+      console.warn(`Failed to get file ${imageId} / ${relativePath}:`, error);
+      return null;
+    }
+  }
   
   /**
    * Export single recipe as JSON file
    */
   async exportSingleRecipe(recipe: SourceRecipeRecord): Promise<void> {
     try {
-      const jsonString = JSON.stringify(recipe, null, 2);
+      // Clean the recipe before export
+      const cleanedRecipe = this.storageService.cleanRecipeForStorage(recipe);
+      
+      const jsonString = JSON.stringify(cleanedRecipe, null, 2);
       const blob = new Blob([jsonString], { type: 'application/json' });
-      const filename = `${recipe.id || 'recipe'}.json`;
+      const filename = `${cleanedRecipe.id || 'recipe'}.json`;
       
       this.downloadBlob(blob, filename);
       this.notificationService.success(`Recipe exported: ${filename}`);
@@ -74,12 +153,15 @@ export class RecipeExportService {
         
         updateProgress(`Processing recipe: ${recipe.title}`);
         
+        // Clean the recipe before export
+        const cleanedRecipe = this.storageService.cleanRecipeForStorage(recipe);
+        
         // Create recipe folder
-        const recipeFolder = zip.folder(recipe.id);
+        const recipeFolder = zip.folder(cleanedRecipe.id);
         if (!recipeFolder) continue;
         
-        // Add recipe.json
-        const recipeJson = JSON.stringify(recipe, null, 2);
+        // Add recipe.json with cleaned data
+        const recipeJson = JSON.stringify(cleanedRecipe, null, 2);
         recipeFolder.file('recipe.json', recipeJson);
         processedCount++;
         
@@ -98,8 +180,15 @@ export class RecipeExportService {
                     const imageName = media.url.split('/')[1];
                     const imageId = this.extractImageId(imageName);
                     
-                    // Get image from IndexedDB
-                    const imageFile = await fileStorage.getImage(imageId);
+                    // Get image with fallback (IndexedDB first, then original file)
+                    const imageFile = await this.getFileWithFallback(
+                      fileStorage, 
+                      imageId, 
+                      recipe,
+                      media.url,
+                      true
+                    );
+                    
                     if (imageFile && imagesFolder) {
                       imagesFolder.file(imageName, imageFile);
                     }
@@ -122,7 +211,15 @@ export class RecipeExportService {
                 const imageName = image.url.split('/')[1];
                 const imageId = this.extractImageId(imageName);
                 
-                const imageFile = await fileStorage.getImage(imageId);
+                // Get image with fallback (IndexedDB first, then original file)
+                const imageFile = await this.getFileWithFallback(
+                  fileStorage, 
+                  imageId, 
+                  recipe,
+                  image.url,
+                  true
+                );
+                
                 if (imageFile && imagesFolder) {
                   imagesFolder.file(imageName, imageFile);
                 }
@@ -143,8 +240,15 @@ export class RecipeExportService {
                 // Extract JSON file name from path
                 const fileName = executable.filePath.replace('downloadExecutables/', '');
                 
-                // Get JSON file from IndexedDB
-                const jsonFile = await fileStorage.getJsonFile(fileName);
+                // Get JSON file with fallback (IndexedDB first, then original file)
+                const jsonFile = await this.getFileWithFallback(
+                  fileStorage, 
+                  fileName, 
+                  recipe,
+                  executable.filePath,
+                  false  // isImage = false for JSON files
+                );
+                
                 if (jsonFile && executablesFolder) {
                   executablesFolder.file(fileName, jsonFile);
                 }
