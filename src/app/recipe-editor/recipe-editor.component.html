@@ -633,16 +633,29 @@
       </div>
     </div>
 
-    <!-- Right - JSON Preview -->
+    <!-- Right - Preview Panel -->
     <div class="preview-panel" *ngIf="currentRecipe">
-      <h3>JSON Preview</h3>
+      <div class="preview-header">
+        <h3>Preview</h3>
+        <div class="preview-actions">
+          <button class="btn btn-sm btn-primary preview-new-tab"
+                  (click)="openPreviewInNewTab()"
+                  title="Open preview in new tab">
+            <span class="btn-icon">🗗</span>
+            Open Preview
+          </button>
+        </div>
+      </div>
+      
+      <!-- JSON Preview Content -->
       <div class="json-preview">
         <pre><code>{{ jsonPreview }}</code></pre>
+        <button class="btn btn-sm btn-secondary copy-btn"
+                (click)="copyToClipboard(jsonPreview)"
+                title="Copy JSON to clipboard">
+          Copy JSON
+        </button>
       </div>
-      <button class="btn btn-sm btn-secondary copy-btn"
-              (click)="copyToClipboard(jsonPreview)">
-        Copy JSON
-      </button>
     </div>
   </div>
 

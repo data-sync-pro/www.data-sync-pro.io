@@ -25,6 +25,7 @@ import {
   LegacyRecipeWalkthrough
 } from '../shared/models/recipe.model';
 import { RecipeService } from '../shared/services/recipe.service';
+import { RecipePreviewService, RecipePreviewData } from '../shared/services/recipe-preview.service';
 import { SelectedRecipe } from './recipe-search-overlay/recipe-search-overlay.component';
 
 interface UIState {
@@ -34,6 +35,7 @@ interface UIState {
   mobileTOCOpen: boolean;
   isMobile: boolean;
   currentView: 'home' | 'category' | 'recipe';
+  isPreviewMode: boolean;
   tocHidden: boolean;
   tocInFooterZone: boolean;
   tocFooterApproaching: boolean;
@@ -97,6 +99,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
     mobileTOCOpen: false,
     isMobile: false,
     currentView: 'home',
+    isPreviewMode: false,
     tocHidden: false,
     tocInFooterZone: false,
     tocFooterApproaching: false,
@@ -183,6 +186,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private router: Router,
     private recipeService: RecipeService,
+    private previewService: RecipePreviewService,
     private meta: Meta,
     private title: Title,
     private cdr: ChangeDetectorRef
@@ -524,17 +528,33 @@ export class RecipesComponent implements OnInit, OnDestroy {
       
       this.navigation = { category, recipeName };
       
-      // Determine current view
-      if (recipeName) {
-        this.ui.currentView = 'recipe';
-        this.loadRecipeDetails(category, recipeName);
-      } else if (category) {
-        this.ui.currentView = 'category';
-        this.loadCategoryRecipes(category);
-      } else {
-        this.ui.currentView = 'home';
-        this.loadAllRecipes();
-      }
+      // Check for preview mode
+      this.route.queryParamMap.pipe(
+        takeUntil(this.destroy$)
+      ).subscribe(queryParams => {
+        const isPreview = queryParams.get('preview') === 'true';
+        const previewRecipeId = queryParams.get('recipeId');
+        
+        if (isPreview && previewRecipeId) {
+          this.ui.isPreviewMode = true;
+          this.ui.currentView = 'recipe';
+          this.loadPreviewRecipe(previewRecipeId);
+          this.setupPreviewSync(previewRecipeId);
+        } else {
+          this.ui.isPreviewMode = false;
+          // Determine current view for normal mode
+          if (recipeName) {
+            this.ui.currentView = 'recipe';
+            this.loadRecipeDetails(category, recipeName);
+          } else if (category) {
+            this.ui.currentView = 'category';
+            this.loadCategoryRecipes(category);
+          } else {
+            this.ui.currentView = 'home';
+            this.loadAllRecipes();
+          }
+        }
+      });
       
       this.updatePageMetadata();
       this.cdr.markForCheck();
@@ -726,6 +746,164 @@ export class RecipesComponent implements OnInit, OnDestroy {
         this.updateUIState({ isLoading: false });
       }
     });
+  }
+
+  /**
+   * Load recipe from preview data
+   */
+  private loadPreviewRecipe(recipeId: string): void {
+    const previewData = this.previewService.getPreviewData(recipeId);
+    
+    if (previewData) {
+      // Convert preview data to RecipeItem format
+      this.currentRecipe = this.convertPreviewToRecipeItem(previewData);
+      this.updateUIState({ isLoading: false });
+      
+      if (this.currentRecipe) {
+        this.generateRecipeTOCStructure();
+        this.clearSectionElementsCache();
+        this.ui.userHasScrolled = false;
+        
+        // Set initial timestamp for comparison
+        this.setPreviewTimestamp(previewData.timestamp);
+      }
+      
+      console.log('📖 Loaded recipe preview data for:', recipeId);
+      this.cdr.markForCheck();
+    } else {
+      console.warn('⚠️ No preview data found for recipe:', recipeId);
+      this.updateUIState({ isLoading: false });
+    }
+  }
+
+  /**
+   * Setup preview synchronization for cross-tab updates
+   */
+  private setupPreviewSync(recipeId: string): void {
+    console.log('🎧 Setting up recipe preview update listeners for Recipe ID:', recipeId);
+    
+    // Enhanced storage event listener
+    const handleStorageChange = (event: StorageEvent) => {
+      const sessionKey = `recipe-preview-${recipeId}`;
+      const backupKey = `backup-recipe-preview-${recipeId}`;
+      
+      console.log('📡 Storage event received:', {
+        key: event.key,
+        hasNewValue: !!event.newValue,
+        storageType: event.storageArea === sessionStorage ? 'sessionStorage' : 'localStorage'
+      });
+      
+      // Check both sessionStorage and localStorage keys
+      if ((event.key === sessionKey || event.key === backupKey) && event.newValue) {
+        try {
+          const previewData = JSON.parse(event.newValue) as RecipePreviewData;
+          console.log('🔄 Updating recipe preview content from storage event');
+          
+          this.updatePreviewContent(previewData);
+        } catch (error) {
+          console.error('❌ Error parsing recipe preview update data:', error);
+        }
+      }
+    };
+
+    // Listen for storage changes (cross-tab communication)
+    window.addEventListener('storage', handleStorageChange);
+    console.log('✅ Storage event listener added for recipe preview');
+    
+    // Enhanced periodic check for updates (fallback mechanism)
+    const updateInterval = setInterval(() => {
+      console.log('⏰ Periodic check for recipe preview updates...');
+      this.checkForPreviewUpdates(recipeId);
+    }, 1000); // Check every 1 second for better responsiveness
+    
+    // Cleanup on destroy
+    this.destroy$.subscribe(() => {
+      console.log('🧹 Cleaning up recipe preview update listeners');
+      clearInterval(updateInterval);
+      window.removeEventListener('storage', handleStorageChange);
+    });
+  }
+
+  /**
+   * Update preview content with new data
+   */
+  private updatePreviewContent(previewData: RecipePreviewData): void {
+    if (!this.currentRecipe) return;
+
+    console.log('🖼️ Updating recipe preview UI with new content');
+    
+    // Convert and update the current recipe item
+    this.currentRecipe = this.convertPreviewToRecipeItem(previewData);
+    
+    // Update page title if needed
+    document.title = `[Preview] ${previewData.title} - Data Sync Pro Recipes`;
+    
+    // Regenerate TOC structure for updated content
+    this.generateRecipeTOCStructure();
+    this.clearSectionElementsCache();
+    
+    // Update timestamp for comparison
+    this.setPreviewTimestamp(previewData.timestamp);
+    
+    // Trigger change detection
+    this.cdr.markForCheck();
+    
+    console.log('✅ Recipe preview UI updated successfully');
+  }
+
+  /**
+   * Check for preview updates via periodic polling (fallback mechanism)
+   */
+  private checkForPreviewUpdates(recipeId: string): void {
+    const currentData = this.previewService.getPreviewData(recipeId);
+    if (!currentData || !this.currentRecipe) return;
+
+    const currentTimestamp = this.getPreviewTimestamp();
+    
+    if (currentData.timestamp > currentTimestamp) {
+      console.log('📅 Found newer recipe content via periodic check, updating...');
+      this.updatePreviewContent(currentData);
+    }
+  }
+
+  /**
+   * Get preview timestamp for comparison
+   */
+  private getPreviewTimestamp(): number {
+    return (this.currentRecipe as any)?._previewTimestamp || 0;
+  }
+
+  /**
+   * Set preview timestamp
+   */
+  private setPreviewTimestamp(timestamp: number): void {
+    if (this.currentRecipe) {
+      (this.currentRecipe as any)._previewTimestamp = timestamp;
+    }
+  }
+
+  /**
+   * Convert preview data to RecipeItem format
+   */
+  private convertPreviewToRecipeItem(previewData: RecipePreviewData): RecipeItem {
+    const sourceRecipe = previewData.recipeData;
+    
+    return {
+      id: sourceRecipe.id,
+      title: sourceRecipe.title,
+      category: sourceRecipe.category,
+      DSPVersions: sourceRecipe.DSPVersions,
+      overview: sourceRecipe.overview,
+      whenToUse: sourceRecipe.whenToUse,
+      generalImages: sourceRecipe.generalImages,
+      prerequisites: sourceRecipe.prerequisites,
+      direction: sourceRecipe.direction,
+      connection: sourceRecipe.connection,
+      walkthrough: sourceRecipe.walkthrough,
+      downloadableExecutables: sourceRecipe.downloadableExecutables,
+      relatedRecipes: sourceRecipe.relatedRecipes,
+      keywords: sourceRecipe.keywords
+    };
   }
 
   /**

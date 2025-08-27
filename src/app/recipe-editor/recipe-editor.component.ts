@@ -5,6 +5,7 @@ import { RecipeExportService } from '../shared/services/recipe-export.service';
 import { RecipeFileStorageService } from '../shared/services/recipe-file-storage.service';
 import { RecipeService } from '../shared/services/recipe.service';
 import { NotificationService } from '../shared/services/notification.service';
+import { RecipePreviewService, RecipePreviewData } from '../shared/services/recipe-preview.service';
 import { 
   RecipeItem, 
   SourceRecipeRecord,
@@ -82,6 +83,9 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
   // Current editing recipe
   currentRecipe: SourceRecipeRecord | null = null;
   jsonPreview = '';
+  
+  // Preview update timer
+  private previewUpdateTimer: any;
   
   // Image preview state
   imagePreviewState = {
@@ -310,7 +314,8 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
     private notificationService: NotificationService,
     private cdr: ChangeDetectorRef,
     private ngZone: NgZone,
-    private renderer: Renderer2
+    private renderer: Renderer2,
+    private previewService: RecipePreviewService
   ) {}
   
   ngOnInit(): void {
@@ -481,6 +486,21 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
     this.previewUpdateSubject.next();
   }
   
+  private triggerCrossTabPreviewUpdate(): void {
+    if (!this.currentRecipe) return;
+    
+    const previewData: RecipePreviewData = {
+      recipeId: this.currentRecipe.id,
+      title: this.currentRecipe.title,
+      category: this.currentRecipe.category,
+      recipeData: this.currentRecipe,
+      timestamp: Date.now()
+    };
+    
+    // Update preview data for cross-tab sync
+    this.previewService.updatePreviewData(previewData);
+  }
+  
   // Tab management
   createNewTab(): void {
     const newRecipe = this.createEmptyRecipe();
@@ -646,6 +666,9 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
     
     this.triggerPreviewUpdate();
     this.autoSaveSubject.next();
+    
+    // Trigger cross-tab preview sync
+    this.triggerCrossTabPreviewUpdate();
   }
   
   // Step management
@@ -2612,5 +2635,65 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
       relatedRecipes: recipe.relatedRecipes || [],
       keywords: recipe.keywords || []
     };
+  }
+
+  /**
+   * Open preview in new tab
+   */
+  public openPreviewInNewTab(): void {
+    if (!this.currentRecipe) return;
+
+    const previewData: RecipePreviewData = {
+      recipeId: this.currentRecipe.id,
+      title: this.currentRecipe.title,
+      category: this.currentRecipe.category,
+      recipeData: this.currentRecipe,
+      timestamp: Date.now()
+    };
+
+    const result = this.previewService.openPreviewInNewTab(this.currentRecipe.id, previewData);
+    
+    if (!result.success) {
+      // Show fallback dialog or notification
+      this.notificationService.error('Unable to open preview. Please check your popup blocker settings.');
+    }
+  }
+
+  /**
+   * Update preview content
+   */
+  private updatePreview(): void {
+    if (!this.currentRecipe) {
+      return;
+    }
+
+    // Debounced preview update
+    if (this.previewUpdateTimer) {
+      clearTimeout(this.previewUpdateTimer);
+    }
+
+    this.previewUpdateTimer = setTimeout(() => {
+      // Also update external preview if open
+      this.updateExternalPreview();
+    }, 500);
+  }
+
+
+  /**
+   * Update external preview if open
+   */
+  private updateExternalPreview(): void {
+    if (!this.currentRecipe) return;
+
+    const previewData: RecipePreviewData = {
+      recipeId: this.currentRecipe.id,
+      title: this.currentRecipe.title,
+      category: this.currentRecipe.category,
+      recipeData: this.currentRecipe,
+      timestamp: Date.now()
+    };
+
+    // Update preview (will notify open tabs via storage event)
+    this.previewService.updatePreviewData(previewData);
   }
 }

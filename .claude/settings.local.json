@@ -36,7 +36,8 @@
       "Bash(start http://localhost:4200/recipe-editor)",
       "Bash(start http://localhost:4200/faq-editor)",
       "Bash(start http://localhost:4202/recipe-editor)",
-      "Bash(timeout:*)"
+      "Bash(timeout:*)",
+      "Read(/D:\\d D:/**)"
     ],
     "deny": []
   }
