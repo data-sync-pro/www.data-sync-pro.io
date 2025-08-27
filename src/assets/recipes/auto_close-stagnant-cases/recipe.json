@@ -54,9 +54,9 @@
       "media": [
         {
           "type": "image",
-          "url": "images/batch-create-executable-image-2.png",
+          "url": "images/batch-create-executable-image.png",
           "alt": "",
-          "imageKey": "batch-create-executable-image-2.png"
+          "imageKey": "batch-create-executable-image.png"
         }
       ]
     },
@@ -71,9 +71,9 @@
       "media": [
         {
           "type": "image",
-          "url": "images/batch-retrieve-image-2.jpg",
+          "url": "images/batch-retrieve-image.jpg",
           "alt": "",
-          "imageKey": "batch-retrieve-image-2.jpg"
+          "imageKey": "batch-retrieve-image.jpg"
         }
       ]
     },
@@ -88,9 +88,9 @@
       "media": [
         {
           "type": "image",
-          "url": "images/batch-scoping-image-2.jpg",
+          "url": "images/batch-scoping-image.jpg",
           "alt": "",
-          "imageKey": "batch-scoping-image-2.jpg"
+          "imageKey": "batch-scoping-image.jpg"
         }
       ]
     },
@@ -109,9 +109,9 @@
       "media": [
         {
           "type": "image",
-          "url": "images/batch-match-image-2.jpg",
+          "url": "images/batch-match-image.jpg",
           "alt": "",
-          "imageKey": "batch-match-image-2.jpg"
+          "imageKey": "batch-match-image.jpg"
         }
       ]
     },
@@ -126,9 +126,9 @@
       "media": [
         {
           "type": "image",
-          "url": "images/batch-mapping-image-2.jpg",
+          "url": "images/batch-mapping-image.jpg",
           "alt": "",
-          "imageKey": "batch-mapping-image-2.jpg"
+          "imageKey": "batch-mapping-image.jpg"
         }
       ]
     },
@@ -138,9 +138,9 @@
       "media": [
         {
           "type": "image",
-          "url": "images/batch-action-image-2.jpg",
+          "url": "images/batch-action-image.jpg",
           "alt": "",
-          "imageKey": "batch-action-image-2.jpg"
+          "imageKey": "batch-action-image.jpg"
         }
       ]
     }
