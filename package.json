@@ -4,10 +4,11 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build",
-    "build:github-pages": "ng build --configuration github-pages",
+    "build": "node scripts/generate-version.js && ng build",
+    "build:github-pages": "node scripts/generate-version.js && ng build --configuration github-pages",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "generate-version": "node scripts/generate-version.js"
   },
   "private": true,
   "dependencies": {

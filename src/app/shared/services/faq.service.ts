@@ -24,6 +24,7 @@ export class FAQService implements OnDestroy {
   private readonly FAQ_DATA_URL = 'assets/data/faqs.json';
   private readonly FAQ_CONTENT_BASE = 'assets/faq-item/';
   private readonly AUTO_LINK_TERMS_URL = 'assets/data/auto-link-terms.json';
+  private readonly VERSION_URL = 'assets/data/version.json';
   
   // Cache
   private faqsCache$ = new BehaviorSubject<FAQItem[]>([]);
@@ -36,7 +37,9 @@ export class FAQService implements OnDestroy {
   private readonly STORAGE_KEY_FAQ_CONTENT = 'faq_content_cache';
   private readonly STORAGE_KEY_FAQ_METADATA = 'faq_metadata_cache';
   private readonly STORAGE_KEY_POPULAR_FAQS = 'popular_faqs_cache';
+  private readonly STORAGE_KEY_APP_VERSION = 'app_version_cache';
   private readonly CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+  private readonly VERSION_CHECK_INTERVAL = 4 * 60 * 60 * 1000; // 4 hours in milliseconds
 
   // Loading state
   private isLoading = false;
@@ -67,8 +70,10 @@ export class FAQService implements OnDestroy {
    */
   private initializeService(): void {
     if (!this.isInitialized) {
-      this.loadFAQs();
-      this.loadAutoLinkTerms();
+      this.checkAndUpdateVersion().then(() => {
+        this.loadFAQs();
+        this.loadAutoLinkTerms();
+      });
       this.isInitialized = true;
     }
   }
@@ -936,5 +941,102 @@ export class FAQService implements OnDestroy {
     testTerms.forEach(term => {
       const config = this.autoLinkTerms[term];
     });
+  }
+
+  /**
+   * Check version and clear cache if needed
+   */
+  public async checkAndUpdateVersion(): Promise<void> {
+    try {
+      // Check if we need to skip this check due to interval
+      const localVersionData = localStorage.getItem(this.STORAGE_KEY_APP_VERSION);
+      if (localVersionData) {
+        const versionInfo = JSON.parse(localVersionData);
+        const lastCheckTime = versionInfo.lastCheckTime || 0;
+        const timeSinceLastCheck = Date.now() - lastCheckTime;
+        
+        if (timeSinceLastCheck < this.VERSION_CHECK_INTERVAL) {
+          const minutesAgo = Math.round(timeSinceLastCheck / 1000 / 60);
+          console.log(`⏭️ Skipping version check (last checked ${minutesAgo} minutes ago)`);
+          return;
+        }
+      }
+      
+      console.log('🔍 Checking application version...');
+      
+      // Get remote version
+      const response = await this.http.get<any>(this.VERSION_URL).toPromise();
+      const remoteVersion = response.build || response.version;
+      
+      // Get local version
+      const localVersion = localVersionData ? JSON.parse(localVersionData).build : null;
+      
+      console.log('📊 Version comparison:', { local: localVersion, remote: remoteVersion });
+      
+      if (!localVersion || localVersion !== remoteVersion) {
+        console.log('🆕 New version detected, clearing all caches...');
+        this.clearAllCaches();
+        
+        // Save new version with reset check time
+        localStorage.setItem(this.STORAGE_KEY_APP_VERSION, JSON.stringify({
+          build: remoteVersion,
+          version: response.version,
+          timestamp: Date.now(),
+          lastCheckTime: Date.now()
+        }));
+        
+        console.log('✅ Cache cleared and version updated');
+        
+        // Silent automatic page refresh
+        setTimeout(() => {
+          window.location.reload();
+        }, 100);
+      } else {
+        console.log('✅ Version is up to date');
+        
+        // Update last check time even if no version change
+        const currentVersionInfo = localVersionData ? JSON.parse(localVersionData) : {};
+        localStorage.setItem(this.STORAGE_KEY_APP_VERSION, JSON.stringify({
+          ...currentVersionInfo,
+          lastCheckTime: Date.now()
+        }));
+      }
+    } catch (error) {
+      console.error('❌ Failed to check version:', error);
+      // If version check fails, continue with normal operation
+    }
+  }
+
+  /**
+   * Clear all caches except editor IndexedDB data
+   */
+  private clearAllCaches(): void {
+    try {
+      // Preserve version info during localStorage clearing
+      const versionData = localStorage.getItem(this.STORAGE_KEY_APP_VERSION);
+      
+      // Clear all localStorage
+      localStorage.clear();
+      
+      // Restore version info
+      if (versionData) {
+        localStorage.setItem(this.STORAGE_KEY_APP_VERSION, versionData);
+      }
+      
+      // Clear all sessionStorage (including preview data)
+      sessionStorage.clear();
+      
+      // Clear memory caches
+      this.contentCache.clear();
+      this.categoriesCache = [];
+      this.autoLinkTerms = {};
+      this.autoLinkTermsLoaded = false;
+      
+      // Note: IndexedDB (FAQEditorDB, RecipeEditorDB) is automatically preserved
+      
+      console.log('🧹 All caches cleared successfully (IndexedDB preserved)');
+    } catch (error) {
+      console.error('❌ Failed to clear caches:', error);
+    }
   }
 }
