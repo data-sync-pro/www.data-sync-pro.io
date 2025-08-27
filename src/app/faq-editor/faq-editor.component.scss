@@ -797,6 +797,24 @@
       color: #333;
     }
     
+    .preview-actions {
+      display: flex;
+      gap: 0.5rem;
+      
+      .new-tab-btn,
+      .preview-toggle {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        font-size: 0.875rem;
+        
+        .btn-icon {
+          font-size: 1rem;
+        }
+      }
+    }
+    
+    // Legacy support for direct preview-toggle
     .preview-toggle {
       display: flex;
       align-items: center;

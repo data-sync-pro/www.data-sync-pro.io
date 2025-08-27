@@ -9,6 +9,7 @@ import { FAQStorageService, EditedFAQ } from '../shared/services/faq-storage.ser
 import { FAQExportService, ExportData, ExportProgress } from '../shared/services/faq-export.service';
 import { FAQItem, FAQCategory } from '../shared/models/faq.model';
 import { NotificationService } from '../shared/services/notification.service';
+import { FAQPreviewService, PreviewData } from '../shared/services/faq-preview.service';
 import { html_beautify } from 'js-beautify';
 
 interface DOMSelection {
@@ -421,6 +422,7 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
   private destroy$ = new Subject<void>();
   private autoSaveTimer: any;
   private contentChangeSubject = new Subject<string>();
+  private previewUpdateTimer: any;
   private undoRedoManager = new UndoRedoManager();
   private isUndoRedoOperation = false;
   
@@ -476,7 +478,8 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
     private storageService: FAQStorageService,
     private exportService: FAQExportService,
     private sanitizer: DomSanitizer,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private previewService: FAQPreviewService
   ) {}
 
   ngOnInit(): void {
@@ -596,6 +599,10 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
     
     if (this.autoSaveTimer) {
       clearInterval(this.autoSaveTimer);
+    }
+    
+    if (this.previewUpdateTimer) {
+      clearTimeout(this.previewUpdateTimer);
     }
     
     // Save any pending changes
@@ -744,6 +751,8 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
         
         // Update preview AFTER DOM content is set
         this.updatePreview();
+        // Also update external preview for content loading
+        this.debouncedPreviewUpdate();
       }, 0);
     } else {
       // Load original content
@@ -784,6 +793,8 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
             
             // Update preview AFTER DOM content is set
             this.updatePreview();
+            // Also update external preview for raw content loading
+            this.debouncedPreviewUpdate();
           }, 0);
         },
         error: (error) => {
@@ -800,6 +811,8 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
             
             // Update preview with error content or fallback to FAQ service
             this.updatePreview();
+            // Also update external preview for error content
+            this.debouncedPreviewUpdate();
             
             // Fallback to FAQ service preview if available
             this.updatePreviewFromFAQService(faq);
@@ -842,6 +855,9 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
         this.state.lastSaved = new Date();
         this.state.saveError = null;
         this.loadEditedFAQs();
+        
+        // Update preview if open
+        this.updatePreviewIfOpen();
         
         // Show notification only for manual saves
         if (!isAutoSave) {
@@ -898,6 +914,7 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
       this.htmlSourceEditor.nativeElement.innerHTML = content;
       this.editorContent = content;
       this.updatePreview();
+      this.debouncedPreviewUpdate(); // Sync external preview for undo operation
       
       // Reset flag after a short delay to allow event propagation
       setTimeout(() => {
@@ -929,6 +946,9 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
     
     // Trigger smart auto-save with immediate content update (no debouncing for sync)
     this.contentChangeSubject.next(currentContent);
+    
+    // Update external preview with debouncing
+    this.debouncedPreviewUpdate();
   }
 
   /**
@@ -944,6 +964,9 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
     this.onTabContentChange();
     
     this.contentChangeSubject.next(currentContent);
+    
+    // Update external preview tab with debouncing to prevent excessive updates
+    this.debouncedPreviewUpdate();
   }
 
   resetCurrentFAQ(): void {
@@ -1151,12 +1174,109 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
     if (confirm('Are you sure you want to clear all edits? This cannot be undone.')) {
       const success = await this.storageService.clearAllEdits();
       if (success) {
+        // Clear all editor state
+        this.resetEditorState();
+        
+        // Reload data
         this.loadEditedFAQs();
-        if (this.state.selectedFAQ) {
-          this.selectFAQ(this.state.selectedFAQ);
-        }
+        this.updateStorageStats();
+        
+        // Show success notification and refresh immediately
+        this.notificationService.success('All edits cleared - ready for new FAQ creation');
+        window.location.reload();
+      } else {
+        this.notificationService.error('Failed to clear edits');
       }
     }
+  }
+
+  /**
+   * Reset editor to initial state
+   */
+  private resetEditorState(): void {
+    // Clear all tabs
+    this.state.tabs = [];
+    this.state.activeTabId = null;
+    
+    // Reset selected FAQ and editor content
+    this.state.selectedFAQ = null;
+    this.editorContent = '';
+    this.currentQuestion = '';
+    this.currentCategory = '';
+    this.currentSubCategory = '';
+    
+    // Reset state flags
+    this.state.hasChanges = false;
+    this.state.isEditing = false;
+    this.state.isSaving = false;
+    this.state.saveError = null;
+    this.state.lastSaved = null;
+    
+    // Clear local data structures
+    this.editedFAQs.clear();
+    this.versionHistory = [];
+    
+    // Clear undo/redo history
+    this.undoRedoManager = new UndoRedoManager();
+    
+    // Clear temporary images
+    this.cleanupTempImageUrls();
+    this.tempImageMap.clear();
+    
+    // Create a default new FAQ tab to maintain user workflow
+    this.createDefaultTab();
+    
+    // Reset search if active
+    this.searchQuery = '';
+    this.selectedCategory = '';
+    this.filterFAQs();
+    
+    // Close any open dialogs
+    this.state.showVersionHistory = false;
+    this.state.showExportDialog = false;
+    this.state.showImportDialog = false;
+    
+    console.log('📝 Editor state reset to initial state');
+  }
+
+  /**
+   * Create a default tab after clearing all edits
+   */
+  private createDefaultTab(): void {
+    const newFAQ: FAQItem & { isNew?: boolean } = {
+      id: this.generateUUID(),
+      name: `new-faq-${Date.now()}`,
+      question: 'New FAQ Question',
+      category: this.categories.length > 0 ? this.categories[0] : 'General',
+      answerPath: '',
+      answer: '',
+      isNew: true
+    };
+
+    const tab: FAQTab = {
+      id: this.generateUUID(),
+      title: 'New FAQ',
+      faq: newFAQ,
+      hasChanges: false,
+      isActive: true,
+      editorContent: '<p>Enter your FAQ answer here...</p>',
+      currentQuestion: newFAQ.question,
+      currentCategory: newFAQ.category,
+      currentSubCategory: newFAQ.subCategory || ''
+    };
+
+    // Add the new tab and make it active
+    this.state.tabs = [tab];
+    this.state.activeTabId = tab.id;
+    this.state.selectedFAQ = newFAQ;
+
+    // Set up editor content for the new FAQ
+    this.currentQuestion = newFAQ.question;
+    this.currentCategory = newFAQ.category;
+    this.currentSubCategory = newFAQ.subCategory || '';
+    this.editorContent = '<p>Enter your FAQ answer here...</p>';
+    
+    console.log('📝 Default tab created after clear all');
   }
 
   getEditedCount(): number {
@@ -2059,6 +2179,8 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
       }
       this.clearUndoHistory();
       this.updatePreview();
+      // Update external preview when regenerating content
+      this.debouncedPreviewUpdate();
     }, 0);
   }
 
@@ -2198,6 +2320,8 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
         this.state.isLoading = false;
         this.initializeUndoState();
         this.updatePreview();
+        // Update external preview when switching to edited FAQ tab
+        this.debouncedPreviewUpdate();
       }, 0);
     } else if ((tab.faq as any).isNew) {
       // New FAQ tab with default paragraph structure
@@ -2213,6 +2337,8 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
         this.state.isLoading = false;
         this.initializeUndoState();
         this.updatePreview();
+        // Update external preview when switching to new FAQ tab
+        this.debouncedPreviewUpdate();
       }, 0);
     } else {
       // Load original content
@@ -2241,6 +2367,8 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
             this.state.isLoading = false;
             this.initializeUndoState();
             this.updatePreview();
+            // Update external preview when loading original content for tab
+            this.debouncedPreviewUpdate();
           }, 0);
         },
         error: (error) => {
@@ -2700,5 +2828,275 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
    */
   getTempImages(): Map<string, File> {
     return this.tempImageMap;
+  }
+
+  // ========================
+  // Preview in New Tab Methods
+  // ========================
+
+  /**
+   * Open preview in new tab with export-ready content
+   */
+  openPreviewInNewTab(): void {
+    if (!this.state.selectedFAQ) {
+      this.notificationService.warning('Please select an FAQ to preview');
+      return;
+    }
+
+    // Get raw editor content - same as in saveFAQ()
+    const editorElement = this.htmlSourceEditor?.nativeElement;
+    const rawEditorContent = editorElement?.innerHTML || this.editorContent;
+    
+    // Clean the content using same logic as export
+    const cleanedContent = this.cleanEditorContent(rawEditorContent);
+    
+    // Convert URL format back to img tags (use blob URLs for preview)
+    const htmlWithImages = this.convertUrlsToImgs(cleanedContent, false);
+    
+    // Apply export service cleaning for consistency
+    const exportReadyContent = this.exportService.cleanHTMLContent(htmlWithImages);
+    
+    // Prepare preview data
+    const previewData: PreviewData = {
+      faqId: this.state.selectedFAQ.id,
+      question: this.currentQuestion || this.state.selectedFAQ.question,
+      category: this.currentCategory || this.state.selectedFAQ.category,
+      subCategory: this.currentSubCategory || this.state.selectedFAQ.subCategory || undefined,
+      htmlContent: exportReadyContent,
+      timestamp: Date.now()
+    };
+
+    // Open preview in new tab
+    const result = this.previewService.openPreviewInNewTab(
+      this.state.selectedFAQ.id,
+      previewData
+    );
+
+    if (result.success) {
+      this.notificationService.success('Preview opened in new tab');
+    } else {
+      // Popup was blocked, show fallback dialog
+      this.showPreviewFallbackDialog(result.url!);
+    }
+  }
+
+  /**
+   * Debounced version of preview update to prevent excessive cross-tab communication
+   */
+  private debouncedPreviewUpdate(): void {
+    if (this.previewUpdateTimer) {
+      clearTimeout(this.previewUpdateTimer);
+    }
+    
+    this.previewUpdateTimer = setTimeout(() => {
+      this.updatePreviewIfOpen();
+    }, 500); // 500ms debounce
+  }
+
+  /**
+   * Update preview if tab is open (called on save)
+   */
+  private updatePreviewIfOpen(): void {
+    if (!this.state.selectedFAQ) return;
+
+    // Get raw editor content
+    const editorElement = this.htmlSourceEditor?.nativeElement;
+    const rawEditorContent = editorElement?.innerHTML || this.editorContent;
+    
+    // Clean and process content
+    const cleanedContent = this.cleanEditorContent(rawEditorContent);
+    const htmlWithImages = this.convertUrlsToImgs(cleanedContent, false);
+    const exportReadyContent = this.exportService.cleanHTMLContent(htmlWithImages);
+    
+    // Update preview data
+    const previewData: PreviewData = {
+      faqId: this.state.selectedFAQ.id,
+      question: this.currentQuestion || this.state.selectedFAQ.question,
+      category: this.currentCategory || this.state.selectedFAQ.category,
+      subCategory: this.currentSubCategory || this.state.selectedFAQ.subCategory || undefined,
+      htmlContent: exportReadyContent,
+      timestamp: Date.now()
+    };
+
+    // Update preview (will notify open tabs via storage event)
+    this.previewService.updatePreviewData(previewData);
+  }
+
+  /**
+   * Get export-ready preview content (used by both preview methods)
+   */
+  getExportReadyPreviewContent(): string {
+    if (!this.htmlSourceEditor?.nativeElement) {
+      return '';
+    }
+
+    // Get raw editor content
+    const editorElement = this.htmlSourceEditor.nativeElement;
+    const rawEditorContent = editorElement.innerHTML || this.editorContent;
+    
+    // Apply all cleaning steps
+    const cleanedContent = this.cleanEditorContent(rawEditorContent);
+    const htmlWithImages = this.convertUrlsToImgs(cleanedContent, true);
+    const exportContent = this.exportService.cleanHTMLContent(htmlWithImages);
+    const decodedContent = this.exportService.decodeHTMLEntities(exportContent);
+    
+    return decodedContent;
+  }
+
+  /**
+   * Show fallback dialog when popup is blocked
+   */
+  showPreviewFallbackDialog(previewUrl: string): void {
+    const fullUrl = window.location.origin + previewUrl;
+    
+    // Create fallback dialog content
+    const dialogHTML = `
+      <div class="preview-fallback-dialog">
+        <h3>Preview Blocked by Browser</h3>
+        <p>Your browser blocked the popup window. You can open the preview using one of these options:</p>
+        
+        <div class="fallback-options">
+          <button class="btn btn-primary" onclick="window.open('${previewUrl}', '_blank'); this.closest('.preview-fallback-overlay').remove();">
+            Try Opening Again
+          </button>
+          
+          <button class="btn btn-secondary" onclick="navigator.clipboard.writeText('${fullUrl}').then(() => alert('URL copied to clipboard!')); this.closest('.preview-fallback-overlay').remove();">
+            Copy URL
+          </button>
+          
+          <button class="btn btn-secondary" onclick="window.location.href = '${previewUrl}';">
+            Open in Current Tab
+          </button>
+        </div>
+        
+        <div class="url-display">
+          <label>Preview URL:</label>
+          <input type="text" readonly value="${fullUrl}" onclick="this.select();" style="width: 100%; margin-top: 0.5rem; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
+        </div>
+        
+        <div class="dialog-footer">
+          <button class="btn btn-sm btn-outline-secondary" onclick="this.closest('.preview-fallback-overlay').remove();">
+            Cancel
+          </button>
+          <small style="margin-left: 1rem; color: #666;">
+            To avoid this in the future, please allow popups for this site.
+          </small>
+        </div>
+      </div>
+    `;
+
+    // Create overlay
+    const overlay = document.createElement('div');
+    overlay.className = 'preview-fallback-overlay';
+    overlay.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    `;
+
+    // Create dialog
+    const dialog = document.createElement('div');
+    dialog.style.cssText = `
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      max-width: 500px;
+      width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
+    `;
+    
+    dialog.innerHTML = dialogHTML;
+    overlay.appendChild(dialog);
+    document.body.appendChild(overlay);
+
+    // Close on overlay click
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) {
+        overlay.remove();
+      }
+    });
+
+    // Add styles for dialog content
+    const style = document.createElement('style');
+    style.textContent = `
+      .preview-fallback-dialog h3 {
+        margin-top: 0;
+        color: #333;
+        margin-bottom: 1rem;
+      }
+      .preview-fallback-dialog p {
+        color: #666;
+        margin-bottom: 1.5rem;
+        line-height: 1.5;
+      }
+      .fallback-options {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+      }
+      .fallback-options .btn {
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        transition: all 0.2s;
+      }
+      .fallback-options .btn-primary {
+        background: #007bff;
+        color: white;
+      }
+      .fallback-options .btn-primary:hover {
+        background: #0056b3;
+      }
+      .fallback-options .btn-secondary {
+        background: #6c757d;
+        color: white;
+      }
+      .fallback-options .btn-secondary:hover {
+        background: #545b62;
+      }
+      .url-display {
+        margin-bottom: 1.5rem;
+      }
+      .url-display label {
+        font-weight: 500;
+        color: #333;
+        display: block;
+      }
+      .dialog-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-top: 1px solid #eee;
+        padding-top: 1rem;
+        margin-top: 1rem;
+      }
+      .dialog-footer .btn-outline-secondary {
+        background: transparent;
+        color: #6c757d;
+        border: 1px solid #6c757d;
+        padding: 0.25rem 0.75rem;
+      }
+      .dialog-footer .btn-outline-secondary:hover {
+        background: #6c757d;
+        color: white;
+      }
+    `;
+    document.head.appendChild(style);
+
+    // Show warning notification
+    this.notificationService.warning('Preview blocked - see dialog for options');
   }
 }

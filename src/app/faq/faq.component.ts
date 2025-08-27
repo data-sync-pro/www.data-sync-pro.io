@@ -25,6 +25,7 @@ import { takeUntil, debounceTime } from 'rxjs/operators';
 import { FAQItem, FAQCategory, FAQSubCategory } from '../shared/models/faq.model';
 import { FAQService } from '../shared/services/faq.service';
 import { PerformanceService } from '../shared/services/performance.service';
+import { FAQPreviewService, PreviewData } from '../shared/services/faq-preview.service';
 
 interface SearchResult {
   item: FAQItem;
@@ -150,11 +151,27 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     private meta: Meta,
     private title: Title,
     private cdr: ChangeDetectorRef,
-    private performanceService: PerformanceService
+    private performanceService: PerformanceService,
+    private previewService: FAQPreviewService
   ) {}
 
   ngOnInit(): void {
-    this.initFaqData();
+    // Check for preview mode first and handle it separately
+    this.route.queryParams.pipe(takeUntil(this.destroy$)).subscribe(params => {
+      const isPreview = params['preview'] === 'true';
+      const previewFaqId = params['faqId'];
+      
+      if (isPreview && previewFaqId) {
+        console.log('🔍 Preview mode detected, faqId:', previewFaqId);
+        this.setupPreviewMode(previewFaqId);
+        // Skip normal FAQ initialization for preview mode
+        return;
+      } else {
+        // Normal FAQ mode initialization
+        this.initFaqData();
+      }
+    });
+    
     this.loadRatingsFromLocalStorage();
     this.cleanupFavoriteData();
     this.loadSidebarState();
@@ -2459,6 +2476,222 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
       this.cachedToc.classList.remove('footer-visible');
     }
   }
+
+  // ========================
+  // Preview Mode Methods
+  // ========================
+
+
+  /**
+   * Setup preview mode with content from editor
+   */
+  private setupPreviewMode(faqId: string): void {
+    console.log('🔧 Setting up preview mode for FAQ ID:', faqId);
+    
+    // Get preview data from storage
+    const previewData = this.previewService.getPreviewData(faqId);
+    console.log('📦 Preview data retrieved:', previewData);
+    
+    if (previewData) {
+      console.log('✅ Preview data found, setting up preview...');
+      
+      // Update page title to indicate preview mode
+      this.title.setTitle(`[Preview] ${previewData.question} - Data Sync Pro FAQ`);
+      
+      // Create virtual FAQ item for preview
+      const previewFAQ: FAQItem = {
+        id: previewData.faqId,
+        name: previewData.faqId,
+        question: previewData.question,
+        category: previewData.category,
+        subCategory: previewData.subCategory,
+        answerPath: '', // No path needed for preview
+        answer: '',
+        safeAnswer: this.sanitizer.bypassSecurityTrustHtml(previewData.htmlContent)
+      };
+      
+      // Set this as the current FAQ
+      this.current.faqItem = previewFAQ;
+      this.current.category = previewData.category;
+      this.current.subCategory = previewData.subCategory || '';
+      this.current.faqTitle = previewData.question;
+      
+      // Initialize FAQ list with preview item to avoid "no FAQ" message
+      this.faqList = [previewFAQ];
+      
+      // Hide sidebar search results since we're showing preview
+      this.search.isActive = false;
+      this.search.isOpen = false;
+      
+      // Set UI state to show content
+      this.ui.isLoading = false;
+      
+      // Force change detection
+      this.cdr.markForCheck();
+      
+      console.log('🎉 Preview mode setup complete');
+      
+      // Setup storage listener for real-time updates
+      this.setupPreviewUpdateListener(faqId);
+    } else {
+      console.error('❌ No preview data found in SessionStorage for faqId:', faqId);
+      this.handleMissingPreviewData(faqId);
+    }
+  }
+
+  /**
+   * Handle case when preview data is not found
+   */
+  private handleMissingPreviewData(faqId: string): void {
+    // Update page title
+    this.title.setTitle('[Preview Error] Preview data not found - Data Sync Pro FAQ');
+    
+    // Create error FAQ item
+    const errorFAQ: FAQItem = {
+      id: faqId,
+      name: faqId,
+      question: 'Preview Data Not Found',
+      category: 'Error',
+      subCategory: '',
+      answerPath: '',
+      answer: '',
+      safeAnswer: this.sanitizer.bypassSecurityTrustHtml(`
+        <div style="text-align: center; padding: 2rem; border: 2px dashed #f0ad4e; border-radius: 8px; background: #fdf6e3;">
+          <h3 style="color: #f0ad4e; margin-bottom: 1rem;">⚠️ Preview Data Not Found</h3>
+          <p style="margin-bottom: 1rem; color: #666;">Unable to find preview data for FAQ ID <code>${faqId}</code> in session storage.</p>
+          <p style="margin-bottom: 1.5rem; color: #666;">Please return to the editor and open preview again.</p>
+          <button onclick="window.close()" style="background: #5bc0de; color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; margin-right: 0.5rem;">Close Preview</button>
+          <button onclick="window.opener?.focus(); window.close();" style="background: #5cb85c; color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer;">Back to Editor</button>
+        </div>
+      `)
+    };
+    
+    // Set the error FAQ as current
+    this.current.faqItem = errorFAQ;
+    this.current.category = 'Error';
+    this.current.subCategory = '';
+    this.current.faqTitle = 'Preview Data Not Found';
+    
+    // Set single item list to avoid "no FAQ" message
+    this.faqList = [errorFAQ];
+    
+    this.ui.isLoading = false;
+    this.cdr.markForCheck();
+  }
+
+  /**
+   * Listen for preview content updates from editor
+   */
+  private setupPreviewUpdateListener(faqId: string): void {
+    console.log('🎧 Setting up preview update listeners for FAQ ID:', faqId);
+    
+    // Enhanced storage event listener
+    const handleStorageEvent = (event: StorageEvent) => {
+      const sessionKey = `faq-preview-${faqId}`;
+      const backupKey = `backup-faq-preview-${faqId}`;
+      
+      console.log('📡 Storage event received:', {
+        key: event.key,
+        hasNewValue: !!event.newValue,
+        storageType: event.storageArea === sessionStorage ? 'sessionStorage' : 'localStorage'
+      });
+      
+      // Check both sessionStorage and localStorage keys
+      if ((event.key === sessionKey || event.key === backupKey) && event.newValue) {
+        try {
+          const updatedData: PreviewData = JSON.parse(event.newValue);
+          console.log('🔄 Updating preview content from storage event');
+          
+          this.updatePreviewContent(updatedData);
+        } catch (error) {
+          console.error('❌ Error parsing preview update data:', error);
+        }
+      }
+    };
+
+    // Listen for storage events (cross-tab communication)
+    window.addEventListener('storage', handleStorageEvent);
+    console.log('✅ Storage event listener added');
+    
+    // Enhanced periodic check for updates (fallback mechanism)
+    const updateInterval = setInterval(() => {
+      console.log('⏰ Periodic check for preview updates...');
+      this.checkForPreviewUpdates(faqId);
+    }, 1000); // Increased frequency to 1 second for better responsiveness
+    
+    // Clean up interval on destroy
+    this.destroy$.pipe(takeUntil(this.destroy$)).subscribe(() => {
+      console.log('🧹 Cleaning up preview update listeners');
+      clearInterval(updateInterval);
+      window.removeEventListener('storage', handleStorageEvent);
+    });
+  }
+
+  /**
+   * Update preview content with new data
+   */
+  private updatePreviewContent(updatedData: PreviewData): void {
+    if (!this.current.faqItem) return;
+
+    console.log('🖼️ Updating preview UI with new content');
+    
+    // Update the current FAQ item with new content
+    this.current.faqItem.question = updatedData.question;
+    this.current.faqItem.safeAnswer = this.sanitizer.bypassSecurityTrustHtml(updatedData.htmlContent);
+    
+    // Update page title
+    this.title.setTitle(`[Preview] ${updatedData.question} - Data Sync Pro FAQ`);
+    
+    // Update timestamp
+    this.setPreviewTimestamp(updatedData.timestamp);
+    
+    // Trigger change detection
+    this.cdr.markForCheck();
+    
+    // Force DOM update
+    this.cdr.detectChanges();
+    
+    console.log('✨ Preview content updated successfully');
+  }
+
+  /**
+   * Check for preview updates (fallback mechanism)
+   */
+  private checkForPreviewUpdates(faqId: string): void {
+    const currentData = this.previewService.getPreviewData(faqId);
+    if (!currentData || !this.current.faqItem) return;
+
+    const currentTimestamp = this.getPreviewTimestamp();
+    
+    if (currentData.timestamp > currentTimestamp) {
+      console.log('📅 Found newer content via periodic check, updating...');
+      this.updatePreviewContent(currentData);
+    }
+  }
+
+  /**
+   * Get preview timestamp for comparison
+   */
+  private getPreviewTimestamp(): number {
+    return (this.current.faqItem as any)?._previewTimestamp || 0;
+  }
+
+  /**
+   * Set preview timestamp
+   */
+  private setPreviewTimestamp(timestamp: number): void {
+    if (this.current.faqItem) {
+      (this.current.faqItem as any)._previewTimestamp = timestamp;
+    }
+  }
+
+  /**
+   * Check if currently in preview mode
+   */
+  isPreviewMode(): boolean {
+    return this.route.snapshot.queryParams['preview'] === 'true';
+  }
+
 
 
 }
