@@ -161,6 +161,13 @@ export class RecipeService implements OnDestroy {
 
         const recipeRequests = activeRecipes.map(recipeIndex => 
           this.http.get<SourceRecipeRecord>(`${this.RECIPE_FOLDERS_BASE}${recipeIndex.folderId}/recipe.json`).pipe(
+            map(recipe => {
+              // Add the actual folder ID to the recipe object for correct path resolution
+              if (recipe) {
+                (recipe as any).__folderId = recipeIndex.folderId;
+              }
+              return recipe;
+            }),
             catchError(error => {
               console.warn(`Failed to load recipe from folder ${recipeIndex.folderId}:`, error);
               return of(null);
@@ -207,11 +214,33 @@ export class RecipeService implements OnDestroy {
   }
 
   /**
+   * Process downloadable executables to convert relative paths to absolute paths
+   */
+  private processDownloadableExecutables(executables: any[], folderId: string): any[] {
+    if (!executables || !Array.isArray(executables)) {
+      return [];
+    }
+    
+    return executables.map(executable => {
+      if (executable.filePath && !executable.filePath.startsWith('http') && !executable.filePath.startsWith('/')) {
+        return {
+          ...executable,
+          filePath: `${this.RECIPE_FOLDERS_BASE}${folderId}/${executable.filePath}`
+        };
+      }
+      return executable;
+    });
+  }
+
+  /**
    * Transform a single record to handle both new and legacy formats
    */
   private transformSingleRecord(record: SourceRecipeRecord): RecipeItem {
     // Check if this is a new format record (based on walkthrough being an array)
     if (Array.isArray(record.walkthrough) && (record.overview || record.usecase) && Array.isArray(record.prerequisites)) {
+      // Use the actual folder ID for image paths, fallback to record.id if not available
+      const folderId = (record as any).__folderId || record.id;
+      
       return {
         // New format fields
         id: record.id,
@@ -227,8 +256,8 @@ export class RecipeService implements OnDestroy {
         direction: record.direction || '',
         safeDirection: record.direction ? this.sanitizer.bypassSecurityTrustHtml(record.direction) : this.sanitizer.bypassSecurityTrustHtml(''),
         connection: record.connection || '',
-        walkthrough: this.processWalkthroughImagePaths(record.walkthrough || [], record.id),
-        downloadableExecutables: record.downloadableExecutables || [],
+        walkthrough: this.processWalkthroughImagePaths(record.walkthrough || [], folderId),
+        downloadableExecutables: this.processDownloadableExecutables(record.downloadableExecutables || [], folderId),
         relatedRecipes: record.relatedRecipes || [],
         keywords: record.keywords || [],
         

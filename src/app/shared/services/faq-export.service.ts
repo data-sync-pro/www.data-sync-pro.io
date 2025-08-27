@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { FAQStorageService, EditedFAQ } from './faq-storage.service';
 import { FAQService } from './faq.service';
 import { FAQItem } from '../models/faq.model';
+import { firstValueFrom } from 'rxjs';
 import JSZip from 'jszip';
 
 export interface ExportData {
@@ -29,9 +31,66 @@ export class FAQExportService {
   private readonly EXPORT_VERSION = '1.0.0';
 
   constructor(
+    private http: HttpClient,
     private storageService: FAQStorageService,
     private faqService: FAQService
   ) {}
+
+  /**
+   * Extract image references from HTML content
+   */
+  private extractImageReferencesFromHTML(htmlContent: { [key: string]: string }): Set<string> {
+    const imageRefs = new Set<string>();
+    const imageRegex = /(?:src|href)\s*=\s*['"](assets\/image\/[^'"]+)['"]/gi;
+    
+    for (const content of Object.values(htmlContent)) {
+      let match;
+      while ((match = imageRegex.exec(content)) !== null) {
+        imageRefs.add(match[1]); // match[1] is the captured group (the image path)
+      }
+    }
+    
+    return imageRefs;
+  }
+
+  /**
+   * Fetch original image from assets folder
+   */
+  private async fetchOriginalImage(imagePath: string): Promise<File | null> {
+    try {
+      const response = await firstValueFrom(this.http.get(imagePath, { responseType: 'blob' }));
+      
+      // Extract filename from path
+      const filename = imagePath.split('/').pop() || 'image';
+      
+      // Convert blob to File object
+      const file = new File([response], filename, { 
+        type: response.type || 'image/jpeg' 
+      });
+      
+      return file;
+    } catch (error) {
+      console.warn(`Failed to fetch original image ${imagePath}:`, error);
+      return null;
+    }
+  }
+
+  /**
+   * Get all original images referenced in HTML content
+   */
+  private async fetchAllOriginalImages(htmlContent: { [key: string]: string }): Promise<Map<string, File>> {
+    const imageRefs = this.extractImageReferencesFromHTML(htmlContent);
+    const originalImages = new Map<string, File>();
+    
+    for (const imagePath of imageRefs) {
+      const imageFile = await this.fetchOriginalImage(imagePath);
+      if (imageFile) {
+        originalImages.set(imagePath, imageFile);
+      }
+    }
+    
+    return originalImages;
+  }
 
   async exportAllEdits(): Promise<ExportData> {
     const editedFAQs = await this.storageService.exportEdits();
@@ -188,8 +247,13 @@ export class FAQExportService {
 
   async downloadAsZip(data: ExportData, progressCallback?: (progress: ExportProgress) => void, tempImages?: Map<string, File>): Promise<void> {
     const zip = new JSZip();
-    const imageCount = tempImages ? tempImages.size : 0;
-    const totalItems = Object.keys(data.htmlContent).length + 3 + imageCount; // HTML files + JSON + instructions + metadata + images
+    
+    // Get original images referenced in HTML content
+    const originalImages = await this.fetchAllOriginalImages(data.htmlContent);
+    
+    const tempImageCount = tempImages ? tempImages.size : 0;
+    const originalImageCount = originalImages.size;
+    const totalItems = Object.keys(data.htmlContent).length + 3 + tempImageCount + originalImageCount; // HTML files + JSON + instructions + metadata + temp images + original images
     let currentItem = 0;
 
     const updateProgress = (step: string) => {
@@ -227,8 +291,18 @@ export class FAQExportService {
         }
       }
 
+      // Add original images referenced in HTML content
+      if (originalImages.size > 0) {
+        for (const [imagePath, imageFile] of originalImages.entries()) {
+          // Create the directory structure: src/assets/image/[faq-id]/
+          const zipImagePath = `src/${imagePath}`;
+          zip.file(zipImagePath, imageFile);
+          updateProgress(`Adding original image ${imageFile.name}`);
+        }
+      }
+
       // Add instructions (updated to include image instructions)
-      const instructions = this.generateUpdateInstructions(data, tempImages);
+      const instructions = this.generateUpdateInstructions(data, tempImages, originalImages);
       zip.file('UPDATE_INSTRUCTIONS.txt', instructions);
       updateProgress('Adding instructions');
 
@@ -426,13 +500,16 @@ export class FAQExportService {
       typeof data.htmlContent === 'object';
   }
 
-  generateUpdateInstructions(data: ExportData, tempImages?: Map<string, File>): string {
-    const imageInstructions = tempImages && tempImages.size > 0 ? `
+  generateUpdateInstructions(data: ExportData, tempImages?: Map<string, File>, originalImages?: Map<string, File>): string {
+    const hasImages = (tempImages && tempImages.size > 0) || (originalImages && originalImages.size > 0);
+    const totalImageCount = (tempImages?.size || 0) + (originalImages?.size || 0);
+    
+    const imageInstructions = hasImages ? `
 
-3. Update Image Files:
+3. Update Image Files (${totalImageCount} files total):
    - Copy all image files from src/assets/image/ to your project's src/assets/image/ directory
    - The following image files are included:
-${Array.from(tempImages.entries()).map(([path, file]) => `     - ${path} (${file.name})`).join('\n')}
+${tempImages && tempImages.size > 0 ? Array.from(tempImages!.entries()).map(([path, file]) => `     - ${path} (${file.name}) [New]`).join('\n') : ''}${tempImages && tempImages.size > 0 && originalImages && originalImages.size > 0 ? '\n' : ''}${originalImages && originalImages.size > 0 ? Array.from(originalImages!.entries()).map(([path, file]) => `     - ${path} (${file.name}) [Original]`).join('\n') : ''}
    - Ensure the directory structure is preserved: src/assets/image/[faq-id]/[faq-id]-[sequence].[ext]
 
 4. Rebuild the Application:
@@ -459,8 +536,8 @@ FAQ Export Update Instructions
 ===============================
 Export Date: ${data.metadata.exportDate}
 Total FAQs: ${data.metadata.itemCount}
-Edited FAQs: ${data.metadata.editedCount}${tempImages ? `
-Total Images: ${tempImages.size}` : ''}
+Edited FAQs: ${data.metadata.editedCount}${hasImages ? `
+Total Images: ${totalImageCount}${tempImages && tempImages.size > 0 ? ` (${tempImages.size} new)` : ''}${originalImages && originalImages.size > 0 ? ` (${originalImages.size} original)` : ''}` : ''}
 
 How to Update Your Codebase:
 -----------------------------
@@ -477,16 +554,17 @@ Notes:
 ------
 - Make sure to backup existing files before replacing
 - Review all changes before committing to version control
-- Test thoroughly in development before deploying to production${tempImages && tempImages.size > 0 ? `
+- Test thoroughly in development before deploying to production${hasImages ? `
 - Image files are organized by FAQ ID to avoid conflicts
-- Image paths in HTML content use [IMG: assets/image/...] format for proper linking` : ''}
+- Image paths in HTML content use [IMG: assets/image/...] format for proper linking${originalImages && originalImages.size > 0 ? `
+- Original images are included to ensure all references work correctly` : ''}` : ''}
 `;
 
     return instructions;
   }
 
-  downloadInstructions(data: ExportData, tempImages?: Map<string, File>): void {
-    const instructions = this.generateUpdateInstructions(data, tempImages);
+  downloadInstructions(data: ExportData, tempImages?: Map<string, File>, originalImages?: Map<string, File>): void {
+    const instructions = this.generateUpdateInstructions(data, tempImages, originalImages);
     const blob = new Blob([instructions], { type: 'text/plain' });
     this.downloadFile(blob, 'UPDATE_INSTRUCTIONS.txt');
   }

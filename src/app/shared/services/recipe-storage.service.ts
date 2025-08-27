@@ -21,6 +21,68 @@ export class RecipeStorageService {
   constructor() {}
   
   /**
+   * Clean recipe object for storage/export by removing runtime properties
+   */
+  public cleanRecipeForStorage(recipe: SourceRecipeRecord): SourceRecipeRecord {
+    // Deep clone to avoid modifying the original
+    const cleanedRecipe = JSON.parse(JSON.stringify(recipe));
+    
+    // Clean walkthrough step media
+    if (cleanedRecipe.walkthrough && Array.isArray(cleanedRecipe.walkthrough)) {
+      cleanedRecipe.walkthrough.forEach((step: any) => {
+        if (step.media && Array.isArray(step.media)) {
+          step.media.forEach((media: any) => {
+            // Remove runtime properties
+            delete media.displayUrl;
+            delete media.imageKey;
+            
+            // Ensure URL is relative path (remove any absolute path prefix if present)
+            if (media.url && media.url.includes('assets/recipes/')) {
+              // Extract just the relative path starting from 'images/'
+              const match = media.url.match(/images\/[^/]+$/);
+              if (match) {
+                media.url = match[0];
+              }
+            }
+          });
+        }
+      });
+    }
+    
+    // Clean general images
+    if (cleanedRecipe.generalImages && Array.isArray(cleanedRecipe.generalImages)) {
+      cleanedRecipe.generalImages.forEach((image: any) => {
+        // Remove runtime properties
+        delete image.displayUrl;
+        delete image.imageKey;
+        
+        // Ensure URL is relative path
+        if (image.url && image.url.includes('assets/recipes/')) {
+          const match = image.url.match(/images\/[^/]+$/);
+          if (match) {
+            image.url = match[0];
+          }
+        }
+      });
+    }
+    
+    // Clean downloadable executables if needed
+    if (cleanedRecipe.downloadableExecutables && Array.isArray(cleanedRecipe.downloadableExecutables)) {
+      cleanedRecipe.downloadableExecutables.forEach((executable: any) => {
+        // Ensure filePath is relative
+        if (executable.filePath && executable.filePath.includes('assets/recipes/')) {
+          const match = executable.filePath.match(/downloadExecutables\/[^/]+$/);
+          if (match) {
+            executable.filePath = match[0];
+          }
+        }
+      });
+    }
+    
+    return cleanedRecipe;
+  }
+  
+  /**
    * Save a recipe to localStorage
    */
   saveRecipe(recipe: SourceRecipeRecord): boolean {
@@ -30,15 +92,18 @@ export class RecipeStorageService {
         return false;
       }
       
+      // Clean the recipe before saving
+      const cleanedRecipe = this.cleanRecipeForStorage(recipe);
+      
       // Get existing edited recipes
       const editedRecipes = this.getAllEditedRecipes();
       
       // Find and update or add new
-      const existingIndex = editedRecipes.findIndex(r => r.id === recipe.id);
+      const existingIndex = editedRecipes.findIndex(r => r.id === cleanedRecipe.id);
       if (existingIndex >= 0) {
-        editedRecipes[existingIndex] = recipe;
+        editedRecipes[existingIndex] = cleanedRecipe;
       } else {
-        editedRecipes.push(recipe);
+        editedRecipes.push(cleanedRecipe);
       }
       
       // Save to localStorage
