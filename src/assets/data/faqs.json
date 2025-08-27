@@ -122,7 +122,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Batch",
     "SeqNo__c": null,
-    "Question__c": "Why Data Sync Pro's Batch?",
+    "Question__c": "Why #Batch?",
     "Answer__c": "rules-engines-batch-why-dsp-batch.html"
   },
   {
@@ -851,7 +851,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Triggers",
     "SeqNo__c": null,
-    "Question__c": "How does TRIGGER_FLIPPER help streamline DSP trigger actions?",
+    "Question__c": "What is the TRIGGER_FLIPPER pattern?",
     "Answer__c": "rules-engines-triggers-trigger-flipper.html"
   },
   {
@@ -869,7 +869,7 @@
     "Category__c": "Processes",
     "SubCategory__c": "Retrieve",
     "SeqNo__c": null,
-    "Question__c": "Am I required to select all fields used in Scoping and Mapping within the Retrieve query?",
+    "Question__c": "Do I need to include every field for Scoping and Mapping in the Retrieve query?",
     "Answer__c": "process-steps-retrieve-retrieve-query-field-requirements.html"
   },
   {
@@ -878,7 +878,7 @@
     "Category__c": "Processes",
     "SubCategory__c": "Retrieve",
     "SeqNo__c": null,
-    "Question__c": "How can I preview a source record and its transformed values before execution?",
+    "Question__c": "How do I preview a source record with its transformed values before execution?",
     "Answer__c": "process-steps-retrieve-preview-source-record.html"
   },
   {
@@ -887,7 +887,7 @@
     "Category__c": "Processes",
     "SubCategory__c": "Retrieve",
     "SeqNo__c": null,
-    "Question__c": "What is the purpose of the 'Additional Retrieve Criteria' field on Pipeline?",
+    "Question__c": "Q: What is the purpose of the 'Additional Retrieve Criteria' field on a Pipeline?",
     "Answer__c": "process-steps-retrieve-additional-retrieve-criteria.html"
   },
   {
