@@ -158,6 +158,16 @@ export class RecipeExportService {
         processedCount++;
       }
       
+      // Generate and add index.json
+      updateProgress('Generating index.json...');
+      const indexJson = this.generateRecipeIndex(recipes);
+      zip.file('index.json', JSON.stringify(indexJson, null, 2));
+      
+      // Add deployment instructions
+      updateProgress('Adding deployment instructions...');
+      const instructions = this.generateRecipeUpdateInstructions(recipes);
+      zip.file('DEPLOYMENT_INSTRUCTIONS.txt', instructions);
+      
       // Generate ZIP
       updateProgress('Generating ZIP file...');
       
@@ -172,7 +182,7 @@ export class RecipeExportService {
       const filename = `recipes_export_${timestamp}.zip`;
       
       this.downloadBlob(zipBlob, filename);
-      this.notificationService.success(`${recipes.length} recipes exported as ZIP`);
+      this.notificationService.success(`${recipes.length} recipes exported as ZIP with index.json`);
       
     } catch (error) {
       console.error('Error exporting recipes as ZIP:', error);
@@ -185,13 +195,25 @@ export class RecipeExportService {
    */
   async exportAsJSON(recipes: SourceRecipeRecord[]): Promise<void> {
     try {
-      const jsonString = JSON.stringify(recipes, null, 2);
+      // Export as structured data with index
+      const exportData = {
+        metadata: {
+          exportDate: new Date().toISOString(),
+          version: '1.0.0',
+          recipeCount: recipes.length,
+          format: 'recipe-collection'
+        },
+        index: this.generateRecipeIndex(recipes),
+        recipes: recipes
+      };
+      
+      const jsonString = JSON.stringify(exportData, null, 2);
       const blob = new Blob([jsonString], { type: 'application/json' });
       const timestamp = new Date().toISOString().split('T')[0];
       const filename = `recipes_${timestamp}.json`;
       
       this.downloadBlob(blob, filename);
-      this.notificationService.success(`${recipes.length} recipes exported as JSON`);
+      this.notificationService.success(`${recipes.length} recipes exported as JSON with index`);
     } catch (error) {
       console.error('Error exporting recipes as JSON:', error);
       this.notificationService.error('Failed to export recipes as JSON');
@@ -245,14 +267,27 @@ export class RecipeExportService {
           const jsonString = event.target?.result as string;
           const data = JSON.parse(jsonString);
           
-          // Handle both single recipe and array of recipes
           let recipes: SourceRecipeRecord[];
-          if (Array.isArray(data)) {
+          
+          // Handle structured export data with index
+          if (data.metadata && data.recipes && data.index) {
+            console.log('Importing structured recipe export with index');
+            recipes = data.recipes;
+            
+            // Optionally validate index consistency
+            if (data.index.recipes) {
+              console.log(`Index contains ${data.index.recipes.length} recipes`);
+            }
+          } 
+          // Handle simple array of recipes (legacy)
+          else if (Array.isArray(data)) {
             recipes = data;
-          } else if (this.validateRecipe(data)) {
+          } 
+          // Handle single recipe
+          else if (this.validateRecipe(data)) {
             recipes = [data];
           } else {
-            throw new Error('Invalid data format');
+            throw new Error('Invalid data format - expected recipe collection or array');
           }
           
           // Validate all recipes
@@ -265,6 +300,7 @@ export class RecipeExportService {
             if (validRecipes.length < recipes.length) {
               this.notificationService.warning(`${recipes.length - validRecipes.length} invalid recipes skipped`);
             }
+            console.log(`Successfully imported ${validRecipes.length} recipes`);
             resolve(validRecipes);
           }
         } catch (error) {
@@ -351,9 +387,22 @@ export class RecipeExportService {
       const zip = new JSZip();
       const zipContent = await zip.loadAsync(file);
       
+      // Check for index.json first
+      let recipeIndex: any = null;
+      const indexFile = zipContent.file('index.json');
+      if (indexFile) {
+        try {
+          const indexContent = await indexFile.async('string');
+          recipeIndex = JSON.parse(indexContent);
+          console.log('Found index.json with recipe metadata:', recipeIndex);
+        } catch (error) {
+          console.warn('Failed to parse index.json:', error);
+        }
+      }
+      
       const importedRecipes: SourceRecipeRecord[] = [];
       const folders = Object.keys(zipContent.files)
-        .filter(path => path.includes('/') && !path.startsWith('__MACOSX'))
+        .filter(path => path.includes('/') && !path.startsWith('__MACOSX') && !path.startsWith('index.json'))
         .map(path => path.split('/')[0])
         .filter((folder, index, self) => self.indexOf(folder) === index);
       
@@ -393,6 +442,15 @@ export class RecipeExportService {
           if (!this.validateRecipe(recipe)) {
             console.warn(`Invalid recipe in folder: ${folder}`);
             continue;
+          }
+
+          // If we have index metadata, use it to validate/enhance the recipe
+          if (recipeIndex && recipeIndex.recipes) {
+            const indexEntry = recipeIndex.recipes.find((entry: any) => entry.folderId === folder);
+            if (indexEntry && !indexEntry.active) {
+              console.log(`Skipping inactive recipe: ${folder}`);
+              continue;
+            }
           }
           
           // Process images
@@ -540,6 +598,24 @@ export class RecipeExportService {
   }
   
   /**
+   * Generate recipe index for ZIP export
+   */
+  private generateRecipeIndex(recipes: SourceRecipeRecord[]): any {
+    const indexRecipes = recipes
+      .filter(recipe => recipe.id && recipe.title) // Only include recipes with valid id and title
+      .map(recipe => ({
+        folderId: recipe.id,
+        name: recipe.id, // Use id as name for consistency
+        category: recipe.category.toLowerCase().replace(/\s+/g, '-'), // Convert to kebab-case
+        active: true
+      }));
+
+    return {
+      recipes: indexRecipes
+    };
+  }
+
+  /**
    * Get file size in bytes
    */
   getFileSize(content: string): number {
@@ -555,5 +631,78 @@ export class RecipeExportService {
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+  }
+
+  /**
+   * Generate update instructions for exported recipes
+   */
+  generateRecipeUpdateInstructions(recipes: SourceRecipeRecord[]): string {
+    const timestamp = new Date().toISOString();
+    const totalRecipes = recipes.length;
+    const categories = [...new Set(recipes.map(r => r.category))];
+
+    const instructions = `
+Recipe Export Update Instructions
+================================
+Export Date: ${timestamp}
+Total Recipes: ${totalRecipes}
+Categories: ${categories.join(', ')}
+
+How to Deploy the Exported Recipes:
+-----------------------------------
+
+1. Recipe Data Structure:
+   - index.json: Contains recipe metadata and configuration
+   - [recipe-id]/recipe.json: Individual recipe definitions
+   - [recipe-id]/images/: Recipe-specific images
+   - [recipe-id]/downloadExecutables/: JSON executable files
+
+2. For Production Deployment:
+   - Copy index.json to src/assets/recipes/
+   - Copy all recipe folders to src/assets/recipes/
+   - Ensure the directory structure matches: src/assets/recipes/[recipe-id]/
+
+3. Recipe System Integration:
+   - The index.json file is automatically loaded by RecipeService
+   - Only recipes marked as "active: true" in index.json will be displayed
+   - Category names are normalized to kebab-case for routing
+
+4. Build Process:
+   - Run: node src/tools/generate-recipe-components.js
+   - This will generate Angular components for each recipe
+   - Run: ng build
+   - Test: ng serve
+
+5. Validation:
+   - All recipes in the index must have corresponding folders
+   - Each recipe folder must contain a recipe.json file
+   - Image references in recipes must match actual image files
+
+Exported Recipe List:
+-------------------
+${recipes.map((recipe, index) => `${index + 1}. ${recipe.title} (${recipe.id})`).join('\n')}
+
+Notes:
+------
+- The index.json format follows RecipeIndexConfig interface requirements
+- Recipe IDs are used as folder names and component identifiers
+- Image paths use relative references: "images/[filename]"
+- All downloadable executables are stored in downloadExecutables/ subdirectory
+- Recipe categories are automatically converted to URL-friendly format
+`;
+
+    return instructions;
+  }
+
+  /**
+   * Download recipe update instructions
+   */
+  downloadRecipeInstructions(recipes: SourceRecipeRecord[]): void {
+    const instructions = this.generateRecipeUpdateInstructions(recipes);
+    const blob = new Blob([instructions], { type: 'text/plain' });
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
+    const filename = `recipe-deployment-instructions-${timestamp}.txt`;
+    
+    this.downloadBlob(blob, filename);
   }
 }
