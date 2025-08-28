@@ -6,6 +6,7 @@ import { Directive, ElementRef, Renderer2, HostListener, AfterViewInit, OnDestro
 export class SimpleZoomableDirective implements AfterViewInit, OnDestroy {
   private backdropEl?: HTMLElement;
   private clonedImg?: HTMLImageElement;
+  private downloadBtn?: HTMLElement;
   private zoomed = false;
   private clickListener?: (event: Event) => void;
   private mutationObserver?: MutationObserver;
@@ -167,6 +168,57 @@ export class SimpleZoomableDirective implements AfterViewInit, OnDestroy {
     // 添加图片到背景
     this.rd.appendChild(this.backdropEl, this.clonedImg);
     
+    // 创建下载按钮
+    this.downloadBtn = this.rd.createElement('button');
+    this.rd.setStyle(this.downloadBtn, 'position', 'fixed');
+    this.rd.setStyle(this.downloadBtn, 'top', '20px');
+    this.rd.setStyle(this.downloadBtn, 'right', '20px');
+    this.rd.setStyle(this.downloadBtn, 'z-index', '10001');
+    this.rd.setStyle(this.downloadBtn, 'width', '48px');
+    this.rd.setStyle(this.downloadBtn, 'height', '48px');
+    this.rd.setStyle(this.downloadBtn, 'border-radius', '50%');
+    this.rd.setStyle(this.downloadBtn, 'background', 'rgba(0, 0, 0, 0.6)');
+    this.rd.setStyle(this.downloadBtn, 'border', 'none');
+    this.rd.setStyle(this.downloadBtn, 'color', 'white');
+    this.rd.setStyle(this.downloadBtn, 'cursor', 'pointer');
+    this.rd.setStyle(this.downloadBtn, 'display', 'flex');
+    this.rd.setStyle(this.downloadBtn, 'align-items', 'center');
+    this.rd.setStyle(this.downloadBtn, 'justify-content', 'center');
+    this.rd.setStyle(this.downloadBtn, 'transition', 'background 0.3s ease');
+    this.rd.setAttribute(this.downloadBtn, 'title', 'Download image');
+    
+    // 添加下载图标 (使用SVG)
+    const iconSvg = `
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="white">
+        <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+      </svg>
+    `;
+    if (this.downloadBtn) {
+      this.downloadBtn.innerHTML = iconSvg;
+      
+      // 添加悬停效果
+      this.downloadBtn.addEventListener('mouseenter', () => {
+        if (this.downloadBtn) {
+          this.rd.setStyle(this.downloadBtn, 'background', 'rgba(0, 0, 0, 0.8)');
+        }
+      });
+      
+      this.downloadBtn.addEventListener('mouseleave', () => {
+        if (this.downloadBtn) {
+          this.rd.setStyle(this.downloadBtn, 'background', 'rgba(0, 0, 0, 0.6)');
+        }
+      });
+      
+      // 添加下载功能
+      this.downloadBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.downloadImage(img);
+      });
+      
+      // 添加下载按钮到页面
+      this.rd.appendChild(document.body, this.downloadBtn);
+    }
+    
     // 添加点击事件
     this.backdropEl?.addEventListener('click', () => this.closeZoom(), { once: true });
     
@@ -184,6 +236,11 @@ export class SimpleZoomableDirective implements AfterViewInit, OnDestroy {
       this.backdropEl = undefined;
     }
     
+    if (this.downloadBtn) {
+      this.rd.removeChild(document.body, this.downloadBtn);
+      this.downloadBtn = undefined;
+    }
+    
     if (this.clonedImg) {
       this.clonedImg = undefined;
     }
@@ -191,6 +248,34 @@ export class SimpleZoomableDirective implements AfterViewInit, OnDestroy {
     this.rd.removeStyle(document.body, 'overflow');
     this.zoomed = false;
     window.dispatchEvent(new Event('zoomEnd'));
+  }
+  
+  private downloadImage(img: HTMLImageElement): void {
+    const link = document.createElement('a');
+    link.href = img.src;
+    
+    // Extract filename from URL or use default
+    let filename = 'image.png';
+    try {
+      const url = new URL(img.src);
+      const pathname = url.pathname;
+      const lastSlash = pathname.lastIndexOf('/');
+      if (lastSlash !== -1) {
+        filename = pathname.substring(lastSlash + 1) || 'image.png';
+      }
+      // Ensure filename has an extension
+      if (!filename.includes('.')) {
+        filename = filename + '.png';
+      }
+    } catch (e) {
+      // If URL parsing fails, use default filename
+      filename = 'image.png';
+    }
+    
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   }
 
   private cleanup(): void {

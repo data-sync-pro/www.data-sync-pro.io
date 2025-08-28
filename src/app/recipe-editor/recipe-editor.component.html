@@ -349,7 +349,7 @@
           <!-- General Images -->
           <div class="form-group">
             <label>General Images</label>
-            <div class="general-images-container">
+            <div class="general-images-container" appSimpleZoomable>
               <div class="general-images-list">
                 <div class="general-image-item" 
                      *ngFor="let image of currentRecipe.generalImages; let i = index; trackBy: trackByIndex">
@@ -381,8 +381,7 @@
                     <div *ngIf="image.displayUrl; else loadingGeneralImage">
                       <img [src]="image.displayUrl" 
                            [alt]="image.alt"
-                           class="media-preview-image clickable-image"
-                           (click)="openImagePreview(image.displayUrl, image.alt)"
+                           class="media-preview-image"
                            title="Click to enlarge"
                            (error)="onImageError($event)">
                     </div>
@@ -552,7 +551,7 @@
             </div>
 
             <!-- Media -->
-            <div class="media-section">
+            <div class="media-section" appSimpleZoomable>
               <h4>Media</h4>
               <div class="media-item" 
                    *ngFor="let media of step.media; let j = index; trackBy: trackByIndex">
@@ -583,8 +582,7 @@
                   <div *ngIf="media.displayUrl; else loadingImage">
                     <img [src]="media.displayUrl" 
                          [alt]="media.alt"
-                         class="media-preview-image clickable-image"
-                         (click)="openImagePreview(media.displayUrl, media.alt)"
+                         class="media-preview-image"
                          title="Click to enlarge"
                          (error)="onImageError($event)">
                   </div>
@@ -672,30 +670,4 @@
          style="display: none"
          (change)="importRecipe($event)">
 
-  <!-- Image Preview Modal -->
-  <div class="image-preview-modal" 
-       [class.show]="imagePreviewState.isOpen"
-       (click)="closeImagePreview($event)">
-    <div class="image-preview-backdrop"></div>
-    <div class="image-preview-content" (click)="$event.stopPropagation()">
-      <button class="image-preview-close" 
-              (click)="closeImagePreview()"
-              title="Close (ESC)">×</button>
-      <img [src]="imagePreviewState.imageUrl" 
-           [alt]="imagePreviewState.altText"
-           [style.transform]="'scale(' + imagePreviewState.zoomLevel + ')'"
-           class="preview-image">
-      <div class="image-preview-controls">
-        <button class="zoom-btn" 
-                (click)="zoomIn()"
-                title="Zoom In (+)">🔍+</button>
-        <button class="zoom-btn" 
-                (click)="zoomOut()"
-                title="Zoom Out (-)">🔍-</button>
-        <button class="zoom-btn" 
-                (click)="resetZoom()"
-                title="Reset Zoom (0)">↻</button>
-      </div>
-    </div>
-  </div>
 </div>

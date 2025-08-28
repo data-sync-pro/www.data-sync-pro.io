@@ -10,13 +10,11 @@ import { ScrollingModule } from '@angular/cdk/scrolling';
 import { FaqRoutingModule } from './faq-routing.module';
 import { FaqComponent } from './faq.component';
 import { SearchOverlayComponent } from '../search-overlay/search-overlay.component';
-import { ZoomableDirective } from 'src/app/zoomable.directive';
 import { SharedModule } from '../shared/shared.module';
 @NgModule({
   declarations: [
     FaqComponent,
-    SearchOverlayComponent,
-    ZoomableDirective
+    SearchOverlayComponent
   ],
   imports: [
     CommonModule,
@@ -29,8 +27,7 @@ import { SharedModule } from '../shared/shared.module';
     SharedModule,
   ],
   exports: [
-    FaqComponent,
-    ZoomableDirective
+    FaqComponent
   ]
 })
 export class FaqModule {}

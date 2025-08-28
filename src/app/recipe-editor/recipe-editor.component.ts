@@ -87,13 +87,6 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
   // Preview update timer
   private previewUpdateTimer: any;
   
-  // Image preview state
-  imagePreviewState = {
-    isOpen: false,
-    imageUrl: '',
-    altText: '',
-    zoomLevel: 1
-  };
   
   // Step expansion state
   expandedSteps: Set<number> = new Set();
@@ -359,28 +352,6 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
   // Keyboard shortcuts
   @HostListener('document:keydown', ['$event'])
   handleKeyboardEvent(event: KeyboardEvent): void {
-    // Image preview keyboard shortcuts
-    if (this.imagePreviewState.isOpen) {
-      switch (event.key) {
-        case 'Escape':
-          event.preventDefault();
-          this.closeImagePreview();
-          return;
-        case '+':
-        case '=':
-          event.preventDefault();
-          this.zoomIn();
-          return;
-        case '-':
-          event.preventDefault();
-          this.zoomOut();
-          return;
-        case '0':
-          event.preventDefault();
-          this.resetZoom();
-          return;
-      }
-    }
     
     // Ctrl+S or Cmd+S for save
     if ((event.ctrlKey || event.metaKey) && event.key === 's') {
@@ -2299,52 +2270,6 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
     }
     
     return finalName;
-  }
-  
-  // Image preview functionality
-  openImagePreview(imageUrl: string, altText: string = ''): void {
-    this.imagePreviewState = {
-      isOpen: true,
-      imageUrl,
-      altText,
-      zoomLevel: 1
-    };
-    
-    // Prevent body scrolling
-    document.body.style.overflow = 'hidden';
-  }
-  
-  closeImagePreview(event?: Event): void {
-    // If event is from backdrop click, check if it's actually the backdrop
-    if (event && event.target) {
-      const target = event.target as HTMLElement;
-      if (!target.classList.contains('image-preview-modal') && 
-          !target.classList.contains('image-preview-backdrop')) {
-        return;
-      }
-    }
-    
-    this.imagePreviewState = {
-      isOpen: false,
-      imageUrl: '',
-      altText: '',
-      zoomLevel: 1
-    };
-    
-    // Restore body scrolling
-    document.body.style.overflow = 'auto';
-  }
-  
-  zoomIn(): void {
-    this.imagePreviewState.zoomLevel = Math.min(this.imagePreviewState.zoomLevel * 1.2, 5);
-  }
-  
-  zoomOut(): void {
-    this.imagePreviewState.zoomLevel = Math.max(this.imagePreviewState.zoomLevel / 1.2, 0.1);
-  }
-  
-  resetZoom(): void {
-    this.imagePreviewState.zoomLevel = 1;
   }
   
   // Load image for media item asynchronously
