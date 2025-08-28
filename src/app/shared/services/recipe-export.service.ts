@@ -264,7 +264,7 @@ export class RecipeExportService {
       
       // Generate and add index.json
       updateProgress('Generating index.json...');
-      const indexJson = this.generateRecipeIndex(recipes);
+      const indexJson = await this.generateRecipeIndex(recipes);
       zip.file('index.json', JSON.stringify(indexJson, null, 2));
       
       // Add deployment instructions
@@ -299,6 +299,9 @@ export class RecipeExportService {
    */
   async exportAsJSON(recipes: SourceRecipeRecord[]): Promise<void> {
     try {
+      // Generate index with merged data
+      const indexData = await this.generateRecipeIndex(recipes);
+      
       // Export as structured data with index
       const exportData = {
         metadata: {
@@ -307,7 +310,7 @@ export class RecipeExportService {
           recipeCount: recipes.length,
           format: 'recipe-collection'
         },
-        index: this.generateRecipeIndex(recipes),
+        index: indexData,
         recipes: recipes
       };
       
@@ -702,21 +705,57 @@ export class RecipeExportService {
   }
   
   /**
-   * Generate recipe index for ZIP export
+   * Generate recipe index for ZIP export - merges with existing index.json
    */
-  private generateRecipeIndex(recipes: SourceRecipeRecord[]): any {
-    const indexRecipes = recipes
-      .filter(recipe => recipe.id && recipe.title) // Only include recipes with valid id and title
-      .map(recipe => ({
-        folderId: recipe.id,
-        name: recipe.id, // Use id as name for consistency
-        category: recipe.category.toLowerCase().replace(/\s+/g, '-'), // Convert to kebab-case
-        active: true
-      }));
-
-    return {
-      recipes: indexRecipes
-    };
+  private async generateRecipeIndex(recipes: SourceRecipeRecord[]): Promise<any> {
+    try {
+      // Load original index.json if it exists
+      const originalIndex = await firstValueFrom(
+        this.http.get<any>('assets/recipes/index.json')
+      ).catch(() => ({ recipes: [] }));
+      
+      // Create a map of existing recipes from original index
+      const existingRecipes = new Map<string, any>();
+      if (originalIndex.recipes && Array.isArray(originalIndex.recipes)) {
+        originalIndex.recipes.forEach((recipe: any) => {
+          if (recipe.folderId) {
+            existingRecipes.set(recipe.folderId, recipe);
+          }
+        });
+      }
+      
+      // Update or add recipes from current export
+      recipes
+        .filter(recipe => recipe.id && recipe.title) // Only include recipes with valid id and title
+        .forEach(recipe => {
+          // Preserve original structure - only folderId and active
+          existingRecipes.set(recipe.id, {
+            folderId: recipe.id,
+            active: true
+          });
+        });
+      
+      // Convert map back to array and sort by folderId for consistency
+      const indexRecipes = Array.from(existingRecipes.values())
+        .sort((a, b) => (a.folderId || '').localeCompare(b.folderId || ''));
+      
+      return {
+        recipes: indexRecipes
+      };
+    } catch (error) {
+      console.warn('Failed to load original index.json, generating new index:', error);
+      // Fallback to simple index if original cannot be loaded
+      const indexRecipes = recipes
+        .filter(recipe => recipe.id && recipe.title)
+        .map(recipe => ({
+          folderId: recipe.id,
+          active: true
+        }));
+      
+      return {
+        recipes: indexRecipes
+      };
+    }
   }
 
   /**
