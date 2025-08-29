@@ -1,0 +1,99 @@
+{
+  "id": "recalculate-rollup-summaries-in-bulk-api",
+  "title": "Recalculate Rollup Summaries in Bulk API",
+  "category": "Batch",
+  "DSPVersions": [],
+  "overview": "Recalculate Account roll-up summary fields that aggregate data from related Opportunities, Contacts, Cases, and Tasks to keep the aggregated metrics accurate.",
+  "whenToUse": "",
+  "generalImages": [
+    {
+      "type": "image",
+      "url": "",
+      "alt": ""
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "",
+      "quickLinks": [
+        {
+          "title": "",
+          "url": ""
+        }
+      ]
+    }
+  ],
+  "direction": "Current ⇒ Current ",
+  "connection": "",
+  "walkthrough": [
+    {
+      "step": "Create Executable",
+      "config": [
+        {
+          "field": "Source Object API Name",
+          "value": "Account"
+        },
+        {
+          "field": "Target Object API Name",
+          "value": "Account"
+        },
+        {
+          "field": "Source Matching Field",
+          "value": "Id"
+        },
+        {
+          "field": "Target Matching Field",
+          "value": "Id"
+        },
+        {
+          "field": "Action",
+          "value": "Update"
+        },
+        {
+          "field": "Executable Name",
+          "value": "Recalculate Account Rollup Summaries"
+        }
+      ],
+      "media": [
+        {
+          "type": "image",
+          "url": "",
+          "alt": ""
+        },
+        {
+          "type": "image",
+          "url": "images/img_1756384428872_2dfa9f1wz_wechat_2025-08-28_202901_363.jpg",
+          "alt": "wechat_2025-08-28_202901_363"
+        }
+      ]
+    },
+    {
+      "step": "Retrieve",
+      "config": [
+        {
+          "field": "SOQL Query",
+          "value": "SELECT Name, Number_of_Cases__c, Number_Of_Cases_Open__c, Number_of_Contacts__c, Number_Of_Opportunities_Won_This_Year__c, Number_Of_Opportunities_Open__c, Total_Opportunity_Amount_Won_This_Year__c, Total_Opportunity_Amount_Open__c, LastModifiedDate FROM Account"
+        }
+      ],
+      "media": []
+    },
+    {
+      "step": "Verify",
+      "config": [
+        {
+          "field": "SOQL Query",
+          "value": "SELECT Name, Number_of_Cases__c, Number_Of_Cases_Open__c, Number_of_Contacts__c, Number_Of_Opportunities_Won_This_Year__c, Number_Of_Opportunities_Open__c, Total_Opportunity_Amount_Won_This_Year__c, Total_Opportunity_Amount_Open__c, LastModifiedDate FROM Account"
+        }
+      ],
+      "media": []
+    }
+  ],
+  "downloadableExecutables": [],
+  "relatedRecipes": [
+    {
+      "title": "",
+      "url": ""
+    }
+  ],
+  "keywords": []
+}
