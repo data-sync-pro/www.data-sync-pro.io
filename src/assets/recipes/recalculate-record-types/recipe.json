@@ -1,9 +1,9 @@
 {
-  "id": "send-overdue-task-emails",
-  "title": "Send Overdue-Task Emails",
+  "id": "recalculate-record-types",
+  "title": "Recalculate Record Types",
   "category": "Batch",
   "DSPVersions": [],
-  "overview": "Automatically email Task owners whenever a Task remains open past its due date. A daily batch job locates overdue Tasks and triggers the notifications, ensuring timely follow-up and accountability.",
+  "overview": "Automatically recalculate Case record types. A scheduled batch job scans all Cases, applies current classification rules, and updates RecordTypeId so every deal stays on the correct sales process and page layout.",
   "whenToUse": "",
   "generalImages": [
     {
@@ -31,19 +31,27 @@
       "config": [
         {
           "field": "Source Object API Name",
-          "value": "Task"
+          "value": "Case"
         },
         {
           "field": "Target Object API Name",
-          "value": "Messaging.SingleEmailMessage"
+          "value": "Case"
+        },
+        {
+          "field": "Source Matching Field",
+          "value": "Id"
+        },
+        {
+          "field": "Target Matching Field",
+          "value": "Id"
         },
         {
           "field": "Action",
-          "value": "ApexAction"
+          "value": "Update"
         },
         {
           "field": "Executable Name",
-          "value": "Send Overdue-Task Emails"
+          "value": "Recalculate Case Record Types"
         }
       ],
       "media": [
@@ -59,7 +67,7 @@
       "config": [
         {
           "field": "SOQL Query",
-          "value": "SELECT Subject, Status, Priority, ActivityDate, IsClosed, Description, CallType, TYPEOF Owner WHEN User THEN Name ELSE Name END, Account.Name FROM Task WHERE IsClosed = FALSE"
+          "value": "SELECT CaseNumber, Status, Priority, Subject, Origin, Type, Reason, SuppliedEmail, TYPEOF Owner WHEN User THEN Name ELSE Name END FROM Case WHERE IsClosed = FALSE AND Status IN ('Pending Customer Response','Pending Internal Review','Awaiting Approval')"
         }
       ],
       "media": []
@@ -82,6 +90,16 @@
     {
       "step": "Action",
       "config": [],
+      "media": []
+    },
+    {
+      "step": "Verify",
+      "config": [
+        {
+          "field": "SOQL Query",
+          "value": "SELECT CaseNumber, Status, Priority, Subject, Origin, Type, Reason, SuppliedEmail, TYPEOF Owner WHEN User THEN Name ELSE Name END FROM Case"
+        }
+      ],
       "media": []
     },
     {

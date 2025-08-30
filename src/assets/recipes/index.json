@@ -1,6 +1,10 @@
 {
   "recipes": [
     {
+      "folderId": "assign-permission-sets-with-existence-check",
+      "active": true
+    },
+    {
       "folderId": "auto_close-stagnant-cases",
       "active": true
     },
@@ -13,6 +17,18 @@
       "active": true
     },
     {
+      "folderId": "convert-leads-in-bulk",
+      "active": true
+    },
+    {
+      "folderId": "delete-closed-cases-older-than-two-years",
+      "active": true
+    },
+    {
+      "folderId": "mask-sensitive-data-in-sandbox",
+      "active": true
+    },
+    {
       "folderId": "reassign-opportunity-owners-for-inactive-users",
       "active": true
     },
@@ -21,7 +37,15 @@
       "active": true
     },
     {
+      "folderId": "recalculate-record-types",
+      "active": true
+    },
+    {
       "folderId": "recalculate-rollup-summaries-in-bulk-api",
+      "active": true
+    },
+    {
+      "folderId": "restore-cases-from-archived-big-object",
       "active": true
     },
     {

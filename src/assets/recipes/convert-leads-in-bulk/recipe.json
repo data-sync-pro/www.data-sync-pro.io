@@ -1,9 +1,9 @@
 {
-  "id": "send-overdue-task-emails",
-  "title": "Send Overdue-Task Emails",
+  "id": "convert-leads-in-bulk",
+  "title": "Convert Leads in Bulk",
   "category": "Batch",
   "DSPVersions": [],
-  "overview": "Automatically email Task owners whenever a Task remains open past its due date. A daily batch job locates overdue Tasks and triggers the notifications, ensuring timely follow-up and accountability.",
+  "overview": "Automatically convert leads that meet the defined criteria into Accounts, Contacts, and Opportunities. A scheduled batch job routinely scans Leads—such as those with Rating = 'Hot'—and initiates the standard lead-conversion process, eliminating manual clicks and keeping pipeline data up to date.\n",
   "whenToUse": "",
   "generalImages": [
     {
@@ -27,15 +27,15 @@
   "connection": "",
   "walkthrough": [
     {
-      "step": "Create Executable",
+      "step": "",
       "config": [
         {
           "field": "Source Object API Name",
-          "value": "Task"
+          "value": "Lead"
         },
         {
           "field": "Target Object API Name",
-          "value": "Messaging.SingleEmailMessage"
+          "value": "Database.LeadConvert"
         },
         {
           "field": "Action",
@@ -43,7 +43,7 @@
         },
         {
           "field": "Executable Name",
-          "value": "Send Overdue-Task Emails"
+          "value": "Convert Leads in Bulk "
         }
       ],
       "media": [
@@ -59,14 +59,19 @@
       "config": [
         {
           "field": "SOQL Query",
-          "value": "SELECT Subject, Status, Priority, ActivityDate, IsClosed, Description, CallType, TYPEOF Owner WHEN User THEN Name ELSE Name END, Account.Name FROM Task WHERE IsClosed = FALSE"
+          "value": "Update the SOQL query to filter and preview the source data:  SELECT Id, Name, Company, Email, Phone, Status, LeadSource, OwnerId, Rating, CreatedDate, LastModifiedDate FROM Lead WHERE Rating = 'Hot' AND IsConverted = FALSE ORDER BY LastModifiedDate ASC"
         }
       ],
       "media": []
     },
     {
       "step": "Scoping",
-      "config": [],
+      "config": [
+        {
+          "field": "Scope Filter",
+          "value": "Rating == 'Hot'"
+        }
+      ],
       "media": []
     },
     {
@@ -82,6 +87,16 @@
     {
       "step": "Action",
       "config": [],
+      "media": []
+    },
+    {
+      "step": "Verify",
+      "config": [
+        {
+          "field": "SOQL Query",
+          "value": "SELECT Id, Name, Company, Email, Phone, Status, LeadSource, OwnerId, Rating, CreatedDate, LastModifiedDate, IsConverted, ConvertedAccountId, ConvertedContactId, ConvertedOpportunityId FROM Lead WHERE Rating = 'Hot' AND IsConverted = TRUE"
+        }
+      ],
       "media": []
     },
     {

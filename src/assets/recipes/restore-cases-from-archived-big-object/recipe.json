@@ -1,9 +1,9 @@
 {
-  "id": "send-overdue-task-emails",
-  "title": "Send Overdue-Task Emails",
+  "id": "restore-cases-from-archived-big-object",
+  "title": "Restore Soft-Deleted Records from Recycle Bin",
   "category": "Batch",
   "DSPVersions": [],
-  "overview": "Automatically email Task owners whenever a Task remains open past its due date. A daily batch job locates overdue Tasks and triggers the notifications, ensuring timely follow-up and accountability.",
+  "overview": "Restore soft-deleted Cases from Salesforce's Recycle Bin before they are permanently purged (typically within 15 days). Selectively undelete Cases removed during this retention period to preserve important customer support history, related communications, and essential audit information.\n",
   "whenToUse": "",
   "generalImages": [
     {
@@ -31,19 +31,27 @@
       "config": [
         {
           "field": "Source Object API Name",
-          "value": "Task"
+          "value": "Case"
         },
         {
           "field": "Target Object API Name",
-          "value": "Messaging.SingleEmailMessage"
+          "value": "Case"
+        },
+        {
+          "field": "Source Matching Field",
+          "value": "Id"
+        },
+        {
+          "field": "Target Matching Field",
+          "value": "Id"
         },
         {
           "field": "Action",
-          "value": "ApexAction"
+          "value": "Undelete"
         },
         {
           "field": "Executable Name",
-          "value": "Send Overdue-Task Emails"
+          "value": "Restore Soft-Deleted Cases from Recycle Bin"
         }
       ],
       "media": [
@@ -59,7 +67,7 @@
       "config": [
         {
           "field": "SOQL Query",
-          "value": "SELECT Subject, Status, Priority, ActivityDate, IsClosed, Description, CallType, TYPEOF Owner WHEN User THEN Name ELSE Name END, Account.Name FROM Task WHERE IsClosed = FALSE"
+          "value": "Update the SOQL query to filter and preview the source data: SELECT CaseNumber, Status, Priority, Subject, Origin, Type, Reason, SuppliedEmail, TYPEOF Owner WHEN User THEN Name ELSE Name END FROM Case WHERE IsClosed = FALSE AND Status IN ('Pending Customer Response','Pending Internal Review','Awaiting Approval')"
         }
       ],
       "media": []
@@ -82,6 +90,16 @@
     {
       "step": "Action",
       "config": [],
+      "media": []
+    },
+    {
+      "step": "Verify",
+      "config": [
+        {
+          "field": "SOQL Query",
+          "value": "SELECT CaseNumber, Status, Priority, Subject, Origin, Type, Reason, SuppliedEmail, TYPEOF Owner WHEN User THEN Name ELSE Name END FROM Case"
+        }
+      ],
       "media": []
     },
     {

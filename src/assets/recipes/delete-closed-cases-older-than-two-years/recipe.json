@@ -1,9 +1,9 @@
 {
-  "id": "reassign-owners-for-queue-owned-cases",
-  "title": "Reassign Owners for Queue-Owned Cases",
+  "id": "delete-closed-cases-older-than-two-years",
+  "title": "Delete Closed Cases Older Than Two Years",
   "category": "Batch",
   "DSPVersions": [],
-  "overview": "Automatically reassign queue-owned Cases to the support agent with the fewest open Cases. A scheduled job regularly finds open Cases where Owner.Type = 'Queue', identifies the user in the group with the lowest active-Case count, and updates OwnerId to that agent—balancing workload and ensuring prompt follow-up.",
+  "overview": "Automatically delete closed Cases that are more than two years old. A scheduled job routinely identifies Cases where Status = 'Closed' and ClosedDate is over two years ago, then permanently removes them to keep data current and minimize storage.",
   "whenToUse": "",
   "generalImages": [
     {
@@ -42,16 +42,16 @@
           "value": "Id"
         },
         {
-          "field": "Target Matching Field",
+          "field": "Target Object API Name",
           "value": "Id"
         },
         {
           "field": "Action",
-          "value": "Update"
+          "value": "Delete"
         },
         {
           "field": "Executable Name",
-          "value": "Reassign Owners for Queue-Owned Cases"
+          "value": "Delete Closed Cases Older Than Two Years"
         }
       ],
       "media": [
@@ -67,7 +67,7 @@
       "config": [
         {
           "field": "SOQL Query",
-          "value": "SELECT CaseNumber, Status, Priority, Subject, Origin, Type, Reason, SuppliedEmail, TYPEOF Owner WHEN User THEN Name ELSE Name END FROM Case WHERE Owner.Type = 'Queue'"
+          "value": "Update the SOQL query to filter and preview the source data: SELECT CaseNumber, Status, Priority, Subject, Origin, Type, Reason, SuppliedEmail, TYPEOF Owner WHEN User THEN Name ELSE Name END FROM Case WHERE IsClosed = TRUE"
         }
       ],
       "media": []
@@ -77,7 +77,7 @@
       "config": [
         {
           "field": "Scope Filter",
-          "value": "IsClosed == False"
+          "value": "ClosedDate < ADD_MONTHS(TODAY() , -24)"
         }
       ],
       "media": []
@@ -89,12 +89,7 @@
     },
     {
       "step": "Mapping",
-      "config": [
-        {
-          "field": "",
-          "value": ""
-        }
-      ],
+      "config": [],
       "media": []
     },
     {
@@ -107,7 +102,7 @@
       "config": [
         {
           "field": "SOQL Query",
-          "value": "SELECT Name, StageName, Amount, CloseDate, Probability, Type, LeadSource, ForecastCategory, NextStep, Account.Name, Owner.Name FROM Opportunity"
+          "value": "Update the SOQL query to filter and preview the source data: SELECT CaseNumber, Status, Priority, Subject, Origin, Type, Reason, SuppliedEmail, TYPEOF Owner WHEN User THEN Name ELSE Name END FROM Case WHERE IsClosed = TRUE"
         }
       ],
       "media": []
