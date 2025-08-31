@@ -92,7 +92,6 @@ export class AnalyticsService {
   }
   trackCustomEvent(data: any) {
     if (!this.enabled) {
-      console.log('Analytics disabled: Custom event tracking skipped');
       return;
     }
     if (!this.userConsented) {
