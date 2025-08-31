@@ -58,6 +58,9 @@ export class SearchOverlayComponent implements OnInit, OnChanges {
 
   suggestions: FaqItem[] = [];
   filteredSuggestions: FaqItem[] = [];
+  
+  // Cache for FAQ answer text content
+  private answerTexts: Map<string, string> = new Map();
 
   constructor(
     private http: HttpClient, 
@@ -82,6 +85,10 @@ export class SearchOverlayComponent implements OnInit, OnChanges {
         this.filterSubCategoryList();
         this.filterSuggestions();
         this.isLoading = false;
+        
+        // Load answer texts asynchronously for search
+        this.loadAnswerTexts();
+        
         this.cdr.detectChanges();
       },
       error: (error) => {
@@ -182,7 +189,15 @@ export class SearchOverlayComponent implements OnInit, OnChanges {
     const kw = this.searchQuery.trim().toLowerCase();
 
     this.filteredSuggestions = this.suggestions.filter((i) => {
-      const matchKW = kw ? i.question.toLowerCase().includes(kw) : true;
+      // Search in question
+      const matchQuestion = kw ? i.question.toLowerCase().includes(kw) : true;
+      
+      // Search in answer content
+      const answerText = this.answerTexts.get(i.id) || '';
+      const matchAnswer = kw ? answerText.includes(kw) : false;
+      
+      // Match keyword in either question or answer
+      const matchKW = !kw || matchQuestion || matchAnswer;
 
       const matchCat =
         !this.selectedCategory || i.category === this.selectedCategory;
@@ -201,5 +216,64 @@ export class SearchOverlayComponent implements OnInit, OnChanges {
       this.selectedCategory ||
       this.selectedSubCategories.length > 0
     );
+  }
+  
+  /**
+   * Load and extract text from all FAQ answer HTML files
+   */
+  private async loadAnswerTexts(): Promise<void> {
+    const loadPromises = this.suggestions.map(async (faq) => {
+      try {
+        const htmlPath = `assets/faq-item/${faq.route}.html`;
+        const response = await fetch(htmlPath);
+        
+        if (response.ok) {
+          const html = await response.text();
+          const cleanText = this.extractTextFromHTML(html);
+          this.answerTexts.set(faq.id, cleanText);
+        }
+      } catch (error) {
+        // Silently handle errors for individual files
+        console.warn(`Failed to load answer for FAQ ${faq.id}:`, error);
+      }
+    });
+    
+    // Load all answers in parallel
+    await Promise.all(loadPromises);
+    
+    // Re-filter suggestions if search query exists
+    if (this.searchQuery.trim()) {
+      this.filterSuggestions();
+      this.cdr.detectChanges();
+    }
+  }
+  
+  /**
+   * Extract clean text from HTML content for searching
+   */
+  private extractTextFromHTML(html: string): string {
+    // Create a temporary DOM element to parse HTML
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = html;
+    
+    // Remove script and style elements
+    const scripts = tempDiv.querySelectorAll('script, style');
+    scripts.forEach(el => el.remove());
+    
+    // Remove img elements as they don't contain searchable text
+    const images = tempDiv.querySelectorAll('img');
+    images.forEach(el => el.remove());
+    
+    // Get text content
+    let text = tempDiv.textContent || tempDiv.innerText || '';
+    
+    // Clean up whitespace
+    text = text
+      .replace(/\s+/g, ' ')  // Replace multiple spaces with single space
+      .replace(/\n{2,}/g, '\n')  // Replace multiple newlines with single newline
+      .trim()
+      .toLowerCase();  // Convert to lowercase for case-insensitive search
+    
+    return text;
   }
 }

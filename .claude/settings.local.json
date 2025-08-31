@@ -37,7 +37,9 @@
       "Bash(start http://localhost:4200/faq-editor)",
       "Bash(start http://localhost:4202/recipe-editor)",
       "Bash(timeout:*)",
-      "Read(/D:\\d D:/**)"
+      "Read(/D:\\d D:/**)",
+      "Bash(cmd /c \"dir E:\\www.data-sync-pro.io\\src\\assets\\faq-item\\*.html /b\")",
+      "Bash(start http://localhost:4200)"
     ],
     "deny": []
   }
