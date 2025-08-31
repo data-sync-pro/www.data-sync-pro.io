@@ -1,52 +1,25 @@
-
-    <p>
-      A <strong>Scope Filter</strong> in Data Sync Pro (DSP) is a formula-based 
-      condition used during the <strong>Scoping</strong> step to determine 
-      which source records should proceed through execution. Scope Filters 
-      can either:
-    </p>
-    <ul>
-      <li>Evaluate to <code>TRUE</code> or <code>FALSE</code> to include 
-      or exclude records, or</li>
-      <li>Raise a conditional error using the 
-      <code>ERROR()</code> function when validation criteria are met.</li>
-    </ul>
-    <p>
-      Scope Filters are <strong>evaluated sequentially</strong>, allowing 
-      for layered, modular filtering logic based on context:
-    </p>
-    <hr />
-    <h3><strong>Sequential Scope Filter Layers</strong></h3>
-    <ul>
-      <li>
-        <strong>Pipeline Scope Filter</strong><br />
-        Applied when the Executable runs as part of a Pipeline. It acts as a 
-        global pre-filter to control record scope across all Executables in 
-        the Pipeline.
-      </li>
-    </ul>
-
-    <img src="assets/image/process-steps-scoping-scope-filter/process-steps-scoping-scope-filter1.jpg">
-
-    <ul>
-      <li>
-        <strong>Executable Scope Filter</strong><br />
-        Defines the core scoping condition for the individual Executable—evaluated 
-        whether the Executable runs standalone or within a Pipeline.
-      </li>
-      <li>
-        <strong>Trigger Scope Filters</strong><br />
-        Used specifically in <strong>Trigger Executables</strong>, these filters 
-        apply to defined trigger events (e.g., Before Insert, After Update) 
-        and allow further control through event-specific logic like 
-        Scope Filter (Before Update Trigger).
-      </li>
-      <li>
-        <strong>Scope Filter (Post Join)</strong><br />
-        Evaluated after the <strong>Join</strong> step, this filter enables 
-        additional refinement of the enriched source dataset.
-      </li>
-    </ul>
+<p><strong>Scope Filter</strong> is a formula-based condition used in the Scoping step to decide which source records <b>continue</b> through execution.</p><ul>
+<li>
+<p>It can return <strong>TRUE/FALSE</strong> to include or exclude records, or raise an error with the <code>ERROR()</code> function when validation rules are met.</p>
+</li>
+<li>
+<p>Scope Filters are evaluated in sequence, allowing layered logic at different levels:</p>
+<ul>
+<li>
+<p><strong>Pipeline Scope Filter:</strong> a global pre-filter across all Executables in a Pipeline.</p>
+</li>
+<li>
+<p><strong>Executable Scope Filter:</strong> the main condition for a single Executable.</p>
+</li>
+<li>
+<p><strong>Trigger Scope Filters:</strong> event-specific filters for Trigger Executables (e.g., Before Insert, After Update).</p>
+</li>
+<li>
+<p><strong>Post-Join Scope Filter:</strong> applied after joins for extra refinement of enriched data.</p>
+</li>
+</ul>
+</li>
+</ul><p>Scope Filters give you flexible, precise control so only valid and relevant records move forward.<br></p>
 
     <img src="assets/image/process-steps-scoping-scope-filter/process-steps-scoping-scope-filter2.jpg">
 
@@ -55,5 +28,3 @@
       ensuring <strong>only relevant records</strong> proceed while allowing validation 
       and filtering at multiple stages.
     </p>
-  
-  

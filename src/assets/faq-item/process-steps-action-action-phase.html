@@ -1,41 +1,7 @@
-
-    <p>
-      The Action step in Data Sync Pro (DSP) defines how 
-      processed data is applied to the target object. It comes after <strong>Scoping</strong>, 
-      <strong>Match</strong>, and <strong>Mapping</strong>, and determines what operation is performed on each 
-      target record.
-    </p>
-    <hr />
-    <h3><strong>Key Capabilities of Action:</strong></h3>
-    <ul>
-      <li>
-        <strong>Perform Target Operations</strong><br />
-        Supports standard DML actions like <strong>Insert</strong>, <strong>Update</strong>, <strong>Upsert</strong>, 
-        <strong>Delete</strong>, <strong>Undelete</strong>, <strong>Merge</strong>, as well as extended operations 
-        such as <strong>Lead Conversion</strong>, <strong>Send Email</strong>, 
-        <strong>Bell Notification</strong>, etc.
-      </li>
-      <li>
-        <strong>Execution Behavior Controls</strong><br />
-        Fine-tune how each record is processed using configurable options:<br />
-        <ul>
-          <li><em>Skip Record Update If No Changes</em></li>
-          <li><em>Skip Fields If Target Value Exists</em></li>
-          <li><em>Skip Null Value Fields</em></li>
-          <li><em>Bypass Duplicate Rule Alerts</em></li>
-          <li><em>All or Nothing DML Execution</em></li>
-        </ul>
-      </li>
-      <li>
-        <strong>Writeback Options</strong><br />
-        Allows writing specific values back to the source or logging them for 
-        reference after successful execution.
-      </li>
-    </ul>
-    <p>
-      📌 The Action step is where all prior logic comes together—executing the 
-      intended operation in a <strong>structured</strong>, <strong>rule-driven</strong>, and <strong>efficient way</strong>.
-    </p>
+<p><strong>Action</strong> defines how processed data is applied to the target object. It runs after Scoping, Match, and Mapping, and determines what operation is executed on the target.</p><p><strong>Key Capabilities:</strong></p><ul>
+<li><strong>Target Action:</strong> Perform standard DML actions (Insert, Update, Upsert, Delete, Undelete, Merge, Publish) as well as extended actions like Lead Conversion, Send Email, and Bell Notification.</li><li>
+<p><strong>Execution Behaviors:</strong> Fine-tune processing with options such as <em><b>Skip Record Update if No Changes</b>, <b>Skip Fields if Target Value Exists</b>, <b>Skip Null Value Fields</b>, <b>Bypass Duplicate Rule Alerts</b>,</em> <em><b>All-or-Nothing DML</b>, and </em><b><i>Fill Missing Fields on Merge.</i></b></p></li><li>
+<p><strong>Writeback:</strong> Optionally write values back to the source after successful execution.</p></li></ul>
   
   
 <img src="assets/image/process-steps-action-action-phase/process-steps-action-action-phase.jpg">

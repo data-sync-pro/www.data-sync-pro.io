@@ -1,7 +1,8 @@
-
-    <p>
-      <strong>Yes</strong>, <strong>DSP fully supports nested formulas</strong>, allowing one formula to be used 
-      within another for complex calculations and transformations.
-    </p>
-  
-  
+<p>Yes. DSP fully supports nesting, allowing one formula to be used inside another.</p><p><strong>Example:</strong></p><pre><div><div><code>IF(
+  AND(
+    CONTAINS_IGNORE_CASE(Status, "open"),
+    DAYS_BETWEEN(TODAY(), CloseDate) <= 7
+  ),
+  "Closing Soon",
+  "Standard"
+)</code></div></div></pre>

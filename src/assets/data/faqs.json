@@ -761,7 +761,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Triggers",
     "SeqNo__c": null,
-    "Question__c": "How to create Self-Adaptive #Trigger?",
+    "Question__c": "How to create a Self-Adaptive #Trigger?",
     "Answer__c": "rules-engines-triggers-setup-self-adaptive-trigger.html"
   },
   {
@@ -779,7 +779,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Triggers",
     "SeqNo__c": null,
-    "Question__c": "How can I set up validation rules within a Self-Adaptive Trigger?",
+    "Question__c": "How can I set up validation rules within a Self-Adaptive #Trigger?",
     "Answer__c": "rules-engines-triggers-validation-self-adaptive.html"
   },
   {
@@ -905,7 +905,7 @@
     "Category__c": "Processes",
     "SubCategory__c": "Preview",
     "SeqNo__c": null,
-    "Question__c": "How can I preview a source record and its transformed values before execution?",
+    "Question__c": "How do I preview a source record with its transformed values before execution?",
     "Answer__c": "process-steps-preview-preview-source-record.html"
   },
   {
@@ -941,7 +941,7 @@
     "Category__c": "Processes",
     "SubCategory__c": "Input",
     "SeqNo__c": null,
-    "Question__c": "What are the formatting requirements for column names in Data Loader?",
+    "Question__c": "What naming conventions are required for #Data Loader columns?",
     "Answer__c": "process-steps-input-data-loader-column-format.html"
   },
   {
@@ -977,7 +977,7 @@
     "Category__c": "Processes",
     "SubCategory__c": "Scoping",
     "SeqNo__c": null,
-    "Question__c": "How can I avoid duplicate source records based on specific conditions?",
+    "Question__c": "How do I prevent duplicate source records in iteration?",
     "Answer__c": "process-steps-scoping-avoid-duplicate-source.html"
   },
   {
@@ -1004,7 +1004,7 @@
     "Category__c": "Processes",
     "SubCategory__c": "Match",
     "SeqNo__c": null,
-    "Question__c": "What happens if a source record matches multiple target records in the Update process?",
+    "Question__c": "What happens if a source record matches multiple target records in an action?",
     "Answer__c": "process-steps-match-multiple-target-records.html"
   },
   {
@@ -1013,7 +1013,7 @@
     "Category__c": "Processes",
     "SubCategory__c": "Match",
     "SeqNo__c": null,
-    "Question__c": "In the Insert process, what happens if a source record matches existing target records?",
+    "Question__c": "What happens if a source record matches existing target records during an Insert?",
     "Answer__c": "process-steps-match-insert-duplicate-check.html"
   },
   {
@@ -1022,7 +1022,7 @@
     "Category__c": "Processes",
     "SubCategory__c": "Match",
     "SeqNo__c": null,
-    "Question__c": "In an Upsert process, when \"Use Salesforce Upsert API\" is enabled, will the Match process be performed?",
+    "Question__c": "Does DSP still run the Match step when \"Use Salesforce Upsert API\" is enabled in an Upsert process?",
     "Answer__c": "process-steps-match-upsert-match-process.html"
   },
   {
@@ -1031,7 +1031,7 @@
     "Category__c": "Processes",
     "SubCategory__c": "Match",
     "SeqNo__c": null,
-    "Question__c": "How can I match with target records using multiple fields, such as in PermissionSetAssignment?",
+    "Question__c": "How do I match target records via multiple fields?",
     "Answer__c": "process-steps-match-multi-field-match.html"
   },
   {
@@ -1040,7 +1040,7 @@
     "Category__c": "Processes",
     "SubCategory__c": "Match",
     "SeqNo__c": null,
-    "Question__c": "What happens if multiple source records match the same target record within a single transaction?",
+    "Question__c": "How does DSP handle multiple source records matching a single target record?",
     "Answer__c": "process-steps-match-multiple-source-same-target.html"
   },
   {
@@ -1049,7 +1049,7 @@
     "Category__c": "Processes",
     "SubCategory__c": "Match",
     "SeqNo__c": null,
-    "Question__c": "How does Match determine the principal(master) record in the Merge process?",
+    "Question__c": "How does Match determine the principal(master) record in a Merge process?",
     "Answer__c": "process-steps-match-match-merge-principal.html"
   },
   {
@@ -1094,7 +1094,7 @@
     "Category__c": "Processes",
     "SubCategory__c": "Mapping",
     "SeqNo__c": null,
-    "Question__c": "How can I reference a field from a parent relationship of the source object in the Mapping?",
+    "Question__c": "How do I reference a parent field?",
     "Answer__c": "process-steps-mapping-mapping-parent-relationship.html"
   },
   {
@@ -1103,7 +1103,7 @@
     "Category__c": "Processes",
     "SubCategory__c": "Mapping",
     "SeqNo__c": null,
-    "Question__c": "How does DSP simplify managing data relationships?",
+    "Question__c": "How can I manage data relationships?",
     "Answer__c": "process-steps-mapping-dsp-relationship-management.html"
   },
   {
@@ -1112,7 +1112,7 @@
     "Category__c": "Processes",
     "SubCategory__c": "Mapping",
     "SeqNo__c": null,
-    "Question__c": "How can I enforce the sequence of target field transformations when order is required?",
+    "Question__c": "How do I control the order of field mappings’ evaluation?",
     "Answer__c": "process-steps-mapping-sequence-of-transformations.html"
   },
   {
@@ -1184,7 +1184,7 @@
     "Category__c": "Processes",
     "SubCategory__c": "Action",
     "SeqNo__c": null,
-    "Question__c": "How can I avoid creating duplicate records if the target record already exists?",
+    "Question__c": "How can I avoid creating duplicate records if the target already exists?",
     "Answer__c": "process-steps-action-avoid-duplicates.html"
   },
   {
@@ -1193,7 +1193,7 @@
     "Category__c": "Processes",
     "SubCategory__c": "Action",
     "SeqNo__c": null,
-    "Question__c": "How can I implement delta update?",
+    "Question__c": "How can I implement delta updates?",
     "Answer__c": "process-steps-action-implement-delta-update.html"
   },
   {
@@ -1202,7 +1202,7 @@
     "Category__c": "Processes",
     "SubCategory__c": "Action",
     "SeqNo__c": null,
-    "Question__c": "Can I skip a field update if the target field already has an existing value?",
+    "Question__c": "Can I skip updating a field if the target already has a value?",
     "Answer__c": "process-steps-action-skip-update-if-exists.html"
   },
   {
@@ -1220,7 +1220,7 @@
     "Category__c": "Processes",
     "SubCategory__c": "Action",
     "SeqNo__c": null,
-    "Question__c": "What is the purpose of Source Object Writeback?",
+    "Question__c": "What is the purpose of Writeback?",
     "Answer__c": "process-steps-action-source-object-writeback.html"
   },
   {
@@ -1229,7 +1229,7 @@
     "Category__c": "Processes",
     "SubCategory__c": "Action",
     "SeqNo__c": null,
-    "Question__c": "What is the purpose of the field 'Use Salesforce Upsert API'?",
+    "Question__c": "What is the purpose of the 'Use Salesforce Upsert API' field?",
     "Answer__c": "process-steps-action-use-upsert-api-field.html"
   },
   {
@@ -1265,7 +1265,7 @@
     "Category__c": "Processes",
     "SubCategory__c": "Verify",
     "SeqNo__c": null,
-    "Question__c": "Does Verify apply only to the Batch rules engine?",
+    "Question__c": "Does Verify apply only to #Batch?",
     "Answer__c": "process-steps-verify-verify-batch-only.html"
   },
   {
@@ -1283,7 +1283,7 @@
     "Category__c": "Transformation",
     "SubCategory__c": null,
     "SeqNo__c": null,
-    "Question__c": "Why is bulkified transformation essential for achieving simplicity and modularity?",
+    "Question__c": "Why is bulkified transformation critical in enterprise data management?",
     "Answer__c": "transformation-bulkified-transformation-essential.html"
   },
   {
@@ -1319,7 +1319,7 @@
     "Category__c": "Transformation",
     "SubCategory__c": null,
     "SeqNo__c": null,
-    "Question__c": "How does DSP simplify managing data relationships?",
+    "Question__c": "How can I manage data relationships?",
     "Answer__c": "transformation-dsp-relationship-management.html"
   },
   {
@@ -1346,7 +1346,7 @@
     "Category__c": "Transformation",
     "SubCategory__c": null,
     "SeqNo__c": null,
-    "Question__c": "How do I define a reusable formula?",
+    "Question__c": "How can I create a reusable formula?",
     "Answer__c": "transformation-define-reusable-formula.html"
   },
   {
@@ -1355,7 +1355,7 @@
     "Category__c": "Transformation",
     "SubCategory__c": null,
     "SeqNo__c": null,
-    "Question__c": "How can I join source data with another data set?",
+    "Question__c": "How can I join the source data with an additional data set?",
     "Answer__c": "transformation-join-source-data.html"
   },
   {
@@ -1382,7 +1382,7 @@
     "Category__c": "Transformation",
     "SubCategory__c": null,
     "SeqNo__c": null,
-    "Question__c": "How can I eliminate duplicate source records from the processing?",
+    "Question__c": "How do I prevent duplicate source records in iteration?",
     "Answer__c": "transformation-eliminate-duplicate-source.html"
   },
   {
@@ -1400,7 +1400,7 @@
     "Category__c": "Transformation",
     "SubCategory__c": null,
     "SeqNo__c": null,
-    "Question__c": "How can I format a string dynamically using DSP expressions and formulas?",
+    "Question__c": "How can I format a string dynamically using DSP expressions?",
     "Answer__c": "transformation-dynamic-string-format.html"
   },
   {
@@ -1409,7 +1409,7 @@
     "Category__c": "Query Manager(Q)",
     "SubCategory__c": null,
     "SeqNo__c": null,
-    "Question__c": "What is Query Manager(Q)?",
+    "Question__c": "What is Query Manager?",
     "Answer__c": "query-managerq-what-is-query-manager.html"
   },
   {
@@ -1418,7 +1418,7 @@
     "Category__c": "Query Manager(Q)",
     "SubCategory__c": null,
     "SeqNo__c": null,
-    "Question__c": "Who can access Q?",
+    "Question__c": "Who can access the Query Manager?",
     "Answer__c": "query-managerq-who-can-access-q.html"
   },
   {
@@ -1427,7 +1427,7 @@
     "Category__c": "Query Manager(Q)",
     "SubCategory__c": null,
     "SeqNo__c": null,
-    "Question__c": "How can I construct a query with the Query Builder?",
+    "Question__c": "How can I build a SOQL query with Query Builder?",
     "Answer__c": "query-managerq-query-builder-construction.html"
   },
   {
@@ -1463,7 +1463,7 @@
     "Category__c": "Query Manager(Q)",
     "SubCategory__c": null,
     "SeqNo__c": null,
-    "Question__c": "How can I query the Owner relationship when the Owner field is polymorphic?",
+    "Question__c": "How do I query the Owner relationship when the Owner field is polymorphic?",
     "Answer__c": "query-managerq-query-owner-polymorphic.html"
   },
   {
@@ -1490,7 +1490,7 @@
     "Category__c": "Query Manager(Q)",
     "SubCategory__c": null,
     "SeqNo__c": null,
-    "Question__c": "Can I use Q to restore deleted records from the Recycle Bin?",
+    "Question__c": "Can I use the Query component to restore deleted records from the Recycle Bin?",
     "Answer__c": "query-managerq-restore-deleted-records.html"
   },
   {
@@ -1517,7 +1517,7 @@
     "Category__c": "Query Manager(Q)",
     "SubCategory__c": null,
     "SeqNo__c": null,
-    "Question__c": "Does Q support the Tooling API?",
+    "Question__c": "Is Tooling API supported in Query?",
     "Answer__c": "query-managerq-q-tooling-api.html"
   },
   {
@@ -1526,7 +1526,7 @@
     "Category__c": "Query Manager(Q)",
     "SubCategory__c": null,
     "SeqNo__c": null,
-    "Question__c": "How can I manage my queries?",
+    "Question__c": "How can I manage my frequently used queries?",
     "Answer__c": "query-managerq-manage-queries.html"
   },
   {
@@ -1535,7 +1535,7 @@
     "Category__c": "Query Manager(Q)",
     "SubCategory__c": null,
     "SeqNo__c": null,
-    "Question__c": "How can I integrate the Q into Salesforce Lightning pages?",
+    "Question__c": "How can I integrate the Query functionality into Lightning pages?",
     "Answer__c": "query-managerq-integrate-q-lightning.html"
   }
 ]

@@ -1,32 +1,16 @@
+<p>You can control evaluation order using the <strong>Seq No.</strong> column in Field Mappings:</p><ol>
+<li>
+<p>In the Executable, open the <strong>Related</strong> tab.</p>
+</li>
+<li>
+<p>Find the <strong>Field Mappings</strong> related list.</p>
+</li>
+<li>
+<p>Edit the <strong>Seq No.</strong> values inline to set the evaluation sequence.</p>
+</li>
+<li>
+<p>Save your changes.</p>
+</li>
+</ol><p>📌 When Seq No. is defined, DSP processes mappings in that order. If the source and target are the same record, transformations are <strong>accumulative</strong>—so a field’s output can be used in subsequent transformations. You may also use <strong><code>EVALUATED_FIELD_VALUE</code></strong> to reference the value of a target field from a prior evaluation.</p>
 
-    <p>
-      To control the order in which target fields are evaluated during <strong>Mapping</strong>:
-    </p>
-    <ul>
-      <li>
-        After configuring the Mapping step, go to the <strong>Related</strong> 
-        tab on the Executable.
-      </li>
-      <li>
-        Locate the <strong>Field Mappings</strong> related list.
-      </li>
-      <li>
-        Edit the <strong>Seq No.</strong> column inline to define the desired 
-        evaluation order.
-      </li>
-      <li>
-        Save your changes.
-      </li>
-    </ul>
-    <p>
-      📌 When <strong>Seq No.</strong> is specified, DSP evaluates field mappings 
-      in that order. If the source and target are the <strong>same record</strong>, 
-      transformations are <strong>accumulative</strong>—meaning the result of 
-      a previously evaluated field can be used in subsequent transformations. 
-      This is useful when one field's output depends on another's value.
-    </p>
-
-        <img src="assets/image/process-steps-mapping-sequence-of-transformations/process-steps-mapping-sequence-of-transformations.jpg" />     
-
-  
-  
+        <img src="assets/image/process-steps-mapping-sequence-of-transformations/process-steps-mapping-sequence-of-transformations.jpg">

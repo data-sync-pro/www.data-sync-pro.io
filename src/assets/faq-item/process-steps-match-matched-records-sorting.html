@@ -1,23 +1,4 @@
+<div><div><p>The <strong>Matched Records Sorting Components</strong> field controls how DSP orders matched target records when multiple matches exist. It accepts semicolon-separated expressions, evaluated in ascending order by default.</p><p><strong>Example:</strong></p><pre><div><div><code>-$FIELDS_COUNT; -LastModifiedDate  
+</code></div></div></pre><p>This sorts records first by the number of populated fields (<strong>DESC</strong>), and if equal, by <strong>LastModifiedDate (DESC)</strong>. Prefixing an expression with a minus sign (<code>-</code>) indicates descending order.</p>
 
-  <ul>
-    <li>
-      The "<strong>Matched Records Sorting Components</strong>" field defines the 
-      <strong>sorting logic</strong> for matched target records when multiple records are found. 
-      It consists of semicolon-separated expressions that <strong>compare</strong> and <strong>sort</strong>
-      records in ascending order by default.<br />
-    </li>
-
-    <li>
-      To sort in descending order, prefix an expression with a negative sign 
-      (<code>-</code>). <br />For example:<br />
-      <code>-LEN(Description) <br />-LastModifiedDate</code><br />
-      This sorts matched records first by <code>Description</code> length (DESC), 
-      and if lengths are the same, by <code>LastModifiedDate</code> (DESC).
-    </li>
-
-    <li>
-      For Boolean values, TRUE is considered smaller than FALSE.
-    </li>
-  </ul>
-
-      <img src="assets/image/process-steps-match-matched-records-sorting/process-steps-match-matched-records-sorting.jpg" />
+      <img src="assets/image/process-steps-match-matched-records-sorting/process-steps-match-matched-records-sorting.jpg"></div></div>

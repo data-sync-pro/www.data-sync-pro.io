@@ -1,24 +1,8 @@
-
-    <p>
-      Both <strong>Preview</strong> and <strong>Retrieve</strong> define 
-      queries to the source object and allow users to view source data 
-      and transformed values for a record.  
-    </p>
-    <ul>
-      <li>
-        <strong>Retrieve </strong>is used in <strong>#Batch</strong> and 
-        <strong>#Data List</strong>, where its filters and ordering clauses 
-        are integral to the execution process. In <strong>#Batch,</strong> 
-        it defines the source data for processing, while in 
-        <strong>#Data List,</strong> it determines the records displayed 
-        to end users.
-      </li>
-      <li>
-        <strong>Preview </strong>is available in <strong>#Action Button</strong> 
-        and <strong>#Triggers</strong> but is only used for reviewing source 
-        data and transformations for a specific record—it does not 
-        influence execution.
-      </li>
-    </ul>
-  
-  
+<p>Both Preview and Retrieve run a SOQL query to fetch source data, but they serve different roles:</p><ul>
+<li>
+<p><strong>Retrieve</strong> (used in #Batch and #Data List) defines which records are processed or displayed during execution.</p>
+</li>
+<li>
+<p><strong>Preview</strong> (used in #Triggers and #Action Buttons) does not affect input data; instead, it lets you inspect source records and their transformed values before execution.</p>
+</li>
+</ul><p>In short, Retrieve controls the records that run, while Preview helps you validate data and transformations without changing the input.</p>

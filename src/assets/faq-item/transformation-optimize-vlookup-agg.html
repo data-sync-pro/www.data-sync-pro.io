@@ -1,20 +1,8 @@
-
-    <p>
-      DSP improves performance through two key strategies:
-    </p>
-    <ul>
-      <li>
-        <strong>Lazy Loading with Caching</strong> - Queries for 
-        <code>VLOOKUP</code> and <code>AGG</code> functions are executed 
-        only when first evaluated. Once retrieved, results are cached and reused 
-        throughout the transaction to avoid redundant lookups.
-      </li>
-      <li>
-        <strong>Query Consolidation</strong> - When multiple functions access 
-        similar datasets, DSP intelligently merges them into a single query 
-        whenever possible, reducing the number of SOQL calls and improving runtime 
-        efficiency.
-      </li>
-    </ul>
-  
-  
+<p>DSP boosts performance with two strategies:</p><ul>
+<li>
+<p><strong>Lazy loading with caching:</strong> Queries run only when first needed for the scoped input data. Once retrieved, results are cached and reused across the transaction to prevent redundant queries.</p>
+</li>
+<li>
+<p><strong>Query consolidation:</strong> When multiple functions reference the same or similar datasets, the DSP compiler merges them into a single query, reducing SOQL calls and improving efficiency.</p>
+</li>
+</ul><p>📌 <strong>In short:</strong> DSP reduces query load and reuses results, making <code>VLOOKUP</code> and <code>AGG</code> functions faster and more efficient.</p>
