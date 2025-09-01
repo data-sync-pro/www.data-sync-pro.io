@@ -381,6 +381,7 @@ interface FAQTab {
   currentQuestion: string;
   currentCategory: string;
   currentSubCategory: string;
+  currentIsActive: boolean;
 }
 
 interface FAQTitleItem {
@@ -461,6 +462,7 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
   currentQuestion = '';
   currentCategory = '';
   currentSubCategory = '';
+  currentIsActive = true;
   previewContent: SafeHtml = '';
   
   storageStats = { used: 0, available: 0, percentage: 0 };
@@ -717,6 +719,7 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
     this.currentQuestion = faq.question;
     this.currentCategory = faq.category;
     this.currentSubCategory = faq.subCategory || '';
+    this.currentIsActive = faq.isActive !== false; // Default to true if not specified
     
     // Update subcategories for the selected category
     this.updateSubCategories();
@@ -736,6 +739,7 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
       this.currentQuestion = edited!.question;
       this.currentCategory = edited!.category;
       this.currentSubCategory = edited!.subCategory || '';
+      this.currentIsActive = edited!.isActive ?? true; // Default to true if not specified
       
       // Set content directly in DOM after view init
       setTimeout(() => {
@@ -846,7 +850,8 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
       question: this.currentQuestion,
       answer: htmlContent,
       category: this.currentCategory,
-      subCategory: this.currentSubCategory || undefined
+      subCategory: this.currentSubCategory || undefined,
+      isActive: this.currentIsActive
     };
 
     this.storageService.saveFAQ(faqData).then(success => {
@@ -1204,6 +1209,7 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
     this.currentQuestion = '';
     this.currentCategory = '';
     this.currentSubCategory = '';
+    this.currentIsActive = true;
     
     // Reset state flags
     this.state.hasChanges = false;
@@ -1262,7 +1268,8 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
       editorContent: '<p>Enter your FAQ answer here...</p>',
       currentQuestion: newFAQ.question,
       currentCategory: newFAQ.category,
-      currentSubCategory: newFAQ.subCategory || ''
+      currentSubCategory: newFAQ.subCategory || '',
+      currentIsActive: true
     };
 
     // Add the new tab and make it active
@@ -1274,6 +1281,7 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
     this.currentQuestion = newFAQ.question;
     this.currentCategory = newFAQ.category;
     this.currentSubCategory = newFAQ.subCategory || '';
+    this.currentIsActive = true; // New FAQs are active by default
     this.editorContent = '<p>Enter your FAQ answer here...</p>';
     
     console.log('📝 Default tab created after clear all');
@@ -2153,7 +2161,8 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
       editorContent: '',
       currentQuestion: newFAQ.question,
       currentCategory: newFAQ.category,
-      currentSubCategory: ''
+      currentSubCategory: '',
+      currentIsActive: true
     };
 
     // Deactivate other tabs
@@ -2268,7 +2277,8 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
       editorContent: '',
       currentQuestion: faq.question,
       currentCategory: faq.category,
-      currentSubCategory: faq.subCategory || ''
+      currentSubCategory: faq.subCategory || '',
+      currentIsActive: faq.isActive !== false
     };
 
     // Deactivate other tabs
@@ -2290,6 +2300,7 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
     this.currentQuestion = tab.currentQuestion;
     this.currentCategory = tab.currentCategory;
     this.currentSubCategory = tab.currentSubCategory;
+    this.currentIsActive = tab.currentIsActive;
 
     // Update subcategories for the selected category
     this.updateSubCategories();
@@ -2309,9 +2320,11 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
       tab.currentQuestion = edited.question;
       tab.currentCategory = edited.category;
       tab.currentSubCategory = edited.subCategory || '';
+      tab.currentIsActive = edited.isActive ?? true;
       this.currentQuestion = edited.question;
       this.currentCategory = edited.category;
       this.currentSubCategory = edited.subCategory || '';
+      this.currentIsActive = edited.isActive ?? true;
 
       setTimeout(() => {
         if (this.htmlSourceEditor?.nativeElement) {
@@ -2388,6 +2401,7 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
       currentTab.currentQuestion = this.currentQuestion;
       currentTab.currentCategory = this.currentCategory;
       currentTab.currentSubCategory = this.currentSubCategory;
+      currentTab.currentIsActive = this.currentIsActive;
       currentTab.hasChanges = this.state.hasChanges;
     }
   }
@@ -2417,6 +2431,7 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
       currentTab.currentQuestion = this.currentQuestion;
       currentTab.currentCategory = this.currentCategory;
       currentTab.currentSubCategory = this.currentSubCategory;
+      currentTab.currentIsActive = this.currentIsActive;
       
       // Update tab title if question changed
       if (this.currentQuestion && this.currentQuestion !== currentTab.faq.question) {

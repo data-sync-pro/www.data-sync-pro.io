@@ -11,6 +11,7 @@ export interface SourceFAQRecord {
   Category__c: string;
   SubCategory__c: string | null;
   SeqNo__c?: string | null;
+  isActive?: boolean;
 }
 
 /**
@@ -34,6 +35,7 @@ export interface FAQItem {
   tags?: string[];
   lastUpdated?: Date;
   showSocialShare?: boolean;
+  isActive?: boolean;
 }
 
 /**

@@ -156,7 +156,8 @@ export class FAQExportService {
           SubCategory__c: edited.subCategory || null,
           SeqNo__c: faq.seqNo || null,
           Question__c: edited.question,
-          Answer__c: faq.answerPath
+          Answer__c: faq.answerPath,
+          isActive: edited.isActive !== false // Use edited isActive value
         };
       }
       // Return original FAQ in export format
@@ -167,7 +168,8 @@ export class FAQExportService {
         SubCategory__c: faq.subCategory || null,
         SeqNo__c: faq.seqNo || null,
         Question__c: faq.question,
-        Answer__c: faq.answerPath
+        Answer__c: faq.answerPath,
+        isActive: faq.isActive !== false
       };
     });
 
@@ -181,7 +183,8 @@ export class FAQExportService {
         SubCategory__c: faq.subCategory || null,
         SeqNo__c: null,
         Question__c: faq.question,
-        Answer__c: htmlFileName
+        Answer__c: htmlFileName,
+        isActive: faq.isActive !== false // Use the actual isActive value from the edited FAQ
       };
     });
 

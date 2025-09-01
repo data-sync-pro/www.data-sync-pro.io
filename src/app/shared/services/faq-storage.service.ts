@@ -9,6 +9,7 @@ export interface EditedFAQ {
   answer: string;
   category: string;
   subCategory?: string;
+  isActive?: boolean;
   timestamp: number;
   version: number;
 }
@@ -144,6 +145,7 @@ export class FAQStorageService {
         answer: faq.answer!,
         category: faq.category!,
         subCategory: faq.subCategory,
+        isActive: faq.isActive,
         timestamp: Date.now(),
         version: version
       };

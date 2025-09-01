@@ -20,6 +20,7 @@ interface RawFaq {
   Answer__c: string;
   Category__c: string;
   SubCategory__c: string | null;
+  isActive?: boolean;
 }
 
 interface FaqItem {
@@ -71,16 +72,18 @@ export class SearchOverlayComponent implements OnInit, OnChanges {
   ngOnInit() {
     this.http.get<RawFaq[]>('assets/data/faqs.json').subscribe({
       next: (data) => {
-        this.suggestions = data.map((r) => ({
-          id: r.Id,
-          question: r.Question__c,
-          route: r.Answer__c.replace('.html', ''),
-          category: r.Category__c,
-          subCategory: r.SubCategory__c,
-          tags: r.SubCategory__c
-            ? [r.Category__c, r.SubCategory__c]
-            : [r.Category__c],
-        }));
+        this.suggestions = data
+          .filter(r => r.isActive !== false)  // Filter out inactive FAQs
+          .map((r) => ({
+            id: r.Id,
+            question: r.Question__c,
+            route: r.Answer__c.replace('.html', ''),
+            category: r.Category__c,
+            subCategory: r.SubCategory__c,
+            tags: r.SubCategory__c
+              ? [r.Category__c, r.SubCategory__c]
+              : [r.Category__c],
+          }));
         this.categories = [...new Set(this.suggestions.map((i) => i.category))];
         this.filterSubCategoryList();
         this.filterSuggestions();

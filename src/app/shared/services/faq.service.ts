@@ -696,7 +696,10 @@ export class FAQService implements OnDestroy {
     
     this.isLoading = true;
     this.http.get<SourceFAQRecord[]>(this.FAQ_DATA_URL).pipe(
-      map(records => records.map(record => this.transformToFAQItem(record))),
+      map(records => records
+        .filter(record => record.isActive !== false) // Filter out inactive FAQs
+        .map(record => this.transformToFAQItem(record))
+      ),
       catchError(error => {
         console.error('Failed to load FAQ data', error);
         return of([]);
@@ -726,7 +729,8 @@ export class FAQService implements OnDestroy {
       tags: record.SubCategory__c ?
         [record.Category__c, record.SubCategory__c] :
         [record.Category__c],
-      lastUpdated: new Date()
+      lastUpdated: new Date(),
+      isActive: record.isActive !== false // Default to true if not specified
     };
   }
 

@@ -490,6 +490,31 @@
       .form-group {
         margin-bottom: 0;
         
+        &.active-field {
+          flex: 0 0 auto; // Don't grow, just take what's needed
+          margin-right: 1rem;
+          margin-top: 1.5rem; // Align with other fields' input area
+          
+          .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            font-weight: 600;
+            color: #555;
+            font-size: 0.875rem;
+            
+            input[type="checkbox"] {
+              margin: 0;
+              cursor: pointer;
+            }
+            
+            .checkbox-text {
+              white-space: nowrap;
+            }
+          }
+        }
+        
         &.question-field {
           flex: 2; // Question field takes more space
         }
