@@ -229,21 +229,27 @@ export class FAQExportService {
   }
 
   downloadAsJSON(data: ExportData): void {
-    const jsonStr = JSON.stringify(data, null, 2);
-    const blob = new Blob([jsonStr], { type: 'application/json' });
+    // Normalize text content before export
+    const normalizedData = this.normalizeExportData(data);
+    const jsonStr = JSON.stringify(normalizedData, null, 2);
+    const blob = new Blob([jsonStr], { type: 'application/json;charset=utf-8' });
     this.downloadFile(blob, `faq-export-${Date.now()}.json`);
   }
 
   downloadFAQsJSON(data: ExportData): void {
-    const faqsJson = JSON.stringify(data.faqs, null, 2);
-    const blob = new Blob([faqsJson], { type: 'application/json' });
+    // Use the standardized normalization method
+    const normalizedData = this.normalizeExportData(data);
+    
+    const faqsJson = JSON.stringify(normalizedData.faqs, null, 2);
+    const blob = new Blob([faqsJson], { type: 'application/json;charset=utf-8' });
     this.downloadFile(blob, 'faqs.json');
   }
 
   downloadHTMLFiles(data: ExportData): void {
     Object.entries(data.htmlContent).forEach(([fileName, content]) => {
-      const cleanedContent = this.cleanHTMLContent(content);
-      const blob = new Blob([cleanedContent], { type: 'text/html' });
+      const normalizedContent = this.normalizeTextContent(content);
+      const cleanedContent = this.cleanHTMLContent(normalizedContent);
+      const blob = new Blob([cleanedContent], { type: 'text/html;charset=utf-8' });
       this.downloadFile(blob, fileName);
     });
   }
@@ -251,8 +257,11 @@ export class FAQExportService {
   async downloadAsZip(data: ExportData, progressCallback?: (progress: ExportProgress) => void, tempImages?: Map<string, File>): Promise<void> {
     const zip = new JSZip();
     
+    // Normalize data before creating ZIP
+    const normalizedData = this.normalizeExportData(data);
+    
     // Get original images referenced in HTML content
-    const originalImages = await this.fetchAllOriginalImages(data.htmlContent);
+    const originalImages = await this.fetchAllOriginalImages(normalizedData.htmlContent);
     
     const tempImageCount = tempImages ? tempImages.size : 0;
     const originalImageCount = originalImages.size;
@@ -272,13 +281,13 @@ export class FAQExportService {
     };
 
     try {
-      // Add FAQ data JSON
-      const faqsJson = JSON.stringify(data.faqs, null, 2);
+      // Add FAQ data JSON with normalized content
+      const faqsJson = JSON.stringify(normalizedData.faqs, null, 2);
       zip.file('faqs.json', faqsJson);
       updateProgress('Adding FAQ data');
 
-      // Add HTML files
-      for (const [fileName, content] of Object.entries(data.htmlContent)) {
+      // Add HTML files with normalized content
+      for (const [fileName, content] of Object.entries(normalizedData.htmlContent)) {
         const cleanedContent = this.cleanHTMLContent(content);
         zip.file(`html-content/${fileName}`, cleanedContent);
         updateProgress(`Adding ${fileName}`);
@@ -310,7 +319,7 @@ export class FAQExportService {
       updateProgress('Adding instructions');
 
       // Add metadata
-      const metadata = JSON.stringify(data.metadata, null, 2);
+      const metadata = JSON.stringify(normalizedData.metadata, null, 2);
       zip.file('export-metadata.json', metadata);
       updateProgress('Adding metadata');
 
@@ -343,7 +352,11 @@ export class FAQExportService {
       
       reader.onload = async (e) => {
         try {
-          const content = e.target?.result as string;
+          let content = e.target?.result as string;
+          
+          // Fix encoding issues in the imported content
+          content = this.normalizeTextContent(content);
+          
           const data = JSON.parse(content) as ExportData;
           
           // Validate export data
@@ -353,8 +366,11 @@ export class FAQExportService {
             return;
           }
 
+          // Normalize imported data
+          const normalizedData = this.normalizeExportData(data);
+          
           // Convert and import the data
-          const success = await this.processImportData(data);
+          const success = await this.processImportData(normalizedData);
           resolve(success);
         } catch (error) {
           console.error('Error importing JSON:', error);
@@ -367,7 +383,8 @@ export class FAQExportService {
         resolve(false);
       };
 
-      reader.readAsText(file);
+      // Read with explicit UTF-8 encoding
+      reader.readAsText(file, 'UTF-8');
     });
   }
 
@@ -386,7 +403,11 @@ export class FAQExportService {
         return false;
       }
       
-      const faqsJsonContent = await faqsJsonFile.async('string');
+      let faqsJsonContent = await faqsJsonFile.async('string');
+      
+      // Normalize text content to fix encoding issues
+      faqsJsonContent = this.normalizeTextContent(faqsJsonContent);
+      
       let faqsData: any[];
       
       try {
@@ -405,7 +426,11 @@ export class FAQExportService {
         for (const [relativePath, file] of Object.entries(htmlFolder.files)) {
           if (file && !file.dir && relativePath.endsWith('.html')) {
             const fileName = relativePath.split('/').pop() || relativePath;
-            const htmlFileContent = await file.async('string');
+            let htmlFileContent = await file.async('string');
+            
+            // Normalize HTML content to fix encoding issues
+            htmlFileContent = this.normalizeTextContent(htmlFileContent);
+            
             htmlContent[fileName] = htmlFileContent;
             console.log(`Extracted HTML file: ${fileName}`);
           }
@@ -603,6 +628,136 @@ Notes:
   /**
    * Decode HTML entities to actual characters
    */
+  /**
+   * Normalize various quote characters to standard ASCII quotes
+   */
+  private normalizeQuotes(content: string): string {
+    if (!content) return content;
+    
+    let normalized = content;
+    
+    // Map of various quote characters to standard ASCII quotes using Unicode escape sequences
+    const quoteMap: { [key: string]: string } = {
+      // Smart/curly quotes
+      '\u2018': "'",  // Left single quotation mark (U+2018)
+      '\u2019': "'",  // Right single quotation mark (U+2019) 
+      '\u201C': '"',  // Left double quotation mark (U+201C)
+      '\u201D': '"',  // Right double quotation mark (U+201D)
+      
+      // Other quote variants
+      '\u00B4': "'",  // Acute accent (U+00B4)
+      '\u0060': "'",  // Grave accent (U+0060)
+      '\u2032': "'",  // Prime (U+2032)
+      '\u2033': '"',  // Double prime (U+2033)
+      
+      // Apostrophe variants
+      '\u02BC': "'",  // Modifier letter apostrophe (U+02BC)
+    };
+    
+    // Replace all quote variants with standard ASCII quotes
+    for (const [unicode, ascii] of Object.entries(quoteMap)) {
+      normalized = normalized.replace(new RegExp(unicode, 'g'), ascii);
+    }
+    
+    return normalized;
+  }
+
+  /**
+   * Fix common UTF-8 encoding corruption issues
+   */
+  private fixEncodingIssues(content: string): string {
+    if (!content) return content;
+    
+    let fixed = content;
+    
+    // Map of common UTF-8 encoding corruptions to correct characters
+    const encodingFixMap: { [key: string]: string } = {
+      // Smart quotes corruption
+      'â€™': "'",   // Right single quotation mark corrupted
+      'â€˜': "'",   // Left single quotation mark corrupted
+      'â€œ': '"',   // Left double quotation mark corrupted
+      'â€\u009d': '"',   // Right double quotation mark corrupted
+      
+      // En/em dash corruption  
+      'â€"': '–',   // En dash corrupted (U+2013)
+      'â€\u0094': '—',   // Em dash corrupted (U+2014)
+      'â€\u0095': '•',   // Bullet point corrupted
+      
+      // Ellipsis corruption
+      'â€¦': '…',   // Horizontal ellipsis corrupted
+      
+      // Other common corruptions
+      'Ã¡': 'á',   // a with acute accent
+      'Ã©': 'é',   // e with acute accent
+      'Ã­': 'í',   // i with acute accent
+      'Ã³': 'ó',   // o with acute accent
+      'Ãº': 'ú',   // u with acute accent
+      'Ã±': 'ñ',   // n with tilde
+      'â„¢': '™',   // Trademark symbol corruption
+      'Â©': '©',   // Copyright symbol corruption
+      'Â®': '®',   // Registered symbol corruption
+      'Â ': ' ',   // Non-breaking space corruption
+    };
+    
+    // Fix encoding corruptions
+    for (const [corrupted, correct] of Object.entries(encodingFixMap)) {
+      fixed = fixed.replace(new RegExp(corrupted, 'g'), correct);
+    }
+    
+    return fixed;
+  }
+
+  /**
+   * Clean and normalize text content
+   */
+  public normalizeTextContent(content: string): string {
+    if (!content) return content;
+    
+    let normalized = content;
+    
+    // Step 1: Fix UTF-8 encoding corruption
+    normalized = this.fixEncodingIssues(normalized);
+    
+    // Step 2: Normalize quotes to ASCII
+    normalized = this.normalizeQuotes(normalized);
+    
+    // Step 3: Decode HTML entities
+    normalized = this.decodeHTMLEntities(normalized);
+    
+    return normalized;
+  }
+
+  /**
+   * Normalize entire export data structure
+   */
+  private normalizeExportData(data: ExportData): ExportData {
+    return {
+      ...data,
+      faqs: data.faqs.map(faq => {
+        const normalizedFaq: any = { ...faq };
+        
+        // Normalize existing text fields without adding new ones
+        if (faq.Question__c !== undefined) {
+          normalizedFaq.Question__c = this.normalizeTextContent(faq.Question__c || '');
+        }
+        if (faq.Category__c !== undefined) {
+          normalizedFaq.Category__c = this.normalizeTextContent(faq.Category__c || '');
+        }
+        if (faq.SubCategory__c !== undefined) {
+          normalizedFaq.SubCategory__c = this.normalizeTextContent(faq.SubCategory__c || '');
+        }
+        
+        return normalizedFaq;
+      }),
+      htmlContent: Object.fromEntries(
+        Object.entries(data.htmlContent).map(([key, value]) => [
+          key, 
+          this.normalizeTextContent(value)
+        ])
+      )
+    };
+  }
+
   public decodeHTMLEntities(content: string): string {
     if (!content) return content;
     

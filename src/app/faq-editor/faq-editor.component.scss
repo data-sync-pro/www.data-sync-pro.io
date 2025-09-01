@@ -408,6 +408,29 @@
         }
       }
       
+      &.inactive {
+        opacity: 0.6;
+        background: #f8f8f8;
+        
+        .faq-question {
+          color: #888;
+          text-decoration: line-through;
+        }
+        
+        .faq-category {
+          color: #aaa;
+        }
+        
+        &:hover {
+          background: #f0f0f0;
+        }
+        
+        &.selected {
+          background: #e8e8e8;
+          border-left-color: #999;
+        }
+      }
+      
       .faq-item-header {
         display: flex;
         justify-content: space-between;
@@ -422,6 +445,15 @@
         
         .edit-indicator {
           display: none;
+        }
+        
+        .status-indicator {
+          font-size: 0.75rem;
+          margin-right: 0.25rem;
+          
+          &.inactive {
+            filter: grayscale(50%);
+          }
         }
       }
       
@@ -1281,6 +1313,32 @@
     
     &:hover:not(:disabled) {
       background: #45a049;
+    }
+    
+    &.save-all-btn {
+      position: relative;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 4px rgba(76, 175, 80, 0.3);
+      
+      &:hover:not(:disabled) {
+        background: #45a049;
+        box-shadow: 0 4px 8px rgba(76, 175, 80, 0.4);
+        transform: translateY(-1px);
+      }
+      
+      &:active:not(:disabled) {
+        transform: translateY(0);
+        box-shadow: 0 2px 4px rgba(76, 175, 80, 0.3);
+      }
+      
+      &:disabled {
+        background: #cccccc;
+        box-shadow: none;
+        cursor: not-allowed;
+      }
     }
   }
   

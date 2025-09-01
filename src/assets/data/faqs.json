@@ -7,7 +7,7 @@
         "SeqNo__c":  null,
         "Question__c":  "What is Data Sync Pro?",
         "Answer__c":  "general-what-is-dsp.html",
-        "isActive":  true
+        "isActive":  false
     },
     {
         "Id":  "a0oEc000005JohOIAS",
@@ -17,7 +17,7 @@
         "SeqNo__c":  null,
         "Question__c":  "What are the five rules engines in DSP, and what are they used for?",
         "Answer__c":  "general-five-dsp-engines.html",
-        "isActive":  true
+        "isActive":  false
     },
     {
         "Id":  "a0oEc000005JohPIAS",
@@ -45,7 +45,7 @@
         "Category__c":  "General",
         "SubCategory__c":  null,
         "SeqNo__c":  null,
-        "Question__c":  "Does DSP process any data outside the subscriberâ€™s Salesforce org?",
+        "Question__c":  "Does DSP process any data outside the subscriber's Salesforce org?",
         "Answer__c":  "general-dsp-external-data.html",
         "isActive":  true
     },
@@ -85,7 +85,7 @@
         "Category__c":  "General",
         "SubCategory__c":  null,
         "SeqNo__c":  null,
-        "Question__c":  "How do DSPâ€™s rules engines compare?",
+        "Question__c":  "How do DSP's rules engines compare?",
         "Answer__c":  "general-dsp-rules-engines-compare.html",
         "isActive":  true
     },
@@ -345,7 +345,7 @@
         "Category__c":  "Rules Engines",
         "SubCategory__c":  "Batch",
         "SeqNo__c":  null,
-        "Question__c":  "Whatâ€™s the best way to implement a complex Batch job with multiple actions?",
+        "Question__c":  "What's the best way to implement a complex Batch job with multiple actions?",
         "Answer__c":  "rules-engines-batch-break-down-complex-batch.html",
         "isActive":  true
     },
@@ -515,7 +515,7 @@
         "Category__c":  "Rules Engines",
         "SubCategory__c":  "Data List",
         "SeqNo__c":  null,
-        "Question__c":  "What advantages does a custom â€˜New Recordâ€™ action have over the default in a #Data List?",
+        "Question__c":  "What advantages does a custom 'New Record' action have over the default in a #Data List?",
         "Answer__c":  "rules-engines-data-list-replace-new-record.html",
         "isActive":  true
     },
@@ -565,7 +565,7 @@
         "Category__c":  "Rules Engines",
         "SubCategory__c":  "Data List",
         "SeqNo__c":  null,
-        "Question__c":  "Whatâ€™s the way to inject custom actions into Pipeline Data Lists?",
+        "Question__c":  "What's the way to inject custom actions into Pipeline Data Lists?",
         "Answer__c":  "rules-engines-data-list-extend-data-lists-lwc.html",
         "isActive":  true
     },
@@ -935,7 +935,7 @@
         "Category__c":  "Rules Engines",
         "SubCategory__c":  "Triggers",
         "SeqNo__c":  null,
-        "Question__c":  "Salesforce requires at least one line of test coverage in an Apex Triggerâ€”how can I achieve this?",
+        "Question__c":  "Salesforce requires at least one line of test coverage in an Apex Trigger—how can I achieve this?",
         "Answer__c":  "rules-engines-triggers-test-coverage-trigger.html",
         "isActive":  true
     },
@@ -1235,7 +1235,7 @@
         "Category__c":  "Processes",
         "SubCategory__c":  "Mapping",
         "SeqNo__c":  null,
-        "Question__c":  "How do I control the order of field mappingsâ€™ evaluation?",
+        "Question__c":  "How do I control the order of field mappings' evaluation?",
         "Answer__c":  "process-steps-mapping-sequence-of-transformations.html",
         "isActive":  true
     },
@@ -1245,7 +1245,7 @@
         "Category__c":  "Processes",
         "SubCategory__c":  "Mapping",
         "SeqNo__c":  null,
-        "Question__c":  "What is the purpose of the \u0027Add Default\u0027 button?",
+        "Question__c":  "Wha'e of the \u0027Add Default\u0027 button?",
         "Answer__c":  "process-steps-mapping-add-default-button.html",
         "isActive":  true
     },

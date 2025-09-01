@@ -334,6 +334,21 @@ export class FAQService implements OnDestroy {
   }
 
   /**
+   * Get all FAQs including inactive ones for editor use
+   */
+  getAllFAQsForEditor(): Observable<FAQItem[]> {
+    return this.http.get<SourceFAQRecord[]>(this.FAQ_DATA_URL).pipe(
+      map(records => records
+        .map(record => this.transformToFAQItem(record))
+      ),
+      catchError(error => {
+        console.error('Failed to load FAQ data for editor', error);
+        return of([]);
+      })
+    );
+  }
+
+  /**
    * 获取FAQ总数
    */
   getFAQCount(): Observable<number> {

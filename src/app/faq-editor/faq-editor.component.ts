@@ -618,7 +618,7 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
 
 
   private loadFAQData(): void {
-    this.faqService.getFAQs()
+    this.faqService.getAllFAQsForEditor()
       .pipe(takeUntil(this.destroy$))
       .subscribe(faqs => {
         this.faqList = faqs;
@@ -825,67 +825,151 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
       });
   }
 
-  saveFAQ(isAutoSave = false): void {
-    if (!this.state.selectedFAQ) return;
+  /**
+   * Unified FAQ save method that handles both current FAQ and tab-based saves
+   */
+  private async saveGenericFAQ(
+    saveContext: 'current' | 'tab',
+    tabData?: FAQTab,
+    options: { isAutoSave?: boolean; silent?: boolean } = {}
+  ): Promise<void> {
+    const { isAutoSave = false, silent = false } = options;
     
-    this.state.isSaving = true;
-    this.state.saveError = null;
+    // Determine data source based on context
+    let faqId: string;
+    let question: string;
+    let rawContent: string;
+    let category: string;
+    let subCategory: string | undefined;
+    let isActive: boolean;
     
-    // For WYSIWYG editor, get HTML content directly from contenteditable
-    const editorElement = this.htmlSourceEditor.nativeElement;
-    const rawEditorContent = editorElement.innerHTML || this.editorContent;
-    
-    // Clean the content to remove any unwanted elements or text
-    const cleanedContent = this.cleanEditorContent(rawEditorContent);
-    
-    // Convert URL format back to img tags for saving (use actual paths, not blob URLs)
-    const htmlContent = this.convertUrlsToImgs(cleanedContent, true);
-    
-    console.log('💾 Saving content - Raw:', rawEditorContent);
-    console.log('💾 Saving content - Cleaned:', cleanedContent);
-    console.log('💾 Saving content - Converted:', htmlContent);
-    
-    const faqData: Partial<EditedFAQ> = {
-      faqId: this.state.selectedFAQ.id,
-      question: this.currentQuestion,
-      answer: htmlContent,
-      category: this.currentCategory,
-      subCategory: this.currentSubCategory || undefined,
-      isActive: this.currentIsActive
-    };
-
-    this.storageService.saveFAQ(faqData).then(success => {
-      if (success) {
-        this.state.hasChanges = false;
-        this.state.lastSaved = new Date();
-        this.state.saveError = null;
-        this.loadEditedFAQs();
-        
-        // Update preview if open
-        this.updatePreviewIfOpen();
-        
-        // Show notification only for manual saves
-        if (!isAutoSave) {
-          this.notificationService.saveSuccess(this.getTruncatedTitle(this.currentQuestion));
-        }
-        // Auto-save is silent - no notification needed
-      } else {
-        this.state.saveError = 'Failed to save to storage';
-        this.notificationService.saveError(
-          this.getTruncatedTitle(this.currentQuestion), 
-          this.state.saveError || undefined
-        );
+    if (saveContext === 'current') {
+      if (!this.state.selectedFAQ) {
+        throw new Error('No FAQ selected for current save');
       }
-      this.state.isSaving = false;
-    }).catch(error => {
-      this.state.saveError = error.message || 'Unknown error occurred';
-      this.notificationService.saveError(
-        this.getTruncatedTitle(this.currentQuestion), 
-        this.state.saveError || undefined
-      );
-      this.state.isSaving = false;
+      
+      // Get data from current editor state
+      faqId = this.state.selectedFAQ.id;
+      question = this.currentQuestion;
+      category = this.currentCategory;
+      subCategory = this.currentSubCategory || undefined;
+      isActive = this.currentIsActive;
+      
+      // Get content from actual editor DOM
+      const editorElement = this.htmlSourceEditor?.nativeElement;
+      rawContent = editorElement?.innerHTML || this.editorContent;
+    } else {
+      if (!tabData) {
+        throw new Error('Tab data required for tab save');
+      }
+      
+      // Get data from tab
+      faqId = tabData.faq.id;
+      question = tabData.currentQuestion;
+      category = tabData.currentCategory;
+      subCategory = tabData.currentSubCategory;
+      isActive = tabData.currentIsActive;
+      rawContent = tabData.editorContent;
+    }
+    
+    // Set saving state for current context
+    if (saveContext === 'current') {
+      this.state.isSaving = true;
+      this.state.saveError = null;
+    }
+    
+    try {
+      // Clean the content to remove any unwanted elements
+      const cleanedContent = this.cleanEditorContent(rawContent);
+      
+      // Convert URL format back to img tags for saving (use actual paths, not blob URLs)
+      const htmlContent = this.convertUrlsToImgs(cleanedContent, true);
+      
+      // Debug logging (only for current saves to avoid spam)
+      if (saveContext === 'current' && !silent) {
+        console.log('💾 Saving content - Raw:', rawContent);
+        console.log('💾 Saving content - Cleaned:', cleanedContent);
+        console.log('💾 Saving content - Converted:', htmlContent);
+      }
+      
+      const faqData: Partial<EditedFAQ> = {
+        faqId,
+        question,
+        answer: htmlContent,
+        category,
+        subCategory,
+        isActive
+      };
+
+      const success = await this.storageService.saveFAQ(faqData);
+      
+      if (success) {
+        // Update state based on context
+        if (saveContext === 'current') {
+          this.state.hasChanges = false;
+          this.state.lastSaved = new Date();
+          this.state.saveError = null;
+          
+          // IMPORTANT: Sync with current tab state to ensure UI consistency
+          // This ensures unsaved count is accurate after individual saves
+          const currentTab = this.getCurrentTab();
+          if (currentTab) {
+            currentTab.hasChanges = false;
+          }
+          
+          // Update preview if open
+          this.updatePreviewIfOpen();
+          
+          // Show notification only for manual saves
+          if (!isAutoSave && !silent) {
+            this.notificationService.saveSuccess(this.getTruncatedTitle(question));
+          }
+        } else if (tabData) {
+          // Update tab state
+          tabData.hasChanges = false;
+          
+          // IMPORTANT: Sync with global state if this is the current active tab
+          // This ensures UI consistency when saving via Save All
+          if (this.isCurrentActiveTab(tabData)) {
+            this.state.hasChanges = false;
+            this.state.lastSaved = new Date();
+            this.state.saveError = null;
+          }
+        }
+        
+        // Always reload edited FAQs to keep UI in sync
+        this.loadEditedFAQs();
+      } else {
+        throw new Error('Failed to save to storage');
+      }
+    } catch (error: any) {
+      const errorMessage = error.message || 'Unknown error occurred';
+      
+      if (saveContext === 'current') {
+        this.state.saveError = errorMessage;
+        if (!silent) {
+          this.notificationService.saveError(
+            this.getTruncatedTitle(question), 
+            errorMessage
+          );
+        }
+      }
+      
       console.error('Save error:', error);
-    });
+      throw error; // Re-throw for caller handling
+    } finally {
+      if (saveContext === 'current') {
+        this.state.isSaving = false;
+      }
+    }
+  }
+
+  saveFAQ(isAutoSave = false): void {
+    this.saveGenericFAQ('current', undefined, { isAutoSave })
+      .catch(error => {
+        // Error already handled in saveGenericFAQ
+        console.error('saveFAQ failed:', error);
+      });
   }
 
   private getTruncatedTitle(title: string, maxLength = 40): string {
@@ -1289,6 +1373,71 @@ export class FaqEditorComponent implements OnInit, OnDestroy, AfterViewInit {
 
   getEditedCount(): number {
     return this.editedFAQs.size;
+  }
+
+  getUnsavedChangesCount(): number {
+    let count = 0;
+    
+    // Count unsaved changes in all tabs (including current tab)
+    // Each tab tracks its own hasChanges state, so no double counting
+    for (const tab of this.state.tabs) {
+      if (tab.hasChanges) {
+        count++;
+      }
+    }
+    
+    return count;
+  }
+
+  async saveAllFAQs(): Promise<void> {
+    const unsavedChanges = this.getUnsavedChangesCount();
+    if (unsavedChanges === 0) return;
+
+    // Show progress notification
+    console.log(`Saving ${unsavedChanges} changes...`);
+    
+    let savedCount = 0;
+    let errorCount = 0;
+    
+    try {
+      // Save all tabs with changes (including current active tab)
+      for (const tab of this.state.tabs) {
+        if (tab.hasChanges) {
+          try {
+            await this.saveTab(tab);
+            savedCount++;
+          } catch (error) {
+            console.error('Error saving tab:', tab.title, error);
+            errorCount++;
+          }
+        }
+      }
+      
+      // Show completion notification
+      if (errorCount === 0) {
+        this.notificationService.success(`Successfully saved ${savedCount} changes`);
+      } else if (savedCount > 0) {
+        this.notificationService.warning(`Saved ${savedCount} changes, ${errorCount} failed`);
+      } else {
+        this.notificationService.error(`Save failed, please check your connection`);
+      }
+      
+    } catch (error) {
+      console.error('Error in saveAllFAQs:', error);
+      this.notificationService.error('Error occurred during save process');
+    }
+  }
+
+
+  private async saveTab(tab: FAQTab): Promise<void> {
+    return this.saveGenericFAQ('tab', tab, { silent: true });
+  }
+
+  /**
+   * Check if the given tab is the currently active tab in the editor
+   */
+  private isCurrentActiveTab(tab: FAQTab): boolean {
+    return this.state.selectedFAQ?.id === tab.faq.id;
   }
 
   getCreatedCount(): number {
