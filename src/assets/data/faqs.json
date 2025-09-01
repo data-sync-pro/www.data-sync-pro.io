@@ -7,7 +7,7 @@
         "SeqNo__c":  null,
         "Question__c":  "What is Data Sync Pro?",
         "Answer__c":  "general-what-is-dsp.html",
-        "isActive":  false
+        "isActive":  true
     },
     {
         "Id":  "a0oEc000005JohOIAS",
@@ -17,7 +17,7 @@
         "SeqNo__c":  null,
         "Question__c":  "What are the five rules engines in DSP, and what are they used for?",
         "Answer__c":  "general-five-dsp-engines.html",
-        "isActive":  false
+        "isActive":  true
     },
     {
         "Id":  "a0oEc000005JohPIAS",
