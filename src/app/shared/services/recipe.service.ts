@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject, of, throwError, combineLatest } from 'rxjs';
 import { map, catchError, shareReplay, tap, finalize, switchMap } from 'rxjs/operators';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { AutoLinkService } from './auto-link.service';
 
 import {
   SourceRecipeRecord,
@@ -80,7 +81,8 @@ export class RecipeService implements OnDestroy {
 
   constructor(
     private http: HttpClient,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
+    private autoLinkService: AutoLinkService
   ) {
     this.initializeService();
     this.initializeIntersectionObserver();
@@ -248,13 +250,19 @@ export class RecipeService implements OnDestroy {
         category: record.category,
         DSPVersions: record.DSPVersions || [],
         overview: record.overview || record.usecase || '',
-        safeOverview: this.sanitizer.bypassSecurityTrustHtml(record.overview || record.usecase || ''),
+        safeOverview: this.sanitizer.bypassSecurityTrustHtml(
+          this.autoLinkService.applyAutoLinkTerms(record.overview || record.usecase || '')
+        ),
         whenToUse: record.whenToUse || '',
-        safeWhenToUse: record.whenToUse ? this.sanitizer.bypassSecurityTrustHtml(record.whenToUse) : undefined,
+        safeWhenToUse: record.whenToUse ? this.sanitizer.bypassSecurityTrustHtml(
+          this.autoLinkService.applyAutoLinkTerms(record.whenToUse)
+        ) : undefined,
         generalImages: record.generalImages || [],
         prerequisites: record.prerequisites || [],
         direction: record.direction || '',
-        safeDirection: record.direction ? this.sanitizer.bypassSecurityTrustHtml(record.direction) : this.sanitizer.bypassSecurityTrustHtml(''),
+        safeDirection: record.direction ? this.sanitizer.bypassSecurityTrustHtml(
+          this.autoLinkService.applyAutoLinkTerms(record.direction)
+        ) : this.sanitizer.bypassSecurityTrustHtml(''),
         connection: record.connection || '',
         walkthrough: this.processWalkthroughImagePaths(record.walkthrough || [], folderId),
         downloadableExecutables: this.processDownloadableExecutables(record.downloadableExecutables || [], folderId),
@@ -263,13 +271,17 @@ export class RecipeService implements OnDestroy {
         
         // Legacy compatibility fields
         usecase: record.usecase || record.overview || '',
-        safeUsecase: this.sanitizer.bypassSecurityTrustHtml(record.usecase || record.overview || ''),
+        safeUsecase: this.sanitizer.bypassSecurityTrustHtml(
+          this.autoLinkService.applyAutoLinkTerms(record.usecase || record.overview || '')
+        ),
         
         // Legacy compatibility fields
         name: record.name,
         description: record.description,
         useCase: record.useCase,
-        safeUseCase: record.useCase ? this.sanitizer.bypassSecurityTrustHtml(record.useCase) : undefined,
+        safeUseCase: record.useCase ? this.sanitizer.bypassSecurityTrustHtml(
+          this.autoLinkService.applyAutoLinkTerms(record.useCase)
+        ) : undefined,
         tags: record.tags,
         lastUpdated: record.lastUpdated ? new Date(record.lastUpdated) : undefined,
         author: record.author,
@@ -292,7 +304,9 @@ export class RecipeService implements OnDestroy {
         category: record.category,
         DSPVersions: [],
         overview: record.useCase || record.description || '',
-        safeOverview: this.sanitizer.bypassSecurityTrustHtml(record.useCase || record.description || ''),
+        safeOverview: this.sanitizer.bypassSecurityTrustHtml(
+          this.autoLinkService.applyAutoLinkTerms(record.useCase || record.description || '')
+        ),
         whenToUse: '',
         safeWhenToUse: undefined,
         generalImages: [],
@@ -310,13 +324,17 @@ export class RecipeService implements OnDestroy {
         
         // Legacy compatibility fields
         usecase: record.useCase || record.description || '',
-        safeUsecase: this.sanitizer.bypassSecurityTrustHtml(record.useCase || record.description || ''),
+        safeUsecase: this.sanitizer.bypassSecurityTrustHtml(
+          this.autoLinkService.applyAutoLinkTerms(record.useCase || record.description || '')
+        ),
         
         // Legacy fields
         name: record.name,
         description: record.description,
         useCase: record.useCase,
-        safeUseCase: record.useCase ? this.sanitizer.bypassSecurityTrustHtml(record.useCase) : undefined,
+        safeUseCase: record.useCase ? this.sanitizer.bypassSecurityTrustHtml(
+          this.autoLinkService.applyAutoLinkTerms(record.useCase)
+        ) : undefined,
         legacyWalkthrough: record.walkthrough as any as LegacyRecipeWalkthrough,
         downloadableExecutable: (record as any).downloadableExecutable,
         tags: record.tags,
