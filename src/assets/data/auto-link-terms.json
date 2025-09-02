@@ -283,6 +283,17 @@
     "AGG_MAX": { "functionDoc": "AGG_MAX" },
     "AGG_MIN": { "functionDoc": "AGG_MIN" },
     "AGG_SUM": { "functionDoc": "AGG_SUM" },
-    "APEX_CLASS": { "functionDoc": "APEX_CLASS" }
+    "APEX_CLASS": { "functionDoc": "APEX_CLASS" },
+    "AGG": { "functionDoc": "aggregate_general" },
+
+    "$CONTEXT_RECORD_ID": { "globalVariableDoc": "global_variables" },
+    "$JOINER": { "globalVariableDoc": "global_variables" },
+    "$Joiner.FieldName": { "globalVariableDoc": "global_variables" },
+    "$ORG_DOMAIN_URL": { "globalVariableDoc": "global_variables" },
+    "$SKIP_ASSIGNMENT": { "globalVariableDoc": "global_variables" },
+    "$User.Email": { "globalVariableDoc": "global_variables" },
+    "$User.ProfileId": { "globalVariableDoc": "global_variables" },
+    "$User.Username": { "globalVariableDoc": "global_variables" },
+    "$User.Id": { "globalVariableDoc": "global_variables" }
   }
 }
