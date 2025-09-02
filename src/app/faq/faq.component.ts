@@ -195,9 +195,19 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
           // Handle answer-based URL (e.g., /general-why-data-sync-pro)
           this.handleAnswerPathNavigation(decodedCat);
         } else {
-          // Handle category-based URL (e.g., /General or /General/SubCategory)
-          this.current.category = decodedCat;
-          this.current.subCategory = subCatParam ? this.safeDecodeURIComponent(subCatParam) : '';
+          // Handle category-based URL (e.g., /general or /general/input)
+          // Map lowercase URL back to original category name
+          const originalCategory = this.categoryMapping[decodedCat] || decodedCat;
+          this.current.category = originalCategory;
+          
+          const decodedSubCat = subCatParam ? this.safeDecodeURIComponent(subCatParam) : '';
+          // For subcategories, convert to title case (capitalize each word)
+          if (decodedSubCat) {
+            const normalizedSubCat = decodedSubCat.replace(/-/g, ' ');
+            this.current.subCategory = normalizedSubCat.replace(/\b\w/g, l => l.toUpperCase());
+          } else {
+            this.current.subCategory = '';
+          }
         }
       } else {
         // Root path
@@ -311,7 +321,42 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
       }
     });
   }
-  private encode = (s: string) => encodeURIComponent(s.trim());
+
+  // Category name mapping for URL conversion (lowercase URL ↔ original name)
+  private categoryMapping: { [key: string]: string } = {
+    'general': 'General',
+    'rules-engines': 'Rules Engines',
+    'processes': 'Processes',
+    'process-steps': 'Process Steps', 
+    'transformation': 'Transformation',
+    'executables': 'Executables',
+    'connections': 'Connections',
+    'query-manager-q': 'Query Manager(Q)'
+  };
+
+  // Reverse mapping (original name → lowercase URL)
+  private reverseCategoryMapping: { [key: string]: string } = {
+    'General': 'general',
+    'Rules Engines': 'rules-engines',
+    'Processes': 'processes',
+    'Process Steps': 'process-steps',
+    'Transformation': 'transformation',
+    'Executables': 'executables', 
+    'Connections': 'connections',
+    'Query Manager(Q)': 'query-manager-q'
+  };
+
+  private encode = (s: string) => {
+    const trimmed = s.trim();
+    // Check if this is a known category, if so use lowercase mapping
+    const lowercaseUrl = this.reverseCategoryMapping[trimmed];
+    if (lowercaseUrl) {
+      return encodeURIComponent(lowercaseUrl);
+    }
+    // For subcategories or other strings, convert to lowercase and replace spaces with hyphens
+    return encodeURIComponent(trimmed.toLowerCase().replace(/\s+/g, '-'));
+  };
+
   
   goHome(): void {
     this.resetState();
@@ -909,9 +954,10 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
   private buildFAQUrl(category?: string | null, subCategory?: string | null): string {
     let url = '/';
     if (category) {
-      url += `/${encodeURIComponent(category)}`;
+      // Use the encode method which now handles lowercase conversion
+      url += `/${this.encode(category)}`;
       if (subCategory) {
-        url += `/${encodeURIComponent(subCategory)}`;
+        url += `/${this.encode(subCategory)}`;
       }
     }
     return url;
@@ -1204,12 +1250,8 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     const hasMultipleHyphens = (urlPath.match(/-/g) || []).length >= 2;
     const isLongerThanCategoryName = urlPath.length > 15; // Most categories are shorter
     
-    // Known category names (case-insensitive check)
-    const knownCategories = ['General', 'Rules Engines', 'Process Steps', 'Executables', 'Connections', 'Query Manager(Q)'];
-    const isKnownCategory = knownCategories.some(cat => 
-      cat.toLowerCase().replace(/\s+/g, '-') === urlPath.toLowerCase() ||
-      cat.toLowerCase() === urlPath.toLowerCase()
-    );
+    // Check if it's a known category by looking in our category mapping
+    const isKnownCategory = this.categoryMapping.hasOwnProperty(urlPath.toLowerCase());
     
     // If it's a known category, treat as category URL
     if (isKnownCategory) {
