@@ -43,7 +43,8 @@
       "Bash(del \"E:\\www.data-sync-pro.io\\add-isactive.ps1\")",
       "Bash(cmd /c:*)",
       "WebFetch(domain:transformation.pushtopic.com)",
-      "Bash(del \"D:\\www.data-sync-pro.io\\test-autolink.html\")"
+      "Bash(del \"D:\\www.data-sync-pro.io\\test-autolink.html\")",
+      "Bash(start http://localhost:4201/recipes)"
     ],
     "deny": []
   }
