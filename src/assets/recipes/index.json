@@ -1,11 +1,35 @@
 {
   "recipes": [
     {
+      "folderId": "add-sharing-records-based-on-roles",
+      "active": true
+    },
+    {
+      "folderId": "allow-only-one-primary-related-record-per-parent",
+      "active": true
+    },
+    {
       "folderId": "assign-permission-sets-with-existence-check",
       "active": true
     },
     {
       "folderId": "auto_close-stagnant-cases",
+      "active": true
+    },
+    {
+      "folderId": "auto-assign-default-permission-sets-to-new-users",
+      "active": true
+    },
+    {
+      "folderId": "auto-create-follow-up-task-based-on-record-status",
+      "active": true
+    },
+    {
+      "folderId": "auto-create-parent-record-for-new-child-record",
+      "active": true
+    },
+    {
+      "folderId": "auto-transfer-records-upon-user-deactivation",
       "active": true
     },
     {
@@ -17,7 +41,15 @@
       "active": true
     },
     {
+      "folderId": "cascade-owner-changes-from-parent-to-child-records",
+      "active": true
+    },
+    {
       "folderId": "convert-leads-in-bulk",
+      "active": true
+    },
+    {
+      "folderId": "copy-related-records-on-parent-record-clone",
       "active": true
     },
     {
@@ -25,7 +57,39 @@
       "active": true
     },
     {
+      "folderId": "deploy-data-sync-pro-configurations",
+      "active": true
+    },
+    {
+      "folderId": "download-record-based-configurations-to-vs-code",
+      "active": true
+    },
+    {
       "folderId": "mask-sensitive-data-in-sandbox",
+      "active": true
+    },
+    {
+      "folderId": "merge-duplicate-accounts-with-principal-record-selection-rule",
+      "active": true
+    },
+    {
+      "folderId": "migrate-contentdocument-data-to-remote-org",
+      "active": true
+    },
+    {
+      "folderId": "new-recipe",
+      "active": true
+    },
+    {
+      "folderId": "notify-new-owner-by-email-on-owner-change",
+      "active": true
+    },
+    {
+      "folderId": "notify-previous-owner-by-bell-notification-on-owner-change",
+      "active": true
+    },
+    {
+      "folderId": "prevent-record-closure-without-required-related-records",
       "active": true
     },
     {
@@ -49,7 +113,23 @@
       "active": true
     },
     {
+      "folderId": "route-approver-by-amount-threshold",
+      "active": true
+    },
+    {
+      "folderId": "send-email-notifications-on-field-changes",
+      "active": true
+    },
+    {
       "folderId": "send-overdue-task-emails",
+      "active": true
+    },
+    {
+      "folderId": "store-record-versions-in-big-object-upon-save",
+      "active": true
+    },
+    {
+      "folderId": "trigger-delayed-batch-execution",
       "active": true
     }
   ]

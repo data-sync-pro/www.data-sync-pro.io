@@ -151,9 +151,11 @@
         <div class="recipe-item"
              *ngFor="let recipe of filteredRecipes"
              [class.edited]="isRecipeEdited(recipe.id)"
+             [class.inactive]="!isRecipeActive(recipe.id)"
              (click)="loadRecipeToEditor(recipe)">
           <div class="recipe-item-header">
             <span class="recipe-id">{{ recipe.id }}</span>
+            <span class="status-indicator inactive" *ngIf="!isRecipeActive(recipe.id)" title="Inactive Recipe">🚫</span>
             <span class="edit-indicator" *ngIf="isRecipeEdited(recipe.id)">✏️</span>
           </div>
           <div class="recipe-title">{{ recipe.title }}</div>
@@ -175,6 +177,15 @@
           <h2>Basic Information</h2>
           
           <div class="form-row">
+            <div class="form-group active-field">
+              <label class="checkbox-label">
+                <input type="checkbox" 
+                       [(ngModel)]="currentIsActive"
+                       (change)="onRecipeChange()">
+                <span class="checkbox-text">Active</span>
+              </label>
+            </div>
+            
             <div class="form-group">
               <label for="title">Title *</label>
               <input type="text" 

@@ -1,4 +1,5 @@
 import { Component, OnInit, OnDestroy, ViewChild, ElementRef, HostListener, ChangeDetectorRef, NgZone, Renderer2 } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { Subject, takeUntil, debounceTime } from 'rxjs';
 import { RecipeStorageService } from '../shared/services/recipe-storage.service';
 import { RecipeExportService } from '../shared/services/recipe-export.service';
@@ -82,7 +83,11 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
   
   // Current editing recipe
   currentRecipe: SourceRecipeRecord | null = null;
+  currentIsActive = true; // Active state for current recipe
   jsonPreview = '';
+  
+  // Recipe active states from index.json
+  private recipeActiveStates = new Map<string, boolean>();
   
   // Preview update timer
   private previewUpdateTimer: any;
@@ -300,6 +305,7 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
   ];
   
   constructor(
+    private http: HttpClient,
     private recipeService: RecipeService,
     private storageService: RecipeStorageService,
     private exportService: RecipeExportService,
@@ -414,11 +420,30 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
   }
   
   private loadRecipes(): void {
+    // Load both recipes and active states
+    this.loadRecipeActiveStates();
+    
     this.recipeService.getRecipes()
       .pipe(takeUntil(this.destroy$))
       .subscribe(recipes => {
         this.recipeList = recipes;
         this.filteredRecipes = recipes;
+      });
+  }
+  
+  private loadRecipeActiveStates(): void {
+    this.http.get<{recipes: {folderId: string, active: boolean}[]}>('assets/recipes/index.json')
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (indexData) => {
+          this.recipeActiveStates.clear();
+          indexData.recipes.forEach(item => {
+            this.recipeActiveStates.set(item.folderId, item.active);
+          });
+        },
+        error: (error) => {
+          console.error('Failed to load recipe active states:', error);
+        }
       });
   }
   
@@ -508,6 +533,7 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
     tab.isActive = true;
     this.state.activeTabId = tabId;
     this.currentRecipe = tab.recipe;
+    this.currentIsActive = this.isRecipeActive(tab.recipe.id);
     this.initializeExpandedSteps();
     this.triggerPreviewUpdate();
     
@@ -581,6 +607,7 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
           this.state.tabs.push(tab);
           this.state.activeTabId = tab.id;
           this.currentRecipe = sourceRecipe;
+          this.currentIsActive = this.isRecipeActive(sourceRecipe.id);
           this.initializeExpandedSteps();
           this.triggerPreviewUpdate();
           this.state.isLoading = false;
@@ -611,6 +638,10 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
   
   isRecipeEdited(recipeId: string): boolean {
     return this.editedRecipeIds.has(recipeId);
+  }
+  
+  isRecipeActive(recipeId: string): boolean {
+    return this.recipeActiveStates.get(recipeId) ?? true; // Default to true if not found
   }
   
   // Recipe editing
