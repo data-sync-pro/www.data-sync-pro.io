@@ -4,6 +4,7 @@ import { Observable, BehaviorSubject, of, throwError } from 'rxjs';
 import { map, catchError, shareReplay, tap, finalize } from 'rxjs/operators';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { PerformanceService } from './performance.service';
+import { AutoLinkService } from './auto-link.service';
 import { getFAQUrlByKey } from '../config/faq-urls.config';
 
 import {
@@ -23,15 +24,12 @@ import {
 export class FAQService implements OnDestroy {
   private readonly FAQ_DATA_URL = 'assets/data/faqs.json';
   private readonly FAQ_CONTENT_BASE = 'assets/faq-item/';
-  private readonly AUTO_LINK_TERMS_URL = 'assets/data/auto-link-terms.json';
   private readonly VERSION_URL = 'assets/data/version.json';
   
   // Cache
   private faqsCache$ = new BehaviorSubject<FAQItem[]>([]);
   private contentCache = new Map<string, SafeHtml>();
   private categoriesCache: FAQCategory[] = [];
-  private autoLinkTerms: { [key: string]: any } = {};
-  private autoLinkTermsLoaded = false;
   
   // Local Storage Cache Keys
   private readonly STORAGE_KEY_FAQ_CONTENT = 'faq_content_cache';
@@ -57,7 +55,8 @@ export class FAQService implements OnDestroy {
   constructor(
     private http: HttpClient,
     private sanitizer: DomSanitizer,
-    private performanceService: PerformanceService
+    private performanceService: PerformanceService,
+    private autoLinkService: AutoLinkService
   ) {
     this.initializeService();
     this.initializeIntersectionObserver();
@@ -72,7 +71,6 @@ export class FAQService implements OnDestroy {
     if (!this.isInitialized) {
       this.checkAndUpdateVersion().then(() => {
         this.loadFAQs();
-        this.loadAutoLinkTerms();
       });
       this.isInitialized = true;
     }
@@ -140,20 +138,6 @@ export class FAQService implements OnDestroy {
     }
   }
 
-  /**
-   * Load auto-link terms configuration
-   */
-  private loadAutoLinkTerms(): void {
-    this.http.get<any>(this.AUTO_LINK_TERMS_URL).pipe(
-      catchError(error => {
-        console.warn('Could not load auto-link terms configuration:', error);
-        return of({ terms: {} });
-      })
-    ).subscribe(config => {
-      this.autoLinkTerms = config.terms || {};
-      this.autoLinkTermsLoaded = true;
-      });
-  }
 
   /**
    * Load cached content from local storage
@@ -464,7 +448,7 @@ export class FAQService implements OnDestroy {
     if (this.contentCache.has(answerPath)) {
 
       // If auto-link terms are loaded, we need to reprocess the cached content
-      if (this.autoLinkTermsLoaded && Object.keys(this.autoLinkTerms).length > 0) {
+      if (this.autoLinkService.isLoaded()) {
         // Get the raw content from local storage to reprocess
         try {
           const cachedContent = localStorage.getItem(this.STORAGE_KEY_FAQ_CONTENT);
@@ -872,7 +856,7 @@ export class FAQService implements OnDestroy {
       });
       
     // Apply auto-link terms after all other processing
-    processedContent = this.applyAutoLinkTerms(processedContent);
+    processedContent = this.autoLinkService.applyAutoLinkTerms(processedContent);
     
     // Clean up extra whitespace but preserve line breaks in content
     // Be careful not to break HTML attributes
@@ -881,86 +865,6 @@ export class FAQService implements OnDestroy {
       .trim();
   }
 
-  /**
-   * Apply auto-link terms to content
-   */
-  private applyAutoLinkTerms(content: string): string {
-    if (!this.autoLinkTerms || Object.keys(this.autoLinkTerms).length === 0) {
-      return content;
-    }
-    
-    // Sort terms by length (longest first) to avoid conflicts
-    const sortedTerms = Object.keys(this.autoLinkTerms).sort((a, b) => b.length - a.length);
-    
-    let processedContent = content;
-    
-    sortedTerms.forEach(term => {
-      const termConfig = this.autoLinkTerms[term];
-      const faqLink = termConfig.faqLink;
-      const resolvedUrl = getFAQUrlByKey(faqLink);
-      
-      if (!resolvedUrl) {
-        console.warn(`❌ No URL found for term: ${term}`);
-        return;
-      }
-
-      // Create regex pattern for the term - only match if every first letter is uppercase and exact match
-      const escapedTerm = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      
-      // Check if term has proper capitalization (each word starts with uppercase)
-      const words = term.split(/\s+/);
-      const isProperlyCapitalized = words.every(word => 
-        word.length > 0 && word[0] === word[0].toUpperCase()
-      );
-      
-      if (!isProperlyCapitalized) {
-        console.warn(`❌ Skipping term "${term}" - not properly capitalized`);
-        return; // Skip terms that don't have proper capitalization
-      }
-      
-      // Pattern to match the exact term within <strong> tags, case-sensitive
-      const pattern = new RegExp(`<strong>([^<]*?)(${escapedTerm})([^<]*?)</strong>`, 'g');
-      
-      processedContent = processedContent.replace(pattern, (fullMatch, beforeTerm, capturedTerm, afterTerm, offset, fullString) => {
-        // Check if the captured term exactly matches the expected term (case-sensitive)
-        if (capturedTerm !== term) {
-          return fullMatch; // Return unchanged if not exact match
-        }
-        
-        // Check if this is the complete content of the <strong> tag (no extra text)
-        const strongContent = beforeTerm + capturedTerm + afterTerm;
-        if (strongContent!== term) {
-          return fullMatch; // Return unchanged if strong tag contains more than just the term
-        }
-        
-        // Replace the entire <strong>term</strong> with <strong><a>term</a></strong>
-        // Using Lightning new_window utility icon with larger size
-        const lightningIcon = `<span style="margin-left: -3px; vertical-align: text-top; opacity: 0.7;">
-          <svg viewBox="0 0 24 24" fill="currentColor" style="width: 16px; height: 16px;">
-            <path d="M19 19H5V5h7V3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.6l-9.8 9.8 1.4 1.4L19 6.4V10h2V3h-7z"/>
-          </svg>
-        </span>`;
-        const linkElement = `<a href="${resolvedUrl}" data-faq-link="${faqLink}" class="rules-engine-link" target="_blank" rel="noopener noreferrer">${capturedTerm}${lightningIcon}</a>`;
-        const replacement = `<strong>${linkElement}</strong>`;
-       return replacement;
-      });
-      
-      // Count successful replacements
-      const matches = processedContent.match(new RegExp(`<a[^>]*>${escapedTerm}<span`, 'gi'));
-    });
-    
-    return processedContent;
-  }
-
-  /**
-   * Debug method to test URL resolution manually
-   */
-  public testUrlResolution(): void {
-    const testTerms = ['batch', 'triggers', 'input', 'preview'];
-    testTerms.forEach(term => {
-      const config = this.autoLinkTerms[term];
-    });
-  }
 
   /**
    * Check version and clear cache if needed
@@ -1048,8 +952,6 @@ export class FAQService implements OnDestroy {
       // Clear memory caches
       this.contentCache.clear();
       this.categoriesCache = [];
-      this.autoLinkTerms = {};
-      this.autoLinkTermsLoaded = false;
       
       // Note: IndexedDB (FAQEditorDB, RecipeEditorDB) is automatically preserved
       

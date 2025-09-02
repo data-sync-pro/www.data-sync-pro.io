@@ -5,6 +5,8 @@ import { OfflineIndicatorComponent } from './components/offline-indicator/offlin
 import { FaqSkeletonComponent } from './components/skeleton/faq-skeleton.component';
 import { LoadingComponent } from './components/loading/loading.component';
 import { SimpleZoomableDirective } from '../simple-zoomable.directive';
+import { AutoLinkDirective } from './directives/auto-link.directive';
+import { AutoLinkPipe } from './pipes/auto-link.pipe';
 
 @NgModule({
   declarations: [
@@ -12,7 +14,9 @@ import { SimpleZoomableDirective } from '../simple-zoomable.directive';
     OfflineIndicatorComponent,
     FaqSkeletonComponent,
     LoadingComponent,
-    SimpleZoomableDirective
+    SimpleZoomableDirective,
+    AutoLinkDirective,
+    AutoLinkPipe
   ],
   imports: [
     CommonModule
@@ -22,7 +26,9 @@ import { SimpleZoomableDirective } from '../simple-zoomable.directive';
     OfflineIndicatorComponent,
     FaqSkeletonComponent,
     LoadingComponent,
-    SimpleZoomableDirective
+    SimpleZoomableDirective,
+    AutoLinkDirective,
+    AutoLinkPipe
   ]
 })
 export class SharedModule { }

@@ -1552,24 +1552,24 @@ export class RecipesComponent implements OnInit, OnDestroy {
       getData: () => this.currentRecipe?.DSPVersions,
       tagClass: 'version-tag'
     },
-    {
-      id: 'connection',
-      title: 'Connection Type',
-      icon: 'link',
-      elementId: 'recipe-connection',
-      contentType: 'text',
-      isVisible: () => this.hasValidConnection(),
-      getData: () => this.currentRecipe?.connection
-    },
-    {
-      id: 'direction',
-      title: 'Direction',
-      icon: 'trending_flat',
-      elementId: 'recipe-direction',
-      contentType: 'html',
-      isVisible: () => this.hasValidDirection(),
-      getData: () => this.currentRecipe?.safeDirection || this.currentRecipe?.direction
-    },
+    // {
+    //   id: 'connection',
+    //   title: 'Connection Type',
+    //   icon: 'link',
+    //   elementId: 'recipe-connection',
+    //   contentType: 'text',
+    //   isVisible: () => this.hasValidConnection(),
+    //   getData: () => this.currentRecipe?.connection
+    // },
+    // {
+    //   id: 'direction',
+    //   title: 'Direction',
+    //   icon: 'trending_flat',
+    //   elementId: 'recipe-direction',
+    //   contentType: 'html',
+    //   isVisible: () => this.hasValidDirection(),
+    //   getData: () => this.currentRecipe?.safeDirection || this.currentRecipe?.direction
+    // },
     {
       id: 'prerequisites',
       title: 'Prerequisites',

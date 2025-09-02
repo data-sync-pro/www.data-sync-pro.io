@@ -332,6 +332,17 @@ select.dsp-input {
         background-color: #f8fff8;
       }
 
+      &.inactive {
+        opacity: 0.6;
+        background-color: #f8f9fa;
+        border-left: 3px solid #dc3545;
+        
+        .recipe-title {
+          text-decoration: line-through;
+          color: #6c757d;
+        }
+      }
+
       .recipe-item-header {
         display: flex;
         justify-content: space-between;
@@ -342,6 +353,15 @@ select.dsp-input {
           font-size: 0.8rem;
           color: #6c757d;
           font-family: monospace;
+        }
+
+        .status-indicator {
+          margin-right: 0.25rem;
+          font-size: 0.8rem;
+          
+          &.inactive {
+            color: #dc3545;
+          }
         }
 
         .edit-indicator {
@@ -431,6 +451,33 @@ select.dsp-input {
           margin-bottom: 0.5rem;
           font-weight: 500;
           color: #495057;
+        }
+        
+        &.active-field {
+          flex: 0 0 auto !important; // 强制覆盖父级的flex: 1
+          max-width: 90px;           // 设置最大宽度限制
+          min-width: auto;           // 移除最小宽度限制
+          
+          .checkbox-label {
+            display: inline-flex; // 使用inline-flex让它只包裹内容
+            align-items: center;
+            gap: 0.4rem;
+            cursor: pointer;
+            font-weight: 500;
+            color: #495057;
+            margin-bottom: 0;
+            
+            input[type="checkbox"] {
+              width: auto;
+              margin: 0;
+              cursor: pointer;
+            }
+            
+            .checkbox-text {
+              font-size: 0.9rem;
+              white-space: nowrap;
+            }
+          }
         }
 
       }
