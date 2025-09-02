@@ -40,7 +40,8 @@
       "Read(/D:\\d D:/**)",
       "Bash(cmd /c \"dir E:\\www.data-sync-pro.io\\src\\assets\\faq-item\\*.html /b\")",
       "Bash(start http://localhost:4200)",
-      "Bash(del \"E:\\www.data-sync-pro.io\\add-isactive.ps1\")"
+      "Bash(del \"E:\\www.data-sync-pro.io\\add-isactive.ps1\")",
+      "Bash(cmd /c:*)"
     ],
     "deny": []
   }
