@@ -67,7 +67,7 @@
     "SeqNo__c": null,
     "Question__c": "How is Data Sync Pro priced?",
     "Answer__c": "general-dsp-licensing-pricing.html",
-    "isActive": true
+    "isActive": false
   },
   {
     "Id": "a0oEc000005JohUIAS",
@@ -125,7 +125,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Batch",
     "SeqNo__c": null,
-    "Question__c": "What is a Batch job in general?",
+    "Question__c": "What is a batch job in general?",
     "Answer__c": "rules-engines-batch-what-is-batch-job.html",
     "isActive": true
   },
@@ -265,7 +265,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Batch",
     "SeqNo__c": null,
-    "Question__c": "How can I efficiently set up Batch Executables to sync multiple objects with parent-child relationships?",
+    "Question__c": "What's the best way to create Batch Executables for syncing data with parent–child relationships?",
     "Answer__c": "rules-engines-batch-batch-parent-child.html",
     "isActive": true
   },
@@ -315,7 +315,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Batch",
     "SeqNo__c": null,
-    "Question__c": "What are the key considerations for enabling the Bulk API?",
+    "Question__c": "What are the key considerations for enabling Bulk API?",
     "Answer__c": "rules-engines-batch-bulk-api-considerations.html",
     "isActive": true
   },
@@ -407,7 +407,7 @@
     "SeqNo__c": null,
     "Question__c": "What are the minimum requirements to create a Data List?",
     "Answer__c": "rules-engines-data-list-data-list-min-reqs.html",
-    "isActive": true
+    "isActive": false
   },
   {
     "Id": "a0oEc000005Joi2IAC",
@@ -415,7 +415,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Data List",
     "SeqNo__c": null,
-    "Question__c": "What is the difference between an actionable Data List and a non-actionable Data List?",
+    "Question__c": "What is the difference between an actionable and non-actionable Data List?",
     "Answer__c": "rules-engines-data-list-actionable-vs-nonactionable.html",
     "isActive": true
   },
@@ -465,7 +465,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Data List",
     "SeqNo__c": null,
-    "Question__c": "Can I specify whether an Action should be a List Action, a Row Action, or both?",
+    "Question__c": "Can I specify whether an action should be a List Action, a Row Action, or both?",
     "Answer__c": "rules-engines-data-list-specify-action-scope.html",
     "isActive": true
   },
@@ -505,7 +505,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Data List",
     "SeqNo__c": null,
-    "Question__c": "How can I configure row-level related lists in a #Data List?",
+    "Question__c": "How can I configure row's related lists in a #Data List?",
     "Answer__c": "rules-engines-data-list-specify-related-lists.html",
     "isActive": true
   },
@@ -525,7 +525,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Data List",
     "SeqNo__c": null,
-    "Question__c": "Can I launch a Data Loader directly from a #Data List?",
+    "Question__c": "Is it possible to run a #Data Loader from a #Data List as a list action?",
     "Answer__c": "rules-engines-data-list-data-loader-list-action.html",
     "isActive": true
   },
@@ -555,7 +555,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Data List",
     "SeqNo__c": null,
-    "Question__c": "How do I enable Query Manager in a #Data List?",
+    "Question__c": "How do I enable Query Manager in a #Data List for end users?",
     "Answer__c": "rules-engines-data-list-end-user-query-customization.html",
     "isActive": true
   },
@@ -685,7 +685,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Data Loader",
     "SeqNo__c": null,
-    "Question__c": "What is #Data Loader?",
+    "Question__c": "What is a #Data Loader?",
     "Answer__c": "rules-engines-data-loader-data-loader-overview.html",
     "isActive": true
   },
@@ -915,7 +915,7 @@
     "Category__c": "Rules Engines",
     "SubCategory__c": "Triggers",
     "SeqNo__c": null,
-    "Question__c": "How can I manage the execution order of #Triggers?",
+    "Question__c": "How can I manage the execution order of #Trigger?",
     "Answer__c": "rules-engines-triggers-trigger-execution-order.html",
     "isActive": true
   },
@@ -1575,7 +1575,7 @@
     "Category__c": "Query Manager(Q)",
     "SubCategory__c": "",
     "SeqNo__c": null,
-    "Question__c": "Who can access the Query Manager?",
+    "Question__c": "Who can access Query Manager?",
     "Answer__c": "query-managerq-who-can-access-q.html",
     "isActive": true
   },
@@ -1627,7 +1627,7 @@
     "SeqNo__c": null,
     "Question__c": "How do I query the Owner relationship when the Owner field is polymorphic?",
     "Answer__c": "query-managerq-query-owner-polymorphic.html",
-    "isActive": true
+    "isActive": false
   },
   {
     "Id": "a0oEc000005Jok0IAC",

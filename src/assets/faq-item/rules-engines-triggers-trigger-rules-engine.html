@@ -1,9 +1,9 @@
-<p>The #Trigger rules engine in DSP is a <strong>rules-driven, modular</strong>framework that simplifies Salesforce trigger logic. Instead of writing Apex or building Record-Triggered Flows, you define Executable records that run on trigger events (like <em>Before Insert</em> or <em>After Update</em>).</p><p>It works in two main ways:</p><ul>
+<p>#Trigger is a <strong>bulkified, </strong><strong>rules-driven, modular </strong>engine that simplifies Salesforce trigger logic. Instead of writing boilerplate bulkification code, you configure #Trigger Executable records <b>declaratively </b>that run on trigger events (like <em>Before Insert</em> or <em>After Update</em>).</p><p>It works in two main ways:</p><ul>
 <li>
-<p><strong>Self-Adaptive Triggers</strong> – apply rules to transform or validate fields on the same record before it’s saved.</p>
+<p><strong>Self-Adaptive Triggers</strong> – apply rules to transform or validate fields on the same record before it's saved.</p>
 </li>
 <li>
 <p><strong>Trigger Actions</strong> – apply rules that use the triggering records to insert, update or delete related records, or send notifications etc.</p>
 </li>
-</ul><p>When a trigger event occurs, DSP evaluates the <strong>scoping criteria</strong> to determine which records should be processed. It then applies field transformations, validations, or actions in a <strong>bulkified manner</strong> for optimal performance.</p><p>To enable it, simply add a single line of static code to your object’s Apex Trigger, ensuring all trigger events are included:</p><pre><div><div><code>pushtopics.TriggerServices.execute();
+</ul><p>When a trigger event occurs, DSP evaluates the <strong>scoping criteria</strong> to determine which records should be processed. It then applies field transformations, validations, or actions in a <strong>bulkified manner</strong> for optimal performance.</p><p>To enable it, simply add a single line of static code to your object's Apex Trigger, ensuring all trigger events are included:</p><pre><div><div><code>pushtopics.TriggerServices.execute();
 </code></div></div></pre><p>By defining trigger logic as Executables and injecting them dynamically at runtime, the #Trigger rules engine acts like <strong>metadata-driven dependency injection</strong> for Salesforce triggers—making automation simpler, modular, and bulk-safe without custom Apex.</p>

@@ -1,1 +1,50 @@
-<p>Yes. You can embed the `<pushtopics>` component inside your custom LWC and pass in **custom action buttons**. Handle events with `onlistaction` and `onrowaction` to run your own logic, and call the component’s `refresh()` method to update the view when actions are complete.</p><p><br></p><div>**Example:**</div><div>```html</div><div><template></div><div>  <pushtopics></div><div>    record-id={recordId}</div><div>    pipeline-api-name="myPipelineApiName"</div><div>    variant="tabs"</div><div>    tab-variant="scoped"</div><div>    action-buttons={actionButtons}</div><div>    onlistaction={handleListAction}</div><div>    onrowaction={handleRowAction}></div><div>  </pushtopics-pipeline-data-lists></div><div></template></div><div>```</div><div><br></div><div>```js</div><div>import { LightningElement, api, track } from 'lwc';</div><div><br></div><div>export default class MyPipelineDataLists extends LightningElement {</div><div>  @api recordId;</div><div><br></div><div>  @track actionButtons = { "executableApiName1": [</div><div>    { label: 'Create Custom Task', name: 'Create Custom Task', variant: 'neutral', listAction: true, rowAction: true },</div><div>    { label: 'Archive', name: 'Archive', listAction: true, rowAction: false }</div><div>  ]};</div><div><br></div><div>  handleListAction(event) {</div><div>    console.log('List action:', JSON.stringify(event.detail, null, 2));</div><div>    // custom logic here</div><div>    this.refreshDataLists();</div><div>  }</div><div><br></div><div>  handleRowAction(event) {</div><div>    console.log('Row action:', JSON.stringify(event.detail, null, 2));</div><div>    // custom logic here</div><div>    this.refreshDataLists();</div><div>  }</div><div><br></div><div>  refreshDataLists() {</div><div>    const cmp = this.template.querySelector('pushtopics-pipeline-data-lists');</div><div>    if (cmp) cmp.refresh();</div><div>  }</div><div>}</div><div>```</div>
+<p>
+  Yes. You can embed the
+  <code>&lt;pushtopics-pipeline-data-lists&gt;</code> component inside your
+  custom LWC and pass in <strong>custom action buttons</strong>. Handle events
+  with <code>onlistaction</code> and <code>onrowaction</code> to run your own
+  logic, and call the component's <code>refresh()</code> method to update the
+  view when actions are complete.
+</p>
+
+<p><strong>Example:</strong></p>
+
+<pre><code>&lt;template&gt;
+ &lt;pushtopics-pipeline-data-lists
+   record-id={recordId}
+   pipeline-api-name="myPipelineApiName"
+   variant="tabs"
+   tab-variant="scoped"
+   action-buttons={actionButtons}
+   onlistaction={handleListAction}
+   onrowaction={handleRowAction}&gt;
+ &lt;/pushtopics-pipeline-data-lists&gt;
+&lt;/template&gt;</code></pre>
+
+<pre><code>import { LightningElement, api, track } from 'lwc';
+
+export default class MyPipelineDataLists extends LightningElement {
+ @api recordId;
+
+ @track actionButtons = { "executableApiName1": [
+   { label: 'Create Custom Task', name: 'Create Custom Task', variant: 'neutral', listAction: true, rowAction: true },
+   { label: 'Archive', name: 'Archive', listAction: true, rowAction: false }
+ ]};
+
+ handleListAction(event) {
+   console.log('List action:', JSON.stringify(event.detail, null, 2));
+   // custom logic here
+   this.refreshDataLists();
+ }
+
+ handleRowAction(event) {
+   console.log('Row action:', JSON.stringify(event.detail, null, 2));
+   // custom logic here
+   this.refreshDataLists();
+ }
+
+ refreshDataLists() {
+   const cmp = this.template.querySelector('pushtopics-pipeline-data-lists');
+   if (cmp) cmp.refresh();
+ }
+}</code></pre>
