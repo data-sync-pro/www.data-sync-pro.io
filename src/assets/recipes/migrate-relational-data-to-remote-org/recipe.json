@@ -1,11 +1,17 @@
 {
-  "id": "download-record-based-configurations-to-vs-code",
-  "title": "Download Record-Based Configurations to VS Code",
+  "id": "migrate-relational-data-to-remote-org",
+  "title": "Migrate Relational Data to Remote Org",
   "category": "Batch",
   "DSPVersions": [],
   "overview": "",
   "whenToUse": "",
-  "generalImages": [],
+  "generalImages": [
+    {
+      "type": "image",
+      "url": "",
+      "alt": ""
+    }
+  ],
   "prerequisites": [
     {
       "description": "",
@@ -44,11 +50,17 @@
           "value": ""
         },
         {
-          "field": "Executable API Name",
-          "value": "Download Record-Based Configurations to VS Code"
+          "field": "Executable Name",
+          "value": "Cross Org Data Migration(Pipeline)"
         }
       ],
-      "media": []
+      "media": [
+        {
+          "type": "image",
+          "url": "",
+          "alt": ""
+        }
+      ]
     },
     {
       "step": "Batch Settings",
@@ -57,12 +69,7 @@
     },
     {
       "step": "Retrieve",
-      "config": [
-        {
-          "field": "SOQL Query",
-          "value": ""
-        }
-      ],
+      "config": [],
       "media": []
     },
     {
@@ -92,6 +99,11 @@
     }
   ],
   "downloadableExecutables": [],
-  "relatedRecipes": [],
+  "relatedRecipes": [
+    {
+      "title": "",
+      "url": ""
+    }
+  ],
   "keywords": []
 }

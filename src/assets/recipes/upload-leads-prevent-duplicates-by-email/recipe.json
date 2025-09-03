@@ -1,7 +1,7 @@
 {
-  "id": "new-recipe",
-  "title": "Account Open Opportunities (with \"Win Deal\" Action)",
-  "category": "Data List",
+  "id": "upload-leads-prevent-duplicates-by-email",
+  "title": "Upload Leads (Prevent Duplicates by Email)",
+  "category": "Data Loader",
   "DSPVersions": [],
   "overview": "",
   "whenToUse": "",
@@ -51,7 +51,7 @@
         },
         {
           "field": "Executable Name",
-          "value": "[Win Deal] on Account's Open Opportunities"
+          "value": "Upload Leads with Email-Based Duplicate Check"
         }
       ],
       "media": [
@@ -61,21 +61,6 @@
           "alt": ""
         }
       ]
-    },
-    {
-      "step": "Data List(Q) Settings",
-      "config": [],
-      "media": []
-    },
-    {
-      "step": "Retrieve",
-      "config": [
-        {
-          "field": "SOQL Query",
-          "value": ""
-        }
-      ],
-      "media": []
     },
     {
       "step": "Scoping",
@@ -94,6 +79,11 @@
     },
     {
       "step": "Action",
+      "config": [],
+      "media": []
+    },
+    {
+      "step": "Preview",
       "config": [],
       "media": []
     }

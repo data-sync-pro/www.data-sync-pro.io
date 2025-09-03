@@ -1,7 +1,7 @@
 {
-  "id": "create-batch-migration-executables-via-migration-builder",
-  "title": "Create Batch Migration Executables via Migration Builder",
-  "category": "Batch",
+  "id": "renew-opportunity-clone-with-related-data",
+  "title": "Renew Opportunity (Clone with Related Data)",
+  "category": "Action Button",
   "DSPVersions": [],
   "overview": "",
   "whenToUse": "",
@@ -27,31 +27,11 @@
   "connection": "",
   "walkthrough": [
     {
-      "step": "Create Executable",
+      "step": "Action Button Settings",
       "config": [
         {
-          "field": "Source Object API Name",
+          "field": "",
           "value": ""
-        },
-        {
-          "field": "Target Object API Name",
-          "value": ""
-        },
-        {
-          "field": "Source Matching Field",
-          "value": ""
-        },
-        {
-          "field": "Target Matching Field",
-          "value": ""
-        },
-        {
-          "field": "Action",
-          "value": ""
-        },
-        {
-          "field": "Executable Name",
-          "value": "Cross Org Data Migration(Pipeline)"
         }
       ],
       "media": [
@@ -61,16 +41,6 @@
           "alt": ""
         }
       ]
-    },
-    {
-      "step": "Batch Settings",
-      "config": [],
-      "media": []
-    },
-    {
-      "step": "Retrieve",
-      "config": [],
-      "media": []
     },
     {
       "step": "Scoping",
@@ -93,7 +63,7 @@
       "media": []
     },
     {
-      "step": "Verify",
+      "step": "Preview",
       "config": [],
       "media": []
     }

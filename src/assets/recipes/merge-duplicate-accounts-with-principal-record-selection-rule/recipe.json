@@ -5,13 +5,7 @@
   "DSPVersions": [],
   "overview": "",
   "whenToUse": "",
-  "generalImages": [
-    {
-      "type": "image",
-      "url": "",
-      "alt": ""
-    }
-  ],
+  "generalImages": [],
   "prerequisites": [
     {
       "description": "",
@@ -51,16 +45,15 @@
         },
         {
           "field": "Executable Name",
-          "value": "Merge Duplicate Accounts with Principal Record Selection Rule"
+          "value": "Mask Contact Data"
         }
       ],
-      "media": [
-        {
-          "type": "image",
-          "url": "",
-          "alt": ""
-        }
-      ]
+      "media": []
+    },
+    {
+      "step": "Batch Settings",
+      "config": [],
+      "media": []
     },
     {
       "step": "Retrieve",
@@ -99,11 +92,6 @@
     }
   ],
   "downloadableExecutables": [],
-  "relatedRecipes": [
-    {
-      "title": "",
-      "url": ""
-    }
-  ],
+  "relatedRecipes": [],
   "keywords": []
 }

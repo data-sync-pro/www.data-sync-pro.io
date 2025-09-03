@@ -1,11 +1,17 @@
 {
-  "id": "download-record-based-configurations-to-vs-code",
-  "title": "Download Record-Based Configurations to VS Code",
-  "category": "Batch",
+  "id": "create-quote-from-data-list",
+  "title": "Create Quote from Data List",
+  "category": "Action Button",
   "DSPVersions": [],
   "overview": "",
   "whenToUse": "",
-  "generalImages": [],
+  "generalImages": [
+    {
+      "type": "image",
+      "url": "",
+      "alt": ""
+    }
+  ],
   "prerequisites": [
     {
       "description": "",
@@ -44,26 +50,17 @@
           "value": ""
         },
         {
-          "field": "Executable API Name",
-          "value": "Download Record-Based Configurations to VS Code"
+          "field": "Executable Name",
+          "value": "Create Quote from Data List"
         }
       ],
-      "media": []
-    },
-    {
-      "step": "Batch Settings",
-      "config": [],
-      "media": []
-    },
-    {
-      "step": "Retrieve",
-      "config": [
+      "media": [
         {
-          "field": "SOQL Query",
-          "value": ""
+          "type": "image",
+          "url": "",
+          "alt": ""
         }
-      ],
-      "media": []
+      ]
     },
     {
       "step": "Scoping",
@@ -86,12 +83,17 @@
       "media": []
     },
     {
-      "step": "Verify",
+      "step": "Preview",
       "config": [],
       "media": []
     }
   ],
   "downloadableExecutables": [],
-  "relatedRecipes": [],
+  "relatedRecipes": [
+    {
+      "title": "",
+      "url": ""
+    }
+  ],
   "keywords": []
 }

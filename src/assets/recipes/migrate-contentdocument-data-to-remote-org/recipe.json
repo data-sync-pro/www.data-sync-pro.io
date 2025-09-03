@@ -5,13 +5,7 @@
   "DSPVersions": [],
   "overview": "",
   "whenToUse": "",
-  "generalImages": [
-    {
-      "type": "image",
-      "url": "",
-      "alt": ""
-    }
-  ],
+  "generalImages": [],
   "prerequisites": [
     {
       "description": "",
@@ -54,13 +48,12 @@
           "value": "Migrate ContentDocuments (Pipeline)"
         }
       ],
-      "media": [
-        {
-          "type": "image",
-          "url": "",
-          "alt": ""
-        }
-      ]
+      "media": []
+    },
+    {
+      "step": "Batch Settings",
+      "config": [],
+      "media": []
     },
     {
       "step": "Retrieve",
@@ -99,11 +92,6 @@
     }
   ],
   "downloadableExecutables": [],
-  "relatedRecipes": [
-    {
-      "title": "",
-      "url": ""
-    }
-  ],
+  "relatedRecipes": [],
   "keywords": []
 }

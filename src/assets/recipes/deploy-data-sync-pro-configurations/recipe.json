@@ -5,13 +5,7 @@
   "DSPVersions": [],
   "overview": "",
   "whenToUse": "",
-  "generalImages": [
-    {
-      "type": "image",
-      "url": "",
-      "alt": ""
-    }
-  ],
+  "generalImages": [],
   "prerequisites": [
     {
       "description": "",
@@ -54,22 +48,16 @@
           "value": "Deploy Data Sync Pro Configurations"
         }
       ],
-      "media": [
-        {
-          "type": "image",
-          "url": "",
-          "alt": ""
-        }
-      ]
+      "media": []
+    },
+    {
+      "step": "Batch Settings",
+      "config": [],
+      "media": []
     },
     {
       "step": "Retrieve",
-      "config": [
-        {
-          "field": "SOQL Query",
-          "value": ""
-        }
-      ],
+      "config": [],
       "media": []
     },
     {
@@ -99,11 +87,6 @@
     }
   ],
   "downloadableExecutables": [],
-  "relatedRecipes": [
-    {
-      "title": "",
-      "url": ""
-    }
-  ],
+  "relatedRecipes": [],
   "keywords": []
 }

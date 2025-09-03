@@ -1,11 +1,17 @@
 {
-  "id": "download-record-based-configurations-to-vs-code",
-  "title": "Download Record-Based Configurations to VS Code",
-  "category": "Batch",
+  "id": "close-all-open-account-tasks",
+  "title": "Close All Open Account Tasks",
+  "category": "Action Button",
   "DSPVersions": [],
   "overview": "",
   "whenToUse": "",
-  "generalImages": [],
+  "generalImages": [
+    {
+      "type": "image",
+      "url": "",
+      "alt": ""
+    }
+  ],
   "prerequisites": [
     {
       "description": "",
@@ -44,25 +50,21 @@
           "value": ""
         },
         {
-          "field": "Executable API Name",
-          "value": "Download Record-Based Configurations to VS Code"
+          "field": "Executable Name",
+          "value": "Mark Account Open Tasks as Closed"
         }
       ],
-      "media": []
-    },
-    {
-      "step": "Batch Settings",
-      "config": [],
-      "media": []
-    },
-    {
-      "step": "Retrieve",
-      "config": [
+      "media": [
         {
-          "field": "SOQL Query",
-          "value": ""
+          "type": "image",
+          "url": "",
+          "alt": ""
         }
-      ],
+      ]
+    },
+    {
+      "step": "Action Button Settings",
+      "config": [],
       "media": []
     },
     {
@@ -86,12 +88,17 @@
       "media": []
     },
     {
-      "step": "Verify",
+      "step": "Preview",
       "config": [],
       "media": []
     }
   ],
   "downloadableExecutables": [],
-  "relatedRecipes": [],
+  "relatedRecipes": [
+    {
+      "title": "",
+      "url": ""
+    }
+  ],
   "keywords": []
 }

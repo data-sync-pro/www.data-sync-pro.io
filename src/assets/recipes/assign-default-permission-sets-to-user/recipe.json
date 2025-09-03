@@ -1,11 +1,17 @@
 {
-  "id": "download-record-based-configurations-to-vs-code",
-  "title": "Download Record-Based Configurations to VS Code",
-  "category": "Batch",
+  "id": "assign-default-permission-sets-to-user",
+  "title": "Assign Default Permission Sets to User",
+  "category": "Action Button",
   "DSPVersions": [],
   "overview": "",
   "whenToUse": "",
-  "generalImages": [],
+  "generalImages": [
+    {
+      "type": "image",
+      "url": "",
+      "alt": ""
+    }
+  ],
   "prerequisites": [
     {
       "description": "",
@@ -44,26 +50,27 @@
           "value": ""
         },
         {
-          "field": "Executable API Name",
-          "value": "Download Record-Based Configurations to VS Code"
+          "field": "Executable Name",
+          "value": "Assign Default Permission Sets to User"
         }
       ],
       "media": []
     },
     {
-      "step": "Batch Settings",
-      "config": [],
-      "media": []
-    },
-    {
-      "step": "Retrieve",
+      "step": "Action Button Settings",
       "config": [
         {
-          "field": "SOQL Query",
+          "field": "",
           "value": ""
         }
       ],
-      "media": []
+      "media": [
+        {
+          "type": "image",
+          "url": "",
+          "alt": ""
+        }
+      ]
     },
     {
       "step": "Scoping",
@@ -86,12 +93,17 @@
       "media": []
     },
     {
-      "step": "Verify",
+      "step": "Preview",
       "config": [],
       "media": []
     }
   ],
   "downloadableExecutables": [],
-  "relatedRecipes": [],
+  "relatedRecipes": [
+    {
+      "title": "",
+      "url": ""
+    }
+  ],
   "keywords": []
 }

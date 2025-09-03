@@ -1,6 +1,10 @@
 {
   "recipes": [
     {
+      "folderId": "account-360-view-all-related-records",
+      "active": true
+    },
+    {
       "folderId": "account-open-opportunities-with-multiple-actions",
       "active": true
     },
@@ -22,6 +26,10 @@
     },
     {
       "folderId": "apply-dynamic-record-assignment-rules",
+      "active": true
+    },
+    {
+      "folderId": "assign-default-permission-sets-to-user",
       "active": true
     },
     {
@@ -69,6 +77,14 @@
       "active": true
     },
     {
+      "folderId": "close-all-open-account-tasks",
+      "active": true
+    },
+    {
+      "folderId": "close-case-with-editable-default-values",
+      "active": true
+    },
+    {
       "folderId": "convert-leads-in-bulk",
       "active": true
     },
@@ -78,6 +94,18 @@
     },
     {
       "folderId": "create-batch-migration-executables-via-migration-builder",
+      "active": true
+    },
+    {
+      "folderId": "create-follow-up-task-in-7-days",
+      "active": true
+    },
+    {
+      "folderId": "create-quote-from-data-list",
+      "active": true
+    },
+    {
+      "folderId": "create-quote-include-opportunity-products",
       "active": true
     },
     {
@@ -105,6 +133,14 @@
       "active": true
     },
     {
+      "folderId": "enable-bulk-api-to-boost-performance",
+      "active": true
+    },
+    {
+      "folderId": "import-child-records-from-data-list",
+      "active": true
+    },
+    {
       "folderId": "mask-sensitive-data-in-sandbox",
       "active": true
     },
@@ -114,6 +150,10 @@
     },
     {
       "folderId": "migrate-contentdocument-data-to-remote-org",
+      "active": true
+    },
+    {
+      "folderId": "migrate-relational-data-to-remote-org",
       "active": true
     },
     {
@@ -165,6 +205,10 @@
       "active": true
     },
     {
+      "folderId": "renew-opportunity-clone-with-related-data",
+      "active": true
+    },
+    {
       "folderId": "restore-cases-from-archived-big-object",
       "active": true
     },
@@ -190,6 +234,22 @@
     },
     {
       "folderId": "trigger-delayed-batch-execution",
+      "active": true
+    },
+    {
+      "folderId": "upload-leads-prevent-duplicates-by-email",
+      "active": true
+    },
+    {
+      "folderId": "upload-records-maintain-relationships-via-external-id",
+      "active": true
+    },
+    {
+      "folderId": "upload-records-transform-record-types",
+      "active": true
+    },
+    {
+      "folderId": "use-delta-update-to-skip-unnecessary-dmls",
       "active": true
     },
     {

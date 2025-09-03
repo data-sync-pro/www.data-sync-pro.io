@@ -1,11 +1,17 @@
 {
-  "id": "download-record-based-configurations-to-vs-code",
-  "title": "Download Record-Based Configurations to VS Code",
-  "category": "Batch",
+  "id": "import-child-records-from-data-list",
+  "title": "Import Child Records from Data List",
+  "category": "Data Loader",
   "DSPVersions": [],
   "overview": "",
   "whenToUse": "",
-  "generalImages": [],
+  "generalImages": [
+    {
+      "type": "image",
+      "url": "",
+      "alt": ""
+    }
+  ],
   "prerequisites": [
     {
       "description": "",
@@ -44,26 +50,17 @@
           "value": ""
         },
         {
-          "field": "Executable API Name",
-          "value": "Download Record-Based Configurations to VS Code"
+          "field": "Executable Name",
+          "value": "Import Child Records via Data List"
         }
       ],
-      "media": []
-    },
-    {
-      "step": "Batch Settings",
-      "config": [],
-      "media": []
-    },
-    {
-      "step": "Retrieve",
-      "config": [
+      "media": [
         {
-          "field": "SOQL Query",
-          "value": ""
+          "type": "image",
+          "url": "",
+          "alt": ""
         }
-      ],
-      "media": []
+      ]
     },
     {
       "step": "Scoping",
@@ -86,12 +83,17 @@
       "media": []
     },
     {
-      "step": "Verify",
+      "step": "Preview",
       "config": [],
       "media": []
     }
   ],
   "downloadableExecutables": [],
-  "relatedRecipes": [],
+  "relatedRecipes": [
+    {
+      "title": "",
+      "url": ""
+    }
+  ],
   "keywords": []
 }

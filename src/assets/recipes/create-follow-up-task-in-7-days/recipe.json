@@ -1,11 +1,17 @@
 {
-  "id": "download-record-based-configurations-to-vs-code",
-  "title": "Download Record-Based Configurations to VS Code",
-  "category": "Batch",
+  "id": "create-follow-up-task-in-7-days",
+  "title": "Create Follow-up Task in 7 Days",
+  "category": "Action Button",
   "DSPVersions": [],
   "overview": "",
   "whenToUse": "",
-  "generalImages": [],
+  "generalImages": [
+    {
+      "type": "image",
+      "url": "",
+      "alt": ""
+    }
+  ],
   "prerequisites": [
     {
       "description": "",
@@ -17,7 +23,7 @@
       ]
     }
   ],
-  "direction": "",
+  "direction": "Current ⇒ Current ",
   "connection": "",
   "walkthrough": [
     {
@@ -25,42 +31,35 @@
       "config": [
         {
           "field": "Source Object API Name",
-          "value": ""
+          "value": "Opportunity"
         },
         {
           "field": "Target Object API Name",
-          "value": ""
-        },
-        {
-          "field": "Source Matching Field",
-          "value": ""
-        },
-        {
-          "field": "Target Matching Field",
-          "value": ""
+          "value": "Task"
         },
         {
           "field": "Action",
-          "value": ""
+          "value": "Insert"
         },
         {
-          "field": "Executable API Name",
-          "value": "Download Record-Based Configurations to VS Code"
+          "field": "Executable Name",
+          "value": "Create Follow-up Task"
         }
       ],
-      "media": []
+      "media": [
+        {
+          "type": "image",
+          "url": "",
+          "alt": ""
+        }
+      ]
     },
     {
-      "step": "Batch Settings",
-      "config": [],
-      "media": []
-    },
-    {
-      "step": "Retrieve",
+      "step": "Action Button Settings",
       "config": [
         {
-          "field": "SOQL Query",
-          "value": ""
+          "field": "Action Button Label",
+          "value": "Create Task"
         }
       ],
       "media": []
@@ -77,7 +76,16 @@
     },
     {
       "step": "Mapping",
-      "config": [],
+      "config": [
+        {
+          "field": "ActivityDate",
+          "value": "ADD_DAYS(TODAY(),7)"
+        },
+        {
+          "field": "Subject",
+          "value": "\"Follow-up \" & Name"
+        }
+      ],
       "media": []
     },
     {
@@ -86,12 +94,17 @@
       "media": []
     },
     {
-      "step": "Verify",
+      "step": "Preview",
       "config": [],
       "media": []
     }
   ],
   "downloadableExecutables": [],
-  "relatedRecipes": [],
+  "relatedRecipes": [
+    {
+      "title": "",
+      "url": ""
+    }
+  ],
   "keywords": []
 }
