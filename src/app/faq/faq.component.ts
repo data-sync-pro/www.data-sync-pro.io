@@ -305,6 +305,7 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
       takeUntil(this.destroy$)
     ).subscribe({
       next: (faqs) => {
+        console.log('📚 FAQ data loaded, count:', faqs.length);
         this.faqList = faqs;
         this.updateUIState({ isLoading: false });
         
@@ -314,6 +315,13 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
         // Clear cached elements when FAQ data changes
         this.cachedFaqElements = null;
         this.cachedQuestionTexts.clear();
+        
+        // Check if we have a pending answer-based URL to process
+        const currentPath = window.location.pathname.substring(1); // Remove leading slash
+        if (currentPath && this.isAnswerBasedURL(currentPath) && !this.isProcessingAnswerPath) {
+          console.log('🔍 Processing pending answer-based URL after data load:', currentPath);
+          this.handleAnswerPathNavigation(currentPath);
+        }
         
         // 数据加载完成后处理pending fragment
         this.handlePendingFragment();
@@ -1306,9 +1314,18 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     
     // Find FAQ item by answer path
     const answerPath = answerSlug + '.html';
-    const faqItem = this.faqList.find(item => item.answerPath === answerPath);
-    
     console.log('🎯 Looking for answerPath:', answerPath);
+    console.log('📊 Current faqList length:', this.faqList.length);
+    
+    // Log first few answer paths for debugging
+    if (this.faqList.length > 0) {
+      console.log('📋 Sample answer paths in faqList:');
+      this.faqList.slice(0, 3).forEach((item, index) => {
+        console.log(`  ${index + 1}. ${item.answerPath} (${item.question})`);
+      });
+    }
+    
+    const faqItem = this.faqList.find(item => item.answerPath === answerPath);
     console.log('📝 Found FAQ item:', faqItem ? faqItem.question : 'NOT FOUND');
     
     if (faqItem) {
@@ -1340,11 +1357,30 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
       console.warn(`❌ FAQ not found for answer path: ${answerPath}`);
       // List some available answer paths for debugging
       console.log('Available answer paths (first 5):', this.faqList.slice(0, 5).map(item => item.answerPath));
+      console.log('Total FAQs loaded:', this.faqList.length);
+      
       // Reset processing flag on failure
       this.isProcessingAnswerPath = false;
       this.isInitialLoad = false;
-      // Redirect to home if FAQ not found
-      this.router.navigate(['/']);
+      
+      // Don't redirect immediately - data might still be loading
+      // Instead, try to reload FAQ data
+      if (this.faqList.length === 0) {
+        console.log('🔄 FAQ list is empty, attempting to reload data...');
+        this.initFaqData();
+        
+        // Wait for data and retry
+        setTimeout(() => {
+          this.faqService.getFAQs().pipe(
+            take(1),
+            filter((faqs: FAQItem[]) => faqs.length > 0)
+          ).subscribe((faqs) => {
+            console.log('✅ FAQ data reloaded, retrying navigation');
+            this.faqList = faqs;
+            this.handleAnswerPathNavigation(answerSlug);
+          });
+        }, 500);
+      }
     }
   }
 
