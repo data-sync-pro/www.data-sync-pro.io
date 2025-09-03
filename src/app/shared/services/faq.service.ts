@@ -683,8 +683,27 @@ export class FAQService implements OnDestroy {
   reloadFAQs(): Observable<FAQItem[]> {
     this.categoriesCache = [];
     this.clearContentCache();
-    this.loadFAQs();
-    return this.getFAQs();
+    
+    // Return the actual HTTP request Observable, not the current cache
+    this.isLoading = true;
+    
+    return this.http.get<SourceFAQRecord[]>(this.FAQ_DATA_URL).pipe(
+      map(records => {
+        const activeRecords = records.filter(record => record.isActive !== false);
+        const transformedFAQs = activeRecords.map(record => this.transformToFAQItem(record));
+        return transformedFAQs;
+      }),
+      tap(faqs => {
+        this.faqsCache$.next(faqs);
+      }),
+      catchError(error => {
+        console.error('Failed to reload FAQ data:', error);
+        return of([]);
+      }),
+      finalize(() => {
+        this.isLoading = false;
+      })
+    );
   }
 
   /**
