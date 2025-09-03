@@ -16,7 +16,7 @@
           return s.replace(/~and~/g, '&')
         }).join('?');
         var originalPath = '/' + decoded.slice(1);
-        console.log('Index.html restoring path from:', l.href, 'to:', originalPath + l.hash);
+        //console.log('Index.html restoring path from:', l.href, 'to:', originalPath + l.hash);
         
         window.history.replaceState(null, null, originalPath + l.hash);
       }

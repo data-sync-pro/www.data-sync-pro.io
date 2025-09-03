@@ -218,7 +218,7 @@ export class PerformanceService {
       });
     } else {
       const duration = performance.now() - startTime;
-      console.log(`Performance: ${name} took ${duration.toFixed(2)}ms`);
+      //console.log(`Performance: ${name} took ${duration.toFixed(2)}ms`);
       return result;
     }
   }

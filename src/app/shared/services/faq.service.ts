@@ -885,7 +885,7 @@ export class FAQService implements OnDestroy {
         }
       }
       
-      console.log('🔍 Checking application version...');
+      //console.log('🔍 Checking application version...');
       
       // Get remote version
       const response = await this.http.get<any>(this.VERSION_URL).toPromise();
@@ -894,10 +894,10 @@ export class FAQService implements OnDestroy {
       // Get local version
       const localVersion = localVersionData ? JSON.parse(localVersionData).build : null;
       
-      console.log('📊 Version comparison:', { local: localVersion, remote: remoteVersion });
+      //console.log('📊 Version comparison:', { local: localVersion, remote: remoteVersion });
       
       if (!localVersion || localVersion !== remoteVersion) {
-        console.log('🆕 New version detected, clearing all caches...');
+        //console.log('🆕 New version detected, clearing all caches...');
         this.clearAllCaches();
         
         // Save new version with reset check time
@@ -908,14 +908,14 @@ export class FAQService implements OnDestroy {
           lastCheckTime: Date.now()
         }));
         
-        console.log('✅ Cache cleared and version updated');
+        //console.log('✅ Cache cleared and version updated');
         
         // Silent automatic page refresh
         setTimeout(() => {
           window.location.reload();
         }, 100);
       } else {
-        console.log('✅ Version is up to date');
+        //console.log('✅ Version is up to date');
         
         // Update last check time even if no version change
         const currentVersionInfo = localVersionData ? JSON.parse(localVersionData) : {};
@@ -955,7 +955,7 @@ export class FAQService implements OnDestroy {
       
       // Note: IndexedDB (FAQEditorDB, RecipeEditorDB) is automatically preserved
       
-      console.log('🧹 All caches cleared successfully (IndexedDB preserved)');
+      //console.log('🧹 All caches cleared successfully (IndexedDB preserved)');
     } catch (error) {
       console.error('❌ Failed to clear caches:', error);
     }

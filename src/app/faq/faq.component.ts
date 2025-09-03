@@ -1979,14 +1979,14 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     const problematicFAQs = this.faqList
       .filter(faq => !faq.safeAnswer && !faq.isLoading && faq.answerPath)
       .slice(0, 5);
-    
+    /*
     if (problematicFAQs.length > 0) {
       console.log('Problematic FAQs:', problematicFAQs.map(faq => ({
         id: faq.id,
         question: faq.question,
         answerPath: faq.answerPath
       })));
-    }
+    }*/
   }
 
   // ==================== Table of Contents Methods ====================
@@ -2799,13 +2799,13 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     const handleStorageEvent = (event: StorageEvent) => {
       const sessionKey = `faq-preview-${faqId}`;
       const backupKey = `backup-faq-preview-${faqId}`;
-      
+      /*
       console.log('📡 Storage event received:', {
         key: event.key,
         hasNewValue: !!event.newValue,
         storageType: event.storageArea === sessionStorage ? 'sessionStorage' : 'localStorage'
       });
-      
+      */
       // Check both sessionStorage and localStorage keys
       if ((event.key === sessionKey || event.key === backupKey) && event.newValue) {
         try {
