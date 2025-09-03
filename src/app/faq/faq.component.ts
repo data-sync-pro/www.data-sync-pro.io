@@ -373,7 +373,7 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     'transformation': 'Transformation',
     'executables': 'Executables',
     'connections': 'Connections',
-    'query-manager-q': 'Query Manager(Q)'
+    'query-manager': 'Query Manager'
   };
 
   // Reverse mapping (original name → lowercase URL)
@@ -385,7 +385,7 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     'Transformation': 'transformation',
     'Executables': 'executables', 
     'Connections': 'connections',
-    'Query Manager(Q)': 'query-manager-q'
+    'Query Manager': 'query-manager'
   };
 
   private encode = (s: string) => {

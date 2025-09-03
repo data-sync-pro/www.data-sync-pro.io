@@ -1562,7 +1562,7 @@
   {
     "Id": "a0oEc000005JojtIAC",
     "Name": "a0oEc000005JojtIAC",
-    "Category__c": "Query Manager(Q)",
+    "Category__c": "Query Manager",
     "SubCategory__c": "",
     "SeqNo__c": null,
     "Question__c": "What is Query Manager?",
@@ -1572,7 +1572,7 @@
   {
     "Id": "a0oEc000005JojuIAC",
     "Name": "a0oEc000005JojuIAC",
-    "Category__c": "Query Manager(Q)",
+    "Category__c": "Query Manager",
     "SubCategory__c": "",
     "SeqNo__c": null,
     "Question__c": "Who can access Query Manager?",
@@ -1582,7 +1582,7 @@
   {
     "Id": "a0oEc000005JojvIAC",
     "Name": "a0oEc000005JojvIAC",
-    "Category__c": "Query Manager(Q)",
+    "Category__c": "Query Manager",
     "SubCategory__c": "",
     "SeqNo__c": null,
     "Question__c": "How can I build a SOQL query with Query Builder?",
@@ -1592,7 +1592,7 @@
   {
     "Id": "a0oEc000005JojwIAC",
     "Name": "a0oEc000005JojwIAC",
-    "Category__c": "Query Manager(Q)",
+    "Category__c": "Query Manager",
     "SubCategory__c": "",
     "SeqNo__c": null,
     "Question__c": "What happens when you execute a query?",
@@ -1602,7 +1602,7 @@
   {
     "Id": "a0oEc000005JojxIAC",
     "Name": "a0oEc000005JojxIAC",
-    "Category__c": "Query Manager(Q)",
+    "Category__c": "Query Manager",
     "SubCategory__c": "",
     "SeqNo__c": null,
     "Question__c": "What is a Column Filter?",
@@ -1612,7 +1612,7 @@
   {
     "Id": "a0oEc000005JojyIAC",
     "Name": "a0oEc000005JojyIAC",
-    "Category__c": "Query Manager(Q)",
+    "Category__c": "Query Manager",
     "SubCategory__c": "",
     "SeqNo__c": null,
     "Question__c": "How does a dynamic filter work?",
@@ -1622,7 +1622,7 @@
   {
     "Id": "a0oEc000005JojzIAC",
     "Name": "a0oEc000005JojzIAC",
-    "Category__c": "Query Manager(Q)",
+    "Category__c": "Query Manager",
     "SubCategory__c": "",
     "SeqNo__c": null,
     "Question__c": "How do I query the Owner relationship when the Owner field is polymorphic?",
@@ -1632,7 +1632,7 @@
   {
     "Id": "a0oEc000005Jok0IAC",
     "Name": "a0oEc000005Jok0IAC",
-    "Category__c": "Query Manager(Q)",
+    "Category__c": "Query Manager",
     "SubCategory__c": "",
     "SeqNo__c": null,
     "Question__c": "How can I query data from a remote Salesforce org?",
@@ -1642,7 +1642,7 @@
   {
     "Id": "a0oEc000005Jok1IAC",
     "Name": "a0oEc000005Jok1IAC",
-    "Category__c": "Query Manager(Q)",
+    "Category__c": "Query Manager",
     "SubCategory__c": "",
     "SeqNo__c": null,
     "Question__c": "Can I include deleted records from the Recycle Bin in my query?",
@@ -1652,7 +1652,7 @@
   {
     "Id": "a0oEc000005Jok2IAC",
     "Name": "a0oEc000005Jok2IAC",
-    "Category__c": "Query Manager(Q)",
+    "Category__c": "Query Manager",
     "SubCategory__c": "",
     "SeqNo__c": null,
     "Question__c": "Can I use the Query component to restore deleted records from the Recycle Bin?",
@@ -1662,7 +1662,7 @@
   {
     "Id": "a0oEc000005Jok3IAC",
     "Name": "a0oEc000005Jok3IAC",
-    "Category__c": "Query Manager(Q)",
+    "Category__c": "Query Manager",
     "SubCategory__c": "",
     "SeqNo__c": null,
     "Question__c": "How do hyperlinks work in query results?",
@@ -1672,7 +1672,7 @@
   {
     "Id": "a0oEc000005Jok4IAC",
     "Name": "a0oEc000005Jok4IAC",
-    "Category__c": "Query Manager(Q)",
+    "Category__c": "Query Manager",
     "SubCategory__c": "",
     "SeqNo__c": null,
     "Question__c": "Is pagination handled on the server-side or client-side?",
@@ -1682,7 +1682,7 @@
   {
     "Id": "a0oEc000005Jok5IAC",
     "Name": "a0oEc000005Jok5IAC",
-    "Category__c": "Query Manager(Q)",
+    "Category__c": "Query Manager",
     "SubCategory__c": "",
     "SeqNo__c": null,
     "Question__c": "Is Tooling API supported in Query?",
@@ -1692,7 +1692,7 @@
   {
     "Id": "a0oEc000005Jok6IAC",
     "Name": "a0oEc000005Jok6IAC",
-    "Category__c": "Query Manager(Q)",
+    "Category__c": "Query Manager",
     "SubCategory__c": "",
     "SeqNo__c": null,
     "Question__c": "How can I manage my frequently used queries?",
@@ -1702,7 +1702,7 @@
   {
     "Id": "a0oEc000005Jok7IAC",
     "Name": "a0oEc000005Jok7IAC",
-    "Category__c": "Query Manager(Q)",
+    "Category__c": "Query Manager",
     "SubCategory__c": "",
     "SeqNo__c": null,
     "Question__c": "How can I integrate the Query functionality into Lightning pages?",
