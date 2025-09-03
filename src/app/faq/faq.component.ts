@@ -120,7 +120,7 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     mobileSidebarOpen: false,
     mobileTOCOpen: false,
     isMobile: false,
-    tocHidden: false
+    tocHidden: true
   };
 
   // TOC Pagination state

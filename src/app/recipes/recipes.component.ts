@@ -100,7 +100,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
     isMobile: false,
     currentView: 'home',
     isPreviewMode: false,
-    tocHidden: false,
+    tocHidden: true,
     tocInFooterZone: false,
     tocFooterApproaching: false,
     activeRecipeTab: 'overview',
