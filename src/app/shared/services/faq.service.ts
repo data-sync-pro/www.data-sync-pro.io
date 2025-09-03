@@ -217,8 +217,13 @@ export class FAQService implements OnDestroy {
 
   /**
    * Warm cache for popular FAQs
+   * TEMPORARILY DISABLED to debug 404 errors
    */
   warmCacheForPopularFAQs(popularFaqIds: string[]): void {
+    // Temporarily disable warm cache to identify 404 source
+    console.log('⚠️ Popular FAQs warm cache temporarily disabled for debugging');
+    return;
+    
     this.getFAQs().pipe(
       map(faqs => faqs.filter(faq => popularFaqIds.includes(faq.id))),
       tap(popularFaqs => {
@@ -233,8 +238,13 @@ export class FAQService implements OnDestroy {
 
   /**
    * Initialize intersection observer for content preloading
+   * TEMPORARILY DISABLED to debug 404 errors
    */
   private initializeIntersectionObserver(): void {
+    // Temporarily disable preloading to identify 404 source
+    console.log('⚠️ IntersectionObserver preloading temporarily disabled for debugging');
+    return;
+    
     if (typeof window !== 'undefined' && 'IntersectionObserver' in window) {
       this.intersectionObserver = new IntersectionObserver(
         (entries) => {
