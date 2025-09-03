@@ -205,7 +205,7 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
               take(1),
               filter((faqs: FAQItem[]) => faqs.length > 0)
             ).subscribe((faqs) => {
-              console.log('✅ FAQ data loaded, processing answer URL');
+              //console.log('✅ FAQ data loaded, processing answer URL');
               this.faqList = faqs;
               this.handleAnswerPathNavigation(decodedCat);
             });
@@ -305,7 +305,7 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
       takeUntil(this.destroy$)
     ).subscribe({
       next: (faqs) => {
-        console.log('📚 FAQ data loaded, count:', faqs.length);
+        //console.log('📚 FAQ data loaded, count:', faqs.length);
         this.faqList = faqs;
         this.updateUIState({ isLoading: false });
         
