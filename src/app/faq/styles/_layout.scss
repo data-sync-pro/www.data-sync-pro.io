@@ -34,7 +34,6 @@ $breakpoint-mobile: 500px;
   transition: margin 0.3s ease; 
 
   &.toc-hidden {
-    margin-right: 60px;
     
     @media (max-width: $breakpoint-desktop) {
       margin-right: 0; // Remove margin on smaller screens where TOC is already hidden
