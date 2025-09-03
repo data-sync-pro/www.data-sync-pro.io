@@ -516,6 +516,21 @@ export class RecipesComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Sort recipes by category first, then by title A-Z
+   */
+  private sortRecipesByCategoryAndTitle(recipes: RecipeItem[]): RecipeItem[] {
+    return [...recipes].sort((a, b) => {
+      // Primary sort: by category
+      const categoryCompare = a.category.localeCompare(b.category);
+      if (categoryCompare !== 0) {
+        return categoryCompare;
+      }
+      // Secondary sort: by title A-Z within same category
+      return a.title.localeCompare(b.title);
+    });
+  }
+
+  /**
    * Setup route parameter handling
    */
   private setupRouteHandling(): void {
@@ -665,7 +680,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
         this.recipes = recipes;
         // Only set filteredRecipes when in home view to avoid overwriting category filters
         if (this.ui.currentView === 'home') {
-          this.filteredRecipes = recipes;
+          this.filteredRecipes = this.sortRecipesByCategoryAndTitle(recipes);
         }
         this.resetTOCPagination();
         this.updateUIState({ isLoading: false });
@@ -687,7 +702,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
     ).subscribe({
       next: (recipes) => {
         this.recipes = recipes;
-        this.filteredRecipes = recipes;
+        this.filteredRecipes = this.sortRecipesByCategoryAndTitle(recipes);
         this.updateUIState({ isLoading: false });
         this.cdr.markForCheck();
       },
@@ -707,7 +722,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
     ).subscribe({
       next: (recipes) => {
         this.recipes = recipes;
-        this.filteredRecipes = recipes;
+        this.filteredRecipes = this.sortRecipesByCategoryAndTitle(recipes);
         this.updateUIState({ isLoading: false });
         this.cdr.markForCheck();
       },
@@ -1175,7 +1190,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
         next: (results) => {
           this.search.results = results;
           this.search.hasResults = results.length > 0;
-          this.filteredRecipes = results;
+          this.filteredRecipes = this.sortRecipesByCategoryAndTitle(results);
           this.cdr.markForCheck();
         },
         error: (error) => {
@@ -1183,7 +1198,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
         }
       });
     } else {
-      this.filteredRecipes = this.recipes;
+      this.filteredRecipes = this.sortRecipesByCategoryAndTitle(this.recipes);
       this.search.results = [];
       this.cdr.markForCheck();
     }
@@ -1196,7 +1211,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
     this.search.query = '';
     this.search.isActive = false;
     this.search.results = [];
-    this.filteredRecipes = this.recipes;
+    this.filteredRecipes = this.sortRecipesByCategoryAndTitle(this.recipes);
     this.cdr.markForCheck();
   }
 
@@ -1447,13 +1462,8 @@ export class RecipesComponent implements OnInit, OnDestroy {
    */
   get trendingRecipes(): RecipeItem[] {
     if (!this._cachedTrendingRecipes || this._lastRecipesLength !== this.recipes.length) {
-      // Sort by estimated time (shorter first) and category diversity
-      this._cachedTrendingRecipes = [...this.recipes]
-        .sort((a, b) => {
-          // Sort by title alphabetically
-          // Finally by title alphabetically
-          return a.title.localeCompare(b.title);
-        })
+      // Sort by category first, then by title A-Z
+      this._cachedTrendingRecipes = this.sortRecipesByCategoryAndTitle(this.recipes)
         .slice(0, 20); // Limit to 20 trending recipes
       
       this._lastRecipesLength = this.recipes.length;

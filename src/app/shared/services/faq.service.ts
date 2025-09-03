@@ -880,7 +880,7 @@ export class FAQService implements OnDestroy {
         
         if (timeSinceLastCheck < this.VERSION_CHECK_INTERVAL) {
           const minutesAgo = Math.round(timeSinceLastCheck / 1000 / 60);
-          console.log(`⏭️ Skipping version check (last checked ${minutesAgo} minutes ago)`);
+          //console.log(`⏭️ Skipping version check (last checked ${minutesAgo} minutes ago)`);
           return;
         }
       }

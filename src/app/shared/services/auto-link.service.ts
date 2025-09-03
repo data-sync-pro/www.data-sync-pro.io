@@ -50,7 +50,7 @@ export class AutoLinkService {
           if (data && data.terms) {
             this.autoLinkTerms = data.terms;
             this.autoLinkTermsLoaded = true;
-            console.log(`✅ Loaded ${Object.keys(this.autoLinkTerms).length} auto-link terms`);
+            //console.log(`✅ Loaded ${Object.keys(this.autoLinkTerms).length} auto-link terms`);
           }
         }),
         catchError(error => {
@@ -111,12 +111,25 @@ export class AutoLinkService {
       
       // Helper function to process a tag type (strong, b, or code)
       const processTag = (tagName: string) => {
-        const pattern = new RegExp(`<${tagName}>([^<]*?)(${escapedTerm})([^<]*?)</${tagName}>`, 'g');
+        // For outer tags (strong, b), also match content that may contain inner tags
+        const innerContent = tagName === 'code' 
+          ? `([^<]*?)(${escapedTerm})([^<]*?)` 
+          : `((?:[^<]|<(?!/${tagName}>))*?)(${escapedTerm})((?:[^<]|<(?!/${tagName}>))*?)`;
+        const pattern = new RegExp(`<${tagName}>${innerContent}</${tagName}>`, 'g');
         
         processedContent = processedContent.replace(pattern, (fullMatch, beforeTerm, capturedTerm, afterTerm, offset) => {
           // Check if the captured term exactly matches the expected term (case-sensitive)
           if (capturedTerm !== term) {
             return fullMatch; // Return unchanged if not exact match
+          }
+          
+          // For outer tags (strong, b), check if the content already contains a link
+          if (tagName !== 'code') {
+            const fullContent = beforeTerm + capturedTerm + afterTerm;
+            // If the content already contains an anchor tag with this term, skip processing
+            if (fullContent.includes(`<a `) && fullContent.includes(`>${term}`)) {
+              return fullMatch; // Already processed by inner tag
+            }
           }
           
           // Skip <code> tags that are inside <pre> tags
@@ -210,8 +223,9 @@ export class AutoLinkService {
       };
       
       // Determine supported tags based on link type
+      // Process code tags first (innermost), then strong/b tags (outer)
       const supportedTags = (termConfig.functionDoc || termConfig.globalVariableDoc)
-        ? ['strong', 'b', 'code']  // Function docs and global variables support three tags
+        ? ['code', 'strong', 'b']  // Function docs and global variables support three tags - code first
         : ['strong', 'b'];         // FAQ links support two tags
       
       // Process all supported tags

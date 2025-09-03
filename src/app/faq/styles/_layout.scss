@@ -33,7 +33,7 @@ $breakpoint-mobile: 500px;
 // 内容区域：简化边距处理
 .faq-container {
   grid-area: main;
-  padding: 20px 40px;
+  padding: 20px 2vw;
   min-height: calc(100vh - $header-height - 200px); // 为页脚留出自然空间
   background: #ffffff;
   transition: margin 0.3s ease; // Smooth transition for margin changes
@@ -152,7 +152,7 @@ $breakpoint-mobile: 500px;
 .faq-main {
   flex: 1;
   min-width: 0;
-  padding: 20px 40px;
+  padding: 20px 2vw;
   margin-bottom: 120px; // 增加底部边距确保footer可见
   background: #ffffff;
   min-height: calc(100vh - 120px);
