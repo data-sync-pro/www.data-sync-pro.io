@@ -3,9 +3,10 @@ import { RouterModule, Routes } from '@angular/router';
 import { FaqComponent } from './faq.component';
 
 const routes: Routes = [
-  { path: '', component: FaqComponent },
-  { path: ':cat', component: FaqComponent },
-  { path: ':cat/:subCat', component: FaqComponent }
+  { path: '', component: FaqComponent }
+  // Temporarily removed parameter routes to prevent answerPath mismatch
+  // { path: ':cat', component: FaqComponent },
+  // { path: ':cat/:subCat', component: FaqComponent }
 ];
 
 @NgModule({
