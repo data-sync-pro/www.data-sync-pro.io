@@ -17,7 +17,7 @@ $breakpoint-desktop: 992px;
   // W3Schools风格的sticky定位
   position: sticky;
   top: $header-height;
-  height: calc(100vh - $header-height);
+  max-height: calc(100vh - $header-height);
   overflow: hidden;
   
   // 响应式隐藏：采用W3Schools的断点策略

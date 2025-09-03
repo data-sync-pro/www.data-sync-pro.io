@@ -17,8 +17,8 @@ $breakpoint-mobile: 500px;
   grid-template-areas: 
     "sidebar main toc";
   grid-template-columns: $sidebar-width 1fr $toc-width;
-  min-height: calc(100vh - $header-height);
   margin-top: $header-height;
+  min-height: 0;
   
   @media (max-width: $breakpoint-desktop) {
     grid-template-areas: "main main main";
@@ -29,7 +29,6 @@ $breakpoint-mobile: 500px;
 .faq-container {
   grid-area: main;
   padding: 20px 1.5vw;
-  min-height: calc(100vh - $header-height - 200px);
   background: #ffffff;
   transition: margin 0.3s ease; 
 
@@ -145,13 +144,12 @@ $breakpoint-mobile: 500px;
   flex: 1;
   min-width: 0;
   padding: 20px 1.5vw;
-  margin-bottom: 120px; 
   background: #ffffff;
-  min-height: calc(100vh - 120px);
+  min-height: auto;
   
-  &.footer-aware {
-    margin-bottom: calc(120px + var(--footer-offset, 0px));
-  }
+ // &.footer-aware {
+ //   margin-bottom: calc(120px + var(--footer-offset, 0px));
+ // }
 }
 
 .section-title,
