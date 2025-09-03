@@ -28,7 +28,7 @@ $breakpoint-mobile: 500px;
 
 .faq-container {
   grid-area: main;
-  padding: 20px 2vw;
+  padding: 20px 1.5vw;
   min-height: calc(100vh - $header-height - 200px);
   background: #ffffff;
   transition: margin 0.3s ease; 
@@ -57,6 +57,7 @@ $breakpoint-mobile: 500px;
   top: $header-height; // Stick below the main header
   z-index: 90; // Higher than TOC but below main header
   padding: 8px 16px;
+  margin-top: 40px;
   margin-bottom: 12px;
   border-bottom: 1px solid #f1f3f4;
   background: rgba(255, 255, 255, 0.95); // Semi-transparent white background
@@ -145,7 +146,7 @@ $breakpoint-mobile: 500px;
 .faq-main {
   flex: 1;
   min-width: 0;
-  padding: 20px 2vw;
+  padding: 20px 1.5vw;
   margin-bottom: 120px; 
   background: #ffffff;
   min-height: calc(100vh - 120px);
