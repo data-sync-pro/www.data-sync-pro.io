@@ -1,6 +1,18 @@
 {
   "recipes": [
     {
+      "folderId": "account-open-opportunities-with-multiple-actions",
+      "active": true
+    },
+    {
+      "folderId": "account-related-opportunities-from-connected-org",
+      "active": true
+    },
+    {
+      "folderId": "active-users-list-with-add-permission-set-action",
+      "active": true
+    },
+    {
       "folderId": "add-sharing-records-based-on-roles",
       "active": true
     },
@@ -9,11 +21,19 @@
       "active": true
     },
     {
+      "folderId": "apply-dynamic-record-assignment-rules",
+      "active": true
+    },
+    {
       "folderId": "assign-permission-sets-with-existence-check",
       "active": true
     },
     {
       "folderId": "auto_close-stagnant-cases",
+      "active": true
+    },
+    {
+      "folderId": "auto-add-opportunity-products-when-creating-quotes",
       "active": true
     },
     {
@@ -26,6 +46,10 @@
     },
     {
       "folderId": "auto-create-parent-record-for-new-child-record",
+      "active": true
+    },
+    {
+      "folderId": "auto-create-related-records-based-on-parent-criteria",
       "active": true
     },
     {
@@ -53,6 +77,22 @@
       "active": true
     },
     {
+      "folderId": "create-batch-migration-executables-via-migration-builder",
+      "active": true
+    },
+    {
+      "folderId": "dashboard-with-actionable-data-lists",
+      "active": true
+    },
+    {
+      "folderId": "data-list-with-row-s-related-lists",
+      "active": true
+    },
+    {
+      "folderId": "data-lists-in-lightning-web-components",
+      "active": true
+    },
+    {
       "folderId": "delete-closed-cases-older-than-two-years",
       "active": true
     },
@@ -77,6 +117,10 @@
       "active": true
     },
     {
+      "folderId": "my-open-cases-with-actions",
+      "active": true
+    },
+    {
       "folderId": "new-recipe",
       "active": true
     },
@@ -86,6 +130,14 @@
     },
     {
       "folderId": "notify-previous-owner-by-bell-notification-on-owner-change",
+      "active": true
+    },
+    {
+      "folderId": "open-cases-in-my-queues",
+      "active": true
+    },
+    {
+      "folderId": "prevent-parent-record-deletion-with-open-child-records",
       "active": true
     },
     {
@@ -109,7 +161,15 @@
       "active": true
     },
     {
+      "folderId": "record-histories-with-restore-action",
+      "active": true
+    },
+    {
       "folderId": "restore-cases-from-archived-big-object",
+      "active": true
+    },
+    {
+      "folderId": "restore-soft-deleted-records-from-recycle-bin",
       "active": true
     },
     {
@@ -130,6 +190,10 @@
     },
     {
       "folderId": "trigger-delayed-batch-execution",
+      "active": true
+    },
+    {
+      "folderId": "validate-date-range-end-date-after-start-date",
       "active": true
     }
   ]

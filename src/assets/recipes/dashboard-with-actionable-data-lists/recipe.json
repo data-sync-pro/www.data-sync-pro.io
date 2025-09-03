@@ -1,0 +1,109 @@
+{
+  "id": "dashboard-with-actionable-data-lists",
+  "title": "Dashboard with Actionable Data Lists",
+  "category": "Data List",
+  "DSPVersions": [],
+  "overview": "",
+  "whenToUse": "",
+  "generalImages": [
+    {
+      "type": "image",
+      "url": "",
+      "alt": ""
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "",
+      "quickLinks": [
+        {
+          "title": "",
+          "url": ""
+        }
+      ]
+    }
+  ],
+  "direction": "",
+  "connection": "",
+  "walkthrough": [
+    {
+      "step": "Create Executable",
+      "config": [
+        {
+          "field": "Source Object API Name",
+          "value": ""
+        },
+        {
+          "field": "Target Object API Name",
+          "value": ""
+        },
+        {
+          "field": "Source Matching Field",
+          "value": ""
+        },
+        {
+          "field": "Target Matching Field",
+          "value": ""
+        },
+        {
+          "field": "Action",
+          "value": ""
+        },
+        {
+          "field": "Executable Name",
+          "value": "Dashboard with Actionable Data Lists"
+        }
+      ],
+      "media": [
+        {
+          "type": "image",
+          "url": "",
+          "alt": ""
+        }
+      ]
+    },
+    {
+      "step": "Data List(Q) Settings",
+      "config": [],
+      "media": []
+    },
+    {
+      "step": "Retrieve",
+      "config": [
+        {
+          "field": "SOQL Query",
+          "value": ""
+        }
+      ],
+      "media": []
+    },
+    {
+      "step": "Scoping",
+      "config": [],
+      "media": []
+    },
+    {
+      "step": "Match",
+      "config": [],
+      "media": []
+    },
+    {
+      "step": "Mapping",
+      "config": [],
+      "media": []
+    },
+    {
+      "step": "Action",
+      "config": [],
+      "media": []
+    }
+  ],
+  "downloadableExecutables": [],
+  "relatedRecipes": [
+    {
+      "title": "",
+      "url": ""
+    }
+  ],
+  "keywords": []
+}

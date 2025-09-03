@@ -1,0 +1,114 @@
+{
+  "id": "restore-soft-deleted-records-from-recycle-bin",
+  "title": "Restore Soft-Deleted Records from Recycle Bin",
+  "category": "Batch",
+  "DSPVersions": [],
+  "overview": "Restore soft-deleted Cases from Salesforce's Recycle Bin before they are permanently purged (typically within 15 days). Selectively undelete Cases removed during this retention period to preserve important customer support history, related communications, and essential audit information.\n",
+  "whenToUse": "",
+  "generalImages": [
+    {
+      "type": "image",
+      "url": "",
+      "alt": ""
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "",
+      "quickLinks": [
+        {
+          "title": "",
+          "url": ""
+        }
+      ]
+    }
+  ],
+  "direction": "Current ⇒ Current ",
+  "connection": "",
+  "walkthrough": [
+    {
+      "step": "Create Executable",
+      "config": [
+        {
+          "field": "Source Object API Name",
+          "value": "Case"
+        },
+        {
+          "field": "Target Object API Name",
+          "value": "Case"
+        },
+        {
+          "field": "Source Matching Field",
+          "value": "Id"
+        },
+        {
+          "field": "Target Matching Field",
+          "value": "Id"
+        },
+        {
+          "field": "Action",
+          "value": "Undelete"
+        },
+        {
+          "field": "Executable Name",
+          "value": "Restore Soft-Deleted Cases from Recycle Bin"
+        }
+      ],
+      "media": [
+        {
+          "type": "image",
+          "url": "",
+          "alt": ""
+        }
+      ]
+    },
+    {
+      "step": "Retrieve",
+      "config": [
+        {
+          "field": "SOQL Query",
+          "value": "SELECT CaseNumber, Status, Priority, Subject, Origin, Type, Reason, SuppliedEmail, TYPEOF Owner WHEN User THEN Name ELSE Name END FROM Case WHERE IsClosed = FALSE AND Status IN ('Pending Customer Response','Pending Internal Review','Awaiting Approval')"
+        }
+      ],
+      "media": []
+    },
+    {
+      "step": "Scoping",
+      "config": [],
+      "media": []
+    },
+    {
+      "step": "Match",
+      "config": [],
+      "media": []
+    },
+    {
+      "step": "Mapping",
+      "config": [],
+      "media": []
+    },
+    {
+      "step": "Action",
+      "config": [],
+      "media": []
+    },
+    {
+      "step": "Verify",
+      "config": [
+        {
+          "field": "SOQL Query",
+          "value": "SELECT CaseNumber, Status, Priority, Subject, Origin, Type, Reason, SuppliedEmail, TYPEOF Owner WHEN User THEN Name ELSE Name END FROM Case"
+        }
+      ],
+      "media": []
+    }
+  ],
+  "downloadableExecutables": [],
+  "relatedRecipes": [
+    {
+      "title": "",
+      "url": ""
+    }
+  ],
+  "keywords": []
+}
