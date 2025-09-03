@@ -7,9 +7,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
 // Virtual scrolling viewport
 .faq-virtual-viewport {
-  height: 70vh; // Responsive height based on viewport
-  max-height: 800px;
-  min-height: 400px;
+  height: 58vh; // Adjust height to fit page viewport minus header/footer space
   width: 100%;
   border-radius: 8px;
   overflow: hidden;
