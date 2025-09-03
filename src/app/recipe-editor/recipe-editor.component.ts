@@ -386,6 +386,21 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
     this.closeAllAutocomplete();
   }
 
+  /**
+   * Sort recipes by category first, then by title A-Z
+   */
+  private sortRecipesByCategoryAndTitle(recipes: RecipeItem[]): RecipeItem[] {
+    return [...recipes].sort((a, b) => {
+      // Primary sort: by category
+      const categoryCompare = a.category.localeCompare(b.category);
+      if (categoryCompare !== 0) {
+        return categoryCompare;
+      }
+      // Secondary sort: by title A-Z within same category
+      return a.title.localeCompare(b.title);
+    });
+  }
+
   private closeAllAutocomplete(): void {
     const dropdowns = document.querySelectorAll('.autocomplete-dropdown');
     dropdowns.forEach(dropdown => {
@@ -427,7 +442,7 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe(recipes => {
         this.recipeList = recipes;
-        this.filteredRecipes = recipes;
+        this.filteredRecipes = this.sortRecipesByCategoryAndTitle(recipes);
       });
   }
   
@@ -624,7 +639,7 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
   }
   
   filterRecipes(): void {
-    this.filteredRecipes = this.recipeList.filter(recipe => {
+    const filteredResults = this.recipeList.filter(recipe => {
       const matchesSearch = !this.searchQuery || 
         recipe.title.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
         recipe.id.toLowerCase().includes(this.searchQuery.toLowerCase());
@@ -634,6 +649,8 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
       
       return matchesSearch && matchesCategory;
     });
+    
+    this.filteredRecipes = this.sortRecipesByCategoryAndTitle(filteredResults);
   }
   
   isRecipeEdited(recipeId: string): boolean {
