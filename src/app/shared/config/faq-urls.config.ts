@@ -4,7 +4,7 @@
  * This configuration maps FAQ references to their corresponding routes
  */
 
-const FAQ_BASE_URL = 'https://faq.pushtopic.com';
+const FAQ_BASE_URL = ''; // Use relative URLs for local navigation
 
 export interface FAQUrlMapping {
   // The key used in HTML files to reference this URL

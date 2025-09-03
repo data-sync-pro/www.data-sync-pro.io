@@ -804,7 +804,7 @@ export class FAQService implements OnDestroy {
       normalizedSrc = `assets/${src}`;
     }
 
-    // Create container with better structure
+    // Create container with comprehensive error handling
     return `<div class="faq-picture">
       <img 
         src="${normalizedSrc}" 
@@ -813,6 +813,7 @@ export class FAQService implements OnDestroy {
         style="display: block; margin: 20px auto; max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); transition: transform 0.3s ease;"
         loading="lazy"
         onload="if(this.parentElement){this.parentElement.classList.add('image-loaded')}"
+        onerror="this.style.display='none';if(this.parentElement){this.parentElement.innerHTML='<div class=\\"image-error-placeholder\\" style=\\"padding: 20px; background: #f8f9fa; border: 2px dashed #dee2e6; border-radius: 8px; text-align: center; color: #6c757d; font-style: italic; margin: 20px auto;\\">🖼️ Image not found: ${alt}</div>';}"
       >
     </div>`;
   }
