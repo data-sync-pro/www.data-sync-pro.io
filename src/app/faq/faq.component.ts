@@ -141,6 +141,8 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
   private scrollTimeout: any;
   private activeScrollElement: string = '';
   private userHasScrolled: boolean = false;
+  private isInitialLoad = true;
+  private isProcessingAnswerPath = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -156,6 +158,9 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
   ) {}
 
   ngOnInit(): void {
+    // Initialize FAQ data first to ensure it's available for routing
+    this.initFaqData();
+    
     // Check for preview mode first and handle it separately
     this.route.queryParams.pipe(takeUntil(this.destroy$)).subscribe(params => {
       const isPreview = params['preview'] === 'true';
@@ -166,9 +171,6 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
         this.setupPreviewMode(previewFaqId);
         // Skip normal FAQ initialization for preview mode
         return;
-      } else {
-        // Normal FAQ mode initialization
-        this.initFaqData();
       }
     });
     
@@ -181,6 +183,7 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     this.setupOptimizedScrollListener();
     this.setupNavLinkHandler();
 
+    // Delay route parameter processing to ensure FAQ data is loading
     this.route.paramMap.pipe(
       takeUntil(this.destroy$)
     ).subscribe(params => {
@@ -192,8 +195,24 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
         
         // Check if this looks like an answer-based URL (contains hyphens and is longer)
         if (this.isAnswerBasedURL(decodedCat) && !subCatParam) {
-          // Handle answer-based URL (e.g., /general-why-data-sync-pro)
-          this.handleAnswerPathNavigation(decodedCat);
+          // For answer-based URLs, wait for FAQ data to be loaded
+          console.log('🔍 Answer-based URL detected:', decodedCat);
+          
+          // If FAQ data is not loaded yet, wait for it
+          if (this.faqList.length === 0) {
+            console.log('⏳ Waiting for FAQ data before processing answer URL...');
+            this.faqService.getFAQs().pipe(
+              take(1),
+              filter((faqs: FAQItem[]) => faqs.length > 0)
+            ).subscribe((faqs) => {
+              console.log('✅ FAQ data loaded, processing answer URL');
+              this.faqList = faqs;
+              this.handleAnswerPathNavigation(decodedCat);
+            });
+          } else {
+            // FAQ data already loaded, process immediately
+            this.handleAnswerPathNavigation(decodedCat);
+          }
         } else {
           // Handle category-based URL (e.g., /general or /general/input)
           // Map lowercase URL back to original category name
@@ -1268,17 +1287,20 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
   private handleAnswerPathNavigation(answerSlug: string): void {
     console.log('🔍 handleAnswerPathNavigation called with:', answerSlug);
     
-    // Wait for FAQ data to be loaded first
+    // Prevent duplicate processing
+    if (this.isProcessingAnswerPath) {
+      console.log('⚠️ Already processing answer path, skipping...');
+      return;
+    }
+    
+    // Set processing flag
+    this.isProcessingAnswerPath = true;
+    
+    // At this point, FAQ data should already be loaded from route param handler
     if (this.faqList.length === 0) {
-      console.log('⏳ FAQ list not loaded yet, waiting...');
-      // Subscribe to FAQ data and try again when it's loaded
-      this.faqService.getFAQs().pipe(
-        take(1),
-        filter((faqs: FAQItem[]) => faqs.length > 0)
-      ).subscribe(() => {
-        console.log('✅ FAQ list loaded, retrying navigation');
-        this.handleAnswerPathNavigation(answerSlug);
-      });
+      console.log('⚠️ FAQ list is empty, cannot process answer path');
+      this.isProcessingAnswerPath = false;
+      this.isInitialLoad = false;
       return;
     }
     
@@ -1304,12 +1326,23 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
       // Wait for UI to update, then navigate to the specific FAQ
       setTimeout(() => {
         console.log('🚀 Calling navigateToFAQ...');
+        // Mark processing as complete before navigation
+        this.isProcessingAnswerPath = false;
         this.navigateToFAQ(faqItem);
+        // If this is initial load, expand the FAQ panel
+        if (this.isInitialLoad) {
+          this.expandFAQPanel(faqItem);
+          this.onFaqOpened(faqItem);
+          this.isInitialLoad = false;
+        }
       }, 200);
     } else {
       console.warn(`❌ FAQ not found for answer path: ${answerPath}`);
       // List some available answer paths for debugging
       console.log('Available answer paths (first 5):', this.faqList.slice(0, 5).map(item => item.answerPath));
+      // Reset processing flag on failure
+      this.isProcessingAnswerPath = false;
+      this.isInitialLoad = false;
       // Redirect to home if FAQ not found
       this.router.navigate(['/']);
     }

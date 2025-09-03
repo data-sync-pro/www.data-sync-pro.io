@@ -1,6 +1,16 @@
-<p>DSP processes the target record iteratively for each matching source record. Each source record applies its transformations in turn, with later updates overwriting earlier ones. The result is a single final version of the target record before execution.</p>
+<p>
+  DSP processes the target record iteratively for each matching source record.
+  Each source record applies its transformations in turn, with later updates
+  overwriting earlier ones. The result is a single final version of the target
+  record before execution.
+</p>
 
-  <p>To process only one source record per matched target, use the <code>IS_FIRST_IN_ITERATION(...expressions)</code> function in a Scope Filter. This ensures that only the first source record in each group is applied.</p>
+<p>
+  To process only one source record per matched target, use the
+  <code>IS_FIRST_IN_ITERATION(...expressions)</code> function in a Scope Filter.
+  This ensures that only the first source record in each group is applied.
+</p>
 
-
-<img src="assets/image/match-how-handle-multiple-sources-single-target/match-how-handle-multiple-sources-single-target.jpg">
+<img
+  src="assets/image/match-how-handle-multiple-sources-single-target/match-how-handle-multiple-sources-single-target.jpg"
+/>
