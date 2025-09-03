@@ -19,7 +19,7 @@ import { AnalyticsService } from '../analytics.service';
 import { Meta, Title } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subject, fromEvent } from 'rxjs';
-import { takeUntil, debounceTime } from 'rxjs/operators';
+import { takeUntil, debounceTime, take, filter } from 'rxjs/operators';
 
 // 导入统一的模型和服务
 import { FAQItem, FAQCategory, FAQSubCategory } from '../shared/models/faq.model';
@@ -184,8 +184,36 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     this.route.paramMap.pipe(
       takeUntil(this.destroy$)
     ).subscribe(params => {
-      this.current.category = params.get('cat') ? this.safeDecodeURIComponent(params.get('cat')!) : '';
-      this.current.subCategory = params.get('subCat') ? this.safeDecodeURIComponent(params.get('subCat')!) : '';
+      const catParam = params.get('cat');
+      const subCatParam = params.get('subCat');
+      
+      if (catParam) {
+        const decodedCat = this.safeDecodeURIComponent(catParam);
+        
+        // Check if this looks like an answer-based URL (contains hyphens and is longer)
+        if (this.isAnswerBasedURL(decodedCat) && !subCatParam) {
+          // Handle answer-based URL (e.g., /general-why-data-sync-pro)
+          this.handleAnswerPathNavigation(decodedCat);
+        } else {
+          // Handle category-based URL (e.g., /general or /general/input)
+          // Map lowercase URL back to original category name
+          const originalCategory = this.categoryMapping[decodedCat] || decodedCat;
+          this.current.category = originalCategory;
+          
+          const decodedSubCat = subCatParam ? this.safeDecodeURIComponent(subCatParam) : '';
+          // For subcategories, convert to title case (capitalize each word)
+          if (decodedSubCat) {
+            const normalizedSubCat = decodedSubCat.replace(/-/g, ' ');
+            this.current.subCategory = normalizedSubCat.replace(/\b\w/g, l => l.toUpperCase());
+          } else {
+            this.current.subCategory = '';
+          }
+        }
+      } else {
+        // Root path
+        this.current.category = '';
+        this.current.subCategory = '';
+      }
       
       // Update TOC pagination when navigation changes
       this.updateTOCPaginationIndices();
@@ -293,7 +321,42 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
       }
     });
   }
-  private encode = (s: string) => encodeURIComponent(s.trim());
+
+  // Category name mapping for URL conversion (lowercase URL ↔ original name)
+  private categoryMapping: { [key: string]: string } = {
+    'general': 'General',
+    'rules-engines': 'Rules Engines',
+    'processes': 'Processes',
+    'process-steps': 'Process Steps', 
+    'transformation': 'Transformation',
+    'executables': 'Executables',
+    'connections': 'Connections',
+    'query-manager-q': 'Query Manager(Q)'
+  };
+
+  // Reverse mapping (original name → lowercase URL)
+  private reverseCategoryMapping: { [key: string]: string } = {
+    'General': 'general',
+    'Rules Engines': 'rules-engines',
+    'Processes': 'processes',
+    'Process Steps': 'process-steps',
+    'Transformation': 'transformation',
+    'Executables': 'executables', 
+    'Connections': 'connections',
+    'Query Manager(Q)': 'query-manager-q'
+  };
+
+  private encode = (s: string) => {
+    const trimmed = s.trim();
+    // Check if this is a known category, if so use lowercase mapping
+    const lowercaseUrl = this.reverseCategoryMapping[trimmed];
+    if (lowercaseUrl) {
+      return encodeURIComponent(lowercaseUrl);
+    }
+    // For subcategories or other strings, convert to lowercase and replace spaces with hyphens
+    return encodeURIComponent(trimmed.toLowerCase().replace(/\s+/g, '-'));
+  };
+
   
   goHome(): void {
     this.resetState();
@@ -818,10 +881,17 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     item.viewCount++;
 
     // 设置当前FAQ
+    console.log('📋 navigateToFAQ - Setting current FAQ item:', item.question);
+    console.log('🔗 FAQ item answerPath:', item.answerPath);
+    console.log('📄 FAQ item has safeAnswer:', !!item.safeAnswer);
+    console.log('⏳ FAQ item isLoading:', item.isLoading);
+    
     this.updateCurrentState({
       faqTitle: item.question,
       faqItem: item
     });
+    
+    console.log('✅ Current FAQ item set to:', this.current.faqItem?.question);
 
     // 强制刷新缓存以确保滚动同步准确性
     this.refreshFaqElementsCache();
@@ -831,6 +901,10 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
 
     // 跟踪FAQ查看
     this.trackFAQView(item);
+
+    // 触发FAQ内容加载
+    console.log('🎯 Calling onFaqOpened to trigger content loading...');
+    this.onFaqOpened(item);
 
     // Scroll to top instead of FAQ item for better navigation experience
     this.scrollToTop();
@@ -864,15 +938,10 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
 
 
   private updateBrowserURL(item: FAQItem): void {
-    const fragment = this.slugify(item.question);
-    // Use current category/subcategory if already in a specific subcategory view
-    // This ensures clicking a FAQ in Preview subcategory stays in Preview
-    const category = this.current.category || item.category;
-    const subCategory = this.current.subCategory || item.subCategory;
-    const url = this.buildFAQUrl(category, subCategory);
+    // Use answer-based URL instead of fragment-based
+    const answerSlug = this.getAnswerSlug(item.answerPath);
     
-    this.router.navigate([url], {
-      fragment: fragment,
+    this.router.navigate(['/', answerSlug], {
       replaceUrl: true
     });
   }
@@ -885,9 +954,10 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
   private buildFAQUrl(category?: string | null, subCategory?: string | null): string {
     let url = '/';
     if (category) {
-      url += `/${encodeURIComponent(category)}`;
+      // Use the encode method which now handles lowercase conversion
+      url += `/${this.encode(category)}`;
       if (subCategory) {
-        url += `/${encodeURIComponent(subCategory)}`;
+        url += `/${this.encode(subCategory)}`;
       }
     }
     return url;
@@ -1164,6 +1234,87 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
             .replace(/^-+|-+$/g, '');
   }
 
+  /**
+   * Extract answer slug from answer path (remove .html extension)
+   */
+  getAnswerSlug(answerPath: string): string {
+    return answerPath.replace(/\.html$/, '');
+  }
+
+  /**
+   * Check if URL looks like an answer-based URL vs category URL
+   */
+  isAnswerBasedURL(urlPath: string): boolean {
+    // Answer-based URLs are longer and contain multiple hyphens
+    // Category URLs are typically single words or short phrases
+    const hasMultipleHyphens = (urlPath.match(/-/g) || []).length >= 2;
+    const isLongerThanCategoryName = urlPath.length > 15; // Most categories are shorter
+    
+    // Check if it's a known category by looking in our category mapping
+    const isKnownCategory = this.categoryMapping.hasOwnProperty(urlPath.toLowerCase());
+    
+    // If it's a known category, treat as category URL
+    if (isKnownCategory) {
+      return false;
+    }
+    
+    // If it has multiple hyphens and is long, likely an answer-based URL
+    return hasMultipleHyphens && isLongerThanCategoryName;
+  }
+
+  /**
+   * Handle navigation based on answer path URL parameter
+   */
+  private handleAnswerPathNavigation(answerSlug: string): void {
+    console.log('🔍 handleAnswerPathNavigation called with:', answerSlug);
+    
+    // Wait for FAQ data to be loaded first
+    if (this.faqList.length === 0) {
+      console.log('⏳ FAQ list not loaded yet, waiting...');
+      // Subscribe to FAQ data and try again when it's loaded
+      this.faqService.getFAQs().pipe(
+        take(1),
+        filter((faqs: FAQItem[]) => faqs.length > 0)
+      ).subscribe(() => {
+        console.log('✅ FAQ list loaded, retrying navigation');
+        this.handleAnswerPathNavigation(answerSlug);
+      });
+      return;
+    }
+    
+    // Find FAQ item by answer path
+    const answerPath = answerSlug + '.html';
+    const faqItem = this.faqList.find(item => item.answerPath === answerPath);
+    
+    console.log('🎯 Looking for answerPath:', answerPath);
+    console.log('📝 Found FAQ item:', faqItem ? faqItem.question : 'NOT FOUND');
+    
+    if (faqItem) {
+      // Set category and subcategory based on found FAQ
+      this.current.category = faqItem.category;
+      this.current.subCategory = faqItem.subCategory || '';
+      
+      console.log('📂 Set category:', this.current.category, 'subcategory:', this.current.subCategory);
+      
+      // Trigger UI updates that normally happen in route parameter subscription
+      this.updateTOCPaginationIndices();
+      this.cdr.detectChanges();
+      this.updatePageMetadata();
+      
+      // Wait for UI to update, then navigate to the specific FAQ
+      setTimeout(() => {
+        console.log('🚀 Calling navigateToFAQ...');
+        this.navigateToFAQ(faqItem);
+      }, 200);
+    } else {
+      console.warn(`❌ FAQ not found for answer path: ${answerPath}`);
+      // List some available answer paths for debugging
+      console.log('Available answer paths (first 5):', this.faqList.slice(0, 5).map(item => item.answerPath));
+      // Redirect to home if FAQ not found
+      this.router.navigate(['/']);
+    }
+  }
+
 
   /**
    * Safe URL decoding that handles double-encoded parameters
@@ -1239,14 +1390,26 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     subCatFilterApplied?: boolean;
   }): void {
   
-    const cat = sel.category;
-    const sub = sel.subCategory ?? '';
-    const frag= this.slugify(sel.question);
-  
-    this.router.navigate(
-      sub ? ['/', cat, sub] : ['/', cat],
-      { fragment: frag }
+    // Find the full FAQ item to get the answerPath
+    const faqItem = this.faqList.find(item => 
+      item.question === sel.question && item.category === sel.category
     );
+    
+    if (faqItem) {
+      // Use answer-based URL
+      const answerSlug = this.getAnswerSlug(faqItem.answerPath);
+      this.router.navigate(['/', answerSlug]);
+    } else {
+      // Fallback to old method if FAQ item not found
+      const cat = sel.category;
+      const sub = sel.subCategory ?? '';
+      const frag = this.slugify(sel.question);
+      
+      this.router.navigate(
+        sub ? ['/', cat, sub] : ['/', cat],
+        { fragment: frag }
+      );
+    }
   
     this.search.isOpen = false;
   
@@ -1260,9 +1423,20 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     subCategory: string | null;
   }): void {
 
-    const frag = this.slugify(sel.question);
-
-    this.router.navigate(['/', sel.category], { fragment: frag });
+    // Find the full FAQ item to get the answerPath
+    const faqItem = this.faqList.find(item => 
+      item.question === sel.question && item.category === sel.category
+    );
+    
+    if (faqItem) {
+      // Use answer-based URL
+      const answerSlug = this.getAnswerSlug(faqItem.answerPath);
+      this.router.navigate(['/', answerSlug]);
+    } else {
+      // Fallback to old method if FAQ item not found
+      const frag = this.slugify(sel.question);
+      this.router.navigate(['/', sel.category], { fragment: frag });
+    }
 
     setTimeout(() => this.openAndScroll(sel.question));
   }
@@ -1348,8 +1522,8 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
 
     if (this.current.category !== faqItem.category ||
         (faqItem.subCategory && this.current.subCategory !== faqItem.subCategory)) {
-      const url = this.buildFAQUrl(faqItem.category, faqItem.subCategory);
-      this.router.navigate([url], { fragment: this.slugify(faqItem.question) });
+      const answerSlug = this.getAnswerSlug(faqItem.answerPath);
+      this.router.navigate(['/', answerSlug]);
       return;
     }
 
@@ -1379,10 +1553,9 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   getFAQShareUrl(faqItem: FAQItem): string {
-    const fragment = this.slugify(faqItem.question);
+    const answerSlug = this.getAnswerSlug(faqItem.answerPath);
     const baseUrl = window.location.origin;
-    const url = this.buildFAQUrl(faqItem.category, faqItem.subCategory);
-    return `${baseUrl}${url}#${fragment}`;
+    return `${baseUrl}/${answerSlug}`;
   }
 
   toggleSocialShare(faqItem: FAQItem): void {

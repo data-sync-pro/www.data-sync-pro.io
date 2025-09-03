@@ -44,7 +44,9 @@
       "Bash(cmd /c:*)",
       "WebFetch(domain:transformation.pushtopic.com)",
       "Bash(del \"D:\\www.data-sync-pro.io\\test-autolink.html\")",
-      "Bash(start http://localhost:4201/recipes)"
+      "Bash(start http://localhost:4201/recipes)",
+      "Bash(del update_faq_answers.js)",
+      "Bash(python:*)"
     ],
     "deny": []
   }
