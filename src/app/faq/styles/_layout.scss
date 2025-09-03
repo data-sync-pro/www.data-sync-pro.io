@@ -56,10 +56,9 @@ $breakpoint-mobile: 500px;
   position: sticky;
   top: $header-height; // Stick below the main header
   z-index: 90; // Higher than TOC but below main header
-  padding: 8px 16px;
-  margin-top: 40px;
+  padding: 8px 1.5vw; // Match faq-main horizontal padding
+
   margin-bottom: 12px;
-  border-bottom: 1px solid #f1f3f4;
   background: rgba(255, 255, 255, 0.95); // Semi-transparent white background
   backdrop-filter: blur(8px); // Modern blur effect for better visibility
   -webkit-backdrop-filter: blur(8px); // Safari support
@@ -68,12 +67,11 @@ $breakpoint-mobile: 500px;
   // Add subtle shadow when scrolled
   &.scrolled {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    border-bottom-color: #e1e5e9;
   }
   
   // Mobile responsive adjustments
   @media (max-width: 768px) {
-    padding: 6px 12px;
+    padding: 6px 1.5vw; // Maintain consistent padding on mobile
     font-size: 0.9rem;
     
     // Adjust for mobile header height if different
@@ -89,8 +87,9 @@ $breakpoint-mobile: 500px;
   align-items: center;
   gap: 2px;
   margin: 0;
-  padding: 0;
+  padding: 0 0 8px 0; // Add bottom padding for the border
   list-style: none;
+  border-bottom: 1px solid #f1f3f4; // Move border to content level
 }
 
 .breadcrumb-item {
