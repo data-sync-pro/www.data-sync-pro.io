@@ -222,17 +222,28 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
           }
         } else {
           // Handle category-based URL (e.g., /general or /general/input)
-          // Map lowercase URL back to original category name
-          const originalCategory = this.categoryMapping[decodedCat] || decodedCat;
-          this.current.category = originalCategory;
-          
-          const decodedSubCat = subCatParam ? this.safeDecodeURIComponent(subCatParam) : '';
-          // For subcategories, convert to title case (capitalize each word)
-          if (decodedSubCat) {
-            const normalizedSubCat = decodedSubCat.replace(/-/g, ' ');
-            this.current.subCategory = normalizedSubCat.replace(/\b\w/g, l => l.toUpperCase());
+          // Wait for FAQ data to be loaded before setting category
+          if (this.faqList.length === 0) {
+            // Force reload FAQ data to ensure it's loaded
+            this.faqService.reloadFAQs().pipe(
+              take(1)
+            ).subscribe({
+              next: (faqs) => {
+                this.faqList = faqs;
+                if (faqs.length > 0) {
+                  this.setCategoryFromRoute(decodedCat, subCatParam);
+                } else {
+                  this.router.navigate(['/']);
+                }
+              },
+              error: (error) => {
+                console.error('Failed to load FAQ data:', error);
+                this.router.navigate(['/']);
+              }
+            });
           } else {
-            this.current.subCategory = '';
+            // FAQ data already loaded, set category immediately
+            this.setCategoryFromRoute(decodedCat, subCatParam);
           }
         }
       } else {
@@ -1337,6 +1348,23 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
+  /**
+   * Set category and subcategory from route parameters
+   */
+  private setCategoryFromRoute(catParam: string, subCatParam: string | null): void {
+    // Map lowercase URL back to original category name
+    const originalCategory = this.categoryMapping[catParam] || catParam;
+    this.current.category = originalCategory;
+    
+    const decodedSubCat = subCatParam ? this.safeDecodeURIComponent(subCatParam) : '';
+    // For subcategories, convert to title case (capitalize each word)
+    if (decodedSubCat) {
+      const normalizedSubCat = decodedSubCat.replace(/-/g, ' ');
+      this.current.subCategory = normalizedSubCat.replace(/\b\w/g, l => l.toUpperCase());
+    } else {
+      this.current.subCategory = '';
+    }
+  }
 
   /**
    * Safe URL decoding that handles double-encoded parameters
