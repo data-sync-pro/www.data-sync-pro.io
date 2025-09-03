@@ -925,8 +925,36 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     this.scrollToTop();
   }
 
+  /**
+   * Show FAQ detail without URL navigation (for direct URL access)
+   */
+  showFAQDetail(item: FAQItem): void {
+    // Mark that user has interacted - this enables TOC highlighting
+    this.userHasScrolled = true;
+    
+    if (!item.viewCount) {
+      item.viewCount = 0;
+    }
+    item.viewCount++;
+
+    // Set current FAQ state
+    this.updateCurrentState({
+      faqTitle: item.question,
+      faqItem: item
+    });
+
+    this.trackFAQView(item);
+
+    this.onFaqOpened(item);
+
+    // Update page metadata
+    this.updatePageMetadata();
+
+    // Scroll to top for better user experience
+    this.scrollToTop();
+  }
+
   onFaqClosed(): void {
-    // FAQ关闭时，检查是否还有其他展开的FAQ
     setTimeout(() => {
       const hasOpenPanels = this.expansionPanels?.some(panel => panel.expanded);
       if (!hasOpenPanels) {
@@ -1317,19 +1345,15 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
       // Trigger UI updates that normally happen in route parameter subscription
       this.updateTOCPaginationIndices();
       this.cdr.detectChanges();
-      this.updatePageMetadata();
       
-      // Wait for UI to update, then navigate to the specific FAQ
+      // Wait for UI to update, then show FAQ detail (without URL navigation)
       setTimeout(() => {
-        // Mark processing as complete before navigation
+        // Mark processing as complete before showing content
         this.isProcessingAnswerPath = false;
-        this.navigateToFAQ(faqItem);
-        // If this is initial load, expand the FAQ panel
-        if (this.isInitialLoad) {
-          this.expandFAQPanel(faqItem);
-          this.onFaqOpened(faqItem);
-          this.isInitialLoad = false;
-        }
+        this.isInitialLoad = false;
+        
+        // Show FAQ detail directly (URL is already correct, don't navigate again)
+        this.showFAQDetail(faqItem);
       }, 200);
     } else {
       // List some available answer paths for debugging
