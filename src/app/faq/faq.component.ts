@@ -167,7 +167,6 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
       const previewFaqId = params['faqId'];
       
       if (isPreview && previewFaqId) {
-        console.log('🔍 Preview mode detected, faqId:', previewFaqId);
         this.setupPreviewMode(previewFaqId);
         // Skip normal FAQ initialization for preview mode
         return;
@@ -196,11 +195,9 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
         // Check if this looks like an answer-based URL (contains hyphens and is longer)
         if (this.isAnswerBasedURL(decodedCat) && !subCatParam) {
           // For answer-based URLs, wait for FAQ data to be loaded
-          console.log('🔍 Answer-based URL detected:', decodedCat);
           
           // If FAQ data is not loaded yet, wait for it
           if (this.faqList.length === 0) {
-            console.log('⏳ Waiting for FAQ data before processing answer URL...');
             this.faqService.getFAQs().pipe(
               take(1),
               filter((faqs: FAQItem[]) => faqs.length > 0)
@@ -319,7 +316,6 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
         // Check if we have a pending answer-based URL to process
         const currentPath = window.location.pathname.substring(1); // Remove leading slash
         if (currentPath && this.isAnswerBasedURL(currentPath) && !this.isProcessingAnswerPath) {
-          console.log('🔍 Processing pending answer-based URL after data load:', currentPath);
           this.handleAnswerPathNavigation(currentPath);
         }
         
@@ -907,18 +903,11 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     }
     item.viewCount++;
 
-    // 设置当前FAQ
-    console.log('📋 navigateToFAQ - Setting current FAQ item:', item.question);
-    console.log('🔗 FAQ item answerPath:', item.answerPath);
-    console.log('📄 FAQ item has safeAnswer:', !!item.safeAnswer);
-    console.log('⏳ FAQ item isLoading:', item.isLoading);
     
     this.updateCurrentState({
       faqTitle: item.question,
       faqItem: item
     });
-    
-    console.log('✅ Current FAQ item set to:', this.current.faqItem?.question);
 
     // 强制刷新缓存以确保滚动同步准确性
     this.refreshFaqElementsCache();
@@ -930,7 +919,6 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     this.trackFAQView(item);
 
     // 触发FAQ内容加载
-    console.log('🎯 Calling onFaqOpened to trigger content loading...');
     this.onFaqOpened(item);
 
     // Scroll to top instead of FAQ item for better navigation experience
@@ -1293,11 +1281,9 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
    * Handle navigation based on answer path URL parameter
    */
   private handleAnswerPathNavigation(answerSlug: string): void {
-    console.log('🔍 handleAnswerPathNavigation called with:', answerSlug);
     
     // Prevent duplicate processing
     if (this.isProcessingAnswerPath) {
-      console.log('⚠️ Already processing answer path, skipping...');
       return;
     }
     
@@ -1306,7 +1292,6 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     
     // At this point, FAQ data should already be loaded from route param handler
     if (this.faqList.length === 0) {
-      console.log('⚠️ FAQ list is empty, cannot process answer path');
       this.isProcessingAnswerPath = false;
       this.isInitialLoad = false;
       return;
@@ -1314,26 +1299,20 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     
     // Find FAQ item by answer path
     const answerPath = answerSlug + '.html';
-    console.log('🎯 Looking for answerPath:', answerPath);
-    console.log('📊 Current faqList length:', this.faqList.length);
     
     // Log first few answer paths for debugging
     if (this.faqList.length > 0) {
-      console.log('📋 Sample answer paths in faqList:');
       this.faqList.slice(0, 3).forEach((item, index) => {
-        console.log(`  ${index + 1}. ${item.answerPath} (${item.question})`);
       });
     }
     
     const faqItem = this.faqList.find(item => item.answerPath === answerPath);
-    console.log('📝 Found FAQ item:', faqItem ? faqItem.question : 'NOT FOUND');
     
     if (faqItem) {
       // Set category and subcategory based on found FAQ
       this.current.category = faqItem.category;
       this.current.subCategory = faqItem.subCategory || '';
       
-      console.log('📂 Set category:', this.current.category, 'subcategory:', this.current.subCategory);
       
       // Trigger UI updates that normally happen in route parameter subscription
       this.updateTOCPaginationIndices();
@@ -1342,7 +1321,6 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
       
       // Wait for UI to update, then navigate to the specific FAQ
       setTimeout(() => {
-        console.log('🚀 Calling navigateToFAQ...');
         // Mark processing as complete before navigation
         this.isProcessingAnswerPath = false;
         this.navigateToFAQ(faqItem);
@@ -1354,10 +1332,7 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
         }
       }, 200);
     } else {
-      console.warn(`❌ FAQ not found for answer path: ${answerPath}`);
       // List some available answer paths for debugging
-      console.log('Available answer paths (first 5):', this.faqList.slice(0, 5).map(item => item.answerPath));
-      console.log('Total FAQs loaded:', this.faqList.length);
       
       // Reset processing flag on failure
       this.isProcessingAnswerPath = false;
@@ -1366,7 +1341,6 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
       // Don't redirect immediately - data might still be loading
       // Instead, try to reload FAQ data
       if (this.faqList.length === 0) {
-        console.log('🔄 FAQ list is empty, attempting to reload data...');
         this.initFaqData();
         
         // Wait for data and retry
@@ -1375,7 +1349,6 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
             take(1),
             filter((faqs: FAQItem[]) => faqs.length > 0)
           ).subscribe((faqs) => {
-            console.log('✅ FAQ data reloaded, retrying navigation');
             this.faqList = faqs;
             this.handleAnswerPathNavigation(answerSlug);
           });
@@ -2728,14 +2701,11 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
    * Setup preview mode with content from editor
    */
   private setupPreviewMode(faqId: string): void {
-    console.log('🔧 Setting up preview mode for FAQ ID:', faqId);
     
     // Get preview data from storage
     const previewData = this.previewService.getPreviewData(faqId);
-    console.log('📦 Preview data retrieved:', previewData);
     
     if (previewData) {
-      console.log('✅ Preview data found, setting up preview...');
       
       // Update page title to indicate preview mode
       this.title.setTitle(`[Preview] ${previewData.question} - Data Sync Pro FAQ`);
@@ -2771,7 +2741,6 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
       // Force change detection
       this.cdr.markForCheck();
       
-      console.log('🎉 Preview mode setup complete');
       
       // Setup storage listener for real-time updates
       this.setupPreviewUpdateListener(faqId);
@@ -2825,7 +2794,6 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
    * Listen for preview content updates from editor
    */
   private setupPreviewUpdateListener(faqId: string): void {
-    console.log('🎧 Setting up preview update listeners for FAQ ID:', faqId);
     
     // Enhanced storage event listener
     const handleStorageEvent = (event: StorageEvent) => {
@@ -2842,7 +2810,6 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
       if ((event.key === sessionKey || event.key === backupKey) && event.newValue) {
         try {
           const updatedData: PreviewData = JSON.parse(event.newValue);
-          console.log('🔄 Updating preview content from storage event');
           
           this.updatePreviewContent(updatedData);
         } catch (error) {
@@ -2853,17 +2820,14 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
 
     // Listen for storage events (cross-tab communication)
     window.addEventListener('storage', handleStorageEvent);
-    console.log('✅ Storage event listener added');
     
     // Enhanced periodic check for updates (fallback mechanism)
     const updateInterval = setInterval(() => {
-      console.log('⏰ Periodic check for preview updates...');
       this.checkForPreviewUpdates(faqId);
     }, 1000); // Increased frequency to 1 second for better responsiveness
     
     // Clean up interval on destroy
     this.destroy$.pipe(takeUntil(this.destroy$)).subscribe(() => {
-      console.log('🧹 Cleaning up preview update listeners');
       clearInterval(updateInterval);
       window.removeEventListener('storage', handleStorageEvent);
     });
@@ -2875,7 +2839,6 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
   private updatePreviewContent(updatedData: PreviewData): void {
     if (!this.current.faqItem) return;
 
-    console.log('🖼️ Updating preview UI with new content');
     
     // Update the current FAQ item with new content
     this.current.faqItem.question = updatedData.question;
@@ -2893,7 +2856,6 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     // Force DOM update
     this.cdr.detectChanges();
     
-    console.log('✨ Preview content updated successfully');
   }
 
   /**
@@ -2906,7 +2868,6 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     const currentTimestamp = this.getPreviewTimestamp();
     
     if (currentData.timestamp > currentTimestamp) {
-      console.log('📅 Found newer content via periodic check, updating...');
       this.updatePreviewContent(currentData);
     }
   }
