@@ -55,6 +55,7 @@ interface CurrentState {
 
 interface UIState {
   isLoading: boolean;
+  isLoadingRouteData: boolean;
   sidebarCollapsed: boolean;
   mobileSidebarOpen: boolean;
   mobileTOCOpen: boolean;
@@ -114,6 +115,7 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
 
   ui: UIState = {
     isLoading: false,
+    isLoadingRouteData: false,
     sidebarCollapsed: false,
     mobileSidebarOpen: false,
     mobileTOCOpen: false,
@@ -199,6 +201,9 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
           
           // If FAQ data is not loaded yet, force reload and wait
           if (this.faqList.length === 0) {
+            // Set loading state to prevent flash of default content
+            this.updateUIState({ isLoadingRouteData: true });
+            
             // Force reload FAQ data to ensure it's loaded
             this.faqService.reloadFAQs().pipe(
               take(1)
@@ -210,9 +215,12 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
                 } else {
                   this.router.navigate(['/']);
                 }
+                // Clear loading state
+                this.updateUIState({ isLoadingRouteData: false });
               },
               error: (error) => {
                 console.error('Failed to load FAQ data:', error);
+                this.updateUIState({ isLoadingRouteData: false });
                 this.router.navigate(['/']);
               }
             });
@@ -224,6 +232,9 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
           // Handle category-based URL (e.g., /general or /general/input)
           // Wait for FAQ data to be loaded before setting category
           if (this.faqList.length === 0) {
+            // Set loading state to prevent flash of default content
+            this.updateUIState({ isLoadingRouteData: true });
+            
             // Force reload FAQ data to ensure it's loaded
             this.faqService.reloadFAQs().pipe(
               take(1)
@@ -235,9 +246,12 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
                 } else {
                   this.router.navigate(['/']);
                 }
+                // Clear loading state
+                this.updateUIState({ isLoadingRouteData: false });
               },
               error: (error) => {
                 console.error('Failed to load FAQ data:', error);
+                this.updateUIState({ isLoadingRouteData: false });
                 this.router.navigate(['/']);
               }
             });
@@ -1320,24 +1334,19 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     const faqItem = this.faqList.find(item => item.answerPath === answerPath);
     
     if (faqItem) {
-      // Set category and subcategory based on found FAQ
+      // Set category and subcategory based on found FAQ but don't trigger intermediate renders
       this.current.category = faqItem.category;
       this.current.subCategory = faqItem.subCategory || '';
       
-      // Trigger UI updates that normally happen in route parameter subscription
-      this.updateTOCPaginationIndices();
-      this.cdr.detectChanges();
+      // Mark processing as complete before showing FAQ detail
+      this.isProcessingAnswerPath = false;
+      this.isInitialLoad = false;
       
-      // Wait for category UI to render, then simulate the normal FAQ click flow
-      setTimeout(() => {
-        // Mark processing as complete before triggering click simulation
-        this.isProcessingAnswerPath = false;
-        this.isInitialLoad = false;
-        
-        // Simulate normal FAQ item display without URL navigation
-        // This uses the existing showFAQDetail method which is designed for direct display
-        this.showFAQDetail(faqItem);
-      }, 150);
+      // Show FAQ detail directly without delay to prevent category flash
+      this.showFAQDetail(faqItem);
+      
+      // Update TOC pagination after FAQ is shown
+      this.updateTOCPaginationIndices();
     } else {
       // Reset processing flag on failure
       this.isProcessingAnswerPath = false;

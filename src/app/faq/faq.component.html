@@ -205,27 +205,29 @@
   </nav>
 
   <main class="faq-main">
-      <!-- 首页：显示所有FAQ -->
-      <div *ngIf="showHome" class="all-faqs">
+      <!-- Route loading state - empty div to prevent flash -->
+      <div *ngIf="ui.isLoadingRouteData" class="route-loading">
+      </div>
+
+
+      <div *ngIf="showHome && !ui.isLoadingRouteData" class="all-faqs">
         <h2 class="section-title">All FAQs</h2>
         
         <!-- Loading skeleton for initial load -->
         <app-faq-skeleton 
-          *ngIf="isLoadingState" 
+          *ngIf="isLoadingState && !ui.isLoadingRouteData" 
           type="list" 
           [count]="10">
         </app-faq-skeleton>
         
         <!-- FAQ content -->
         <ng-container 
-          *ngIf="!isLoadingState"
+          *ngIf="!isLoadingState && !ui.isLoadingRouteData"
           [ngTemplateOutlet]="faqListTemplate" 
           [ngTemplateOutletContext]="{ faqItems: allFaqList }">
         </ng-container>
       </div>
-
-      <!-- 分类页面：显示分类介绍 -->
-      <div *ngIf="!showHome && !current.faqItem && !search.isActive" class="category-intro">
+      <div *ngIf="!showHome && !current.faqItem && !search.isActive && !ui.isLoadingRouteData" class="category-intro">
         <div class="category-header">
           <h2 class="category-title">
             {{ current.subCategory || current.category }}
@@ -233,7 +235,6 @@
         </div>
       </div>
 
-      <!-- 单个FAQ详情显示 -->
       <div *ngIf="current.faqItem && !search.isActive && !search.query.trim()" class="faq-detail">
         <div class="faq-detail-content">
           <h2 class="faq-question">{{ current.faqItem.question }}</h2>
@@ -383,23 +384,21 @@
           </div>
         </div>
       </div>
-      <!-- 搜索结果和分类浏览的FAQ列表 -->
       <ng-container *ngIf="!showHome && (!current.faqItem || search.isActive || search.query.trim())">
         <!-- Loading skeleton for search/category filtering -->
         <app-faq-skeleton 
-          *ngIf="isLoadingState" 
+          *ngIf="isLoadingState && !ui.isLoadingRouteData" 
           type="search" 
           [count]="6">
         </app-faq-skeleton>
         
         <!-- FAQ list content -->
         <ng-container 
-          *ngIf="!isLoadingState"
+          *ngIf="!isLoadingState && !ui.isLoadingRouteData"
           [ngTemplateOutlet]="faqListTemplate" 
           [ngTemplateOutletContext]="{ faqItems: filteredFAQ }">
         </ng-container>
 
-        <!-- 搜索无结果时的优化显示 -->
         <div class="no-results" *ngIf="filteredFAQ.length === 0">
           <div *ngIf="search.query.trim(); else noSearchResults" class="search-no-results">
             <div class="no-results-icon">
@@ -454,7 +453,6 @@
   </main>
   </div>
 
-  <!-- Desktop TOC - Grid定位 -->
   <aside
     class="faq-toc desktop-toc"
     *ngIf="shouldShowTOC && !ui.isMobile"
