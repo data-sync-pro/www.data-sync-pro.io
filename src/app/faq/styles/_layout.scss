@@ -4,17 +4,14 @@
   scroll-behavior: smooth;
 }
 
-// W3Schools启发的现代布局变量
 $header-height: 60px;
 $sidebar-width: 280px;
 $sidebar-collapsed: 56px;
 $toc-width: 320px;
 
-// W3Schools风格的断点系统
 $breakpoint-desktop: 992px;
 $breakpoint-mobile: 500px;
 
-// 主容器：采用W3Schools的自然流动布局
 .faq-layout-container {
   display: grid;
   grid-template-areas: 
@@ -23,24 +20,21 @@ $breakpoint-mobile: 500px;
   min-height: calc(100vh - $header-height);
   margin-top: $header-height;
   
-  // W3Schools风格的响应式处理
   @media (max-width: $breakpoint-desktop) {
     grid-template-areas: "main main main";
     grid-template-columns: 1fr;
   }
 }
 
-// 内容区域：简化边距处理
 .faq-container {
   grid-area: main;
   padding: 20px 2vw;
-  min-height: calc(100vh - $header-height - 200px); // 为页脚留出自然空间
+  min-height: calc(100vh - $header-height - 200px);
   background: #ffffff;
-  transition: margin 0.3s ease; // Smooth transition for margin changes
+  transition: margin 0.3s ease; 
 
-  // When TOC is hidden, add right margin similar to sidebar collapse
   &.toc-hidden {
-    margin-right: 60px; // Add right margin when TOC is hidden, similar to sidebar collapsed margin
+    margin-right: 60px;
     
     @media (max-width: $breakpoint-desktop) {
       margin-right: 0; // Remove margin on smaller screens where TOC is already hidden
@@ -148,22 +142,19 @@ $breakpoint-mobile: 500px;
   margin: 0 1px;
 }
 
-// 主内容区域
 .faq-main {
   flex: 1;
   min-width: 0;
   padding: 20px 2vw;
-  margin-bottom: 120px; // 增加底部边距确保footer可见
+  margin-bottom: 120px; 
   background: #ffffff;
   min-height: calc(100vh - 120px);
   
-  // 当检测到footer时增加额外的底部空间
   &.footer-aware {
     margin-bottom: calc(120px + var(--footer-offset, 0px));
   }
 }
 
-// 标题样式
 .section-title,
 .category-title {
   font-size: 2.5rem !important;
@@ -175,7 +166,6 @@ $breakpoint-mobile: 500px;
   text-align: center;
 }
 
-// FAQ列表容器
 .all-faqs,
 .category-intro {
   margin: 0 auto 0 auto;
@@ -188,10 +178,8 @@ $breakpoint-mobile: 500px;
   }
 }
 
-// FAQ详情页面
 .faq-detail {
-  max-width:87%;
-  margin: 0 auto;
+  max-width:100%;
   padding: 40px 0;
 
   .faq-question {
@@ -237,7 +225,6 @@ $breakpoint-mobile: 500px;
   }
 }
 
-// 图片缩放
 .zoom-backdrop {
   position: fixed;
   inset: 0;
