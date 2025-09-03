@@ -5,22 +5,17 @@
   <title>FAQ - Data Sync Pro</title>
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <!-- 防止缓存index.html，确保总是获取最新的文件引用 -->
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <link rel="icon" type="image/png" href="pushtopic-logo.png">
-  <!-- 单页应用路由重定向脚本 - 恢复真实路径 -->
   <script>
     (function(l) {
-      // 检查是否有来自404.html的重定向参数
       if (l.search[1] === '/' ) {
         var decoded = l.search.slice(1).split('&').map(function(s) { 
           return s.replace(/~and~/g, '&')
         }).join('?');
-        
-        // 恢复原始路径
-        var originalPath = '/' + decoded.slice(1); // 移除开头的 '/'
+        var originalPath = '/' + decoded.slice(1);
         console.log('Index.html restoring path from:', l.href, 'to:', originalPath + l.hash);
         
         window.history.replaceState(null, null, originalPath + l.hash);
@@ -32,7 +27,6 @@
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <link rel="manifest" href="manifest.webmanifest">
   <meta name="theme-color" content="#1976d2">
-  <!-- JSZip library for Recipe Editor -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 </head>
 <body class="mat-typography">

@@ -265,7 +265,7 @@ export class PerformanceService {
       this.alerts.push(alert);
       this.alertsSubject.next([...this.alerts]);
       
-      console.warn(`Performance Alert (${severity}): ${metric} = ${value}ms, threshold = ${alert.threshold}ms`);
+      //console.warn(`Performance Alert (${severity}): ${metric} = ${value}ms, threshold = ${alert.threshold}ms`);
     }
   }
 
