@@ -63,7 +63,7 @@
             >
               <lightning-icon
                 iconName="utility:search"
-                size="xx-small"
+                size="x-small"
                 alternativeText="Search"
               ></lightning-icon>
               <span class="search-text">Search...</span>
@@ -122,6 +122,7 @@
                 >
                   <div class="nav-content">
                     <lightning-icon
+                      *ngIf="!ui.sidebarCollapsed"
                       iconName="utility:folder"
                       size="xx-small"
                       [alternativeText]="category.name + ' category'"

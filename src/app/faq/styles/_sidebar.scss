@@ -50,6 +50,16 @@ $breakpoint-desktop: 992px;
       display: none;
     }
 
+    // 调整折叠时的头部布局，使按钮与下方图标对齐
+    .sidebar-header {
+      justify-content: center;
+      padding: 16px 12px;
+      
+      .sidebar-toggle-btn {
+        margin: 0;
+      }
+    }
+
     .nav-item {
       justify-content: center;
       padding: 12px 8px;
@@ -63,6 +73,18 @@ $breakpoint-desktop: 992px;
 
       .nav-icon {
         margin: 0;
+      }
+    }
+
+    // 禁用分类和子分类的hover和点击效果
+    .category-nav,
+    .subcategory-nav {
+      pointer-events: none;  // 完全禁用鼠标事件
+      cursor: default;        // 鼠标指针变为默认
+      
+      &:hover {
+        background-color: transparent;  // 移除hover背景色
+        color: #5f6368;                // 保持默认颜色
       }
     }
   }

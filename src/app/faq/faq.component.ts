@@ -927,6 +927,9 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
       faqItem: item
     });
 
+    // Navigate TOC to the page containing this FAQ item
+    this.navigateToFAQPage(item);
+
     this.trackFAQView(item);
 
     // Load FAQ content directly (without URL navigation)
@@ -1765,6 +1768,8 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     this.updateUIState({ sidebarCollapsed: collapsed });
     // Save state to localStorage for persistence
     localStorage.setItem('faq-sidebar-collapsed', collapsed.toString());
+    // Force change detection to ensure icon updates immediately
+    this.cdr.detectChanges();
   }
 
   toggleTOC(): void {

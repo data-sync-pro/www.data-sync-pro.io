@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 @Component({
@@ -6,7 +6,7 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
   templateUrl: './lightning-icon.component.html',
   styleUrls: ['./lightning-icon.component.scss']
 })
-export class LightningIconComponent implements OnInit {
+export class LightningIconComponent implements OnInit, OnChanges {
   @Input() iconName!: string;
   @Input() size: 'xx-small' | 'x-small' | 'small' | 'medium' | 'large' = 'medium';
   @Input() variant: 'bare' | 'container' | 'border' | 'border-filled' = 'bare';
@@ -22,6 +22,13 @@ export class LightningIconComponent implements OnInit {
   ngOnInit() {
     this.parseIconName();
     this.loadIconSvg();
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['iconName'] && !changes['iconName'].firstChange) {
+      this.parseIconName();
+      this.loadIconSvg();
+    }
   }
 
   private parseIconName() {
