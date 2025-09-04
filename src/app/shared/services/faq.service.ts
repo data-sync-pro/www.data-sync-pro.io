@@ -546,6 +546,27 @@ export class FAQService implements OnDestroy {
         });
         
         this.categoriesCache = Array.from(categoryMap.values());
+        
+        // Apply specific sorting order for Rules Engines subcategories
+        this.categoriesCache.forEach(category => {
+          if (category.name === 'Rules Engines') {
+            const sortOrder = ['Batch', 'Trigger', 'Data List', 'Action Button', 'Data Loader'];
+            category.subCategories.sort((a, b) => {
+              const aIndex = sortOrder.indexOf(a.name);
+              const bIndex = sortOrder.indexOf(b.name);
+              // If both items are in the sort order, sort by their position
+              if (aIndex !== -1 && bIndex !== -1) {
+                return aIndex - bIndex;
+              }
+              // If only one item is in the sort order, put it first
+              if (aIndex !== -1) return -1;
+              if (bIndex !== -1) return 1;
+              // If neither item is in the sort order, use alphabetical sorting
+              return a.name.localeCompare(b.name);
+            });
+          }
+        });
+        
         return this.categoriesCache;
       }),
       shareReplay(1)
