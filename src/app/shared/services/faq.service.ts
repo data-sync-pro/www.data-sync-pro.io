@@ -546,6 +546,27 @@ export class FAQService implements OnDestroy {
         });
         
         this.categoriesCache = Array.from(categoryMap.values());
+        
+        // Apply specific sorting order for Rules Engines subcategories
+        this.categoriesCache.forEach(category => {
+          if (category.name === 'Rules Engines') {
+            const sortOrder = ['Batch', 'Trigger', 'Data List', 'Action Button', 'Data Loader'];
+            category.subCategories.sort((a, b) => {
+              const aIndex = sortOrder.indexOf(a.name);
+              const bIndex = sortOrder.indexOf(b.name);
+              // If both items are in the sort order, sort by their position
+              if (aIndex !== -1 && bIndex !== -1) {
+                return aIndex - bIndex;
+              }
+              // If only one item is in the sort order, put it first
+              if (aIndex !== -1) return -1;
+              if (bIndex !== -1) return 1;
+              // If neither item is in the sort order, use alphabetical sorting
+              return a.name.localeCompare(b.name);
+            });
+          }
+        });
+        
         return this.categoriesCache;
       }),
       shareReplay(1)
@@ -683,8 +704,27 @@ export class FAQService implements OnDestroy {
   reloadFAQs(): Observable<FAQItem[]> {
     this.categoriesCache = [];
     this.clearContentCache();
-    this.loadFAQs();
-    return this.getFAQs();
+    
+    // Return the actual HTTP request Observable, not the current cache
+    this.isLoading = true;
+    
+    return this.http.get<SourceFAQRecord[]>(this.FAQ_DATA_URL).pipe(
+      map(records => {
+        const activeRecords = records.filter(record => record.isActive !== false);
+        const transformedFAQs = activeRecords.map(record => this.transformToFAQItem(record));
+        return transformedFAQs;
+      }),
+      tap(faqs => {
+        this.faqsCache$.next(faqs);
+      }),
+      catchError(error => {
+        console.error('Failed to reload FAQ data:', error);
+        return of([]);
+      }),
+      finalize(() => {
+        this.isLoading = false;
+      })
+    );
   }
 
   /**
@@ -785,7 +825,7 @@ export class FAQService implements OnDestroy {
       normalizedSrc = `assets/${src}`;
     }
 
-    // Create container with better structure
+    // Create container with comprehensive error handling
     return `<div class="faq-picture">
       <img 
         src="${normalizedSrc}" 
@@ -793,8 +833,8 @@ export class FAQService implements OnDestroy {
         class="faq-image"
         style="display: block; margin: 20px auto; max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); transition: transform 0.3s ease;"
         loading="lazy"
-        onload="this.parentElement.classList.add('image-loaded')"
-      >
+        onload="if(this.parentElement){this.parentElement.classList.add('image-loaded')}"
+            >
     </div>`;
   }
 
@@ -885,7 +925,7 @@ export class FAQService implements OnDestroy {
         }
       }
       
-      console.log('🔍 Checking application version...');
+      //console.log('🔍 Checking application version...');
       
       // Get remote version
       const response = await this.http.get<any>(this.VERSION_URL).toPromise();
@@ -894,10 +934,10 @@ export class FAQService implements OnDestroy {
       // Get local version
       const localVersion = localVersionData ? JSON.parse(localVersionData).build : null;
       
-      console.log('📊 Version comparison:', { local: localVersion, remote: remoteVersion });
+      //console.log('📊 Version comparison:', { local: localVersion, remote: remoteVersion });
       
       if (!localVersion || localVersion !== remoteVersion) {
-        console.log('🆕 New version detected, clearing all caches...');
+        //console.log('🆕 New version detected, clearing all caches...');
         this.clearAllCaches();
         
         // Save new version with reset check time
@@ -908,14 +948,14 @@ export class FAQService implements OnDestroy {
           lastCheckTime: Date.now()
         }));
         
-        console.log('✅ Cache cleared and version updated');
+        //console.log('✅ Cache cleared and version updated');
         
         // Silent automatic page refresh
         setTimeout(() => {
           window.location.reload();
         }, 100);
       } else {
-        console.log('✅ Version is up to date');
+        //console.log('✅ Version is up to date');
         
         // Update last check time even if no version change
         const currentVersionInfo = localVersionData ? JSON.parse(localVersionData) : {};
@@ -955,7 +995,7 @@ export class FAQService implements OnDestroy {
       
       // Note: IndexedDB (FAQEditorDB, RecipeEditorDB) is automatically preserved
       
-      console.log('🧹 All caches cleared successfully (IndexedDB preserved)');
+      //console.log('🧹 All caches cleared successfully (IndexedDB preserved)');
     } catch (error) {
       console.error('❌ Failed to clear caches:', error);
     }

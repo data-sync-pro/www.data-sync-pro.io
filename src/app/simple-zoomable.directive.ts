@@ -119,7 +119,6 @@ export class SimpleZoomableDirective implements AfterViewInit, OnDestroy {
       return;
     }
 
-    // 创建背景遮罩
     this.backdropEl = this.rd.createElement('div');
     this.rd.setStyle(this.backdropEl, 'position', 'fixed');
     this.rd.setStyle(this.backdropEl, 'top', '0');
@@ -133,10 +132,8 @@ export class SimpleZoomableDirective implements AfterViewInit, OnDestroy {
     this.rd.setStyle(this.backdropEl, 'justify-content', 'center');
     this.rd.setStyle(this.backdropEl, 'cursor', 'zoom-out');
 
-    // 创建图片克隆
     this.clonedImg = img.cloneNode(true) as HTMLImageElement;
     
-    // 计算最佳尺寸 - 使用95%的屏幕宽度
     const maxWidth = window.innerWidth * 0.95;
     const maxHeight = window.innerHeight * 0.9;
     const imgRatio = img.naturalWidth / img.naturalHeight;
@@ -144,17 +141,13 @@ export class SimpleZoomableDirective implements AfterViewInit, OnDestroy {
     let finalWidth: number;
     let finalHeight: number;
 
-    // 优先使用95%的屏幕宽度
     finalWidth = maxWidth;
     finalHeight = finalWidth / imgRatio;
 
-    // 如果高度超出屏幕，则调整为适合屏幕高度
     if (finalHeight > maxHeight) {
       finalHeight = maxHeight;
       finalWidth = finalHeight * imgRatio;
     }
-
-    // 设置克隆图片样式
     this.rd.setStyle(this.clonedImg, 'width', `${finalWidth}px`);
     this.rd.setStyle(this.clonedImg, 'height', `${finalHeight}px`);
     this.rd.setStyle(this.clonedImg, 'max-width', 'none');
