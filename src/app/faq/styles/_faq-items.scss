@@ -7,11 +7,40 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
 // Virtual scrolling viewport
 .faq-virtual-viewport {
-  height: 58vh; // Adjust height to fit page viewport minus header/footer space
+  // Precise calculation: 100vh - (header:60px + layout-margin:60px + breadcrumb:32px + container-padding:40px + main-padding:40px)
+  height: calc(100vh - 325px);
   width: 100%;
   border-radius: 8px;
   overflow: hidden;
   
+  // When on homepage (all-faqs) without breadcrumb navigation
+  .all-faqs & {
+    height: calc(100vh - 270px); 
+  }
+  
+  // Mobile responsive adjustments
+  @media (max-width: 768px) {
+    height: calc(100vh - 180px); // Mobile has smaller header and padding
+    max-height: calc(100vh - 180px);
+    min-height: 250px;
+    
+    .all-faqs & {
+      height: calc(100vh - 160px);
+      max-height: calc(100vh - 160px);
+    }
+  }
+  
+  @media (max-width: 480px) {
+    height: calc(100vh - 150px); // Even less space on small mobile
+    max-height: calc(100vh - 150px);
+    min-height: 200px;
+    
+    .all-faqs & {
+      height: calc(100vh - 130px);
+      max-height: calc(100vh - 130px);
+    }
+  }
+
   // Custom scrollbar for the virtual viewport
   ::ng-deep .cdk-virtual-scroll-content-wrapper {
     scrollbar-width: thin;
