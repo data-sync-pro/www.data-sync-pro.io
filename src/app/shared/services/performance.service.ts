@@ -218,7 +218,7 @@ export class PerformanceService {
       });
     } else {
       const duration = performance.now() - startTime;
-      console.log(`Performance: ${name} took ${duration.toFixed(2)}ms`);
+      //console.log(`Performance: ${name} took ${duration.toFixed(2)}ms`);
       return result;
     }
   }
@@ -265,7 +265,7 @@ export class PerformanceService {
       this.alerts.push(alert);
       this.alertsSubject.next([...this.alerts]);
       
-      console.warn(`Performance Alert (${severity}): ${metric} = ${value}ms, threshold = ${alert.threshold}ms`);
+      //console.warn(`Performance Alert (${severity}): ${metric} = ${value}ms, threshold = ${alert.threshold}ms`);
     }
   }
 

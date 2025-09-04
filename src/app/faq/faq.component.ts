@@ -13,15 +13,13 @@ import {
   ChangeDetectorRef
 } from '@angular/core';
 import { trigger, state, style, transition, animate } from '@angular/animations';
-import { MatExpansionPanel } from '@angular/material/expansion';
 import { DomSanitizer } from '@angular/platform-browser';
 import { AnalyticsService } from '../analytics.service';
 import { Meta, Title } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subject, fromEvent } from 'rxjs';
-import { takeUntil, debounceTime, take, filter } from 'rxjs/operators';
+import { takeUntil, debounceTime, take, filter, tap } from 'rxjs/operators';
 
-// 导入统一的模型和服务
 import { FAQItem, FAQCategory, FAQSubCategory } from '../shared/models/faq.model';
 import { FAQService } from '../shared/services/faq.service';
 import { PerformanceService } from '../shared/services/performance.service';
@@ -57,6 +55,7 @@ interface CurrentState {
 
 interface UIState {
   isLoading: boolean;
+  isLoadingRouteData: boolean;
   sidebarCollapsed: boolean;
   mobileSidebarOpen: boolean;
   mobileTOCOpen: boolean;
@@ -116,6 +115,7 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
 
   ui: UIState = {
     isLoading: false,
+    isLoadingRouteData: false,
     sidebarCollapsed: false,
     mobileSidebarOpen: false,
     mobileTOCOpen: false,
@@ -194,35 +194,70 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
         
         // Check if this looks like an answer-based URL (contains hyphens and is longer)
         if (this.isAnswerBasedURL(decodedCat) && !subCatParam) {
+          // Set processing flag immediately to prevent race conditions
+          this.isProcessingAnswerPath = true;
+          
           // For answer-based URLs, wait for FAQ data to be loaded
           
-          // If FAQ data is not loaded yet, wait for it
+          // If FAQ data is not loaded yet, force reload and wait
           if (this.faqList.length === 0) {
-            this.faqService.getFAQs().pipe(
-              take(1),
-              filter((faqs: FAQItem[]) => faqs.length > 0)
-            ).subscribe((faqs) => {
-              //console.log('✅ FAQ data loaded, processing answer URL');
-              this.faqList = faqs;
-              this.handleAnswerPathNavigation(decodedCat);
+            // Set loading state to prevent flash of default content
+            this.updateUIState({ isLoadingRouteData: true });
+            
+            // Force reload FAQ data to ensure it's loaded
+            this.faqService.reloadFAQs().pipe(
+              take(1)
+            ).subscribe({
+              next: (faqs) => {
+                this.faqList = faqs;
+                if (faqs.length > 0) {
+                  this.handleAnswerPathNavigation(decodedCat, true);
+                } else {
+                  this.router.navigate(['/']);
+                }
+                // Clear loading state
+                this.updateUIState({ isLoadingRouteData: false });
+              },
+              error: (error) => {
+                console.error('Failed to load FAQ data:', error);
+                this.updateUIState({ isLoadingRouteData: false });
+                this.router.navigate(['/']);
+              }
             });
           } else {
             // FAQ data already loaded, process immediately
-            this.handleAnswerPathNavigation(decodedCat);
+            this.handleAnswerPathNavigation(decodedCat, true);
           }
         } else {
           // Handle category-based URL (e.g., /general or /general/input)
-          // Map lowercase URL back to original category name
-          const originalCategory = this.categoryMapping[decodedCat] || decodedCat;
-          this.current.category = originalCategory;
-          
-          const decodedSubCat = subCatParam ? this.safeDecodeURIComponent(subCatParam) : '';
-          // For subcategories, convert to title case (capitalize each word)
-          if (decodedSubCat) {
-            const normalizedSubCat = decodedSubCat.replace(/-/g, ' ');
-            this.current.subCategory = normalizedSubCat.replace(/\b\w/g, l => l.toUpperCase());
+          // Wait for FAQ data to be loaded before setting category
+          if (this.faqList.length === 0) {
+            // Set loading state to prevent flash of default content
+            this.updateUIState({ isLoadingRouteData: true });
+            
+            // Force reload FAQ data to ensure it's loaded
+            this.faqService.reloadFAQs().pipe(
+              take(1)
+            ).subscribe({
+              next: (faqs) => {
+                this.faqList = faqs;
+                if (faqs.length > 0) {
+                  this.setCategoryFromRoute(decodedCat, subCatParam);
+                } else {
+                  this.router.navigate(['/']);
+                }
+                // Clear loading state
+                this.updateUIState({ isLoadingRouteData: false });
+              },
+              error: (error) => {
+                console.error('Failed to load FAQ data:', error);
+                this.updateUIState({ isLoadingRouteData: false });
+                this.router.navigate(['/']);
+              }
+            });
           } else {
-            this.current.subCategory = '';
+            // FAQ data already loaded, set category immediately
+            this.setCategoryFromRoute(decodedCat, subCatParam);
           }
         }
       } else {
@@ -238,7 +273,6 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
       this.updatePageMetadata();
     });
 
-    // 处理URL片段，自动展开对应的FAQ项目
     this.route.fragment.pipe(
       takeUntil(this.destroy$)
     ).subscribe(fragment => {
@@ -256,7 +290,6 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    // 延迟初始化缓存，确保DOM完全渲染
     setTimeout(() => {
       this.refreshFaqElementsCache();
       
@@ -277,15 +310,7 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
       clearTimeout(this.scrollTimeout);
     }
     
-    // Clean up intersection observer
-    if (this.expansionPanels) {
-      this.expansionPanels.forEach(panel => {
-        const element = (panel as any)._elementRef?.nativeElement;
-        if (element) {
-          this.faqService.unobserveElement(element);
-        }
-      });
-    }
+    // Clean up intersection observer (no longer needed without expansion panels)
     
     // Clean up footer observer
     this.cleanupFooterObserver();
@@ -297,7 +322,6 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
   private initFaqData(): void {
     this.updateUIState({ isLoading: true });
 
-    // 使用新的FAQ服务
     this.faqService.getFAQs().pipe(
       takeUntil(this.destroy$)
     ).subscribe({
@@ -313,13 +337,9 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
         this.cachedFaqElements = null;
         this.cachedQuestionTexts.clear();
         
-        // Check if we have a pending answer-based URL to process
-        const currentPath = window.location.pathname.substring(1); // Remove leading slash
-        if (currentPath && this.isAnswerBasedURL(currentPath) && !this.isProcessingAnswerPath) {
-          this.handleAnswerPathNavigation(currentPath);
-        }
+        // Note: Answer-based URL handling is ONLY done through route parameter processing
+        // to avoid race conditions. Do not add URL handling logic here.
         
-        // 数据加载完成后处理pending fragment
         this.handlePendingFragment();
         // Set up preloading observers
         this.setupPreloadingObservers();
@@ -332,7 +352,6 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
       }
     });
 
-    // 加载分类信息
     this.faqService.getCategories().pipe(
       takeUntil(this.destroy$)
     ).subscribe({
@@ -354,7 +373,7 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     'transformation': 'Transformation',
     'executables': 'Executables',
     'connections': 'Connections',
-    'query-manager-q': 'Query Manager(Q)'
+    'query-manager': 'Query Manager'
   };
 
   // Reverse mapping (original name → lowercase URL)
@@ -366,7 +385,7 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     'Transformation': 'transformation',
     'Executables': 'executables', 
     'Connections': 'connections',
-    'Query Manager(Q)': 'query-manager-q'
+    'Query Manager': 'query-manager'
   };
 
   private encode = (s: string) => {
@@ -492,8 +511,6 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     
     // Clear cached FAQ elements when state changes
     this.cachedFaqElements = null;
-    
-    this.closeAllFAQPanels();
   }
 
   // State update helpers for immutability and OnPush optimization
@@ -538,17 +555,6 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
 
-  private closeAllFAQPanels(): void {
-    setTimeout(() => {
-      if (!this.expansionPanels) return;
-      
-      this.expansionPanels.forEach(panel => {
-        if (panel.expanded) {
-          panel.close();
-        }
-      });
-    }, 0);
-  }
 
   private highlightKeywords(text: string, keywords: string[]): string {
     if (!keywords.length || !text) return text;
@@ -564,7 +570,6 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   }
 
-  // 计算搜索相关性评分
   private calculateRelevanceScore(item: FAQItem, query: string): { score: number; matchType: 'title' | 'content' | 'category'; matchedText: string } {
     const lowerQuery = query.toLowerCase();
     const lowerQuestion = item.question.toLowerCase();
@@ -576,35 +581,29 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     let matchType: 'title' | 'content' | 'category' = 'content';
     let matchedText = '';
 
-    // 标题完全匹配 - 最高分
     if (lowerQuestion === lowerQuery) {
       score = 100;
       matchType = 'title';
       matchedText = item.question;
     }
-    // 标题开头匹配 - 高分
     else if (lowerQuestion.startsWith(lowerQuery)) {
       score = 90;
       matchType = 'title';
       matchedText = item.question;
     }
-    // 标题包含匹配 - 中高分
     else if (lowerQuestion.includes(lowerQuery)) {
       score = 80;
       matchType = 'title';
       matchedText = item.question;
     }
-    // 分类匹配 - 中分
     else if (lowerCategory.includes(lowerQuery) || lowerSubCategory.includes(lowerQuery)) {
       score = 60;
       matchType = 'category';
       matchedText = item.category + (item.subCategory ? ` > ${item.subCategory}` : '');
     }
-    // 答案内容匹配 - 低分
     else if (lowerAnswer.includes(lowerQuery)) {
       score = 40;
       matchType = 'content';
-      // 提取匹配的上下文
       const index = lowerAnswer.indexOf(lowerQuery);
       const start = Math.max(0, index - 50);
       const end = Math.min(lowerAnswer.length, index + lowerQuery.length + 50);
@@ -665,12 +664,10 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     return this.current.faqItem;
   }
 
-  // TOC 优化的计算属性
   private _cachedTrendingQuestions?: FAQItem[];
   private _lastFaqListLength?: number;
 
   get trendingQuestions(): FAQItem[] {
-    // 缓存热门问题，只有当FAQ列表变化时才重新计算
     if (!this._cachedTrendingQuestions || this._lastFaqListLength !== this.faqList.length) {
       const trendingIds = [
         'a0oEc000005JohNIAS',
@@ -708,22 +705,18 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   get shouldShowTOC(): boolean {
-    // 移动设备使用抽屉式TOC，这里返回false
     if (this.ui.isMobile) {
       return false;
     }
 
-    // 搜索状态不显示
     if (this.search.isActive || this.search.query.trim()) {
       return false;
     }
 
-    // 首页显示trending questions
     if (this.showHome) {
       return this.trendingQuestions.length > 0;
     }
 
-    // 分类页面显示分类TOC
     return (!!this.current.category || !!this.current.subCategory) &&
            this.currentFAQList.length > 1;
   }
@@ -742,7 +735,6 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
   get filteredFAQ(): FAQItem[] {
     const q = this.search.query.toLowerCase().trim();
 
-    // 如果有搜索查询，使用智能搜索
     if (q) {
       return this.performSmartSearch(q);
     }
@@ -755,7 +747,6 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     });
   }
 
-  // 智能搜索方法
   private performSmartSearch(query: string): FAQItem[] {
     return this.performanceService.measure('faq-smart-search-render', () => {
       const keywords = query.split(/\s+/).filter(k => k.length > 0);
@@ -840,9 +831,7 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
       item.question.toLowerCase() === this.search.query.toLowerCase().trim()
     );
 
-    if (exactMatch) {
-      setTimeout(() => this.expandFAQPanel(exactMatch), 100);
-    }
+    // FAQ exact match found - content will be displayed directly
 
     this.search.query = '';
     this.search.isActive = false;
@@ -871,7 +860,7 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     // Load FAQ content
     if (!item.safeAnswer && item.answerPath) {
       item.isLoading = true;
-      this.cdr.markForCheck(); // 触发变更检测显示加载状态
+      this.cdr.markForCheck(); 
 
       this.faqService.getFAQContent(item.answerPath).pipe(
         takeUntil(this.destroy$)
@@ -887,7 +876,7 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
           item.safeAnswer = this.sanitizer.bypassSecurityTrustHtml(
             '<p class="error-message">Failed to load content, please try again later</p>'
           );
-          this.cdr.markForCheck(); // 确保错误状态也能更新UI
+          this.cdr.markForCheck();
         }
       });
     }
@@ -897,7 +886,6 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     // Mark that user has interacted - this enables TOC highlighting
     this.userHasScrolled = true;
     
-    // 增加查看次数
     if (!item.viewCount) {
       item.viewCount = 0;
     }
@@ -909,34 +897,82 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
       faqItem: item
     });
 
-    // 强制刷新缓存以确保滚动同步准确性
     this.refreshFaqElementsCache();
 
-    // 更新浏览器URL
     this.updateBrowserURL(item);
 
-    // 跟踪FAQ查看
     this.trackFAQView(item);
 
-    // 触发FAQ内容加载
     this.onFaqOpened(item);
 
     // Scroll to top instead of FAQ item for better navigation experience
     this.scrollToTop();
   }
 
+  /**
+   * Show FAQ detail without URL navigation (for direct URL access)
+   */
+  showFAQDetail(item: FAQItem): void {
+    // Mark that user has interacted - this enables TOC highlighting
+    this.userHasScrolled = true;
+    
+    if (!item.viewCount) {
+      item.viewCount = 0;
+    }
+    item.viewCount++;
+
+    // Set current FAQ state
+    this.updateCurrentState({
+      faqTitle: item.question,
+      faqItem: item
+    });
+
+    this.trackFAQView(item);
+
+    // Load FAQ content directly (without URL navigation)
+    this.loadFAQContent(item);
+
+    // Update page metadata
+    this.updatePageMetadata();
+
+    // Scroll to top for better user experience
+    this.scrollToTop();
+  }
+
+  /**
+   * Pure content loading method without URL navigation or panel expansion
+   */
+  private loadFAQContent(item: FAQItem): void {
+    // Load FAQ content if not already loaded
+    if (!item.safeAnswer && item.answerPath) {
+      item.isLoading = true;
+      this.cdr.markForCheck(); // Trigger change detection to show loading state
+
+      this.faqService.getFAQContent(item.answerPath).pipe(
+        takeUntil(this.destroy$)
+      ).subscribe({
+        next: (content) => {
+          item.safeAnswer = content;
+          item.isLoading = false;
+          this.cdr.markForCheck(); 
+        },
+        error: (error) => {
+          console.error('Failed to load FAQ content:', error);
+          item.isLoading = false;
+          item.safeAnswer = this.sanitizer.bypassSecurityTrustHtml(
+            '<p class="error-message">Failed to load content, please try again later</p>'
+          );
+          this.cdr.markForCheck(); // Ensure error state is also updated in UI
+        }
+      });
+    }
+  }
+
   onFaqClosed(): void {
-    // FAQ关闭时，检查是否还有其他展开的FAQ
-    setTimeout(() => {
-      const hasOpenPanels = this.expansionPanels?.some(panel => panel.expanded);
-      if (!hasOpenPanels) {
-        // If no expanded FAQ, remove fragment from URL
-        this.clearBrowserURLFragment();
-        // Clear current FAQ title
-        this.current.faqTitle = '';
-        this.current.faqItem = null;
-      }
-    }, 100);
+    // Clear current FAQ title and item when FAQ is closed
+    this.clearBrowserURLFragment();
+    this.current.faqTitle = '';
+    this.current.faqItem = null;
   }
 
 
@@ -1145,7 +1181,7 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
       : ['/', this.encode(faqItem.category)];
 
     this.router.navigate(url, { fragment: this.slugify(faqItem.question) });
-    setTimeout(() => this.expandFAQPanel(faqItem), 500);
+    // FAQ content will be displayed directly without panel expansion
   }
 
 
@@ -1157,8 +1193,7 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
 
     const faqItem = this.faqList.find(item => item.question === suggestion);
     if (faqItem) {
-      this.expandFAQPanel(faqItem);
-      this.onFaqOpened(faqItem);
+      this.showFAQDetail(faqItem);
     }
   }
 
@@ -1231,17 +1266,15 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     return answer.replace(/\.html$/, '').toLowerCase();
   }
   openSearchOverlay(initialQuery?: string): void {
-    // 设置初始查询
     this.searchOverlayInitialQuery = initialQuery || '';
     this.updateSearchState({ isOpen: true });
   }
 
   closeSearchOverlay(): void {
-    this.searchOverlayInitialQuery = ''; // 清空初始查询
+    this.searchOverlayInitialQuery = ''; 
     this.updateSearchState({ isOpen: false });
   }
   @ViewChild('faqSearchBox') faqSearchBox!: ElementRef<HTMLInputElement>;
-  @ViewChildren(MatExpansionPanel) expansionPanels!: QueryList<MatExpansionPanel>;
 
   slugify(s: string): string {
     return s.toLowerCase()
@@ -1280,10 +1313,9 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
   /**
    * Handle navigation based on answer path URL parameter
    */
-  private handleAnswerPathNavigation(answerSlug: string): void {
-    
-    // Prevent duplicate processing
-    if (this.isProcessingAnswerPath) {
+  private handleAnswerPathNavigation(answerSlug: string, fromRouteHandler: boolean = false): void {
+    // Prevent duplicate processing, unless explicitly called from route handler
+    if (this.isProcessingAnswerPath && !fromRouteHandler) {
       return;
     }
     
@@ -1299,64 +1331,49 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     
     // Find FAQ item by answer path
     const answerPath = answerSlug + '.html';
-    
-    // Log first few answer paths for debugging
-    if (this.faqList.length > 0) {
-      this.faqList.slice(0, 3).forEach((item, index) => {
-      });
-    }
-    
     const faqItem = this.faqList.find(item => item.answerPath === answerPath);
     
     if (faqItem) {
-      // Set category and subcategory based on found FAQ
+      // Set category and subcategory based on found FAQ but don't trigger intermediate renders
       this.current.category = faqItem.category;
       this.current.subCategory = faqItem.subCategory || '';
       
+      // Mark processing as complete before showing FAQ detail
+      this.isProcessingAnswerPath = false;
+      this.isInitialLoad = false;
       
-      // Trigger UI updates that normally happen in route parameter subscription
+      // Show FAQ detail directly without delay to prevent category flash
+      this.showFAQDetail(faqItem);
+      
+      // Update TOC pagination after FAQ is shown
       this.updateTOCPaginationIndices();
-      this.cdr.detectChanges();
-      this.updatePageMetadata();
-      
-      // Wait for UI to update, then navigate to the specific FAQ
-      setTimeout(() => {
-        // Mark processing as complete before navigation
-        this.isProcessingAnswerPath = false;
-        this.navigateToFAQ(faqItem);
-        // If this is initial load, expand the FAQ panel
-        if (this.isInitialLoad) {
-          this.expandFAQPanel(faqItem);
-          this.onFaqOpened(faqItem);
-          this.isInitialLoad = false;
-        }
-      }, 200);
     } else {
-      // List some available answer paths for debugging
-      
       // Reset processing flag on failure
       this.isProcessingAnswerPath = false;
       this.isInitialLoad = false;
       
-      // Don't redirect immediately - data might still be loading
-      // Instead, try to reload FAQ data
-      if (this.faqList.length === 0) {
-        this.initFaqData();
-        
-        // Wait for data and retry
-        setTimeout(() => {
-          this.faqService.getFAQs().pipe(
-            take(1),
-            filter((faqs: FAQItem[]) => faqs.length > 0)
-          ).subscribe((faqs) => {
-            this.faqList = faqs;
-            this.handleAnswerPathNavigation(answerSlug);
-          });
-        }, 500);
-      }
+      // If FAQ not found, redirect to home to avoid broken state
+      this.router.navigate(['/']);
     }
   }
 
+  /**
+   * Set category and subcategory from route parameters
+   */
+  private setCategoryFromRoute(catParam: string, subCatParam: string | null): void {
+    // Map lowercase URL back to original category name
+    const originalCategory = this.categoryMapping[catParam] || catParam;
+    this.current.category = originalCategory;
+    
+    const decodedSubCat = subCatParam ? this.safeDecodeURIComponent(subCatParam) : '';
+    // For subcategories, convert to title case (capitalize each word)
+    if (decodedSubCat) {
+      const normalizedSubCat = decodedSubCat.replace(/-/g, ' ');
+      this.current.subCategory = normalizedSubCat.replace(/\b\w/g, l => l.toUpperCase());
+    } else {
+      this.current.subCategory = '';
+    }
+  }
 
   /**
    * Safe URL decoding that handles double-encoded parameters
@@ -1411,10 +1428,9 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
       
       if (idx >= 0) {
         const faqItem = this.filteredFAQ[idx];
-        const panel = this.expansionPanels.toArray()[idx];
         
-        // Open the panel
-        panel.open();
+        // Show FAQ detail directly
+        this.showFAQDetail(faqItem);
         
         // Scroll to top instead of FAQ item for better navigation experience
         this.scrollToTop();
@@ -1507,29 +1523,14 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
 
   private handlePendingFragment(): void {
     if (this.pendingFragment && this.faqList.length > 0) {
-      // 立即处理fragment，不需要长时间延迟
       setTimeout(() => {
         this.scrollToAndExpandFAQ(this.pendingFragment!);
         this.pendingFragment = undefined;
-        // 确保UI立即更新
         this.cdr.detectChanges();
-      }, 100); // 减少延迟时间，只等待DOM更新
+      }, 100);
     }
   }
 
-  private expandFAQPanel(faqItem: FAQItem): void {
-    setTimeout(() => {
-      if (!this.expansionPanels) return;
-      
-      const panels = this.expansionPanels.toArray();
-      const faqList = this.current.category ? this.filteredFAQ : this.allFaqList;
-      const targetIndex = faqList.findIndex(item => item.id === faqItem.id);
-
-      if (targetIndex >= 0 && panels[targetIndex]) {
-        panels[targetIndex].open();
-      }
-    }, 50);
-  }
 
 
 
@@ -1577,8 +1578,7 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     this.current.faqTitle = faqItem.question;
     this.activeScrollElement = faqItem.question;
 
-    this.expandFAQPanel(faqItem);
-    this.onFaqOpened(faqItem);
+    this.showFAQDetail(faqItem);
     this.updateFAQMetadata(faqItem);
     this.scrollToElement(this.slugify(faqItem.question));
   }
@@ -1603,7 +1603,6 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
   toggleSocialShare(faqItem: FAQItem): void {
     faqItem.showSocialShare = !faqItem.showSocialShare;
 
-    // 关闭其他FAQ的社交分享下拉菜单
     this.faqList.forEach(item => {
       if (item.id !== faqItem.id) {
         item.showSocialShare = false;
@@ -1623,8 +1622,6 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     } else {
       this.fallbackCopyToClipboard(shareUrl);
     }
-
-    // 跟踪分享事件
     this.analyticsService.trackCustomEvent({
       eventType: 'faq_share',
       action: 'copy_link',
@@ -1655,7 +1652,6 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   private showCopySuccess(): void {
-    // 创建临时的成功提示
     const toast = document.createElement('div');
     toast.textContent = '✅ Link copied to clipboard!';
     toast.style.cssText = `
@@ -1673,7 +1669,6 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
       animation: slideIn 0.3s ease;
     `;
 
-    // 添加动画样式
     const style = document.createElement('style');
     style.textContent = `
       @keyframes slideIn {
@@ -1689,7 +1684,6 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
 
     document.body.appendChild(toast);
 
-    // 3秒后移除提示
     setTimeout(() => {
       toast.style.animation = 'slideOut 0.3s ease';
       setTimeout(() => {
@@ -1727,7 +1721,6 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     if (socialUrl) {
       window.open(socialUrl, '_blank', 'width=600,height=400');
 
-      // 跟踪分享事件
       this.analyticsService.trackCustomEvent({
         eventType: 'faq_share',
         action: `share_${platform}`,
@@ -1833,7 +1826,6 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
   // Keyboard shortcut for search overlay
   @HostListener('document:keydown', ['$event'])
   onKeydown(event: KeyboardEvent): void {
-    // 检查是否在输入框中，如果是则跳过处理
     const activeElement = document.activeElement;
     const isInputActive = activeElement && (
       activeElement.tagName === 'INPUT' || 
@@ -1847,7 +1839,6 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
       this.openSearchOverlay();
     }
 
-    // / 键打开搜索（仅当不在输入框中时）
     if (event.key === '/' && !isInputActive) {
       event.preventDefault();
       this.openSearchOverlay();
@@ -1979,14 +1970,14 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     const problematicFAQs = this.faqList
       .filter(faq => !faq.safeAnswer && !faq.isLoading && faq.answerPath)
       .slice(0, 5);
-    
+    /*
     if (problematicFAQs.length > 0) {
       console.log('Problematic FAQs:', problematicFAQs.map(faq => ({
         id: faq.id,
         question: faq.question,
         answerPath: faq.answerPath
       })));
-    }
+    }*/
   }
 
   // ==================== Table of Contents Methods ====================
@@ -2147,8 +2138,8 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     // 跟踪FAQ查看
     this.trackFAQView(item);
 
-    // 展开对应的FAQ面板
-    this.expandFAQPanel(item);
+    // Display FAQ content directly
+    this.showFAQDetail(item);
 
     // Scroll to top instead of FAQ item for better navigation experience
     this.scrollToTop();
@@ -2346,8 +2337,8 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     // 跟踪FAQ查看
     this.trackFAQView(item);
 
-    // 展开对应的FAQ面板
-    this.expandFAQPanel(item);
+    // Display FAQ content directly
+    this.showFAQDetail(item);
 
     // Scroll to top instead of FAQ item for better navigation experience
     this.scrollToTop();
@@ -2799,13 +2790,13 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     const handleStorageEvent = (event: StorageEvent) => {
       const sessionKey = `faq-preview-${faqId}`;
       const backupKey = `backup-faq-preview-${faqId}`;
-      
+      /*
       console.log('📡 Storage event received:', {
         key: event.key,
         hasNewValue: !!event.newValue,
         storageType: event.storageArea === sessionStorage ? 'sessionStorage' : 'localStorage'
       });
-      
+      */
       // Check both sessionStorage and localStorage keys
       if ((event.key === sessionKey || event.key === backupKey) && event.newValue) {
         try {

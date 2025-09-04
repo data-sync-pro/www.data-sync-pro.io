@@ -17,7 +17,7 @@ $breakpoint-desktop: 992px;
   // W3Schools风格的sticky定位
   position: sticky;
   top: $header-height;
-  height: calc(100vh - $header-height);
+  height: calc(100vh - $header-height); // 改为固定高度，确保占满可用空间
   overflow: hidden;
   
   // 响应式隐藏：采用W3Schools的断点策略
@@ -71,6 +71,7 @@ $breakpoint-desktop: 992px;
     height: 100%;
     display: flex;
     flex-direction: column;
+    min-height: 0; // 确保 flexbox 正确计算子元素高度
   }
 
   .sidebar-header {
@@ -80,6 +81,7 @@ $breakpoint-desktop: 992px;
     padding: 16px 20px;
     border-bottom: 1px solid #f1f3f4;
     min-height: 64px;
+    flex-shrink: 0; // 确保头部不会被压缩
 
     .sidebar-main-title {
       font-size: 1.125rem;
@@ -114,10 +116,11 @@ $breakpoint-desktop: 992px;
   }
 
   .sidebar-body {
-    flex: 1;
+    flex: 1 1 auto; // 明确指定 flex-grow, flex-shrink, flex-basis
     overflow-y: auto;
     overflow-x: hidden;
     padding: 8px 0;
+    min-height: 0; // 允许内容缩小到小于其最小内容高度
 
     &::-webkit-scrollbar {
       width: 6px;
@@ -141,6 +144,7 @@ $breakpoint-desktop: 992px;
   .sidebar-search {
     padding: 12px 16px;
     border-bottom: 1px solid #f1f3f4;
+    flex-shrink: 0; // 确保搜索栏不会被压缩
 
     .sidebar-search-btn {
       width: 100%;

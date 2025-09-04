@@ -147,10 +147,10 @@
       "description": "Self-Adaptive Trigger Rules Engine"
     },
 
-    "Query Manager(Q)": {
+    "Query Manager": {
       "faqLink": "query-manager.what-is-query-manager",
       "caseSensitive": true,
-      "description": "Query Manager(Q) - Advanced Query Tool"
+      "description": "Query Manager - Advanced Query Tool"
     },
     "Query Manager": {
       "faqLink": "query-manager.what-is-query-manager",

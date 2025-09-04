@@ -17,8 +17,8 @@ $breakpoint-mobile: 500px;
   grid-template-areas: 
     "sidebar main toc";
   grid-template-columns: $sidebar-width 1fr $toc-width;
-  min-height: calc(100vh - $header-height);
   margin-top: $header-height;
+  min-height: 0;
   
   @media (max-width: $breakpoint-desktop) {
     grid-template-areas: "main main main";
@@ -28,13 +28,11 @@ $breakpoint-mobile: 500px;
 
 .faq-container {
   grid-area: main;
-  padding: 20px 2vw;
-  min-height: calc(100vh - $header-height - 200px);
+  padding: 20px 1.5vw;
   background: #ffffff;
   transition: margin 0.3s ease; 
 
   &.toc-hidden {
-    margin-right: 60px;
     
     @media (max-width: $breakpoint-desktop) {
       margin-right: 0; // Remove margin on smaller screens where TOC is already hidden
@@ -56,9 +54,9 @@ $breakpoint-mobile: 500px;
   position: sticky;
   top: $header-height; // Stick below the main header
   z-index: 90; // Higher than TOC but below main header
-  padding: 8px 16px;
+  padding: 8px 1.5vw; // Match faq-main horizontal padding
+
   margin-bottom: 12px;
-  border-bottom: 1px solid #f1f3f4;
   background: rgba(255, 255, 255, 0.95); // Semi-transparent white background
   backdrop-filter: blur(8px); // Modern blur effect for better visibility
   -webkit-backdrop-filter: blur(8px); // Safari support
@@ -67,12 +65,11 @@ $breakpoint-mobile: 500px;
   // Add subtle shadow when scrolled
   &.scrolled {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    border-bottom-color: #e1e5e9;
   }
   
   // Mobile responsive adjustments
   @media (max-width: 768px) {
-    padding: 6px 12px;
+    padding: 6px 1.5vw; // Maintain consistent padding on mobile
     font-size: 0.9rem;
     
     // Adjust for mobile header height if different
@@ -88,8 +85,9 @@ $breakpoint-mobile: 500px;
   align-items: center;
   gap: 2px;
   margin: 0;
-  padding: 0;
+  padding: 0 0 8px 0; // Add bottom padding for the border
   list-style: none;
+  border-bottom: 1px solid #f1f3f4; // Move border to content level
 }
 
 .breadcrumb-item {
@@ -145,14 +143,13 @@ $breakpoint-mobile: 500px;
 .faq-main {
   flex: 1;
   min-width: 0;
-  padding: 20px 2vw;
-  margin-bottom: 120px; 
+  padding: 20px 1.5vw;
   background: #ffffff;
-  min-height: calc(100vh - 120px);
+  min-height: auto;
   
-  &.footer-aware {
-    margin-bottom: calc(120px + var(--footer-offset, 0px));
-  }
+ // &.footer-aware {
+ //   margin-bottom: calc(120px + var(--footer-offset, 0px));
+ // }
 }
 
 .section-title,

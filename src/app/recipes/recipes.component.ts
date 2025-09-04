@@ -783,7 +783,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
         this.setPreviewTimestamp(previewData.timestamp);
       }
       
-      console.log('📖 Loaded recipe preview data for:', recipeId);
+      //console.log('📖 Loaded recipe preview data for:', recipeId);
       this.cdr.markForCheck();
     } else {
       console.warn('⚠️ No preview data found for recipe:', recipeId);
@@ -795,7 +795,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
    * Setup preview synchronization for cross-tab updates
    */
   private setupPreviewSync(recipeId: string): void {
-    console.log('🎧 Setting up recipe preview update listeners for Recipe ID:', recipeId);
+    //console.log('🎧 Setting up recipe preview update listeners for Recipe ID:', recipeId);
     
     // Enhanced storage event listener
     const handleStorageChange = (event: StorageEvent) => {
@@ -812,7 +812,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
       if ((event.key === sessionKey || event.key === backupKey) && event.newValue) {
         try {
           const previewData = JSON.parse(event.newValue) as RecipePreviewData;
-          console.log('🔄 Updating recipe preview content from storage event');
+          //console.log('🔄 Updating recipe preview content from storage event');
           
           this.updatePreviewContent(previewData);
         } catch (error) {
@@ -823,17 +823,17 @@ export class RecipesComponent implements OnInit, OnDestroy {
 
     // Listen for storage changes (cross-tab communication)
     window.addEventListener('storage', handleStorageChange);
-    console.log('✅ Storage event listener added for recipe preview');
+    //console.log('✅ Storage event listener added for recipe preview');
     
     // Enhanced periodic check for updates (fallback mechanism)
     const updateInterval = setInterval(() => {
-      console.log('⏰ Periodic check for recipe preview updates...');
+      //console.log('⏰ Periodic check for recipe preview updates...');
       this.checkForPreviewUpdates(recipeId);
     }, 1000); // Check every 1 second for better responsiveness
     
     // Cleanup on destroy
     this.destroy$.subscribe(() => {
-      console.log('🧹 Cleaning up recipe preview update listeners');
+      //console.log('🧹 Cleaning up recipe preview update listeners');
       clearInterval(updateInterval);
       window.removeEventListener('storage', handleStorageChange);
     });
@@ -845,7 +845,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
   private updatePreviewContent(previewData: RecipePreviewData): void {
     if (!this.currentRecipe) return;
 
-    console.log('🖼️ Updating recipe preview UI with new content');
+    //console.log('🖼️ Updating recipe preview UI with new content');
     
     // Convert and update the current recipe item
     this.currentRecipe = this.convertPreviewToRecipeItem(previewData);
@@ -863,7 +863,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
     // Trigger change detection
     this.cdr.markForCheck();
     
-    console.log('✅ Recipe preview UI updated successfully');
+    //console.log('✅ Recipe preview UI updated successfully');
   }
 
   /**
@@ -876,7 +876,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
     const currentTimestamp = this.getPreviewTimestamp();
     
     if (currentData.timestamp > currentTimestamp) {
-      console.log('📅 Found newer recipe content via periodic check, updating...');
+      //console.log('📅 Found newer recipe content via periodic check, updating...');
       this.updatePreviewContent(currentData);
     }
   }
@@ -950,7 +950,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
    * Navigate to recipe
    */
   goToRecipe(recipe: RecipeItem): void {
-    console.log('Navigating to recipe:', recipe.title, '(id:', recipe.id, ') Category:', recipe.category);
+    //console.log('Navigating to recipe:', recipe.title, '(id:', recipe.id, ') Category:', recipe.category);
     
     // Check if navigating to the same recipe
     const isSameRecipe = this.currentRecipe && 
@@ -979,7 +979,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
    * Change recipe tab - Optimized for smooth animation without conflicts
    */
   changeRecipeTab(tabName: string, withAnimation: boolean = false): void {
-    console.log('Changing recipe tab to:', tabName);
+    //console.log('Changing recipe tab to:', tabName);
     
     // Clear previous animation state at the start
     this.ui.tabAnimationDirection = null;
@@ -1043,7 +1043,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
    * Change recipe section
    */
   changeRecipeSection(sectionId: string): void {
-    console.log('Changing recipe section to:', sectionId);
+    //console.log('Changing recipe section to:', sectionId);
     
     this.ui.activeSectionId = sectionId;
     this.recipeTOC.currentSectionId = sectionId;
@@ -1059,7 +1059,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
     if (this.ui.activeRecipeTab === 'walkthrough') {
       const stepIndex = this.getWalkthroughStepFromSectionId(sectionId);
       if (stepIndex >= 0) {
-        console.log('Navigating to walkthrough step:', stepIndex);
+        //console.log('Navigating to walkthrough step:', stepIndex);
         this.ui.currentWalkthroughStep = stepIndex;
       }
     }
@@ -1087,7 +1087,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
     );
     
     if (parentTab) {
-      console.log('Ensuring parent tab is active for content display and expanded for section:', sectionId);
+      //console.log('Ensuring parent tab is active for content display and expanded for section:', sectionId);
       // Set the parent tab as active for content display (needed for *ngIf in template)
       this.ui.activeRecipeTab = parentTab.id;
       this.recipeTOC.currentTabId = parentTab.id;
@@ -2258,7 +2258,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
     if (this.ui.activeRecipeTab === 'walkthrough') {
       const sectionId = this.getSectionIdFromWalkthroughStep(this.ui.currentWalkthroughStep);
       if (sectionId) {
-        console.log('Syncing TOC section with walkthrough step:', sectionId);
+        //console.log('Syncing TOC section with walkthrough step:', sectionId);
         this.ui.activeSectionId = sectionId;
         this.recipeTOC.currentSectionId = sectionId;
       }
@@ -2791,9 +2791,9 @@ export class RecipesComponent implements OnInit, OnDestroy {
     // Replace em dash and other dash characters with underscore in the URL to match actual folder names
     const normalizedUrl = url.replace(/[\u2010-\u2015]/g, '_');
     
-    console.log('Original URL:', url);
-    console.log('Normalized URL:', normalizedUrl);
-    console.log('Download title:', title);
+    //console.log('Original URL:', url);
+    //console.log('Normalized URL:', normalizedUrl);
+    //console.log('Download title:', title);
     
     // Create a temporary anchor element to force download
     const link = document.createElement('a');
