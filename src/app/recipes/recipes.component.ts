@@ -1542,15 +1542,24 @@ export class RecipesComponent implements OnInit, OnDestroy {
    */
   private readonly overviewSectionConfigs = [
     {
-      id: 'use-case',
-      title: 'Description',
+      id: 'overview',
+      title: 'Overview',
       icon: 'lightbulb',
-      elementId: 'recipe-use-case',
+      elementId: 'recipe-overview',
       contentType: 'use-case-highlight',
-      isVisible: () => this.hasValidUseCase(),
-      getData: () => this.currentRecipe?.safeUsecase || this.currentRecipe?.safeUseCase,
+      isVisible: () => this.hasValidOverview(),
+      getData: () => this.currentRecipe?.overview,
       alwaysShow: true,
       isHighlight: true
+    },
+    {
+      id: 'when-to-use',
+      title: 'When to Use',
+      icon: 'schedule',
+      elementId: 'recipe-when-to-use',
+      contentType: 'html',
+      isVisible: () => this.hasValidWhenToUse(),
+      getData: () => this.currentRecipe?.whenToUse
     },
     {
       id: 'dsp-versions',
@@ -2686,6 +2695,22 @@ export class RecipesComponent implements OnInit, OnDestroy {
   hasValidUseCase(): boolean {
     const usecase = this.currentRecipe?.usecase || this.currentRecipe?.useCase;
     return !!(usecase && usecase.trim().length > 0);
+  }
+
+  /**
+   * Check if current recipe has valid overview
+   */
+  hasValidOverview(): boolean {
+    const overview = this.currentRecipe?.overview;
+    return !!(overview && overview.trim().length > 0);
+  }
+
+  /**
+   * Check if current recipe has valid when to use
+   */
+  hasValidWhenToUse(): boolean {
+    const whenToUse = this.currentRecipe?.whenToUse;
+    return !!(whenToUse && whenToUse.trim().length > 0);
   }
 
   /**
