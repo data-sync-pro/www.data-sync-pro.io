@@ -787,7 +787,7 @@
     "Id": "a0oEc000005JoixIAC",
     "Category__c": "Processes",
     "SubCategory__c": "Retrieve",
-    "Question__c": "Q: What is the purpose of the 'Additional Retrieve Criteria' field on a Pipeline?",
+    "Question__c": "What is the purpose of the 'Additional Retrieve Criteria' field on a Pipeline?",
     "Original_Answer__c": "process-steps-retrieve-additional-retrieve-criteria.html",
     "New_Answer__c": "retrieve-purpose-of-additional-criteria.html"
   },
