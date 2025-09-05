@@ -391,7 +391,7 @@ $breakpoint-desktop: 992px;
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.5);
-  z-index: 99;
+  z-index: 999; // Fixed: increased from 99 to 999 to be below sidebar (1000) but above content
   opacity: 0;
   transition: opacity 0.3s ease;
   pointer-events: none; // Critical: disable pointer events when hidden

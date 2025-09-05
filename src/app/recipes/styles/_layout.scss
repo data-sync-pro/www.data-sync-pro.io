@@ -86,7 +86,7 @@ $breakpoint-mobile: 576px;
   width: 100%;
   height: 100%;
   background: rgba(0, 0, 0, 0.5);
-  z-index: 199;
+  z-index: 1099; // Fixed: increased from 199 to 1099 to be below sidebar (1100) but above content
   opacity: 0;
   visibility: hidden;
   transition: all 0.3s ease;
