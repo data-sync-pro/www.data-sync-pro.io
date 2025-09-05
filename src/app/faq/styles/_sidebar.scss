@@ -243,11 +243,7 @@ $breakpoint-desktop: 992px;
       border-radius: 0 20px 20px 0;
       margin-right: 8px;
       position: relative;
-      -webkit-tap-highlight-color: transparent;
-      touch-action: manipulation;
-      -webkit-touch-callout: none;
-      user-select: none;
-      min-height: 44px;
+
 
       &:hover {
         background-color: #f1f3f4;
@@ -370,10 +366,7 @@ $breakpoint-desktop: 992px;
   cursor: pointer;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   transition: $transition;
-  -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
-  -webkit-touch-callout: none;
-  user-select: none;
+
 
   &:hover {
     background: #f8f9fa;
@@ -394,10 +387,8 @@ $breakpoint-desktop: 992px;
   z-index: 999; // Fixed: increased from 99 to 999 to be below sidebar (1000) but above content
   opacity: 0;
   transition: opacity 0.3s ease;
-  pointer-events: none; // Critical: disable pointer events when hidden
 
   &.active {
     opacity: 1;
-    pointer-events: auto; // Re-enable when active
   }
 }
