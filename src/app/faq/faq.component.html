@@ -9,16 +9,18 @@
   ☰
 </button>
 
-<!-- Mobile TOC toggle button -->
+<!-- Mobile TOC toggle button - DISABLED -->
+<!--
 <button
   class="mobile-toc-toggle"
   (click)="toggleMobileTOC($event)"
   (touchstart)="handleTouchStart()"
-  *ngIf="ui.isMobile && shouldShowTOC"
+  *ngIf="false"
   aria-label="Toggle table of contents"
 >
   📋
 </button>
+-->
 
 <!-- Mobile sidebar overlay -->
 <div
@@ -577,15 +579,19 @@
 
 <!-- Removed duplicate TOC - now using grid-positioned version above -->
 
-<!-- Mobile TOC Drawer -->
+<!-- Mobile TOC Drawer - DISABLED -->
+<!--
 <div class="mobile-toc-overlay" 
      [class.active]="ui.mobileTOCOpen" 
      (click)="closeMobileTOC()"
-     *ngIf="ui.isMobile"></div>
+     *ngIf="false"></div>
+-->
 
+<!-- Mobile TOC Sidebar - DISABLED -->
+<!--
 <aside
   class="faq-toc mobile-toc"
-  *ngIf="shouldShowTOC && ui.isMobile"
+  *ngIf="false"
   [class.open]="ui.mobileTOCOpen"
 >
   <div class="mobile-toc-content">
@@ -655,6 +661,7 @@
     </div>
   </div>
 </aside>
+-->
 
 <!-- 共用FAQ列表模板 -->
 <ng-template #faqListTemplate let-faqItems="faqItems">

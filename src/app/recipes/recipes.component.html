@@ -449,15 +449,17 @@
     </div>
   </aside>
 
-  <!-- Mobile TOC Toggle Button -->
+  <!-- Mobile TOC Toggle Button - DISABLED -->
+  <!--
   <button class="mobile-toc-toggle" 
           (click)="toggleMobileTOC()" 
-          *ngIf="ui.isMobile && shouldShowTOC"
+          *ngIf="false"
           mat-fab
           color="primary"
           matTooltip="Table of Contents">
     <mat-icon>list</mat-icon>
   </button>
+  -->
 
   <!-- TOC Toggle Button (Desktop) -->
   <button class="toc-toggle-btn"
@@ -471,9 +473,10 @@
 
 </div>
 
-<!-- Mobile TOC Drawer -->
+<!-- Mobile TOC Drawer - DISABLED -->
+<!--
 <aside class="recipe-toc mobile-toc" 
-       *ngIf="ui.isMobile && shouldShowTOC"
+       *ngIf="false"
        [class.open]="ui.mobileTOCOpen">
   
   <div class="mobile-toc-overlay" 
@@ -523,6 +526,7 @@
     </div>
   </div>
 </aside>
+-->
 
 <!-- Recipe Search Overlay -->
 <app-recipe-search-overlay
