@@ -322,7 +322,6 @@ export class RecipeStepComponent {
     if (navigator.clipboard && window.isSecureContext) {
       navigator.clipboard.writeText(text).then(() => {
         // Successfully copied
-        console.log('Copied to clipboard:', text);
       }).catch(err => {
         console.error('Failed to copy text: ', err);
       });
@@ -335,7 +334,6 @@ export class RecipeStepComponent {
       textArea.select();
       try {
         document.execCommand('copy');
-        console.log('Copied to clipboard:', text);
       } catch (err) {
         console.error('Failed to copy text: ', err);
       }

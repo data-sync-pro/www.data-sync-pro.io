@@ -120,21 +120,17 @@ export class FAQPreviewService {
     const storageKey = `${this.PREVIEW_KEY_PREFIX}${data.faqId}`;
     const dataString = JSON.stringify(data);
     
-    console.log('📤 Updating preview data for:', data.faqId, 'at', new Date().toLocaleTimeString());
-    
+
     // Method 1: Direct sessionStorage update (triggers real storage events)
     // First remove the key, then set it to ensure the storage event fires
     sessionStorage.removeItem(storageKey);
     sessionStorage.setItem(storageKey, dataString);
-    
-    console.log('✅ Preview data saved to sessionStorage');
-    
+
     // Method 2: Also try localStorage as backup (some browsers handle this better for cross-tab)
     const backupKey = `backup-${storageKey}`;
     localStorage.removeItem(backupKey);
     localStorage.setItem(backupKey, dataString);
-    
-    console.log('💾 Backup saved to localStorage');
+ 
   }
 
   /**

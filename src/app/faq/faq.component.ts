@@ -171,15 +171,6 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     }, 100);
   }
 
-  // Debug click handler
-  debugClick(item: FAQItem, event: Event): void {
-    console.log('🚀 DEBUG CLICK WORKS!', {
-      item: item.question,
-      event: event.type,
-      target: event.target
-    });
-    alert(`Debug click on: ${item.question}`);
-  }
 
   ngOnInit(): void {
     // Initialize FAQ data first to ensure it's available for routing
@@ -911,11 +902,6 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   navigateToFAQ(item: FAQItem, event?: Event): void {
-    console.log('🔥 navigateToFAQ called!', {
-      item: item.question,
-      event: event?.type,
-      target: event?.target
-    });
     
     // Only prevent default for actual click/touch events, not keyboard events
     if (event && event.type !== 'keydown') {

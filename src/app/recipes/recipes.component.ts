@@ -802,11 +802,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
       const sessionKey = `recipe-preview-${recipeId}`;
       const backupKey = `backup-recipe-preview-${recipeId}`;
       
-      console.log('📡 Storage event received:', {
-        key: event.key,
-        hasNewValue: !!event.newValue,
-        storageType: event.storageArea === sessionStorage ? 'sessionStorage' : 'localStorage'
-      });
+
       
       // Check both sessionStorage and localStorage keys
       if ((event.key === sessionKey || event.key === backupKey) && event.newValue) {

@@ -23,7 +23,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   
   // Mobile responsive adjustments
   @media (max-width: 768px) {
-    height: calc(100vh - 180px); // Mobile has smaller header and padding
+    height: calc(100vh - 250px); // Mobile has smaller header and padding
     max-height: calc(100vh - 180px);
     min-height: 250px;
     
@@ -34,13 +34,13 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
   
   @media (max-width: 480px) {
-    height: calc(100vh - 150px); // Even less space on small mobile
-    max-height: calc(100vh - 150px);
+    height: calc(100vh - 360px); // Even less space on small mobile
+    max-height: calc(100vh - 360px);
     min-height: 200px;
     
     .all-faqs & {
-      height: calc(100vh - 130px);
-      max-height: calc(100vh - 130px);
+      height: calc(100vh - 280px);
+      max-height: calc(100vh - 280px);
     }
   }
 

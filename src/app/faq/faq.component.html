@@ -668,14 +668,13 @@
       <div
         class="faq-item"
         *cdkVirtualFor="let item of faqItems; trackBy: trackByFAQ"
-        (click)="debugClick(item, $event); navigateToFAQ(item, $event)"
+        (click)="navigateToFAQ(item, $event)"
         (touchstart)="handleTouchStart()"
         [attr.aria-label]="'Navigate to FAQ: ' + item.question"
         role="button"
         tabindex="0"
         (keydown.enter)="navigateToFAQ(item, $event)"
         (keydown.space)="$event.preventDefault(); navigateToFAQ(item, $event)"
-        style="cursor: pointer !important; background: rgba(255, 0, 0, 0.1) !important; border: 2px solid red !important;"
       >
         <div class="faq-header">
           <div class="faq-title-section">
@@ -699,14 +698,13 @@
       <div
         class="faq-item"
         *ngFor="let item of faqItems; trackBy: trackByFAQ"
-        (click)="debugClick(item, $event); navigateToFAQ(item, $event)"
+        (click)="navigateToFAQ(item, $event)"
         (touchstart)="handleTouchStart()"
         [attr.aria-label]="'Navigate to FAQ: ' + item.question"
         role="button"
         tabindex="0"
         (keydown.enter)="navigateToFAQ(item, $event)"
         (keydown.space)="$event.preventDefault(); navigateToFAQ(item, $event)"
-        style="cursor: pointer !important; background: rgba(255, 0, 0, 0.1) !important; border: 2px solid red !important;"
       >
         <div class="faq-header">
           <div class="faq-title-section">
