@@ -55,6 +55,7 @@
   }
 
   .mobile-toggle-btn {
+    display: none; // Hide mobile hamburger menu button
     position: absolute;
     top: 50%;
     right: 1.5rem;

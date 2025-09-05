@@ -67,13 +67,9 @@ $breakpoint-mobile: 500px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   }
   
-  // Mobile responsive adjustments
+  // Mobile responsive adjustments - hide breadcrumb on mobile
   @media (max-width: 768px) {
-    padding: 6px 1.5vw; // Maintain consistent padding on mobile
-    font-size: 0.9rem;
-    
-    // Adjust for mobile header height if different
-    top: $header-height;
+    display: none; // Hide breadcrumb completely on mobile devices
   }
   
   // Ensure proper stacking context
