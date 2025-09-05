@@ -1,0 +1,58 @@
+// ==================== Debug Styles (临时调试) ====================
+// 这些样式可以帮助可视化点击区域和层级问题
+
+// 调试模式：给FAQ项目添加颜色边框
+.debug-mode .faq-item {
+  border: 2px solid lime !important;
+  background-color: rgba(0, 255, 0, 0.1) !important;
+  
+  &:hover {
+    border-color: red !important;
+    background-color: rgba(255, 0, 0, 0.1) !important;
+  }
+  
+  &:active {
+    border-color: blue !important;
+    background-color: rgba(0, 0, 255, 0.1) !important;
+  }
+}
+
+// 调试虚拟滚动容器
+.debug-mode .faq-virtual-viewport {
+  border: 3px dashed orange !important;
+  background-color: rgba(255, 165, 0, 0.05) !important;
+}
+
+.debug-mode .faq-regular-list {
+  border: 3px dashed purple !important;
+  background-color: rgba(128, 0, 128, 0.05) !important;
+}
+
+// 显示所有元素的z-index
+.debug-mode * {
+  position: relative;
+  
+  &::before {
+    content: 'z:' attr(data-z-index);
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: yellow;
+    color: black;
+    font-size: 10px;
+    padding: 1px 3px;
+    z-index: 9999;
+    pointer-events: none;
+  }
+}
+
+// 快速启用调试模式的类
+.faq-layout-container.debug {
+  .faq-item {
+    border: 2px solid red !important;
+    
+    &:hover {
+      border-color: green !important;
+    }
+  }
+}

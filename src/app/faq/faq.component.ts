@@ -123,6 +123,10 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     tocHidden: true
   };
 
+  // Touch event handling
+  private touchStartTime = 0;
+  private touchHandled = false;
+
   // TOC Pagination state
   tocPagination: TOCPaginationState = {
     currentPage: 1,
@@ -156,6 +160,26 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     private performanceService: PerformanceService,
     private previewService: FAQPreviewService
   ) {}
+
+  // Touch event handler to mark touch as handled
+  handleTouchStart(): void {
+    this.touchStartTime = Date.now();
+    this.touchHandled = true;
+    // Reset flag after a short delay to avoid interference
+    setTimeout(() => {
+      this.touchHandled = false;
+    }, 100);
+  }
+
+  // Debug click handler
+  debugClick(item: FAQItem, event: Event): void {
+    console.log('🚀 DEBUG CLICK WORKS!', {
+      item: item.question,
+      event: event.type,
+      target: event.target
+    });
+    alert(`Debug click on: ${item.question}`);
+  }
 
   ngOnInit(): void {
     // Initialize FAQ data first to ensure it's available for routing
@@ -806,7 +830,11 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
 
-  selectPopularFAQ(faq: FAQItem): void {
+  selectPopularFAQ(faq: FAQItem, event?: Event): void {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
     this.search.query = faq.question;
     this.search.isActive = false;
     this.performSearch();
@@ -882,7 +910,18 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
-  navigateToFAQ(item: FAQItem): void {
+  navigateToFAQ(item: FAQItem, event?: Event): void {
+    console.log('🔥 navigateToFAQ called!', {
+      item: item.question,
+      event: event?.type,
+      target: event?.target
+    });
+    
+    // Only prevent default for actual click/touch events, not keyboard events
+    if (event && event.type !== 'keydown') {
+      event.stopPropagation();
+      // Don't preventDefault as we want the navigation to happen
+    }
     // Mark that user has interacted - this enables TOC highlighting
     this.userHasScrolled = true;
     
@@ -1736,7 +1775,11 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   // Sidebar navigation methods
-  selectCategory(categoryName: string): void {
+  selectCategory(categoryName: string, event?: Event): void {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
     this.resetState();
     this.router.navigate(['/', this.encode(categoryName)]);
     
@@ -1745,7 +1788,11 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
-  selectSubCategory(subCategoryName: string): void {
+  selectSubCategory(subCategoryName: string, event?: Event): void {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
     this.resetState();
     
     if (this.current.category) {
@@ -1800,19 +1847,35 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     this.updateUIState({ isMobile: window.innerWidth <= 768 });
   }
 
-  toggleMobileSidebar(): void {
+  toggleMobileSidebar(event?: Event): void {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
     this.updateUIState({ mobileSidebarOpen: !this.ui.mobileSidebarOpen });
   }
 
-  closeMobileSidebar(): void {
+  closeMobileSidebar(event?: Event): void {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
     this.updateUIState({ mobileSidebarOpen: false });
   }
 
-  toggleMobileTOC(): void {
+  toggleMobileTOC(event?: Event): void {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
     this.updateUIState({ mobileTOCOpen: !this.ui.mobileTOCOpen });
   }
 
-  closeMobileTOC(): void {
+  closeMobileTOC(event?: Event): void {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
     this.updateUIState({ mobileTOCOpen: false });
   }
 
@@ -2125,7 +2188,11 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
   /**
    * 选择并显示指定FAQ项目（从右侧目录点击）
    */
-  scrollToFAQ(item: FAQItem): void {
+  scrollToFAQ(item: FAQItem, event?: Event): void {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
     // Mark that user has interacted - this enables TOC highlighting
     this.userHasScrolled = true;
     
@@ -2324,7 +2391,11 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
   /**
    * 选择热门问题
    */
-  selectTrendingQuestion(item: FAQItem): void {
+  selectTrendingQuestion(item: FAQItem, event?: Event): void {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
     // Mark that user has interacted - this enables TOC highlighting
     this.userHasScrolled = true;
     

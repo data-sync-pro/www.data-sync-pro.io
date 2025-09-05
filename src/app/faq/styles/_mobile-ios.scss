@@ -1,0 +1,159 @@
+// ==================== iOS Mobile Optimizations ====================
+
+// Global iOS-specific touch optimizations
+@media (pointer: coarse) {
+  // All clickable elements
+  button,
+  [role="button"],
+  .clickable,
+  .nav-item,
+  .faq-item,
+  .popular-faq-item,
+  .contact-button,
+  .breadcrumb-item,
+  .toc-item,
+  .trending-question-item {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    -webkit-touch-callout: none;
+    user-select: none;
+    
+    // Ensure minimum touch target size
+    min-height: 44px;
+    min-width: 44px;
+    
+    // Add padding for better touch targets
+    &:not(button) {
+      padding: 12px;
+    }
+  }
+  
+  // Prevent text selection on interactive elements
+  .faq-header,
+  .nav-content,
+  .sidebar-search-btn {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+  
+  // Improve scroll performance
+  .sidebar-body,
+  .faq-container,
+  .faq-virtual-viewport,
+  .toc-content {
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+  }
+  
+  // Disable momentum scrolling on modals
+  .mobile-toc-overlay,
+  .sidebar-overlay {
+    -webkit-overflow-scrolling: auto;
+  }
+}
+
+// iOS-specific fixes
+@supports (-webkit-touch-callout: none) {
+  // Fix for iOS Safari fixed positioning
+  .mobile-sidebar-toggle,
+  .mobile-toc-toggle {
+    transform: translate3d(0, 0, 0);
+    -webkit-transform: translate3d(0, 0, 0);
+  }
+  
+  // Main content scrollable without breaking interactions
+  .faq-layout-container {
+    position: relative;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    height: 100vh;
+    // Prevent iOS bounce but keep content interactive
+    overscroll-behavior-y: contain;
+  }
+  
+  // Only prevent scroll when modals are open
+  body {
+    &.sidebar-open,
+    &.toc-open {
+      position: fixed;
+      overflow: hidden;
+      width: 100%;
+    }
+  }
+}
+
+// Fix for iOS input zoom
+@media (max-width: 768px) {
+  input,
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+}
+
+// Improve touch feedback
+@media (hover: none) and (pointer: coarse) {
+  // Add active states for all interactive elements
+  .nav-item,
+  .faq-item,
+  .toc-item,
+  button,
+  [role="button"] {
+    transition: background-color 0.1s ease, transform 0.1s ease;
+    
+    &:active {
+      transform: scale(0.98);
+    }
+  }
+  
+  // Disable hover effects on touch devices
+  .faq-item:hover {
+    transform: none;
+    box-shadow: none;
+  }
+  
+  .nav-item:hover {
+    background-color: transparent;
+  }
+  
+  // Use active state instead of hover
+  .faq-item:active {
+    background-color: rgba(26, 115, 232, 0.08);
+    border-color: #1a73e8;
+  }
+  
+  .nav-item:active {
+    background-color: rgba(66, 133, 244, 0.15);
+  }
+}
+
+// Prevent double-tap zoom on buttons
+button {
+  touch-action: manipulation;
+}
+
+// Fix for iOS Safari bottom bar
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .faq-container {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  
+  .mobile-sidebar {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+// Improve form inputs on mobile
+@media (max-width: 768px) {
+  input[type="text"],
+  input[type="search"],
+  input[type="email"],
+  textarea {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    border-radius: 0;
+  }
+}

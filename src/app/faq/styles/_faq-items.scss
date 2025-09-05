@@ -12,6 +12,9 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   width: 100%;
   border-radius: 8px;
   overflow: hidden;
+  pointer-events: auto;
+  z-index: 10;
+  position: relative;
   
   // When on homepage (all-faqs) without breadcrumb navigation
   .all-faqs & {
@@ -45,6 +48,9 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   ::ng-deep .cdk-virtual-scroll-content-wrapper {
     scrollbar-width: thin;
     scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+    pointer-events: auto !important;
+    position: static !important; // Changed from relative to static
+    z-index: auto;
     
     &::-webkit-scrollbar {
       width: 6px;
@@ -65,9 +71,27 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 }
 
+// Global CDK Virtual Scroll fixes
+::ng-deep cdk-virtual-scroll-viewport {
+  pointer-events: auto !important;
+  position: relative !important;
+  
+  .cdk-virtual-scroll-content-wrapper {
+    pointer-events: auto !important;
+    position: static !important;
+  }
+  
+  .cdk-virtual-scroll-spacer {
+    pointer-events: none !important;
+  }
+}
+
 // Regular list container for smaller lists
 .faq-regular-list {
   width: 100%;
+  pointer-events: auto;
+  z-index: 10;
+  position: relative;
 }
 
 // FAQ列表容器
@@ -81,6 +105,11 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     overflow: hidden;
     position: relative;
     cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    -webkit-touch-callout: none;
+    z-index: 50; // Higher z-index to ensure clickable above breadcrumb and other elements
+    pointer-events: auto; // Explicitly enable pointer events
 
     &:hover {
       transform: translateY(-2px);
@@ -91,10 +120,11 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         color: $primary-color;
       }
 
-      .navigate-icon {
-        color: $primary-color;
-        transform: translateX(4px);
-      }
+    }
+
+    &:active {
+      background-color: rgba(26, 115, 232, 0.05);
+      transform: translateY(0);
     }
 
 
@@ -182,12 +212,6 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       align-items: center;
       flex-shrink: 0;
 
-      .navigate-icon {
-        font-size: 1.2rem;
-        color: #666;
-        transition: $transition;
-        opacity: 0.6;
-      }
     }
   }
 }

@@ -1,8 +1,10 @@
 <!-- Mobile sidebar toggle button -->
 <button
   class="mobile-sidebar-toggle"
-  (click)="toggleMobileSidebar()"
+  (click)="toggleMobileSidebar($event)"
+  (touchstart)="handleTouchStart()"
   *ngIf="ui.isMobile"
+  aria-label="Toggle sidebar menu"
 >
   ☰
 </button>
@@ -10,8 +12,10 @@
 <!-- Mobile TOC toggle button -->
 <button
   class="mobile-toc-toggle"
-  (click)="toggleMobileTOC()"
+  (click)="toggleMobileTOC($event)"
+  (touchstart)="handleTouchStart()"
   *ngIf="ui.isMobile && shouldShowTOC"
+  aria-label="Toggle table of contents"
 >
   📋
 </button>
@@ -20,7 +24,8 @@
 <div
   class="sidebar-overlay"
   [class.active]="ui.mobileSidebarOpen"
-  (click)="closeMobileSidebar()"
+  (click)="closeMobileSidebar($event)"
+  (touchstart)="handleTouchStart()"
 ></div>
 
 <!-- W3Schools风格的网格布局容器 -->
@@ -74,7 +79,9 @@
           <!-- Navigation Tree -->
           <div class="sidebar-nav">
             <!-- Home -->
-            <div class="nav-item home-nav" [class.active]="showHome" (click)="goHome()">
+            <div class="nav-item home-nav" [class.active]="showHome" 
+                 (click)="goHome()"
+                 (touchstart)="handleTouchStart()">
               <div class="nav-content">
                 <lightning-icon
                   iconName="utility:home"
@@ -118,7 +125,8 @@
                   class="nav-item category-nav"
                   [class.active]="current.category === category.name && !current.subCategory"
                   [class.expanded]="current.category === category.name"
-                  (click)="selectCategory(category.name)"
+                  (click)="selectCategory(category.name, $event)"
+                  (touchstart)="handleTouchStart()"
                 >
                   <div class="nav-content">
                     <lightning-icon
@@ -142,7 +150,8 @@
                     *ngFor="let subCategory of category.subCategories"
                     class="nav-item subcategory-nav"
                     [class.active]="current.subCategory === subCategory.name"
-                    (click)="selectSubCategory(subCategory.name)"
+                    (click)="selectSubCategory(subCategory.name, $event)"
+                    (touchstart)="handleTouchStart()"
                   >
                     <div class="nav-content">
                       <span class="nav-indent"></span>
@@ -428,7 +437,8 @@
                 <button
                   class="popular-faq-item"
                   *ngFor="let faq of popularFAQs"
-                  (click)="selectPopularFAQ(faq)"
+                  (click)="selectPopularFAQ(faq, $event)"
+                  (touchstart)="handleTouchStart()"
                 >
                   {{ faq.question }}
                 </button>
@@ -495,7 +505,8 @@
             class="toc-item trending-item"
             *ngFor="let item of paginatedTrendingQuestions; trackBy: trackByFAQ"
             [class.active]="isCurrentFAQ(item)"
-            (click)="selectTrendingQuestion(item)"
+            (click)="selectTrendingQuestion(item, $event)"
+            (touchstart)="handleTouchStart()"
           >
             <div class="toc-item-title">{{ item.question }}</div>
             <div class="toc-item-indicator" *ngIf="isCurrentFAQ(item)"></div>
@@ -537,7 +548,8 @@
             class="toc-item"
             *ngFor="let item of paginatedCurrentFAQList; trackBy: trackByFAQ"
             [class.active]="isCurrentFAQ(item)"
-            (click)="scrollToFAQ(item)"
+            (click)="scrollToFAQ(item, $event)"
+            (touchstart)="handleTouchStart()"
           >
             <div class="toc-item-title">{{ item.question }}</div>
             <div class="toc-item-indicator" *ngIf="isCurrentFAQ(item)"></div>
@@ -656,12 +668,14 @@
       <div
         class="faq-item"
         *cdkVirtualFor="let item of faqItems; trackBy: trackByFAQ"
-        (click)="navigateToFAQ(item)"
+        (click)="debugClick(item, $event); navigateToFAQ(item, $event)"
+        (touchstart)="handleTouchStart()"
         [attr.aria-label]="'Navigate to FAQ: ' + item.question"
         role="button"
         tabindex="0"
-        (keydown.enter)="navigateToFAQ(item)"
-        (keydown.space)="$event.preventDefault(); navigateToFAQ(item)"
+        (keydown.enter)="navigateToFAQ(item, $event)"
+        (keydown.space)="$event.preventDefault(); navigateToFAQ(item, $event)"
+        style="cursor: pointer !important; background: rgba(255, 0, 0, 0.1) !important; border: 2px solid red !important;"
       >
         <div class="faq-header">
           <div class="faq-title-section">
@@ -675,12 +689,6 @@
           </div>
 
           <div class="faq-actions">
-            <lightning-icon
-              iconName="utility:chevronright"
-              size="xx-small"
-              alternativeText="Navigate to FAQ"
-              class="navigate-icon"
-            ></lightning-icon>
           </div>
         </div>
       </div>
@@ -691,12 +699,14 @@
       <div
         class="faq-item"
         *ngFor="let item of faqItems; trackBy: trackByFAQ"
-        (click)="navigateToFAQ(item)"
+        (click)="debugClick(item, $event); navigateToFAQ(item, $event)"
+        (touchstart)="handleTouchStart()"
         [attr.aria-label]="'Navigate to FAQ: ' + item.question"
         role="button"
         tabindex="0"
-        (keydown.enter)="navigateToFAQ(item)"
-        (keydown.space)="$event.preventDefault(); navigateToFAQ(item)"
+        (keydown.enter)="navigateToFAQ(item, $event)"
+        (keydown.space)="$event.preventDefault(); navigateToFAQ(item, $event)"
+        style="cursor: pointer !important; background: rgba(255, 0, 0, 0.1) !important; border: 2px solid red !important;"
       >
         <div class="faq-header">
           <div class="faq-title-section">
@@ -710,12 +720,6 @@
           </div>
 
           <div class="faq-actions">
-            <lightning-icon
-              iconName="utility:chevronright"
-              size="xx-small"
-              alternativeText="Navigate to FAQ"
-              class="navigate-icon"
-            ></lightning-icon>
           </div>
         </div>
       </div>
