@@ -493,9 +493,7 @@
     </div>
     
     <div class="mobile-toc-list">
-      <!-- Recipe Detail TOC Navigation - Sections Only (Mobile) -->
       <ng-container *ngIf="showRecipeDetails">
-        <!-- Only show sections for the active tab (Mobile) -->
         <div class="toc-sections" *ngIf="ui.activeRecipeTab">
           <div *ngFor="let section of getActiveTabSections(); let i = index" 
                class="toc-item toc-section-item"
@@ -509,7 +507,6 @@
         </div>
       </ng-container>
       
-      <!-- Recipe List for Mobile -->
       <ng-container *ngIf="!showRecipeDetails">
         <div class="toc-item" 
              *ngFor="let recipe of (showHome ? paginatedTrendingRecipes : paginatedCategoryRecipes)"

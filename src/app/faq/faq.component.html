@@ -595,7 +595,6 @@
   [class.open]="ui.mobileTOCOpen"
 >
   <div class="mobile-toc-content">
-    <!-- Mobile TOC Header -->
     <div class="mobile-toc-header">
       <div class="mobile-toc-header-content">
         <h3 class="mobile-toc-title">
@@ -609,7 +608,6 @@
         </button>
       </div>
       
-      <!-- Mobile Pagination Controls -->
       <div class="mobile-toc-pagination" *ngIf="tocPagination.totalPages > 1">
         <div class="pagination-info">{{ tocPaginationInfo }}</div>
         <div class="pagination-buttons">
@@ -631,9 +629,7 @@
       </div>
     </div>
 
-    <!-- Mobile TOC List -->
     <div class="mobile-toc-list">
-      <!-- Trending Questions for Home Page -->
       <ng-container *ngIf="showHome">
         <div
           class="mobile-toc-item trending-item"
@@ -646,7 +642,6 @@
         </div>
       </ng-container>
 
-      <!-- Category TOC for Category Pages -->
       <ng-container *ngIf="!showHome">
         <div
           class="mobile-toc-item"
