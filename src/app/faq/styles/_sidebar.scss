@@ -37,7 +37,7 @@ $z-index-mobile-toggle: 1001;
     top: $header-height;
     height: calc(100vh - $header-height);
     overflow: hidden;
-    width: $sidebar-width;
+    width: 100%;
     
     // 默认隐藏状态 + GPU加速
     transform: translateX(-100%);
