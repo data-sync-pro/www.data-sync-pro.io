@@ -161,14 +161,14 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     private previewService: FAQPreviewService
   ) {}
 
-  // Touch event handler to mark touch as handled
+  // Touch event handler to mark touch as handled - 优化移动端响应
   handleTouchStart(): void {
     this.touchStartTime = Date.now();
     this.touchHandled = true;
-    // Reset flag after a short delay to avoid interference
+    // 缩短延迟时间，提高真实设备响应速度
     setTimeout(() => {
       this.touchHandled = false;
-    }, 100);
+    }, 50); // 从100ms减少到50ms，更适合真实移动设备
   }
 
 

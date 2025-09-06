@@ -54,11 +54,8 @@ $breakpoint-mobile: 500px;
   }
 
   .faq-sidebar {
-    transform: translateX(-100%);
-
-    &.mobile-open {
-      transform: translateX(0);
-    }
+    // Transform已在_sidebar.scss中处理，此处仅控制显示
+    display: block; // 确保移动端显示
   }
 
   .faq-toc {
@@ -112,11 +109,7 @@ $breakpoint-mobile: 500px;
 
   .faq-sidebar {
     width: 280px;
-    transform: translateX(-100%);
-
-    &.mobile-open {
-      transform: translateX(0);
-    }
+    // Transform已在_sidebar.scss中统一处理，避免重复定义
   }
 
   .faq-toc {
