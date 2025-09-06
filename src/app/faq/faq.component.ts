@@ -932,6 +932,11 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
 
     // Scroll to top instead of FAQ item for better navigation experience
     this.scrollToTop();
+    
+    // 手机端点击FAQ后关闭侧边栏
+    if (this.ui.isMobile && this.ui.mobileSidebarOpen) {
+      this.closeMobileSidebar();
+    }
   }
 
   /**
@@ -1500,6 +1505,11 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     this.search.isOpen = false;
   
     setTimeout(() => this.openAndScroll(sel.question, sel.id));
+    
+    // 手机端选择搜索结果后关闭侧边栏
+    if (this.ui.isMobile && this.ui.mobileSidebarOpen) {
+      this.closeMobileSidebar();
+    }
   }
   
   
@@ -1643,7 +1653,7 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
 
     if (navigator.clipboard && window.isSecureContext) {
       navigator.clipboard.writeText(shareUrl).then(() => {
-        this.showCopySuccess();
+        //this.showCopySuccess();
       }).catch(() => {
         this.fallbackCopyToClipboard(shareUrl);
       });
@@ -1671,7 +1681,7 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
 
     try {
       document.execCommand('copy');
-      this.showCopySuccess();
+      //this.showCopySuccess();
     } catch (err) {
       console.error('Failed to copy text: ', err);
     }
