@@ -3,7 +3,7 @@
   class="mobile-sidebar-toggle"
   (click)="toggleMobileSidebar($event)"
   (touchstart)="handleTouchStart()"
-  *ngIf="ui.isMobile"
+  *ngIf="ui.isMobile && !ui.mobileSidebarOpen"
   aria-label="Toggle sidebar menu"
 >
   ☰
@@ -50,12 +50,22 @@
             class="sidebar-toggle-btn"
             (click)="toggleSidebar()"
             title="Toggle sidebar"
+            *ngIf="!ui.isMobile"
           >
             <lightning-icon
               [iconName]="ui.sidebarCollapsed ? 'utility:chevronright' : 'utility:chevronleft'"
               size="xx-small"
               [alternativeText]="ui.sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'"
             ></lightning-icon>
+          </button>
+          <!-- Mobile close button -->
+          <button
+            class="mobile-sidebar-close"
+            (click)="closeMobileSidebar()"
+            title="Close sidebar"
+            *ngIf="ui.isMobile && ui.mobileSidebarOpen"
+          >
+            ✕
           </button>
         </div>
 

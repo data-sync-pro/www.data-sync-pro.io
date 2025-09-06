@@ -167,6 +167,34 @@ $z-index-mobile-toggle: 1001;
         color: #202124;
       }
     }
+
+    // 移动端关闭按钮 - 位于右侧
+    .mobile-sidebar-close {
+      background: transparent;
+      border: none;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1.5rem;
+      color: #5f6368;
+      transition: $transition;
+      margin-left: auto; // 推到右侧
+      flex-shrink: 0;
+
+      &:hover {
+        background-color: #f1f3f4;
+        color: #202124;
+      }
+
+      &:active {
+        background-color: #e8eaed;
+        transform: scale(0.95);
+      }
+    }
   }
 
   .sidebar-body {

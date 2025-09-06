@@ -142,9 +142,10 @@ $breakpoint-mobile: 500px;
 
     .faq-header {
       padding: 16px 20px;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 12px;
+    }
+
+    .faq-title-section {
+      width: 100%;
     }
 
     .faq-question {
@@ -154,7 +155,14 @@ $breakpoint-mobile: 500px;
 
     .faq-question-row {
       width: 100%;
+      display: flex;
       justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .category-badges {
+      margin-left: auto;
+      flex-shrink: 0;
     }
 
     .category-badge {
