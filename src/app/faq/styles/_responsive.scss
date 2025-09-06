@@ -125,7 +125,7 @@ $breakpoint-mobile: 500px;
   }
 
   .sidebar-overlay {
-    display: block;
+    display: none !important; // 移动端不需要遮罩层，因为侧边栏占满全屏
   }
 
   // 标题

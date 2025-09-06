@@ -1766,6 +1766,25 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
       event.preventDefault();
       event.stopPropagation();
     }
+    
+    // 手机端特殊处理：有子分类时优先展开
+    if (this.ui.isMobile) {
+      const category = this.categories.find(c => c.name === categoryName);
+      
+      // 如果有子分类
+      if (category && category.subCategories.length > 0) {
+        // 如果当前未展开，则只展开不导航
+        if (this.current.category !== categoryName) {
+          this.current.category = categoryName;
+          this.current.subCategory = '';
+          this.cdr.markForCheck();
+          return; // 不导航，不关闭侧边栏
+        }
+        // 如果已展开，继续执行导航
+      }
+    }
+    
+    // 原有逻辑：导航到category
     this.resetState();
     this.router.navigate(['/', this.encode(categoryName)]);
     
