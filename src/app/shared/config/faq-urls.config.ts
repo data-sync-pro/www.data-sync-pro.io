@@ -27,27 +27,27 @@ export const FAQ_URL_MAPPINGS: { [category: string]: { [key: string]: FAQUrlMapp
   'rules-engines': {
     'batch.what-is-batch': {
       key: 'batch.what-is-batch',
-      path: '/batch-what-is-batch-job'
+      path: '/what-is-batch-job'
     },
     'data-list.what-is-data-list': {
       key: 'data-list.what-is-data-list',
-      path: '/data-list-what-is-data-list'
+      path: '/what-is-data-list'
     },
     'triggers.how-it-works': {
       key: 'triggers.how-it-works',
-      path: '/triggers-how-it-works'
+      path: '/how-does-trigger-work'
     },
     'triggers.what-is-self-adaptive-trigger': {
       key: 'triggers.what-is-self-adaptive-trigger',
-      path: '/triggers-what-is-self-adaptive-trigger'
+      path: '/what-is-self-adaptive-trigger'
     },
     'action-button.what-is-action-button': {
       key: 'action-button.what-is-action-button',
-      path: '/action-button-what-is-action-button'
+      path: '/what-is-action-button'
     },
     'data-loader.how-it-works': {
       key: 'data-loader.how-it-works',
-      path: '/data-loader-how-it-works'
+      path: '/what-is-data-loader'
     }
   },
   
@@ -55,46 +55,43 @@ export const FAQ_URL_MAPPINGS: { [category: string]: { [key: string]: FAQUrlMapp
   'process-steps': {
     'input.what-does-input-do': {
       key: 'input.what-does-input-do',
-      path: '/input-what-does-input-do'
+      path: '/what-does-input-do'
     },
     'preview.what-does-preview-do': {
       key: 'preview.what-does-preview-do',
-      path: '/preview-what-does-preview-do'
+      path: '/what-does-preview-do'
     },
     'retrieve.what-does-retrieve-do': {
       key: 'retrieve.what-does-retrieve-do',
-      path: '/retrieve-what-does-retrieve-do'
+      path: '/what-does-retrieve-do'
     },
     'scoping.what-does-scoping-do': {
       key: 'scoping.what-does-scoping-do',
-      path: '/scoping-what-does-scoping-do'
+      path: '/what-does-scoping-do'
     },
     'match.what-does-match-do': {
       key: 'match.what-does-match-do',
-      path: '/match-what-does-match-do'
+      path: '/what-does-match-do'
     },
     'mapping.what-does-mapping-do': {
       key: 'mapping.what-does-mapping-do',
-      path: '/mapping-what-does-mapping-do'
+      path: '/what-does-mapping-do'
     },
     'action.what-does-action-do': {
       key: 'action.what-does-action-do',
-      path: '/action-what-does-action-do'
+      path: '/what-does-action-do'
     },
     'verify.what-does-verify-do': {
       key: 'verify.what-does-verify-do',
-      path: '/verify-what-does-verify-do'
+      path: '/what-does-verify-do'
     }
   },
-
-
-
 
   // Query Manager Category
   'query-manager': {
     'query-manager.what-is-query-manager': {
       key: 'query-manager.what-is-query-manager',
-      path: '/query-manager-what-is-query-manager'
+      path: '/what-is-query-manager'
     }
   }
 };

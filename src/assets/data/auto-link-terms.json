@@ -1,42 +1,27 @@
 {
   "terms": {
-    "Batch": {
+    "#Batch": {
       "faqLink": "batch.what-is-batch",
       "caseSensitive": true,
       "description": "Batch Rules Engine"
-    },
+    },    
     "#Batches": {
       "faqLink": "batch.what-is-batch",
       "caseSensitive": true,
       "description": "Batch Rules Engine"
     },
-    "#Batch": {
-      "faqLink": "batch.what-is-batch",
-      "caseSensitive": true,
-      "description": "Batch Rules Engine"
-    },
 
-    "Triggers": {
-      "faqLink": "triggers.how-it-works", 
-      "caseSensitive": true,
-      "description": "Triggers Rules Engine"
-    },
     "#Trigger": {
       "faqLink": "triggers.how-it-works", 
       "caseSensitive": true,
       "description": "Triggers Rules Engine"
-    },    
+    },       
     "#Triggers": {
       "faqLink": "triggers.how-it-works", 
       "caseSensitive": true,
       "description": "Triggers Rules Engine"
     },
-
-    "Data List": {
-      "faqLink": "data-list.what-is-data-list",
-      "caseSensitive": true,
-      "description": "Data List Rules Engine"
-    },        
+       
     "#Data List": {
       "faqLink": "data-list.what-is-data-list",
       "caseSensitive": true,
@@ -47,12 +32,6 @@
       "caseSensitive": true,
       "description": "Data List Rules Engine"
     },    
-
-    "Action Button": {
-      "faqLink": "action-button.what-is-action-button",
-      "caseSensitive": true,
-      "description": "Action Button Rules Engine"
-    },
     "#Action Button": {
       "faqLink": "action-button.what-is-action-button",
       "caseSensitive": true,
@@ -63,22 +42,11 @@
       "caseSensitive": true,
       "description": "Action Button Rules Engine"
     },    
-   
-    "Data Loader": {
-      "faqLink": "data-loader.how-it-works",
-      "caseSensitive": true,
-      "description": "Data Loader Rules Engine"
-    },
     "#Data Loader": {
       "faqLink": "data-loader.how-it-works",
       "caseSensitive": true,
       "description": "Data Loader Rules Engine"
     },
-    "#Data Loaders": {
-      "faqLink": "data-loader.how-it-works",
-      "caseSensitive": true,
-      "description": "Data Loader Rules Engine"
-    },    
 
     "Input": {
       "faqLink": "input.what-does-input-do",
@@ -130,28 +98,17 @@
       "caseSensitive": true,
       "description": "Verify Process Step"
     },
-
-    "Self-Adaptive Trigger": {
+    "Self-Adaptive #Trigger": {
       "faqLink": "triggers.what-is-self-adaptive-trigger",
       "caseSensitive": true,
       "description": "Self-Adaptive Trigger Rules Engine"
     },
-    "#Self-Adaptive Trigger": {
-      "faqLink": "triggers.what-is-self-adaptive-trigger",
-      "caseSensitive": true,
-      "description": "Self-Adaptive Trigger Rules Engine"
-    },
-    "#Self-Adaptive Triggers": {
+    "Self-Adaptive #Triggers": {
       "faqLink": "triggers.what-is-self-adaptive-trigger",
       "caseSensitive": true,
       "description": "Self-Adaptive Trigger Rules Engine"
     },
 
-    "Query Manager": {
-      "faqLink": "query-manager.what-is-query-manager",
-      "caseSensitive": true,
-      "description": "Query Manager - Advanced Query Tool"
-    },
     "Query Manager": {
       "faqLink": "query-manager.what-is-query-manager",
       "caseSensitive": true,
