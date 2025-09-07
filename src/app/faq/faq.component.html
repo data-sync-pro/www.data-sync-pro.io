@@ -3,29 +3,30 @@
   class="mobile-sidebar-toggle"
   (click)="toggleMobileSidebar($event)"
   (touchstart)="handleTouchStart()"
-  *ngIf="ui.isMobile"
+  *ngIf="ui.isMobile && !ui.mobileSidebarOpen"
   aria-label="Toggle sidebar menu"
 >
   ☰
 </button>
 
-<!-- Mobile TOC toggle button -->
+<!-- Mobile TOC toggle button - DISABLED -->
+<!--
 <button
   class="mobile-toc-toggle"
   (click)="toggleMobileTOC($event)"
   (touchstart)="handleTouchStart()"
-  *ngIf="ui.isMobile && shouldShowTOC"
+  *ngIf="false"
   aria-label="Toggle table of contents"
 >
   📋
 </button>
+-->
 
 <!-- Mobile sidebar overlay -->
 <div
   class="sidebar-overlay"
   [class.active]="ui.mobileSidebarOpen"
   (click)="closeMobileSidebar($event)"
-  (touchstart)="handleTouchStart()"
 ></div>
 
 <!-- W3Schools风格的网格布局容器 -->
@@ -49,12 +50,22 @@
             class="sidebar-toggle-btn"
             (click)="toggleSidebar()"
             title="Toggle sidebar"
+            *ngIf="!ui.isMobile"
           >
             <lightning-icon
               [iconName]="ui.sidebarCollapsed ? 'utility:chevronright' : 'utility:chevronleft'"
               size="xx-small"
               [alternativeText]="ui.sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'"
             ></lightning-icon>
+          </button>
+          <!-- Mobile close button -->
+          <button
+            class="mobile-sidebar-close"
+            (click)="closeMobileSidebar()"
+            title="Close sidebar"
+            *ngIf="ui.isMobile && ui.mobileSidebarOpen"
+          >
+            ✕
           </button>
         </div>
 
@@ -577,19 +588,22 @@
 
 <!-- Removed duplicate TOC - now using grid-positioned version above -->
 
-<!-- Mobile TOC Drawer -->
+<!-- Mobile TOC Drawer - DISABLED -->
+<!--
 <div class="mobile-toc-overlay" 
      [class.active]="ui.mobileTOCOpen" 
      (click)="closeMobileTOC()"
-     *ngIf="ui.isMobile"></div>
+     *ngIf="false"></div>
+-->
 
+<!-- Mobile TOC Sidebar - DISABLED -->
+<!--
 <aside
   class="faq-toc mobile-toc"
-  *ngIf="shouldShowTOC && ui.isMobile"
+  *ngIf="false"
   [class.open]="ui.mobileTOCOpen"
 >
   <div class="mobile-toc-content">
-    <!-- Mobile TOC Header -->
     <div class="mobile-toc-header">
       <div class="mobile-toc-header-content">
         <h3 class="mobile-toc-title">
@@ -603,7 +617,6 @@
         </button>
       </div>
       
-      <!-- Mobile Pagination Controls -->
       <div class="mobile-toc-pagination" *ngIf="tocPagination.totalPages > 1">
         <div class="pagination-info">{{ tocPaginationInfo }}</div>
         <div class="pagination-buttons">
@@ -625,9 +638,7 @@
       </div>
     </div>
 
-    <!-- Mobile TOC List -->
     <div class="mobile-toc-list">
-      <!-- Trending Questions for Home Page -->
       <ng-container *ngIf="showHome">
         <div
           class="mobile-toc-item trending-item"
@@ -640,7 +651,6 @@
         </div>
       </ng-container>
 
-      <!-- Category TOC for Category Pages -->
       <ng-container *ngIf="!showHome">
         <div
           class="mobile-toc-item"
@@ -655,13 +665,14 @@
     </div>
   </div>
 </aside>
+-->
 
 <!-- 共用FAQ列表模板 -->
 <ng-template #faqListTemplate let-faqItems="faqItems">
   <div class="faq-list">
-    <!-- Virtual scrolling for large lists (more than 20 items) -->
+    <!-- Virtual scrolling for large lists (more than 20 items) - 仅桌面端 -->
     <cdk-virtual-scroll-viewport 
-      *ngIf="faqItems.length > 20" 
+      *ngIf="faqItems.length > 20 && !ui.isMobile" 
       itemSize="120" 
       class="faq-virtual-viewport"
     >
@@ -693,8 +704,8 @@
       </div>
     </cdk-virtual-scroll-viewport>
 
-    <!-- Regular scrolling for smaller lists -->
-    <div *ngIf="faqItems.length <= 20" class="faq-regular-list">
+    <!-- Regular scrolling for smaller lists or mobile -->
+    <div *ngIf="faqItems.length <= 20 || ui.isMobile" class="faq-regular-list">
       <div
         class="faq-item"
         *ngFor="let item of faqItems; trackBy: trackByFAQ"

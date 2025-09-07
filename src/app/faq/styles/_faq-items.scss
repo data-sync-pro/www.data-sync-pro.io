@@ -386,7 +386,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   margin-top: 24px;
   padding: 16px 20px;
   position: relative;
-  
+  margin-bottom: 24px;
 }
 
 .feedback-container {
@@ -624,7 +624,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
 .social-menu {
   position: absolute;
-  top: calc(100% + 8px);
+  bottom: calc(100% + 8px);
   right: 0;
   width: 88px;
   background: #ffffff;

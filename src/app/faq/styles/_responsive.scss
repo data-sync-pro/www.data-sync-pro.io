@@ -54,11 +54,8 @@ $breakpoint-mobile: 500px;
   }
 
   .faq-sidebar {
-    transform: translateX(-100%);
-
-    &.mobile-open {
-      transform: translateX(0);
-    }
+    // Transform已在_sidebar.scss中处理，此处仅控制显示
+    display: block; // 确保移动端显示
   }
 
   .faq-toc {
@@ -111,12 +108,8 @@ $breakpoint-mobile: 500px;
   }
 
   .faq-sidebar {
-    width: 280px;
-    transform: translateX(-100%);
-
-    &.mobile-open {
-      transform: translateX(0);
-    }
+    width: 100%;
+    // Transform已在_sidebar.scss中统一处理，避免重复定义
   }
 
   .faq-toc {
@@ -132,7 +125,7 @@ $breakpoint-mobile: 500px;
   }
 
   .sidebar-overlay {
-    display: block;
+    display: none !important; // 移动端不需要遮罩层，因为侧边栏占满全屏
   }
 
   // 标题
@@ -149,9 +142,10 @@ $breakpoint-mobile: 500px;
 
     .faq-header {
       padding: 16px 20px;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 12px;
+    }
+
+    .faq-title-section {
+      width: 100%;
     }
 
     .faq-question {
@@ -161,7 +155,14 @@ $breakpoint-mobile: 500px;
 
     .faq-question-row {
       width: 100%;
+      display: flex;
       justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .category-badges {
+      margin-left: auto;
+      flex-shrink: 0;
     }
 
     .category-badge {

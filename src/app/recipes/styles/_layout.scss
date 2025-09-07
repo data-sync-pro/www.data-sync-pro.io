@@ -86,7 +86,7 @@ $breakpoint-mobile: 576px;
   width: 100%;
   height: 100%;
   background: rgba(0, 0, 0, 0.5);
-  z-index: 199;
+  z-index: 1099; // Fixed: increased from 199 to 1099 to be below sidebar (1100) but above content
   opacity: 0;
   visibility: hidden;
   transition: all 0.3s ease;
@@ -409,17 +409,9 @@ $breakpoint-mobile: 576px;
     border-bottom-color: #e1e5e9;
   }
   
-  // Mobile responsive adjustments
+  // Mobile responsive adjustments - hide breadcrumb on mobile
   @media (max-width: $breakpoint-tablet) {
-    padding: 6px 20px;
-    font-size: 0.9rem;
-    
-    // Adjust for mobile header height if different
-    top: $header-height;
-  }
-  
-  @media (max-width: $breakpoint-mobile) {
-    padding: 6px 15px;
+    display: none; // Hide breadcrumb completely on mobile devices
   }
   
   // Ensure proper stacking context

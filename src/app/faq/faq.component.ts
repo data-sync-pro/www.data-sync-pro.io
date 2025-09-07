@@ -161,14 +161,14 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     private previewService: FAQPreviewService
   ) {}
 
-  // Touch event handler to mark touch as handled
+  // Touch event handler to mark touch as handled - 优化移动端响应
   handleTouchStart(): void {
     this.touchStartTime = Date.now();
     this.touchHandled = true;
-    // Reset flag after a short delay to avoid interference
+    // 缩短延迟时间，提高真实设备响应速度
     setTimeout(() => {
       this.touchHandled = false;
-    }, 100);
+    }, 50); // 从100ms减少到50ms，更适合真实移动设备
   }
 
 
@@ -932,6 +932,11 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
 
     // Scroll to top instead of FAQ item for better navigation experience
     this.scrollToTop();
+    
+    // 手机端点击FAQ后关闭侧边栏
+    if (this.ui.isMobile && this.ui.mobileSidebarOpen) {
+      this.closeMobileSidebar();
+    }
   }
 
   /**
@@ -1500,6 +1505,11 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     this.search.isOpen = false;
   
     setTimeout(() => this.openAndScroll(sel.question, sel.id));
+    
+    // 手机端选择搜索结果后关闭侧边栏
+    if (this.ui.isMobile && this.ui.mobileSidebarOpen) {
+      this.closeMobileSidebar();
+    }
   }
   
   
@@ -1643,7 +1653,7 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
 
     if (navigator.clipboard && window.isSecureContext) {
       navigator.clipboard.writeText(shareUrl).then(() => {
-        this.showCopySuccess();
+        //this.showCopySuccess();
       }).catch(() => {
         this.fallbackCopyToClipboard(shareUrl);
       });
@@ -1671,7 +1681,7 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
 
     try {
       document.execCommand('copy');
-      this.showCopySuccess();
+      //this.showCopySuccess();
     } catch (err) {
       console.error('Failed to copy text: ', err);
     }
@@ -1766,6 +1776,25 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
       event.preventDefault();
       event.stopPropagation();
     }
+    
+    // 手机端特殊处理：有子分类时优先展开
+    if (this.ui.isMobile) {
+      const category = this.categories.find(c => c.name === categoryName);
+      
+      // 如果有子分类
+      if (category && category.subCategories.length > 0) {
+        // 如果当前未展开，则只展开不导航
+        if (this.current.category !== categoryName) {
+          this.current.category = categoryName;
+          this.current.subCategory = '';
+          this.cdr.markForCheck();
+          return; // 不导航，不关闭侧边栏
+        }
+        // 如果已展开，继续执行导航
+      }
+    }
+    
+    // 原有逻辑：导航到category
     this.resetState();
     this.router.navigate(['/', this.encode(categoryName)]);
     
