@@ -486,11 +486,10 @@
     "SubCategory__c": "Data List",
     "SeqNo__c": null,
     "Question__c": "What are the benefits of grouping multiple #Data Lists into a Pipeline?",
-    "Answer__c": "benefits-of-grouping-into-pipeline.html",
+    "Answer__c": "data-list-benefits-of-grouping-into-pipeline.html",
     "isActive": true
   },
-  {
-    "Id": "a0oEc000005JoiAIAS",
+  {    "Id": "a0oEc000005JoiAIAS",
     "Name": "a0oEc000005JoiAIAS",
     "Category__c": "Rules Engines",
     "SubCategory__c": "Data List",
@@ -656,7 +655,7 @@
     "SubCategory__c": "Action Button",
     "SeqNo__c": null,
     "Question__c": "What are the benefits of grouping multiple #Action Buttons into a Pipeline?",
-    "Answer__c": "benefits-of-grouping-into-pipeline.html",
+    "Answer__c": "action-button-benefits-of-grouping-into-pipeline.html",
     "isActive": true
   },
   {
