@@ -196,7 +196,7 @@
     "SubCategory__c": "Batch",
     "SeqNo__c": null,
     "Question__c": "What permissions are required to execute a #Batch?",
-    "Answer__c": "permissions-required-to-execute.html",
+    "Answer__c": "batch-permissions-required-to-execute.html",
     "isActive": true
   },
   {
@@ -426,7 +426,7 @@
     "SubCategory__c": "Data List",
     "SeqNo__c": null,
     "Question__c": "What permissions are needed to use a #Data List?",
-    "Answer__c": "permissions-needed-to-use.html",
+    "Answer__c": "data-list-permissions-needed-to-use.html",
     "isActive": true
   },
   {
@@ -676,7 +676,7 @@
     "SubCategory__c": "Action Button",
     "SeqNo__c": null,
     "Question__c": "What permissions are needed to use a #Action Button?",
-    "Answer__c": "permissions-needed.html",
+    "Answer__c": "action-button-permissions-needed.html",
     "isActive": true
   },
   {
@@ -736,7 +736,7 @@
     "SubCategory__c": "Data Loader",
     "SeqNo__c": null,
     "Question__c": "What permissions are needed to use a #Data Loader?",
-    "Answer__c": "permissions-needed.html",
+    "Answer__c": "data-loader-permissions-needed.html",
     "isActive": true
   },
   {
