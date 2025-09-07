@@ -386,7 +386,7 @@
     "SubCategory__c": "Data List",
     "SeqNo__c": null,
     "Question__c": "How do I create an Actionable #Data List?",
-    "Answer__c": "how-to-create-actionable.html",
+    "Answer__c": "how-to-create-actionable-data-list.html",
     "isActive": true
   },
   {
@@ -616,7 +616,7 @@
     "SubCategory__c": "Action Button",
     "SeqNo__c": null,
     "Question__c": "How do I create an #Action Button?",
-    "Answer__c": "how-to-create.html",
+    "Answer__c": "how-to-create-action-button.html",
     "isActive": true
   },
   {
@@ -696,7 +696,7 @@
     "SubCategory__c": "Data Loader",
     "SeqNo__c": null,
     "Question__c": "How do I create a #Data Loader?",
-    "Answer__c": "how-to-create.html",
+    "Answer__c": "how-to-create-data-loader.html",
     "isActive": true
   },
   {
@@ -846,7 +846,7 @@
     "SubCategory__c": "Trigger",
     "SeqNo__c": null,
     "Question__c": "How to create a Self-Adaptive #Trigger?",
-    "Answer__c": "how-to-create-self-adaptive.html",
+    "Answer__c": "how-to-create-self-adaptive-trigger.html",
     "isActive": true
   },
   {

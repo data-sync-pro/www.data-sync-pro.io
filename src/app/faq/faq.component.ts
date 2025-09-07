@@ -1328,8 +1328,8 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
   isAnswerBasedURL(urlPath: string): boolean {
     // Answer-based URLs are longer and contain multiple hyphens
     // Category URLs are typically single words or short phrases
-    const hasMultipleHyphens = (urlPath.match(/-/g) || []).length >= 2;
-    const isLongerThanCategoryName = urlPath.length > 15; // Most categories are shorter
+    const hasMultipleHyphens = (urlPath.match(/-/g) || []).length >= 1;
+    const isLongerThanCategoryName = urlPath.length > 1; // Most categories are shorter
     
     // Check if it's a known category by looking in our category mapping
     const isKnownCategory = this.categoryMapping.hasOwnProperty(urlPath.toLowerCase());

@@ -58,8 +58,8 @@ function answerPathMatcher(segments: UrlSegment[]): UrlMatchResult | null {
     const path = segments[0].path.toLowerCase();
     
     // Use same logic as FaqComponent.isAnswerBasedURL()
-    const hasMultipleHyphens = (path.match(/-/g) || []).length >= 2;
-    const isLongerThanCategory = path.length > 15;
+    const hasMultipleHyphens = (path.match(/-/g) || []).length >= 1;
+    const isLongerThanCategory = path.length > 1;
     
     // Ensure it's not a known category
     const validCategories = [
