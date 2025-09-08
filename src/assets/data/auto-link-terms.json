@@ -1,116 +1,116 @@
 {
   "terms": {
     "#Batch": {
-      "faqLink": "batch.what-is-batch",
+      "faqLink": "batch",
       "caseSensitive": true,
       "description": "Batch Rules Engine"
     },    
     "#Batches": {
-      "faqLink": "batch.what-is-batch",
+      "faqLink": "batch",
       "caseSensitive": true,
       "description": "Batch Rules Engine"
     },
 
     "#Trigger": {
-      "faqLink": "triggers.how-it-works", 
+      "faqLink": "trigger", 
       "caseSensitive": true,
-      "description": "Triggers Rules Engine"
+      "description": "Trigger Rules Engine"
     },       
     "#Triggers": {
-      "faqLink": "triggers.how-it-works", 
+      "faqLink": "trigger", 
       "caseSensitive": true,
-      "description": "Triggers Rules Engine"
+      "description": "Trigger Rules Engine"
     },
        
     "#Data List": {
-      "faqLink": "data-list.what-is-data-list",
+      "faqLink": "data-list",
       "caseSensitive": true,
       "description": "Data List Rules Engine"
     },
     "#Data Lists": {
-      "faqLink": "data-list.what-is-data-list",
+      "faqLink": "data-list",
       "caseSensitive": true,
       "description": "Data List Rules Engine"
     },    
     "#Action Button": {
-      "faqLink": "action-button.what-is-action-button",
+      "faqLink": "action-button",
       "caseSensitive": true,
       "description": "Action Button Rules Engine"
     },
     "#Action Buttons": {
-      "faqLink": "action-button.what-is-action-button",
+      "faqLink": "action-button",
       "caseSensitive": true,
       "description": "Action Button Rules Engine"
     },    
     "#Data Loader": {
-      "faqLink": "data-loader.how-it-works",
+      "faqLink": "data-loader",
       "caseSensitive": true,
       "description": "Data Loader Rules Engine"
     },
 
     "Input": {
-      "faqLink": "input.what-does-input-do",
+      "faqLink": "processes.input",
       "caseSensitive": true,
       "description": "Input Process Step"
     },
     "Preview": {
-      "faqLink": "preview.what-does-preview-do",
+      "faqLink": "processes.preview",
       "caseSensitive": true,
       "description": "Preview Process Step"
     },
     "Retrieve": {
-      "faqLink": "retrieve.what-does-retrieve-do",
+      "faqLink": "processes.retrieve",
       "caseSensitive": true,
       "description": "Retrieve Process Step"
     },
     "Retrieves": {
-      "faqLink": "retrieve.what-does-retrieve-do",
+      "faqLink": "processes.retrieve",
       "caseSensitive": true,
       "description": "Retrieve Process Step"
     },    
     "Scoping": {
-      "faqLink": "scoping.what-does-scoping-do",
+      "faqLink": "processes.scoping",
       "caseSensitive": true,
       "description": "Scoping Process Step"
     },
     "Match": {
-      "faqLink": "match.what-does-match-do",
+      "faqLink": "processes.match",
       "caseSensitive": true,
       "description": "Match Process Step"
     },
     "Mapping": {
-      "faqLink": "mapping.what-does-mapping-do",
+      "faqLink": "processes.mapping",
       "caseSensitive": true,
       "description": "Mapping Process Step"
     },
     "Action": {
-      "faqLink": "action.what-does-action-do",
+      "faqLink": "processes.action",
       "caseSensitive": true,
       "description": "Action Process Step"
     },
     "Actions": {
-      "faqLink": "action.what-does-action-do",
+      "faqLink": "processes.action",
       "caseSensitive": true,
       "description": "Action Process Step"
     },
     "Verify": {
-      "faqLink": "verify.what-does-verify-do",
+      "faqLink": "processes.verify",
       "caseSensitive": true,
       "description": "Verify Process Step"
     },
     "Self-Adaptive #Trigger": {
-      "faqLink": "triggers.what-is-self-adaptive-trigger",
+      "faqLink": "trigger.what-is-self-adaptive-trigger",
       "caseSensitive": true,
       "description": "Self-Adaptive Trigger Rules Engine"
     },
     "Self-Adaptive #Triggers": {
-      "faqLink": "triggers.what-is-self-adaptive-trigger",
+      "faqLink": "trigger.what-is-self-adaptive-trigger",
       "caseSensitive": true,
       "description": "Self-Adaptive Trigger Rules Engine"
     },
 
     "Query Manager": {
-      "faqLink": "query-manager.what-is-query-manager",
+      "faqLink": "query-manager",
       "caseSensitive": true,
       "description": "Query Manager - Advanced Query Tool"
     },

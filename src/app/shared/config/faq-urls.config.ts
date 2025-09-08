@@ -23,6 +23,80 @@ export interface FAQUrlMapping {
  * Example in HTML: data-faq-link="batch.what-is-batch"
  */
 export const FAQ_URL_MAPPINGS: { [category: string]: { [key: string]: FAQUrlMapping } } = {
+  // Category-level mappings (for auto-link navigation to category lists)
+  'categories': {
+    'batch': {
+      key: 'batch',
+      path: '/rules-engines/batch',
+      description: 'Batch Rules Engine Category'
+    },
+    'trigger': {
+      key: 'trigger',
+      path: '/rules-engines/trigger',
+      description: 'Triggers Rules Engine Category'
+    },
+    'data-list': {
+      key: 'data-list',
+      path: '/rules-engines/data-list',
+      description: 'Data List Rules Engine Category'
+    },
+    'action-button': {
+      key: 'action-button',
+      path: '/rules-engines/action-button',
+      description: 'Action Button Rules Engine Category'
+    },
+    'data-loader': {
+      key: 'data-loader',
+      path: '/rules-engines/data-loader',
+      description: 'Data Loader Rules Engine Category'
+    },
+    'processes.input': {
+      key: 'processes.input',
+      path: '/processes/input',
+      description: 'Input Process Step'
+    },
+    'processes.preview': {
+      key: 'processes.preview',
+      path: '/processes/preview',
+      description: 'Preview Process Step'
+    },
+    'processes.retrieve': {
+      key: 'processes.retrieve',
+      path: '/processes/retrieve',
+      description: 'Retrieve Process Step'
+    },
+    'processes.scoping': {
+      key: 'processes.scoping',
+      path: '/processes/scoping',
+      description: 'Scoping Process Step'
+    },
+    'processes.match': {
+      key: 'processes.match',
+      path: '/processes/match',
+      description: 'Match Process Step'
+    },
+    'processes.mapping': {
+      key: 'processes.mapping',
+      path: '/processes/mapping',
+      description: 'Mapping Process Step'
+    },
+    'processes.action': {
+      key: 'processes.action',
+      path: '/processes/action',
+      description: 'Action Process Step'
+    },
+    'processes.verify': {
+      key: 'processes.verify',
+      path: '/processes/verify',
+      description: 'Verify Process Step'
+    },
+    'query-manager': {
+      key: 'query-manager',
+      path: '/query-manager',
+      description: 'Query Manager Category'
+    }
+  },
+  
   // Rules Engines Category
   'rules-engines': {
     'batch.what-is-batch': {
