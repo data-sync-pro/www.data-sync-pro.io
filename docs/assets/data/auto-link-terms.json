@@ -131,18 +131,13 @@
       "description": "Verify Process Step"
     },
 
-    "Self-Adaptive Trigger": {
-      "faqLink": "triggers.what-is-self-adaptive-trigger",
-      "caseSensitive": true,
-      "description": "Self-Adaptive Trigger Rules Engine"
-    },
     "#Self-Adaptive Trigger": {
-      "faqLink": "triggers.what-is-self-adaptive-trigger",
+      "faqLink": "trigger.what-is-self-adaptive-trigger",
       "caseSensitive": true,
       "description": "Self-Adaptive Trigger Rules Engine"
     },
     "#Self-Adaptive Triggers": {
-      "faqLink": "triggers.what-is-self-adaptive-trigger",
+      "faqLink": "trigger.what-is-self-adaptive-trigger",
       "caseSensitive": true,
       "description": "Self-Adaptive Trigger Rules Engine"
     },
