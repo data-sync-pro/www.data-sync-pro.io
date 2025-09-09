@@ -1,256 +1,484 @@
 {
   "terms": {
     "#Batch": {
-      "faqLink": "batch",
-      "caseSensitive": true,
-      "description": "Batch Rules Engine"
-    },    
+      "faqLink": "batch"
+    },
     "#Batches": {
-      "faqLink": "batch",
-      "caseSensitive": true,
-      "description": "Batch Rules Engine"
+      "faqLink": "batch"
     },
-
     "#Trigger": {
-      "faqLink": "trigger", 
-      "caseSensitive": true,
-      "description": "Trigger Rules Engine"
-    },       
-    "#Triggers": {
-      "faqLink": "trigger", 
-      "caseSensitive": true,
-      "description": "Trigger Rules Engine"
+      "faqLink": "trigger"
     },
-       
+    "#Triggers": {
+      "faqLink": "trigger"
+    },
     "#Data List": {
-      "faqLink": "data-list",
-      "caseSensitive": true,
-      "description": "Data List Rules Engine"
+      "faqLink": "data-list"
     },
     "#Data Lists": {
-      "faqLink": "data-list",
-      "caseSensitive": true,
-      "description": "Data List Rules Engine"
-    },    
+      "faqLink": "data-list"
+    },
     "#Action Button": {
-      "faqLink": "action-button",
-      "caseSensitive": true,
-      "description": "Action Button Rules Engine"
+      "faqLink": "action-button"
     },
     "#Action Buttons": {
-      "faqLink": "action-button",
-      "caseSensitive": true,
-      "description": "Action Button Rules Engine"
-    },    
-    "#Data Loader": {
-      "faqLink": "data-loader",
-      "caseSensitive": true,
-      "description": "Data Loader Rules Engine"
+      "faqLink": "action-button"
     },
-
+    "#Data Loader": {
+      "faqLink": "data-loader"
+    },
     "Input": {
-      "faqLink": "processes.input",
-      "caseSensitive": true,
-      "description": "Input Process Step"
+      "faqLink": "processes.input"
     },
     "Preview": {
-      "faqLink": "processes.preview",
-      "caseSensitive": true,
-      "description": "Preview Process Step"
+      "faqLink": "processes.preview"
     },
     "Retrieve": {
-      "faqLink": "processes.retrieve",
-      "caseSensitive": true,
-      "description": "Retrieve Process Step"
+      "faqLink": "processes.retrieve"
     },
     "Retrieves": {
-      "faqLink": "processes.retrieve",
-      "caseSensitive": true,
-      "description": "Retrieve Process Step"
-    },    
+      "faqLink": "processes.retrieve"
+    },
     "Scoping": {
-      "faqLink": "processes.scoping",
-      "caseSensitive": true,
-      "description": "Scoping Process Step"
+      "faqLink": "processes.scoping"
     },
     "Match": {
-      "faqLink": "processes.match",
-      "caseSensitive": true,
-      "description": "Match Process Step"
+      "faqLink": "processes.match"
     },
     "Mapping": {
-      "faqLink": "processes.mapping",
-      "caseSensitive": true,
-      "description": "Mapping Process Step"
+      "faqLink": "processes.mapping"
     },
     "Action": {
-      "faqLink": "processes.action",
-      "caseSensitive": true,
-      "description": "Action Process Step"
+      "faqLink": "processes.action"
     },
     "Actions": {
-      "faqLink": "processes.action",
-      "caseSensitive": true,
-      "description": "Action Process Step"
+      "faqLink": "processes.action"
     },
     "Verify": {
-      "faqLink": "processes.verify",
-      "caseSensitive": true,
-      "description": "Verify Process Step"
+      "faqLink": "processes.verify"
     },
     "Self-Adaptive #Trigger": {
-      "faqLink": "trigger.what-is-self-adaptive-trigger",
-      "caseSensitive": true,
-      "description": "Self-Adaptive Trigger Rules Engine"
+      "faqLink": "trigger.what-is-self-adaptive-trigger"
     },
     "Self-Adaptive #Triggers": {
-      "faqLink": "trigger.what-is-self-adaptive-trigger",
-      "caseSensitive": true,
-      "description": "Self-Adaptive Trigger Rules Engine"
+      "faqLink": "trigger.what-is-self-adaptive-trigger"
     },
-
     "Query Manager": {
-      "faqLink": "query-manager",
-      "caseSensitive": true,
-      "description": "Query Manager - Advanced Query Tool"
+      "faqLink": "query-manager"
     },
-
-    "ADD_DAYS": { "functionDoc": "ADD_DAYS" },
-    "ADD_MONTHS": { "functionDoc": "ADD_MONTHS" },
-    "AND": { "functionDoc": "AND" },
-    "BASE64_ENCODE": { "functionDoc": "BASE64_ENCODE" },
-    "BASE64_DECODE": { "functionDoc": "BASE64_DECODE" },
-    "BLANK_VALUE": { "functionDoc": "BLANK_VALUE" },
-    "BUSINESS_HOURS_ADD": { "functionDoc": "BUSINESS_HOURS_ADD" },
-    "BUSINESS_HOURS_DIFF": { "functionDoc": "BUSINESS_HOURS_DIFF" },
-    "BUSINESS_HOURS_IS_WITHIN": { "functionDoc": "BUSINESS_HOURS_IS_WITHIN" },
-    "BUSINESS_HOURS_NEXT_START_DATE": { "functionDoc": "BUSINESS_HOURS_NEXT_START_DATE" },
-    "CONTAINS": { "functionDoc": "CONTAINS" },
-    "CONTAINS_IGNORE_CASE": { "functionDoc": "CONTAINS_IGNORE_CASE" },
-    "DATE": { "functionDoc": "DATE" },
-    "DAY": { "functionDoc": "DAY" },
-    "DAYS_BETWEEN": { "functionDoc": "DAYS_BETWEEN" },
-    "DAY_OF_YEAR": { "functionDoc": "DAY_OF_YEAR" },
-    "ENDS_WITH": { "functionDoc": "ENDS_WITH" },
-    "ENDS_WITH_IGNORE_CASE": { "functionDoc": "ENDS_WITH_IGNORE_CASE" },
-    "EQUALS": { "functionDoc": "EQUALS" },
-    "EQUALS_IGNORE_CASE": { "functionDoc": "EQUALS_IGNORE_CASE" },
-    "ERROR": { "functionDoc": "ERROR" },
-    "ERROR_VALUE": { "functionDoc": "ERROR_VALUE" },
-    "ESCAPE_HTML4": { "functionDoc": "ESCAPE_HTML4" },
-    "ESCAPE_XML": { "functionDoc": "ESCAPE_XML" },
-    "EVALUATED_FIELD_VALUE": { "functionDoc": "EVALUATED_FIELD_VALUE" },
-    "FORMAT_DATETIME": { "functionDoc": "FORMAT_DATETIME" },
-    "FORMAT_DSP_TEMPLATE": { "functionDoc": "FORMAT_DSP_TEMPLATE" },
-    "GLOBAL_VARIABLES": { "functionDoc": "GLOBAL_VARIABLES" },
-    "GET_PICKLIST_FIELD_OPTIONS": { "functionDoc": "GET_PICKLIST_FIELD_OPTIONS" },
-    "HAS_PERMISSION": { "functionDoc": "HAS_PERMISSION" },
-    "IF": { "functionDoc": "IF" },
-    "INDEX_OF": { "functionDoc": "INDEX_OF" },
-    "INDEX_OF_IGNORE_CASE": { "functionDoc": "INDEX_OF_IGNORE_CASE" },
-    "IS_ALL_LOWER_CASE": { "functionDoc": "IS_ALL_LOWER_CASE" },
-    "IS_ALL_UPPER_CASE": { "functionDoc": "IS_ALL_UPPER_CASE" },
-    "IS_ALPHA": { "functionDoc": "IS_ALPHA" },
-    "IS_ALPHA_SPACE": { "functionDoc": "IS_ALPHA_SPACE" },
-    "IS_ALPHANUMERIC": { "functionDoc": "IS_ALPHANUMERIC" },
-    "IS_ALPHANUMERIC_SPACE": { "functionDoc": "IS_ALPHANUMERIC_SPACE" },
-    "IS_BLANK": { "functionDoc": "IS_BLANK" },
-    "IS_CURRENT_USER_IN_OWNER_QUEUE": { "functionDoc": "IS_CURRENT_USER_IN_OWNER_QUEUE" },
-    "IS_DECIMAL": { "functionDoc": "IS_DECIMAL" },
-    "IS_EMAIL_ADDRESS": { "functionDoc": "IS_EMAIL_ADDRESS" },
-    "IS_FIRST_IN_ITERATION": { "functionDoc": "IS_FIRST_IN_ITERATION" },
-    "IS_INSERT": { "functionDoc": "IS_INSERT" },
-    "IS_NUMERIC": { "functionDoc": "IS_NUMERIC" },
-    "IS_PHONE_NUMBER": { "functionDoc": "IS_PHONE_NUMBER" },
-    "IS_PRODUCTION": { "functionDoc": "IS_PRODUCTION" },
-    "IS_UPDATE": { "functionDoc": "IS_UPDATE" },
-    "JOIN_JSON": { "functionDoc": "JOIN_JSON" },
-    "JOIN_OBJECT": { "functionDoc": "JOIN_OBJECT" },
-    "LAST_INDEX_OF": { "functionDoc": "LAST_INDEX_OF" },
-    "LAST_INDEX_OF_IGNORE_CASE": { "functionDoc": "LAST_INDEX_OF_IGNORE_CASE" },
-    "LEFT": { "functionDoc": "LEFT" },
-    "LEN": { "functionDoc": "LEN" },
-    "MATCHES": { "functionDoc": "MATCHES" },
-    "MAP_VALUE_CONTAINS": { "functionDoc": "MAP_VALUE_CONTAINS" },
-    "MAP_VALUE_CONTAINS_IGNORE_CASE": { "functionDoc": "MAP_VALUE_CONTAINS_IGNORE_CASE" },
-    "MAP_VALUE_EQUALS": { "functionDoc": "MAP_VALUE_EQUALS" },
-    "MAP_VALUE_STARTS_WITH": { "functionDoc": "MAP_VALUE_STARTS_WITH" },
-    "MAP_VALUE_STARTS_WITH_IGNORE_CASE": { "functionDoc": "MAP_VALUE_STARTS_WITH_IGNORE_CASE" },
-    "MAX": { "functionDoc": "MAX" },
-    "MIN": { "functionDoc": "MIN" },
-    "MONTH": { "functionDoc": "MONTH" },
-    "NOT": { "functionDoc": "NOT" },
-    "NOW": { "functionDoc": "NOW" },
-    "OR": { "functionDoc": "OR" },
-    "OPERATORS": { "functionDoc": "OPERATORS" },
-    "RANDOMIZE": { "functionDoc": "RANDOMIZE" },
-    "RANDOM_ITEM": { "functionDoc": "RANDOM_ITEM" },
-    "REPLACE": { "functionDoc": "REPLACE" },
-    "REPLACE_ALL": { "functionDoc": "REPLACE_ALL" },
-    "REPLACE_FIRST": { "functionDoc": "REPLACE_FIRST" },
-    "RIGHT": { "functionDoc": "RIGHT" },
-    "ROUND": { "functionDoc": "ROUND" },
-    "SCRAMBLE": { "functionDoc": "SCRAMBLE" },
-    "SKIP_BLANK_VALUE": { "functionDoc": "SKIP_BLANK_VALUE" },
-    "STARTS_WITH": { "functionDoc": "STARTS_WITH" },
-    "STARTS_WITH_IGNORE_CASE": { "functionDoc": "STARTS_WITH_IGNORE_CASE" },
-    "STRING_JOIN": { "functionDoc": "STRING_JOIN" },
-    "SUBSTRING": { "functionDoc": "SUBSTRING" },
-    "SUBSTRING_AFTER": { "functionDoc": "SUBSTRING_AFTER" },
-    "SUBSTRING_AFTER_LAST": { "functionDoc": "SUBSTRING_AFTER_LAST" },
-    "SUBSTRING_BEFORE": { "functionDoc": "SUBSTRING_BEFORE" },
-    "SUBSTRING_BEFORE_LAST": { "functionDoc": "SUBSTRING_BEFORE_LAST" },
-    "SUBSTRING_BETWEEN": { "functionDoc": "SUBSTRING_BETWEEN" },
-    "TRIGGER_FLIPPER": { "functionDoc": "TRIGGER_FLIPPER" },
-    "TRIGGER_IS_AFTER": { "functionDoc": "TRIGGER_IS_AFTER" },
-    "TRIGGER_IS_BEFORE": { "functionDoc": "TRIGGER_IS_BEFORE" },
-    "TRIGGER_IS_FLIPPED": { "functionDoc": "TRIGGER_IS_FLIPPED" },
-    "TRIGGER_IS_CHANGED": { "functionDoc": "TRIGGER_IS_CHANGED" },
-    "TRIGGER_IS_CHANGED_FROM": { "functionDoc": "TRIGGER_IS_CHANGED_FROM" },
-    "TRIGGER_IS_CHANGED_TO": { "functionDoc": "TRIGGER_IS_CHANGED_TO" },
-    "TRIGGER_IS_DELETE": { "functionDoc": "TRIGGER_IS_DELETE" },
-    "TRIGGER_IS_INSERT": { "functionDoc": "TRIGGER_IS_INSERT" },
-    "TRIGGER_IS_UNDELETE": { "functionDoc": "TRIGGER_IS_UNDELETE" },
-    "TRIGGER_IS_UPDATE": { "functionDoc": "TRIGGER_IS_UPDATE" },
-    "TRIGGER_OLD_VALUE": { "functionDoc": "TRIGGER_OLD_VALUE" },
-    "TODAY": { "functionDoc": "TODAY" },
-    "TO_BLOB": { "functionDoc": "TO_BLOB" },
-    "TO_BOOLEAN": { "functionDoc": "TO_BOOLEAN" },
-    "TO_DATE": { "functionDoc": "TO_DATE" },
-    "TO_DATETIME": { "functionDoc": "TO_DATETIME" },
-    "TO_DECIMAL": { "functionDoc": "TO_DECIMAL" },
-    "TO_INTEGER": { "functionDoc": "TO_INTEGER" },
-    "TO_LOWER_CASE": { "functionDoc": "TO_LOWER_CASE" },
-    "TO_STRING": { "functionDoc": "TO_STRING" },
-    "TO_START_OF_MONTH": { "functionDoc": "TO_START_OF_MONTH" },
-    "TO_START_OF_WEEK": { "functionDoc": "TO_START_OF_WEEK" },
-    "TO_TIME": { "functionDoc": "TO_TIME" },
-    "TO_UPPER_CASE": { "functionDoc": "TO_UPPER_CASE" },
-    "TRIM": { "functionDoc": "TRIM" },
-    "VALUE_IN": { "functionDoc": "VALUE_IN" },
-    "VLOOKUP": { "functionDoc": "VLOOKUP" },
-    "VLOOKUP_CONNECTION": { "functionDoc": "VLOOKUP_CONNECTION" },
-    "VLOOKUP_RECORD": { "functionDoc": "VLOOKUP_RECORD" },
-    "VLOOKUP_RECORD_CONNECTION": { "functionDoc": "VLOOKUP_RECORD_CONNECTION" },
-    "YEAR": { "functionDoc": "YEAR" },
-    "YESTERDAY": { "functionDoc": "YESTERDAY" },
-    "AGG_AVG": { "functionDoc": "AGG_AVG" },
-    "AGG_COUNT": { "functionDoc": "AGG_COUNT" },
-    "AGG_COUNT_DISTINCT": { "functionDoc": "AGG_COUNT_DISTINCT" },
-    "AGG_MAX": { "functionDoc": "AGG_MAX" },
-    "AGG_MIN": { "functionDoc": "AGG_MIN" },
-    "AGG_SUM": { "functionDoc": "AGG_SUM" },
-    "APEX_CLASS": { "functionDoc": "APEX_CLASS" },
-    "AGG": { "functionDoc": "aggregate_general" },
-
-    "$CONTEXT_RECORD_ID": { "globalVariableDoc": "global_variables" },
-    "$JOINER": { "globalVariableDoc": "global_variables" },
-    "$Joiner.FieldName": { "globalVariableDoc": "global_variables" },
-    "$ORG_DOMAIN_URL": { "globalVariableDoc": "global_variables" },
-    "$SKIP_ASSIGNMENT": { "globalVariableDoc": "global_variables" },
-    "$User.Email": { "globalVariableDoc": "global_variables" },
-    "$User.ProfileId": { "globalVariableDoc": "global_variables" },
-    "$User.Username": { "globalVariableDoc": "global_variables" },
-    "$User.Id": { "globalVariableDoc": "global_variables" }
+    "ADD_DAYS": {
+      "functionDoc": "ADD_DAYS"
+    },
+    "ADD_MONTHS": {
+      "functionDoc": "ADD_MONTHS"
+    },
+    "AND": {
+      "functionDoc": "AND"
+    },
+    "BASE64_ENCODE": {
+      "functionDoc": "BASE64_ENCODE"
+    },
+    "BASE64_DECODE": {
+      "functionDoc": "BASE64_DECODE"
+    },
+    "BLANK_VALUE": {
+      "functionDoc": "BLANK_VALUE"
+    },
+    "BUSINESS_HOURS_ADD": {
+      "functionDoc": "BUSINESS_HOURS_ADD"
+    },
+    "BUSINESS_HOURS_DIFF": {
+      "functionDoc": "BUSINESS_HOURS_DIFF"
+    },
+    "BUSINESS_HOURS_IS_WITHIN": {
+      "functionDoc": "BUSINESS_HOURS_IS_WITHIN"
+    },
+    "BUSINESS_HOURS_NEXT_START_DATE": {
+      "functionDoc": "BUSINESS_HOURS_NEXT_START_DATE"
+    },
+    "CONTAINS": {
+      "functionDoc": "CONTAINS"
+    },
+    "CONTAINS_IGNORE_CASE": {
+      "functionDoc": "CONTAINS_IGNORE_CASE"
+    },
+    "DATE": {
+      "functionDoc": "DATE"
+    },
+    "DAY": {
+      "functionDoc": "DAY"
+    },
+    "DAYS_BETWEEN": {
+      "functionDoc": "DAYS_BETWEEN"
+    },
+    "DAY_OF_YEAR": {
+      "functionDoc": "DAY_OF_YEAR"
+    },
+    "ENDS_WITH": {
+      "functionDoc": "ENDS_WITH"
+    },
+    "ENDS_WITH_IGNORE_CASE": {
+      "functionDoc": "ENDS_WITH_IGNORE_CASE"
+    },
+    "EQUALS": {
+      "functionDoc": "EQUALS"
+    },
+    "EQUALS_IGNORE_CASE": {
+      "functionDoc": "EQUALS_IGNORE_CASE"
+    },
+    "ERROR": {
+      "functionDoc": "ERROR"
+    },
+    "ERROR_VALUE": {
+      "functionDoc": "ERROR_VALUE"
+    },
+    "ESCAPE_HTML4": {
+      "functionDoc": "ESCAPE_HTML4"
+    },
+    "ESCAPE_XML": {
+      "functionDoc": "ESCAPE_XML"
+    },
+    "EVALUATED_FIELD_VALUE": {
+      "functionDoc": "EVALUATED_FIELD_VALUE"
+    },
+    "FORMAT_DATETIME": {
+      "functionDoc": "FORMAT_DATETIME"
+    },
+    "FORMAT_DSP_TEMPLATE": {
+      "functionDoc": "FORMAT_DSP_TEMPLATE"
+    },
+    "GLOBAL_VARIABLES": {
+      "functionDoc": "GLOBAL_VARIABLES"
+    },
+    "GET_PICKLIST_FIELD_OPTIONS": {
+      "functionDoc": "GET_PICKLIST_FIELD_OPTIONS"
+    },
+    "HAS_PERMISSION": {
+      "functionDoc": "HAS_PERMISSION"
+    },
+    "IF": {
+      "functionDoc": "IF"
+    },
+    "INDEX_OF": {
+      "functionDoc": "INDEX_OF"
+    },
+    "INDEX_OF_IGNORE_CASE": {
+      "functionDoc": "INDEX_OF_IGNORE_CASE"
+    },
+    "IS_ALL_LOWER_CASE": {
+      "functionDoc": "IS_ALL_LOWER_CASE"
+    },
+    "IS_ALL_UPPER_CASE": {
+      "functionDoc": "IS_ALL_UPPER_CASE"
+    },
+    "IS_ALPHA": {
+      "functionDoc": "IS_ALPHA"
+    },
+    "IS_ALPHA_SPACE": {
+      "functionDoc": "IS_ALPHA_SPACE"
+    },
+    "IS_ALPHANUMERIC": {
+      "functionDoc": "IS_ALPHANUMERIC"
+    },
+    "IS_ALPHANUMERIC_SPACE": {
+      "functionDoc": "IS_ALPHANUMERIC_SPACE"
+    },
+    "IS_BLANK": {
+      "functionDoc": "IS_BLANK"
+    },
+    "IS_CURRENT_USER_IN_OWNER_QUEUE": {
+      "functionDoc": "IS_CURRENT_USER_IN_OWNER_QUEUE"
+    },
+    "IS_DECIMAL": {
+      "functionDoc": "IS_DECIMAL"
+    },
+    "IS_EMAIL_ADDRESS": {
+      "functionDoc": "IS_EMAIL_ADDRESS"
+    },
+    "IS_FIRST_IN_ITERATION": {
+      "functionDoc": "IS_FIRST_IN_ITERATION"
+    },
+    "IS_INSERT": {
+      "functionDoc": "IS_INSERT"
+    },
+    "IS_NUMERIC": {
+      "functionDoc": "IS_NUMERIC"
+    },
+    "IS_PHONE_NUMBER": {
+      "functionDoc": "IS_PHONE_NUMBER"
+    },
+    "IS_PRODUCTION": {
+      "functionDoc": "IS_PRODUCTION"
+    },
+    "IS_UPDATE": {
+      "functionDoc": "IS_UPDATE"
+    },
+    "JOIN_JSON": {
+      "functionDoc": "JOIN_JSON"
+    },
+    "JOIN_OBJECT": {
+      "functionDoc": "JOIN_OBJECT"
+    },
+    "LAST_INDEX_OF": {
+      "functionDoc": "LAST_INDEX_OF"
+    },
+    "LAST_INDEX_OF_IGNORE_CASE": {
+      "functionDoc": "LAST_INDEX_OF_IGNORE_CASE"
+    },
+    "LEFT": {
+      "functionDoc": "LEFT"
+    },
+    "LEN": {
+      "functionDoc": "LEN"
+    },
+    "MATCHES": {
+      "functionDoc": "MATCHES"
+    },
+    "MAP_VALUE_CONTAINS": {
+      "functionDoc": "MAP_VALUE_CONTAINS"
+    },
+    "MAP_VALUE_CONTAINS_IGNORE_CASE": {
+      "functionDoc": "MAP_VALUE_CONTAINS_IGNORE_CASE"
+    },
+    "MAP_VALUE_EQUALS": {
+      "functionDoc": "MAP_VALUE_EQUALS"
+    },
+    "MAP_VALUE_STARTS_WITH": {
+      "functionDoc": "MAP_VALUE_STARTS_WITH"
+    },
+    "MAP_VALUE_STARTS_WITH_IGNORE_CASE": {
+      "functionDoc": "MAP_VALUE_STARTS_WITH_IGNORE_CASE"
+    },
+    "MAX": {
+      "functionDoc": "MAX"
+    },
+    "MIN": {
+      "functionDoc": "MIN"
+    },
+    "MONTH": {
+      "functionDoc": "MONTH"
+    },
+    "NOT": {
+      "functionDoc": "NOT"
+    },
+    "NOW": {
+      "functionDoc": "NOW"
+    },
+    "OR": {
+      "functionDoc": "OR"
+    },
+    "OPERATORS": {
+      "functionDoc": "OPERATORS"
+    },
+    "RANDOMIZE": {
+      "functionDoc": "RANDOMIZE"
+    },
+    "RANDOM_ITEM": {
+      "functionDoc": "RANDOM_ITEM"
+    },
+    "REPLACE": {
+      "functionDoc": "REPLACE"
+    },
+    "REPLACE_ALL": {
+      "functionDoc": "REPLACE_ALL"
+    },
+    "REPLACE_FIRST": {
+      "functionDoc": "REPLACE_FIRST"
+    },
+    "RIGHT": {
+      "functionDoc": "RIGHT"
+    },
+    "ROUND": {
+      "functionDoc": "ROUND"
+    },
+    "SCRAMBLE": {
+      "functionDoc": "SCRAMBLE"
+    },
+    "SKIP_BLANK_VALUE": {
+      "functionDoc": "SKIP_BLANK_VALUE"
+    },
+    "STARTS_WITH": {
+      "functionDoc": "STARTS_WITH"
+    },
+    "STARTS_WITH_IGNORE_CASE": {
+      "functionDoc": "STARTS_WITH_IGNORE_CASE"
+    },
+    "STRING_JOIN": {
+      "functionDoc": "STRING_JOIN"
+    },
+    "SUBSTRING": {
+      "functionDoc": "SUBSTRING"
+    },
+    "SUBSTRING_AFTER": {
+      "functionDoc": "SUBSTRING_AFTER"
+    },
+    "SUBSTRING_AFTER_LAST": {
+      "functionDoc": "SUBSTRING_AFTER_LAST"
+    },
+    "SUBSTRING_BEFORE": {
+      "functionDoc": "SUBSTRING_BEFORE"
+    },
+    "SUBSTRING_BEFORE_LAST": {
+      "functionDoc": "SUBSTRING_BEFORE_LAST"
+    },
+    "SUBSTRING_BETWEEN": {
+      "functionDoc": "SUBSTRING_BETWEEN"
+    },
+    "TRIGGER_FLIPPER": {
+      "functionDoc": "TRIGGER_FLIPPER"
+    },
+    "TRIGGER_IS_AFTER": {
+      "functionDoc": "TRIGGER_IS_AFTER"
+    },
+    "TRIGGER_IS_BEFORE": {
+      "functionDoc": "TRIGGER_IS_BEFORE"
+    },
+    "TRIGGER_IS_FLIPPED": {
+      "functionDoc": "TRIGGER_IS_FLIPPED"
+    },
+    "TRIGGER_IS_CHANGED": {
+      "functionDoc": "TRIGGER_IS_CHANGED"
+    },
+    "TRIGGER_IS_CHANGED_FROM": {
+      "functionDoc": "TRIGGER_IS_CHANGED_FROM"
+    },
+    "TRIGGER_IS_CHANGED_TO": {
+      "functionDoc": "TRIGGER_IS_CHANGED_TO"
+    },
+    "TRIGGER_IS_DELETE": {
+      "functionDoc": "TRIGGER_IS_DELETE"
+    },
+    "TRIGGER_IS_INSERT": {
+      "functionDoc": "TRIGGER_IS_INSERT"
+    },
+    "TRIGGER_IS_UNDELETE": {
+      "functionDoc": "TRIGGER_IS_UNDELETE"
+    },
+    "TRIGGER_IS_UPDATE": {
+      "functionDoc": "TRIGGER_IS_UPDATE"
+    },
+    "TRIGGER_OLD_VALUE": {
+      "functionDoc": "TRIGGER_OLD_VALUE"
+    },
+    "TODAY": {
+      "functionDoc": "TODAY"
+    },
+    "TO_BLOB": {
+      "functionDoc": "TO_BLOB"
+    },
+    "TO_BOOLEAN": {
+      "functionDoc": "TO_BOOLEAN"
+    },
+    "TO_DATE": {
+      "functionDoc": "TO_DATE"
+    },
+    "TO_DATETIME": {
+      "functionDoc": "TO_DATETIME"
+    },
+    "TO_DECIMAL": {
+      "functionDoc": "TO_DECIMAL"
+    },
+    "TO_INTEGER": {
+      "functionDoc": "TO_INTEGER"
+    },
+    "TO_LOWER_CASE": {
+      "functionDoc": "TO_LOWER_CASE"
+    },
+    "TO_STRING": {
+      "functionDoc": "TO_STRING"
+    },
+    "TO_START_OF_MONTH": {
+      "functionDoc": "TO_START_OF_MONTH"
+    },
+    "TO_START_OF_WEEK": {
+      "functionDoc": "TO_START_OF_WEEK"
+    },
+    "TO_TIME": {
+      "functionDoc": "TO_TIME"
+    },
+    "TO_UPPER_CASE": {
+      "functionDoc": "TO_UPPER_CASE"
+    },
+    "TRIM": {
+      "functionDoc": "TRIM"
+    },
+    "VALUE_IN": {
+      "functionDoc": "VALUE_IN"
+    },
+    "VLOOKUP": {
+      "functionDoc": "VLOOKUP"
+    },
+    "VLOOKUP_CONNECTION": {
+      "functionDoc": "VLOOKUP_CONNECTION"
+    },
+    "VLOOKUP_RECORD": {
+      "functionDoc": "VLOOKUP_RECORD"
+    },
+    "VLOOKUP_RECORD_CONNECTION": {
+      "functionDoc": "VLOOKUP_RECORD_CONNECTION"
+    },
+    "YEAR": {
+      "functionDoc": "YEAR"
+    },
+    "YESTERDAY": {
+      "functionDoc": "YESTERDAY"
+    },
+    "AGG_AVG": {
+      "functionDoc": "AGG_AVG"
+    },
+    "AGG_COUNT": {
+      "functionDoc": "AGG_COUNT"
+    },
+    "AGG_COUNT_DISTINCT": {
+      "functionDoc": "AGG_COUNT_DISTINCT"
+    },
+    "AGG_MAX": {
+      "functionDoc": "AGG_MAX"
+    },
+    "AGG_MIN": {
+      "functionDoc": "AGG_MIN"
+    },
+    "AGG_SUM": {
+      "functionDoc": "AGG_SUM"
+    },
+    "APEX_CLASS": {
+      "functionDoc": "apex_class"
+    },
+    "AGG": {
+      "functionDoc": "aggregate_general"
+    },
+    "Transformation": {
+      "functionDoc": "home"
+    },
+    "Apex Class": {
+      "functionDoc": "apex_class"
+    },
+    "$CONTEXT_RECORD_ID": {
+      "globalVariableDoc": "global_variables"
+    },
+    "$JOINER": {
+      "globalVariableDoc": "global_variables"
+    },
+    "$Joiner.FieldName": {
+      "globalVariableDoc": "global_variables"
+    },
+    "$ORG_DOMAIN_URL": {
+      "globalVariableDoc": "global_variables"
+    },
+    "$SKIP_ASSIGNMENT": {
+      "globalVariableDoc": "global_variables"
+    },
+    "$User.Email": {
+      "globalVariableDoc": "global_variables"
+    },
+    "$User.ProfileId": {
+      "globalVariableDoc": "global_variables"
+    },
+    "$User.Username": {
+      "globalVariableDoc": "global_variables"
+    },
+    "$User.Id": {
+      "globalVariableDoc": "global_variables"
+    }
   }
 }
