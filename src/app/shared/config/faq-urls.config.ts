@@ -111,8 +111,8 @@ export const FAQ_URL_MAPPINGS: { [category: string]: { [key: string]: FAQUrlMapp
       key: 'triggers.how-it-works',
       path: '/how-does-trigger-work'
     },
-    'triggers.what-is-self-adaptive-trigger': {
-      key: 'triggers.what-is-self-adaptive-trigger',
+    'trigger.what-is-self-adaptive-trigger': {
+      key: 'trigger.what-is-self-adaptive-trigger',
       path: '/what-is-self-adaptive-trigger'
     },
     'action-button.what-is-action-button': {

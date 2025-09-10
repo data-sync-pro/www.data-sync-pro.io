@@ -6,7 +6,7 @@
 <pre><div><div><code>IF(
   AND(
     CONTAINS_IGNORE_CASE(Status, "open"),
-    DAYS_BETWEEN(TODAY(), CloseDate) <= 7
+    DAYS_BETWEEN(TODAY(), TO_DATE(ClosedDate)) <= 7
   ),
   "Closing Soon",
   "Standard"
