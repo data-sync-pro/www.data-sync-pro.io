@@ -24,10 +24,11 @@ $z-index-mobile-toggle: 1001;
   // 桌面端：保持静态定位在网格中，移动端使用fixed定位
   @media (min-width: #{$breakpoint-desktop + 1px}) {
     // 桌面端：网格定位，正常文档流
-    position: static;
+    position: sticky;
     height: calc(100vh - $header-height);
     overflow: hidden;
     transform: none;
+     top: $header-height
   }
   
   // 移动端：fixed定位 + transform动画
