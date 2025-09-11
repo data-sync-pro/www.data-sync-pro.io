@@ -1,11 +1,33 @@
-<p><strong>Scoping </strong>refines source data in-memory using filters and joins to define the dataset for downstream processing. It is available in all DSP rules engines, including #Batch, #Data Lists, #Triggers, #Action Buttons, and #Data Loader.</p><p><strong>Key functions of Scoping:</strong></p><ul>
-<li>
-<p><strong>Scope Filters (in-memory filtering):</strong> Apply DSP formulas and expressions to define which source records proceed to Match, Mapping, and Action steps.</p>
-</li>
-<li>
-<p><strong>Source Joins:</strong> Combine source data with another object (from any Connection) or with a JSON array. DSP supports <strong>left joins</strong> and <strong>cross joins</strong>, enabling multi-source refinement and dynamic filtering.</p>
-</li>
-</ul><p><em>Note:</em> Scoping is for advanced data shaping that cannot be expressed directly in the initial SOQL query (Retrieve). It runs after data is retrieved or uploaded, but before Match, Mapping, and Actions.</p>
-  
-  
-<img src="assets/image/scoping-what-does-scoping-do/scoping-what-does-scoping-do.jpg">
+<p>
+  <strong>Scoping </strong>refines source data in-memory using filters and joins
+  to define the dataset for downstream processing. It is available in all DSP
+  rules engines, including <b>#Batch</b>, <b>#Data Lists</b>, <b>#Triggers</b>, <b>#Action Buttons</b>, and
+  <b>#Data Loader</b>.
+</p>
+<p><strong>Key functions of Scoping:</strong></p>
+<ul>
+  <li>
+    <p>
+      <strong>Scope Filters (in-memory filtering):</strong> Apply DSP formulas
+      and expressions to define which source records proceed to Match, Mapping,
+      and Action steps.
+    </p>
+  </li>
+  <li>
+    <p>
+      <strong>Source Joins:</strong> Combine source data with another object
+      (from any Connection) or with a JSON array. DSP supports
+      <strong>left joins</strong> and <strong>cross joins</strong>, enabling
+      multi-source refinement and dynamic filtering.
+    </p>
+  </li>
+</ul>
+<p>
+  <em>Note:</em> Scoping is for advanced data shaping that cannot be expressed
+  directly in the initial SOQL query (Retrieve). It runs after data is retrieved
+  or uploaded, but before Match, Mapping, and Actions.
+</p>
+
+<img
+  src="assets/image/scoping-what-does-scoping-do/scoping-what-does-scoping-do.jpg"
+/>
