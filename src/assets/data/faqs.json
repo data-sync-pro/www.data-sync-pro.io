@@ -985,7 +985,7 @@
     "SubCategory__c": "Retrieve",
     "SeqNo__c": null,
     "Question__c": "What is the purpose of the 'Additional Retrieve Criteria' field on a Pipeline?",
-    "Answer__c": "purpose-of-additional-criteria.html",
+    "Answer__c": "purpose-of-additional-criteria-in-pipeline.html",
     "isActive": true
   },
   {
