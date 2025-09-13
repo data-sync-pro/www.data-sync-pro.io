@@ -1481,10 +1481,30 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     subCatFilterApplied?: boolean;
   }): void {
   
-    // Find the full FAQ item to get the answerPath
-    const faqItem = this.faqList.find(item => 
-      item.question === sel.question && item.category === sel.category
-    );
+    // Find the full FAQ item using ID for unique identification
+    let faqItem = null;
+    
+    // First try to find by ID if provided (most accurate)
+    if (sel.id) {
+      faqItem = this.faqList.find(item => item.id === sel.id);
+    }
+    
+    // If not found by ID or ID not provided, try by question, category, and subCategory
+    if (!faqItem) {
+      faqItem = this.faqList.find(item => 
+        item.question === sel.question && 
+        item.category === sel.category &&
+        item.subCategory === sel.subCategory
+      );
+    }
+    
+    // Last fallback: just question and category (original logic)
+    if (!faqItem) {
+      faqItem = this.faqList.find(item => 
+        item.question === sel.question && 
+        item.category === sel.category
+      );
+    }
     
     if (faqItem) {
       // Use answer-based URL
