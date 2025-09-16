@@ -48,6 +48,9 @@
     "Mapping": {
       "faqLink": "processes.mapping"
     },
+     "Mappings": {
+      "faqLink": "processes.mapping"
+    },
     "Action": {
       "faqLink": "processes.action"
     },
