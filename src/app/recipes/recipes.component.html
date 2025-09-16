@@ -114,7 +114,7 @@
   <nav class="breadcrumb-nav" *ngIf="breadcrumbPath.length > 1" aria-label="breadcrumb">
     <div class="breadcrumb">
       <ng-container *ngFor="let crumb of breadcrumbPath; let last = last; let first = first">
-        <button class="breadcrumb-item" 
+        <button class="breadcrumb-item"
                 [class.active]="last && !showRecipeDetails"
                 [routerLink]="crumb.url"
                 [disabled]="false"
@@ -122,7 +122,7 @@
           <lightning-icon *ngIf="first" iconName="utility:home" size="xx-small" alternativeText="Home"></lightning-icon>
           <span>{{ crumb.name }}</span>
         </button>
-        
+
         <span class="breadcrumb-separator" *ngIf="!last">
           <lightning-icon iconName="utility:chevronright" size="xx-small" alternativeText="Next"></lightning-icon>
         </span>
@@ -387,7 +387,7 @@
   </main>
 
   <!-- Right TOC (Table of Contents) - Microsoft Learn Style -->
-  <aside class="recipe-toc-outline" 
+  <aside class="recipe-toc recipe-toc-outline"
          *ngIf="shouldShowTOC && !ui.isMobile && showRecipeDetails">
     
     <div class="toc-container">
@@ -430,7 +430,7 @@
   </aside>
   
   <!-- Recipe List TOC (for Home/Category pages) -->
-  <aside class="recipe-list-toc" 
+  <aside class="recipe-toc recipe-list-toc"
          *ngIf="shouldShowTOC && !ui.isMobile && !showRecipeDetails">
     <div class="toc-container">
       <h3 class="toc-heading">{{ currentTOCTitle }}</h3>
@@ -440,7 +440,6 @@
               *ngFor="let recipe of (showHome ? paginatedTrendingRecipes : paginatedCategoryRecipes)"
               [class.active]="recipe.id === currentRecipe?.id">
             <a (click)="goToRecipe(recipe)">
-              <mat-icon class="recipe-icon">{{ getCategoryIcon(recipe.category) }}</mat-icon>
               <span>{{ recipe.title }}</span>
             </a>
           </li>

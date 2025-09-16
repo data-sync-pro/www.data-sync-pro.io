@@ -4,8 +4,8 @@
 $header-height: 60px; // Global header height
 // 改为百分比布局，更加响应式
 $sidebar-width-percent: 18%; // 约216px in 1200px container
-$sidebar-collapsed-width-percent: 5%; // 约60px in 1200px container  
-$toc-width-percent: 20%; // 约240px in 1200px container
+$sidebar-collapsed-width-percent: 5%; // 约60px in 1200px container
+$toc-width-percent: 18%; // 与sidebar宽度保持一致
 // 保留像素值用于移动端和特殊情况
 $sidebar-width: 240px;
 $sidebar-collapsed-width: 56px;
@@ -15,10 +15,13 @@ $breakpoint-desktop: 992px;
 $breakpoint-tablet: 768px;
 $breakpoint-mobile: 576px;
 
-// FAQ-inspired主容器布局 - 三栏设计
+// FAQ-inspired主容器布局 - 四栏设计(包含breadcrumb)
 .recipe-layout-container {
   display: grid;
-  grid-template-areas: "sidebar main toc";
+  grid-template-areas:
+    "sidebar breadcrumb toc"
+    "sidebar main toc";
+  grid-template-rows: auto 1fr;
   // 使用百分比布局，更响应式和灵活
   grid-template-columns: $sidebar-width-percent 1fr $toc-width-percent;
   min-height: calc(100vh - $header-height);
@@ -32,10 +35,12 @@ $breakpoint-mobile: 576px;
   }
 
   &.toc-hidden {
-    grid-template-areas: "sidebar main";
+    grid-template-areas:
+      "sidebar breadcrumb"
+      "sidebar main";
     // TOC隐藏时，主内容获得更多空间
     grid-template-columns: $sidebar-width-percent 1fr;
-    
+
     &.sidebar-collapsed {
       grid-template-columns: $sidebar-collapsed-width-percent 1fr;
     }
@@ -43,15 +48,15 @@ $breakpoint-mobile: 576px;
 
   // 在大屏幕上优化比例
   @media (min-width: 1400px) {
-    grid-template-columns: 16% 1fr 18%; // 大屏幕上稍微减少侧栏占比
-    
+    grid-template-columns: 16% 1fr 16%; // 大屏幕上sidebar和toc保持相同宽度
+
     &.sidebar-collapsed {
-      grid-template-columns: 4% 1fr 18%;
+      grid-template-columns: 4% 1fr 16%;
     }
 
     &.toc-hidden {
       grid-template-columns: 16% 1fr;
-      
+
       &.sidebar-collapsed {
         grid-template-columns: 4% 1fr;
       }
@@ -60,7 +65,9 @@ $breakpoint-mobile: 576px;
 
   // 移动端切换到全宽布局
   @media (max-width: $breakpoint-desktop) {
-    grid-template-areas: "main";
+    grid-template-areas:
+      "breadcrumb"
+      "main";
     grid-template-columns: 1fr;
   }
 }
@@ -110,18 +117,18 @@ $breakpoint-mobile: 576px;
 
 .recipe-main {
   grid-area: main;
-  padding: 80px; // Normal bottom padding for footer visibility
+  padding: 20px 1.5vw; // Match FAQ's responsive padding
   overflow-x: hidden;
   overflow-y: auto;
   background: #ffffff;
-  
+
   min-height: calc(100vh - $header-height);
   @media (max-width: $breakpoint-tablet) {
-    padding: 50px 20px 30px 20px; // Normal bottom padding for tablet
+    padding: 16px 32px; // Match FAQ's tablet padding
   }
 
   @media (max-width: $breakpoint-mobile) {
-    padding: 45px 15px 20px 15px; // Normal bottom padding for mobile
+    padding: 12px 16px; // Match FAQ's mobile padding
     // On mobile, allow scrolling to footer
     min-height: calc(100vh - $header-height);
   }
@@ -162,8 +169,8 @@ $breakpoint-mobile: 576px;
   
   // 大屏幕上调整位置
   @media (min-width: 1400px) {
-    right: calc(18% + 2%); // 大屏幕TOC比例 + 边距
-    
+    right: calc(16% + 2%); // 大屏幕TOC比例 + 边距
+
     .recipe-layout-container.toc-hidden & {
       right: 2%;
     }
@@ -387,33 +394,27 @@ $breakpoint-mobile: 576px;
 
 // Breadcrumb navigation - sticky positioning like FAQ
 .breadcrumb-nav {
-  grid-area: main;
-  margin-top: 20px;
-  margin-left: 40px;
-  margin-right: 40px;
-  align-self: start; // Stick to top of main area
+  grid-area: breadcrumb; // Assign to breadcrumb grid area
   position: sticky;
   top: $header-height; // Stick below the main header
   z-index: 90; // Higher than TOC but below main header
-  padding: 8px 40px; // Match main content horizontal padding
-  margin-bottom: 0;
-  border-bottom: 1px solid #f1f3f4;
+  padding: 8px 1.5vw; // Match FAQ horizontal padding
+  margin-bottom: 12px; // Match FAQ margin
   background: rgba(255, 255, 255, 0.95); // Semi-transparent white background
   backdrop-filter: blur(8px); // Modern blur effect for better visibility
   -webkit-backdrop-filter: blur(8px); // Safari support
   transition: all 0.2s ease;
-  
+
   // Add subtle shadow when scrolled
   &.scrolled {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    border-bottom-color: #e1e5e9;
   }
-  
+
   // Mobile responsive adjustments - hide breadcrumb on mobile
-  @media (max-width: $breakpoint-tablet) {
+  @media (max-width: 768px) {
     display: none; // Hide breadcrumb completely on mobile devices
   }
-  
+
   // Ensure proper stacking context
   isolation: isolate;
 }
@@ -423,8 +424,9 @@ $breakpoint-mobile: 576px;
   align-items: center;
   gap: 2px;
   margin: 0;
-  padding: 0;
+  padding: 0 0 8px 0; // Add bottom padding for the border
   list-style: none;
+  border-bottom: 1px solid #f1f3f4; // Move border to content level
 }
 
 .breadcrumb-item {
@@ -433,22 +435,22 @@ $breakpoint-mobile: 576px;
   gap: 4px;
   background: none;
   border: none;
-  color: #202124;
-  font-size: 0.8rem;
+  color: #1a73e8; // FAQ blue color
+  font-size: 1rem; // Match FAQ font size
   font-weight: 400;
   cursor: pointer;
-  padding: 2px 6px;
+  padding: 2px 6px; // Match FAQ padding
   border-radius: 3px;
   text-decoration: none;
   transition: all 0.15s ease;
 
   &:hover:not(.active) {
     background-color: rgba(26, 115, 232, 0.08);
-    color: #202124;
+    color: #1557b0; // Match FAQ hover color
   }
 
   &.active {
-    color: #5f6368;
+    color: #5f6368; // Match FAQ active color
     cursor: default;
     font-weight: 500;
   }
@@ -462,13 +464,13 @@ $breakpoint-mobile: 576px;
     max-width: 120px;
     overflow: hidden;
     text-overflow: ellipsis;
-    
+
     // Mobile responsive text truncation
-    @media (max-width: $breakpoint-tablet) {
+    @media (max-width: 768px) {
       max-width: 80px;
     }
-    
-    @media (max-width: $breakpoint-mobile) {
+
+    @media (max-width: 480px) {
       max-width: 60px;
     }
   }
@@ -486,7 +488,7 @@ $breakpoint-mobile: 576px;
 // Recipe detail container
 .recipe-detail {
   max-width: $content-max-width;
-  padding-top: 60px;
+  padding-top: 20px; // Match FAQ's top padding
   margin: 0 auto;
 }
 
