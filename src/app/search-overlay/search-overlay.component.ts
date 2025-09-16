@@ -191,26 +191,64 @@ export class SearchOverlayComponent implements OnInit, OnChanges {
   filterSuggestions() {
     const kw = this.searchQuery.trim().toLowerCase();
 
-    this.filteredSuggestions = this.suggestions.filter((i) => {
-      // Search in question
-      const matchQuestion = kw ? i.question.toLowerCase().includes(kw) : true;
-      
-      // Search in answer content
-      const answerText = this.answerTexts.get(i.id) || '';
-      const matchAnswer = kw ? answerText.includes(kw) : false;
-      
-      // Match keyword in either question or answer
-      const matchKW = !kw || matchQuestion || matchAnswer;
+    // Filter and add priority information
+    const filteredWithPriority = this.suggestions
+      .filter((i) => {
+        // Search in question
+        const matchQuestion = kw ? i.question.toLowerCase().includes(kw) : true;
 
-      const matchCat =
-        !this.selectedCategory || i.category === this.selectedCategory;
+        // Search in answer content
+        const answerText = this.answerTexts.get(i.id) || '';
+        const matchAnswer = kw ? answerText.includes(kw) : false;
 
-      const matchSub =
-        this.selectedSubCategories.length === 0 ||
-        (i.subCategory && this.selectedSubCategories.includes(i.subCategory));
+        // Match keyword in either question or answer
+        const matchKW = !kw || matchQuestion || matchAnswer;
 
-      return matchKW && matchCat && matchSub;
-    });
+        const matchCat =
+          !this.selectedCategory || i.category === this.selectedCategory;
+
+        const matchSub =
+          this.selectedSubCategories.length === 0 ||
+          (i.subCategory && this.selectedSubCategories.includes(i.subCategory));
+
+        return matchKW && matchCat && matchSub;
+      })
+      .map((i) => {
+        // Add priority based on match type
+        let priority = 999; // Default lowest priority
+
+        if (kw) {
+          // Category match - priority 1 (highest)
+          if (i.category.toLowerCase().includes(kw)) {
+            priority = 1;
+          }
+          // SubCategory match - priority 2
+          else if (i.subCategory && i.subCategory.toLowerCase().includes(kw)) {
+            priority = 2;
+          }
+          // Question match - priority 3
+          else if (i.question.toLowerCase().includes(kw)) {
+            priority = 3;
+          }
+          // Answer match - priority 4 (lowest)
+          else if (this.answerTexts.get(i.id)?.toLowerCase().includes(kw)) {
+            priority = 4;
+          }
+        }
+
+        return { item: i, priority };
+      })
+      .sort((a, b) => {
+        // Sort by priority first
+        if (a.priority !== b.priority) {
+          return a.priority - b.priority;
+        }
+        // Same priority, sort alphabetically by question
+        return a.item.question.localeCompare(b.item.question);
+      })
+      .map(result => result.item); // Return only the FAQ items
+
+    this.filteredSuggestions = filteredWithPriority;
   }
 
   get hasActiveFilters(): boolean {
