@@ -161,14 +161,14 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     private previewService: FAQPreviewService
   ) {}
 
-  // Touch event handler to mark touch as handled - 优化移动端响应
+  
   handleTouchStart(): void {
     this.touchStartTime = Date.now();
     this.touchHandled = true;
-    // 缩短延迟时间，提高真实设备响应速度
+    
     setTimeout(() => {
       this.touchHandled = false;
-    }, 50); // 从100ms减少到50ms，更适合真实移动设备
+    }, 50); 
   }
 
 
@@ -788,10 +788,10 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
         }
       });
 
-      // 按相关性评分排序
+      
       results.sort((a, b) => b.score - a.score);
 
-      // 更新搜索结果状态
+      
       this.updateSearchState({
         results,
         hasResults: results.length > 0
@@ -816,7 +816,7 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     const result = this.search.results.find(r => r.item.id === item.id);
     if (!result) return '';
 
-    const types = { title: '标题匹配', content: '内容匹配', category: '分类匹配' };
+    const types = { title: 'Title Match', content: 'Content Match', category: 'Category Match' };
     return types[result.matchType] || '';
   }
 
@@ -933,7 +933,7 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     // Scroll to top instead of FAQ item for better navigation experience
     this.scrollToTop();
     
-    // 手机端点击FAQ后关闭侧边栏
+    
     if (this.ui.isMobile && this.ui.mobileSidebarOpen) {
       this.closeMobileSidebar();
     }
@@ -1446,7 +1446,7 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   /**
-   * 获取分类描述
+
    */
   getCategoryDescription(): string {
     return '';
@@ -1526,7 +1526,7 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
   
     setTimeout(() => this.openAndScroll(sel.question, sel.id));
     
-    // 手机端选择搜索结果后关闭侧边栏
+    
     if (this.ui.isMobile && this.ui.mobileSidebarOpen) {
       this.closeMobileSidebar();
     }
@@ -1557,7 +1557,7 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     setTimeout(() => this.openAndScroll(sel.question));
   }
 
-  // 分享功能相关方法
+  
   private updatePageMetadata(): void {
     let pageTitle = 'FAQ - Data Sync Pro';
     let pageDescription = 'Frequently Asked Questions about Data Sync Pro';
@@ -1797,24 +1797,24 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
       event.stopPropagation();
     }
     
-    // 手机端特殊处理：有子分类时优先展开
+    
     if (this.ui.isMobile) {
       const category = this.categories.find(c => c.name === categoryName);
       
-      // 如果有子分类
+      
       if (category && category.subCategories.length > 0) {
-        // 如果当前未展开，则只展开不导航
+        
         if (this.current.category !== categoryName) {
           this.current.category = categoryName;
           this.current.subCategory = '';
           this.cdr.markForCheck();
-          return; // 不导航，不关闭侧边栏
+          return; 
         }
-        // 如果已展开，继续执行导航
+        
       }
     }
     
-    // 原有逻辑：导航到category
+    
     this.resetState();
     this.router.navigate(['/', this.encode(categoryName)]);
     
@@ -2065,11 +2065,11 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
   // ==================== Debug Methods ====================
   
   /**
-   * 调试方法：检查FAQ加载状态
+
    */
   debugFAQStatus(): void {
     
-    // 显示前5个有问题的FAQ
+    
     const problematicFAQs = this.faqList
       .filter(faq => !faq.safeAnswer && !faq.isLoading && faq.answerPath)
       .slice(0, 5);
@@ -2086,7 +2086,7 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
   // ==================== Table of Contents Methods ====================
 
   /**
-   * 设置滚动监听器，用于实现滚动同步高亮
+
    */
   private setupScrollListener(): void {
     // This method is now merged into setupOptimizedScrollListener
@@ -2094,10 +2094,10 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   /**
-   * 高性能的活跃滚动元素更新（侧边栏同步优化）
+
    */
   private updateActiveScrollElementOptimized(scrollPosition: number): void {
-    const offset = scrollPosition + 150; // 降低偏移量，提高响应性
+    const offset = scrollPosition + 150; 
     
     // Cache FAQ elements and their positions to avoid repeated queries
     if (!this.cachedFaqElements || this.cachedFaqElements.length === 0) {
@@ -2107,7 +2107,7 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     let activeElement = '';
     let closestDistance = Infinity;
 
-    // 使用二分查找和位置缓存优化查找性能
+    
     if (!this.cachedFaqElements) return;
     
     for (let i = 0; i < this.cachedFaqElements.length; i++) {
@@ -2116,19 +2116,19 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
       const absoluteTop = rect.top + scrollPosition;
       const absoluteBottom = absoluteTop + rect.height;
       
-      // 检查元素是否在视口中或即将进入视口
+      
       if (absoluteTop <= offset + 100 && absoluteBottom >= offset - 100) {
         const distance = Math.abs(absoluteTop - offset);
         
-        // 选择最接近的元素作为活跃元素
+        
         if (distance < closestDistance) {
           closestDistance = distance;
-          // 使用预缓存的文本避免DOM查询
+          
           const cachedText = this.cachedQuestionTexts.get(i);
           if (cachedText) {
             activeElement = cachedText;
           } else {
-            // 回退到DOM查询（应该很少发生）
+            
             const questionElement = element.querySelector('.faq-question');
             if (questionElement) {
               activeElement = questionElement.textContent || '';
@@ -2139,43 +2139,43 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
       }
     }
 
-    // 立即更新活跃元素，无额外检查延迟
+    
     if (activeElement && activeElement !== this.activeScrollElement) {
       this.activeScrollElement = activeElement;
       
-      // 使用微任务确保DOM更新的及时性
+      
       Promise.resolve().then(() => {
         this.cdr.markForCheck();
         
-        // 确保TOC中的活跃项目滚动到视图中
+        
         this.scrollActiveTOCItemIntoView();
       });
     }
   }
   
   /**
-   * 确保TOC中的活跃项目滚动到视图中
+
    */
   private scrollActiveTOCItemIntoView(): void {
-    // 查找活跃的TOC项目
+    
     const activeTOCItem = document.querySelector('.faq-toc .toc-item.active');
     if (activeTOCItem) {
-      // 使用scrollIntoView平滑滚动到活跃项目
+      
       activeTOCItem.scrollIntoView({
         behavior: 'smooth',
-        block: 'nearest', // 只有在必要时才滚动
+        block: 'nearest', 
         inline: 'nearest'
       });
     }
   }
 
   /**
-   * 刷新FAQ元素缓存
+
    */
   private refreshFaqElementsCache(): void {
     this.cachedFaqElements = Array.from(document.querySelectorAll('.faq-item'));
     
-    // 预缓存问题文本以避免重复查询
+    
     this.cachedQuestionTexts = new Map();
     this.cachedFaqElements.forEach((element, index) => {
       const questionElement = element.querySelector('.faq-question');
@@ -2198,21 +2198,21 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
   private cachedQuestionTexts: Map<number, string> = new Map();
 
   /**
-   * 判断是否为当前展开的FAQ（增强版，支持滚动同步和页脚感知）
+
    */
   isCurrentFAQ(item: FAQItem): boolean {
-    // 首先检查是否是当前选中的FAQ
+    
     if (this.current.faqTitle === item.question) {
       return true;
     }
     
-    // 检查是否在页脚区域 - 如果是，不显示活跃状态
+    
     const footerStatus = this.checkFooterProximity();
     if (footerStatus.inFooterZone) {
-      return false; // 在页脚区域时，不显示任何FAQ为活跃状态
+      return false; 
     }
     
-    // 然后检查是否是当前滚动到的FAQ（用于自动高亮）
+    
     if (this.activeScrollElement === item.question) {
       return true;
     }
@@ -2221,7 +2221,7 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   /**
-   * 选择并显示指定FAQ项目（从右侧目录点击）
+
    */
   scrollToFAQ(item: FAQItem, event?: Event): void {
     if (event) {
@@ -2234,15 +2234,15 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     // Navigate to the TOC page containing this FAQ
     this.navigateToFAQPage(item);
     
-    // 设置当前FAQ项目
+    
     this.current.faqItem = item;
     this.current.faqTitle = item.question;
-    this.activeScrollElement = item.question; // 立即设置活跃元素
+    this.activeScrollElement = item.question; 
 
-    // 更新浏览器URL
+    
     this.updateBrowserURL(item);
 
-    // 跟踪FAQ查看
+    
     this.trackFAQView(item);
 
     // Display FAQ content directly
@@ -2251,7 +2251,7 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     // Scroll to top instead of FAQ item for better navigation experience
     this.scrollToTop();
 
-    // 加载FAQ内容（如果尚未加载）
+    
     if (!item.safeAnswer && item.answerPath) {
       item.isLoading = true;
 
@@ -2276,12 +2276,12 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   /**
-   * 快速滚动到页面顶部
+
    */
   private scrollToTop(): void {
     window.scrollTo({
       top: 0,
-      behavior: 'auto' // 快速滚动，不使用平滑动画
+      behavior: 'auto' 
     });
   }
 
@@ -2384,16 +2384,16 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   /**
-   * 平滑滚动到指定FAQ元素
+
    */
   private smoothScrollToFAQElement(item: FAQItem): void {
-    // 等待DOM更新后再滚动
+    
     setTimeout(() => {
       const elementId = this.slugify(item.question);
       const element = document.getElementById(elementId);
       
       if (element) {
-        const headerOffset = 100; // 考虑固定头部的高度
+        const headerOffset = 100; 
         const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
         const offsetPosition = elementPosition - headerOffset;
 
@@ -2402,7 +2402,7 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
           behavior: 'smooth'
         });
       } else {
-        // 如果找不到元素，尝试通过FAQ项目选择器查找
+        
         const faqItems = document.querySelectorAll('.faq-item');
         for (let i = 0; i < faqItems.length; i++) {
           const questionElement = faqItems[i].querySelector('.faq-question');
@@ -2424,7 +2424,7 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
 
 
   /**
-   * 选择热门问题
+
    */
   selectTrendingQuestion(item: FAQItem, event?: Event): void {
     if (event) {
@@ -2437,15 +2437,15 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     // Navigate to the TOC page containing this FAQ
     this.navigateToFAQPage(item);
     
-    // 设置当前FAQ
+    
     this.current.faqTitle = item.question;
     this.current.faqItem = item;
-    this.activeScrollElement = item.question; // 立即设置活跃元素
+    this.activeScrollElement = item.question; 
 
-    // 更新浏览器URL
+    
     this.updateBrowserURL(item);
 
-    // 跟踪FAQ查看
+    
     this.trackFAQView(item);
 
     // Display FAQ content directly
@@ -2456,8 +2456,8 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   /**
-   * TrackBy函数用于优化ngFor性能
-   * 使用唯一的ID而不是问题文本，以支持相同问题在不同子类别中的正确显示
+
+
    */
   trackByFAQ(_index: number, item: FAQItem): string {
     return item.id;
@@ -2584,24 +2584,24 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
    * Handle all scroll-related updates in one optimized function
    */
   private handleOptimizedScroll(scrollPosition: number): void {
-    // 检查页脚区域状态
+    
     const footerStatus = this.checkFooterProximity();
     
-    // 根据页脚状态调整活跃元素更新逻辑
+    
     if (!footerStatus.inFooterZone) {
       this.updateActiveScrollElementOptimized(scrollPosition);
     } else {
-      // 在页脚区域，清除活跃状态
+      
       this.clearActiveStateInFooterZone();
     }
     
-    // 更新TOC状态基于页脚位置
+    
     this.updateTOCFooterState(footerStatus);
     
     // Update breadcrumb sticky behavior
     this.updateBreadcrumbScrollState(scrollPosition);
     
-    // 简化的页脚偏移更新（减少频率以提高性能）
+    
     if (scrollPosition % 3 === 0) {
       this.updateFooterOffsetOptimized(footerStatus.footerOffset);
     }
@@ -2646,10 +2646,10 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   /**
-   * 检查页脚邻近状态（带缓存优化）
+
    */
   private checkFooterProximity(): { inFooterZone: boolean; approaching: boolean; footerOffset: number } {
-    // 使用缓存减少DOM查询频率
+    
     const now = Date.now();
     if (this.lastFooterStatus && (now - this.footerCheckDebounce) < 50) {
       return this.lastFooterStatus;
@@ -2665,7 +2665,7 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     
     const footerRect = footerElement.getBoundingClientRect();
     const viewportHeight = window.innerHeight;
-    const footerThreshold = 200; // 页脚感知阈值
+    const footerThreshold = 200; 
     
     let footerOffset = 0;
     if (footerRect.top < viewportHeight) {
@@ -2673,7 +2673,7 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
       footerOffset = Math.min(footerOffset, footerRect.height);
     }
     
-    const inFooterZone = footerRect.top < viewportHeight * 0.8; // 80%视口
+    const inFooterZone = footerRect.top < viewportHeight * 0.8; 
     const approaching = footerRect.top < viewportHeight + footerThreshold;
     
     const result = { inFooterZone, approaching, footerOffset };
@@ -2684,17 +2684,17 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
   }
   
   /**
-   * 更新TOC的页脚状态
+
    */
   private updateTOCFooterState(footerStatus: { inFooterZone: boolean; approaching: boolean; footerOffset: number }): void {
     const tocElement = document.querySelector('.faq-toc.desktop-toc') as HTMLElement;
     if (!tocElement) return;
     
-    // 根据页脚状态更新TOC类
+    
     tocElement.classList.toggle('in-footer-zone', footerStatus.inFooterZone);
     tocElement.classList.toggle('footer-approaching', footerStatus.approaching);
     
-    // 设置CSS变量用于高度调整
+    
     if (footerStatus.approaching && footerStatus.footerOffset > 0) {
       document.documentElement.style.setProperty('--footer-overlap', `${footerStatus.footerOffset}px`);
     } else {
@@ -2703,7 +2703,7 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
   }
   
   /**
-   * 在页脚区域清除活跃状态
+
    */
   private clearActiveStateInFooterZone(): void {
     if (this.activeScrollElement) {
@@ -2713,10 +2713,10 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   /**
-   * 简化的页脚偏移更新
+
    */
   private updateFooterOffsetOptimized(footerOffset: number): void {
-    // 设置简单的页脚可见性标志
+    
     const isFooterVisible = footerOffset > 20;
     document.documentElement.style.setProperty('--footer-visible', isFooterVisible ? '1' : '0');
   }
@@ -2727,7 +2727,7 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
   private lastFooterState: boolean | null = null;
   private lastFooterOffset: number | null = null;
   
-  // 页脚状态缓存
+  
   private lastFooterStatus: { inFooterZone: boolean; approaching: boolean; footerOffset: number } | null = null;
   private footerCheckDebounce: number = 0;
 

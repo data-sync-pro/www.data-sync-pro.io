@@ -1,6 +1,6 @@
 // ==================== FAQ Items Styles ====================
 
-// 共用变量
+
 $primary-color: #1a73e8;
 $accent-color: #e74c3c;
 $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -94,13 +94,13 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
 }
 
-// FAQ列表容器
+
 .faq-list {
   .faq-item {
     background: #ffffff;
     border: 1px solid #e1e5e9;
     border-radius: 12px;
-    margin: 8px 0 16px 0; // 为第一个项目添加上边距
+    margin: 8px 0 16px 0; 
     transition: $transition;
     overflow: hidden;
     position: relative;
@@ -216,7 +216,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 }
 
-// 热门FAQ样式
+
 .trending-faq {
   width: 100%;
   margin: 20px auto 32px auto;
@@ -282,7 +282,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 }
 
-// 扩展面板样式 (Angular Material)
+
 .mat-expansion-panel {
   background: #ffffff;
   border: 1px solid #e1e5e9;
@@ -337,7 +337,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 }
 
-// 特殊状态
+
 .faq-item {
   &.featured {
     border-color: #ffd700;

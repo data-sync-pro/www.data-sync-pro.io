@@ -2,7 +2,7 @@
 
 // Global iOS-specific touch optimizations
 @media (pointer: coarse) {
-  // All clickable elements - 优化移动端触摸响应
+  
   button,
   [role="button"],
   .clickable,
@@ -27,21 +27,21 @@
       padding: 12px;
     }
     
-    // 确保在transform容器中的元素仍可交互
+    
     position: relative;
     z-index: 1;
     pointer-events: auto;
   }
   
-  // 侧边栏导航项目特殊优化
+  
   .faq-sidebar.mobile-open .nav-item {
-    // 在移动端打开状态下确保导航项目可点击
+    
     position: relative;
-    z-index: 10; // 更高层级确保可点击
+    z-index: 10; 
     pointer-events: auto;
     touch-action: manipulation;
     
-    // 增大点击区域
+    
     &::before {
       content: '';
       position: absolute;
@@ -88,9 +88,9 @@
     -webkit-transform: translate3d(0, 0, 0);
   }
   
-  // 侧边栏iOS Safari修复
+  
   .faq-sidebar {
-    // 强制GPU加速，修复transform性能问题
+    
     -webkit-transform: translate3d(0, 0, 0);
     transform: translate3d(0, 0, 0);
     -webkit-backface-visibility: hidden;
@@ -106,7 +106,7 @@
         -webkit-transform: translate3d(0, 0, 0);
         transform: translate3d(0, 0, 0);
         
-        // iOS Safari特有：确保内容可滚动和交互
+        
         .sidebar-body {
           -webkit-overflow-scrolling: touch;
           overflow-y: auto;

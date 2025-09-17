@@ -1,7 +1,7 @@
 import { SafeHtml } from '@angular/platform-browser';
 
 /**
- * 原始FAQ数据记录 (来自JSON文件)
+
  */
 export interface SourceFAQRecord {
   Id: string;
@@ -15,7 +15,7 @@ export interface SourceFAQRecord {
 }
 
 /**
- * 处理后的FAQ项目 (应用中使用)
+
  */
 export interface FAQItem {
   id: string;
@@ -39,7 +39,7 @@ export interface FAQItem {
 }
 
 /**
- * 搜索结果项目 (包含搜索相关信息)
+
  */
 export interface FAQSearchResult extends FAQItem {
   relevanceScore?: number;
@@ -49,7 +49,7 @@ export interface FAQSearchResult extends FAQItem {
 }
 
 /**
- * FAQ分类信息
+
  */
 export interface FAQCategory {
   name: string;
@@ -58,7 +58,7 @@ export interface FAQCategory {
 }
 
 /**
- * FAQ子分类信息
+
  */
 export interface FAQSubCategory {
   name: string;
@@ -67,7 +67,7 @@ export interface FAQSubCategory {
 }
 
 /**
- * 分页信息
+
  */
 export interface PaginationInfo {
   currentPage: number;
@@ -79,7 +79,7 @@ export interface PaginationInfo {
 }
 
 /**
- * 搜索选项
+
  */
 export interface SearchOptions {
   category?: string;
@@ -90,7 +90,7 @@ export interface SearchOptions {
 }
 
 /**
- * FAQ统计信息
+
  */
 export interface FAQStats {
   totalFAQs: number;
@@ -101,7 +101,7 @@ export interface FAQStats {
 }
 
 /**
- * 用户偏好设置
+
  */
 export interface UserPreferences {
   preferredPageSize: number;
@@ -111,7 +111,7 @@ export interface UserPreferences {
 }
 
 /**
- * FAQ操作事件
+
  */
 export interface FAQEvent {
   type: 'view' | 'rate' | 'search';
@@ -125,22 +125,22 @@ export interface FAQEvent {
 }
 
 /**
- * 渲染策略类型
+
  */
 export type RenderStrategy = 'basic' | 'paginated' | 'virtual';
 
 /**
- * 设备类型
+
  */
 export type DeviceType = 'mobile' | 'tablet' | 'desktop';
 
 /**
- * 连接速度类型
+
  */
 export type ConnectionSpeed = 'slow' | 'fast';
 
 /**
- * FAQ内容状态
+
  */
 export enum FAQContentStatus {
   NOT_LOADED = 'not_loaded',
@@ -150,7 +150,7 @@ export enum FAQContentStatus {
 }
 
 /**
- * 搜索建议项目
+
  */
 export interface SearchSuggestion {
   text: string;
@@ -160,7 +160,7 @@ export interface SearchSuggestion {
 }
 
 /**
- * FAQ过滤器
+
  */
 export interface FAQFilter {
   categories: string[];
@@ -174,7 +174,7 @@ export interface FAQFilter {
 }
 
 /**
- * FAQ排序选项
+
  */
 export interface FAQSortOptions {
   field: 'question' | 'category' | 'viewCount' | 'lastUpdated';
@@ -182,7 +182,7 @@ export interface FAQSortOptions {
 }
 
 /**
- * FAQ导出选项
+
  */
 export interface FAQExportOptions {
   format: 'json' | 'csv' | 'pdf';

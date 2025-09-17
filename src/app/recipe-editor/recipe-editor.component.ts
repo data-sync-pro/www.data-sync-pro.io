@@ -1479,9 +1479,6 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
       // Report missing images
       if (missingImages.length > 0) {
         console.warn(`Missing ${missingImages.length} images after import:`, missingImages);
-        this.notificationService.warning(
-          `导入的Recipe缺少 ${missingImages.length} 张图片。点击图片占位符可重新上传。`
-        );
       } else {
         console.log('All images are available after import');
       }

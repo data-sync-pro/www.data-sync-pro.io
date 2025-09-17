@@ -1,11 +1,11 @@
 // ==================== Search & TOC Styles ====================
 
-// 共用变量
+
 $primary-color: #1a73e8;
 $accent-color: #e74c3c;
 $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
-// 搜索高亮
+
 .search-highlight {
   background-color: #ffeb3b;
   color: #333;
@@ -14,7 +14,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   font-weight: 500;
 }
 
-// 搜索建议
+
 .search-suggestions {
   position: absolute;
   top: 100%;
@@ -74,7 +74,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 }
 
-// 搜索无结果
+
 .search-no-results {
   text-align: center;
   padding: 40px 20px;
@@ -139,7 +139,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 }
 
-// ==================== TOC样式 ====================
+
 
 .faq-toc {
   background: #ffffff;
@@ -280,7 +280,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 }
 
-// 热门问题TOC
+
 .trending-toc {
   .toc-header .toc-title {
     color: $accent-color;
@@ -319,7 +319,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 }
 
-// 分类TOC
+
 .category-toc {
   .toc-header .toc-title {
     color: $primary-color;
@@ -338,7 +338,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 }
 
-// ==================== Mobile TOC 样式 ====================
+
 
 // Mobile TOC toggle button
 .mobile-toc-toggle {
@@ -514,7 +514,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 }
 
-// 响应式调整
+
 @media (max-width: 480px) {
   .mobile-toc {
     &.mobile-toc {

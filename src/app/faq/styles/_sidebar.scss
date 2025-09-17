@@ -1,19 +1,19 @@
 // ==================== FAQ Sidebar Styles ====================
 
-// 共用变量
+
 $sidebar-width: 280px;
 $sidebar-collapsed: 56px;
 $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 $breakpoint-desktop: 992px;
 
-// Z-index层级常量 - 统一管理避免冲突
+
 $z-index-base: 10;
 $z-index-sidebar-desktop: 90;
 $z-index-overlay: 998;
 $z-index-sidebar-mobile: 1000;
 $z-index-mobile-toggle: 1001;
 
-// W3Schools风格的侧边栏：Grid定位 + Sticky行为
+
 .faq-sidebar {
   grid-area: sidebar;
   background: #ffffff;
@@ -21,9 +21,9 @@ $z-index-mobile-toggle: 1001;
   transition: $transition;
   z-index: $z-index-sidebar-desktop;
   
-  // 桌面端：保持静态定位在网格中，移动端使用fixed定位
+  
   @media (min-width: #{$breakpoint-desktop + 1px}) {
-    // 桌面端：网格定位，正常文档流
+    
     position: sticky;
     height: calc(100vh - $header-height);
     overflow: hidden;
@@ -31,7 +31,7 @@ $z-index-mobile-toggle: 1001;
      top: $header-height
   }
   
-  // 移动端：fixed定位 + transform动画
+  
   @media (max-width: $breakpoint-desktop) {
     position: fixed;
     left: 0;
@@ -40,23 +40,23 @@ $z-index-mobile-toggle: 1001;
     overflow: hidden;
     width: 100%;
     
-    // 默认隐藏状态 + GPU加速
+    
     transform: translateX(-100%);
-    will-change: transform; // 提示浏览器进行GPU加速
+    will-change: transform; 
     z-index: $z-index-sidebar-mobile;
     
     &.mobile-open {
       transform: translateX(0);
-      // 使用isolation创建新的堆叠上下文，避免transform影响内部z-index
+      
       isolation: isolate;
       
-      // 确保内部元素正常可交互
+      
       .sidebar-content {
         position: relative;
-        z-index: 1; // 在isolation上下文中建立层级
+        z-index: 1; 
       }
       
-      // 导航项目确保可点击
+      
       .nav-item {
         position: relative;
         z-index: 2;
@@ -83,7 +83,7 @@ $z-index-mobile-toggle: 1001;
       display: none;
     }
 
-    // 调整折叠时的头部布局，使按钮与下方图标对齐
+    
     .sidebar-header {
       justify-content: center;
       padding: 16px 12px;
@@ -109,15 +109,15 @@ $z-index-mobile-toggle: 1001;
       }
     }
 
-    // 禁用分类和子分类的hover和点击效果
+    
     .category-nav,
     .subcategory-nav {
-      pointer-events: none;  // 完全禁用鼠标事件
-      cursor: default;        // 鼠标指针变为默认
+      pointer-events: none;  
+      cursor: default;        
       
       &:hover {
-        background-color: transparent;  // 移除hover背景色
-        color: #5f6368;                // 保持默认颜色
+        background-color: transparent;  
+        color: #5f6368;                
       }
     }
   }
@@ -126,7 +126,7 @@ $z-index-mobile-toggle: 1001;
     height: 100%;
     display: flex;
     flex-direction: column;
-    min-height: 0; // 确保 flexbox 正确计算子元素高度
+    min-height: 0; 
   }
 
   .sidebar-header {
@@ -136,7 +136,7 @@ $z-index-mobile-toggle: 1001;
     padding: 16px 20px;
     border-bottom: 1px solid #f1f3f4;
     min-height: 64px;
-    flex-shrink: 0; // 确保头部不会被压缩
+    flex-shrink: 0; 
 
     .sidebar-main-title {
       font-size: 1.125rem;
@@ -169,7 +169,7 @@ $z-index-mobile-toggle: 1001;
       }
     }
 
-    // 移动端关闭按钮 - 位于右侧
+    
     .mobile-sidebar-close {
       background: transparent;
       border: none;
@@ -183,7 +183,7 @@ $z-index-mobile-toggle: 1001;
       font-size: 1.5rem;
       color: #5f6368;
       transition: $transition;
-      margin-left: auto; // 推到右侧
+      margin-left: auto; 
       flex-shrink: 0;
 
       &:hover {
@@ -199,11 +199,11 @@ $z-index-mobile-toggle: 1001;
   }
 
   .sidebar-body {
-    flex: 1 1 auto; // 明确指定 flex-grow, flex-shrink, flex-basis
+    flex: 1 1 auto; 
     overflow-y: auto;
     overflow-x: hidden;
     padding: 8px 0;
-    min-height: 0; // 允许内容缩小到小于其最小内容高度
+    min-height: 0; 
 
     &::-webkit-scrollbar {
       width: 6px;
@@ -227,7 +227,7 @@ $z-index-mobile-toggle: 1001;
   .sidebar-search {
     padding: 12px 16px;
     border-bottom: 1px solid #f1f3f4;
-    flex-shrink: 0; // 确保搜索栏不会被压缩
+    flex-shrink: 0; 
 
     .sidebar-search-btn {
       width: 100%;
@@ -244,8 +244,8 @@ $z-index-mobile-toggle: 1001;
       gap: 8px;
 
       .search-text {
-        flex: 1; // 让搜索文本占据剩余空间
-        text-align: left; // 确保文本左对齐
+        flex: 1; 
+        text-align: left; 
       }
 
       .search-shortcut {
@@ -323,7 +323,7 @@ $z-index-mobile-toggle: 1001;
         background-color: #e8f0fe;
         color: #1a73e8;
         font-weight: 500;
-        // 添加平滑过渡效果
+        
         transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
 
         &::before {
@@ -334,7 +334,7 @@ $z-index-mobile-toggle: 1001;
           bottom: 0;
           width: 3px;
           background-color: #1a73e8;
-          // 添加指示器过渡效果
+          
           transition: width 0.2s ease-out, background-color 0.15s ease;
         }
       }
@@ -411,7 +411,7 @@ $z-index-mobile-toggle: 1001;
   }
 }
 
-// 移动端侧边栏
+
 .mobile-sidebar-toggle {
   display: none;
   position: fixed;
@@ -454,12 +454,12 @@ $z-index-mobile-toggle: 1001;
   z-index: $z-index-overlay;
   opacity: 0;
   transition: opacity 0.3s ease;
-  pointer-events: none; // 隐藏时禁用指针事件，避免干扰侧边栏交互
+  pointer-events: none; 
 
   &.active {
     opacity: 1;
-    pointer-events: auto; // 仅在激活时启用指针事件
-    // 确保遮罩层不会干扰侧边栏内容的触摸事件
+    pointer-events: auto; 
+    
     touch-action: manipulation;
   }
 }

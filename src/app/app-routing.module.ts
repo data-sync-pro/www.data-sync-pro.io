@@ -39,13 +39,13 @@ const routes: Routes = [
 
 @NgModule({
   imports: [RouterModule.forRoot(routes, {
-    // 配置滚动行为
-    scrollPositionRestoration: 'disabled', // 禁用自动滚动，由组件自己处理
-    anchorScrolling: 'disabled', // 禁用自动锚点滚动，避免冲突
-    scrollOffset: [0, 80], // 滚动偏移量，为固定header留出空间
-    // 启用预加载策略，提升用户体验
-    preloadingStrategy: PreloadAllModules, // 预加载所有懒加载模块
-    // enableTracing: true // 开发时可启用路由跟踪（生产环境应关闭）
+    
+    scrollPositionRestoration: 'disabled', 
+    anchorScrolling: 'disabled', 
+    scrollOffset: [0, 80], 
+    
+    preloadingStrategy: PreloadAllModules, 
+    
   })],
   exports: [RouterModule]
 })

@@ -42,7 +42,7 @@ export interface SelectedSuggestion extends FaqItem {
 })
 export class SearchOverlayComponent implements OnInit, OnChanges {
   @Input() isOpen = false;
-  @Input() initialQuery = ''; // 初始搜索查询
+  @Input() initialQuery = ''; 
   @Output() closed = new EventEmitter<void>();
   @Output() selectedResult = new EventEmitter<FaqItem>();
   @ViewChild('searchInput') searchInputRef!: ElementRef<HTMLInputElement>;
@@ -158,10 +158,10 @@ export class SearchOverlayComponent implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['isOpen']?.currentValue) {
-      // 设置初始搜索查询
+      
       if (changes['initialQuery'] || this.initialQuery) {
         this.searchQuery = this.initialQuery;
-        // 触发搜索结果过滤
+        
         setTimeout(() => {
           this.filterSuggestions();
         }, 0);
@@ -170,14 +170,14 @@ export class SearchOverlayComponent implements OnInit, OnChanges {
       // Immediate focus without delay to improve responsiveness
       setTimeout(() => {
         this.searchInputRef?.nativeElement?.focus();
-        // 如果有初始查询，选中所有文本
+        
         if (this.searchQuery) {
           this.searchInputRef?.nativeElement?.select();
         }
       }, 0);
     }
     
-    // 处理 initialQuery 变化
+    
     if (changes['initialQuery'] && !changes['isOpen']) {
       this.searchQuery = this.initialQuery;
       this.filterSuggestions();

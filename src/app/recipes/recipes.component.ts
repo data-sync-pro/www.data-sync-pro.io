@@ -2490,7 +2490,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
    * Get previous step title
    */
   get previousStepTitle(): string {
-    if (!this.canGoToPreviousStep) return '上一步';
+    if (!this.canGoToPreviousStep) return 'Previous';
     const prevIndex = this.ui.currentWalkthroughStep - 1;
     return this.getStepTitleByIndex(prevIndex);
   }
@@ -2499,7 +2499,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
    * Get next step title  
    */
   get nextStepTitle(): string {
-    if (!this.canGoToNextStep) return '下一步';
+    if (!this.canGoToNextStep) return 'Next';
     const nextIndex = this.ui.currentWalkthroughStep + 1;
     return this.getStepTitleByIndex(nextIndex);
   }

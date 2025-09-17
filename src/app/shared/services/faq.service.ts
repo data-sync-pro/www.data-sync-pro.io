@@ -333,7 +333,7 @@ export class FAQService implements OnDestroy {
   }
 
   /**
-   * 获取FAQ总数
+
    */
   getFAQCount(): Observable<number> {
     return this.getFAQs().pipe(
@@ -342,7 +342,7 @@ export class FAQService implements OnDestroy {
   }
 
   /**
-   * 根据ID获取单个FAQ
+
    */
   getFAQById(id: string): Observable<FAQItem | undefined> {
     return this.getFAQs().pipe(
@@ -351,7 +351,7 @@ export class FAQService implements OnDestroy {
   }
 
   /**
-   * 根据分类筛选FAQ
+
    */
   getFAQsByCategory(category: string, subCategory?: string): Observable<FAQItem[]> {
     return this.getFAQs().pipe(
@@ -436,7 +436,7 @@ export class FAQService implements OnDestroy {
   }
 
   /**
-   * 获取FAQ内容
+
    */
   getFAQContent(answerPath: string): Observable<SafeHtml> {
     if (!answerPath) {
@@ -574,7 +574,7 @@ export class FAQService implements OnDestroy {
   }
 
   /**
-   * 获取热门FAQ
+
    */
   getTrendingFAQs(ids: string[]): Observable<FAQItem[]> {
     return this.getFAQs().pipe(
@@ -588,7 +588,7 @@ export class FAQService implements OnDestroy {
   }
 
   /**
-   * 获取FAQ统计信息
+
    */
   getFAQStats(): Observable<FAQStats> {
     return this.getFAQs().pipe(
@@ -644,7 +644,7 @@ export class FAQService implements OnDestroy {
   }
 
   /**
-   * 清除内容缓存
+
    */
   clearContentCache(): void {
     this.contentCache.clear();
@@ -699,7 +699,7 @@ export class FAQService implements OnDestroy {
   }
 
   /**
-   * 重新加载FAQ数据
+
    */
   reloadFAQs(): Observable<FAQItem[]> {
     this.categoriesCache = [];

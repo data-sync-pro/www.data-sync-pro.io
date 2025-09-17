@@ -2,11 +2,11 @@
 
 // Layout variables
 $header-height: 60px; // Global header height
-// 改为百分比布局，更加响应式
-$sidebar-width-percent: 18%; // 约216px in 1200px container
-$sidebar-collapsed-width-percent: 5%; // 约60px in 1200px container
-$toc-width-percent: 18%; // 与sidebar宽度保持一致
-// 保留像素值用于移动端和特殊情况
+
+$sidebar-width-percent: 18%; 
+$sidebar-collapsed-width-percent: 5%; 
+$toc-width-percent: 18%; 
+
 $sidebar-width: 240px;
 $sidebar-collapsed-width: 56px;
 $toc-width: 240px;
@@ -15,14 +15,14 @@ $breakpoint-desktop: 992px;
 $breakpoint-tablet: 768px;
 $breakpoint-mobile: 576px;
 
-// FAQ-inspired主容器布局 - 四栏设计(包含breadcrumb)
+
 .recipe-layout-container {
   display: grid;
   grid-template-areas:
     "sidebar breadcrumb toc"
     "sidebar main toc";
   grid-template-rows: auto 1fr;
-  // 使用百分比布局，更响应式和灵活
+  
   grid-template-columns: $sidebar-width-percent 1fr $toc-width-percent;
   min-height: calc(100vh - $header-height);
   margin-top: $header-height;
@@ -30,7 +30,7 @@ $breakpoint-mobile: 576px;
   transition: grid-template-columns 0.3s ease;
 
   &.sidebar-collapsed {
-    // 折叠时sidebar占用更少空间，给主内容更多空间
+    
     grid-template-columns: $sidebar-collapsed-width-percent 1fr $toc-width-percent;
   }
 
@@ -38,7 +38,7 @@ $breakpoint-mobile: 576px;
     grid-template-areas:
       "sidebar breadcrumb"
       "sidebar main";
-    // TOC隐藏时，主内容获得更多空间
+    
     grid-template-columns: $sidebar-width-percent 1fr;
 
     &.sidebar-collapsed {
@@ -46,9 +46,9 @@ $breakpoint-mobile: 576px;
     }
   }
 
-  // 在大屏幕上优化比例
+  
   @media (min-width: 1400px) {
-    grid-template-columns: 16% 1fr 16%; // 大屏幕上sidebar和toc保持相同宽度
+    grid-template-columns: 16% 1fr 16%; 
 
     &.sidebar-collapsed {
       grid-template-columns: 4% 1fr 16%;
@@ -63,7 +63,7 @@ $breakpoint-mobile: 576px;
     }
   }
 
-  // 移动端切换到全宽布局
+  
   @media (max-width: $breakpoint-desktop) {
     grid-template-areas:
       "breadcrumb"
@@ -153,8 +153,8 @@ $breakpoint-mobile: 576px;
 .toc-toggle-btn {
   position: fixed;
   top: 50%;
-  // 使用百分比定位，与walkthrough导航按钮保持一致
-  right: calc($toc-width-percent + 2%); // TOC宽度 + 小边距
+  
+  right: calc($toc-width-percent + 2%); 
   transform: translateY(-50%);
   z-index: 90;
   opacity: 0;
@@ -162,14 +162,14 @@ $breakpoint-mobile: 576px;
   transition: all 0.3s ease;
   
   .recipe-layout-container.toc-hidden & {
-    right: 2%; // 使用百分比替代固定20px
+    right: 2%; 
     opacity: 1;
     visibility: visible;
   }
   
-  // 大屏幕上调整位置
+  
   @media (min-width: 1400px) {
-    right: calc(16% + 2%); // 大屏幕TOC比例 + 边距
+    right: calc(16% + 2%); 
 
     .recipe-layout-container.toc-hidden & {
       right: 2%;

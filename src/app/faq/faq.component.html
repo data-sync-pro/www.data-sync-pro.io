@@ -29,11 +29,11 @@
   (click)="closeMobileSidebar($event)"
 ></div>
 
-<!-- W3Schools风格的网格布局容器 -->
+
 <div class="faq-layout-container"
      [class.toc-hidden]="ui.tocHidden"
      [class.sidebar-collapsed]="ui.sidebarCollapsed">
-  <!-- Left Sidebar - Grid定位 -->
+
   <aside
     class="faq-sidebar"
     [class.mobile-open]="ui.mobileSidebarOpen"
@@ -667,10 +667,10 @@
 </aside>
 -->
 
-<!-- 共用FAQ列表模板 -->
+
 <ng-template #faqListTemplate let-faqItems="faqItems">
   <div class="faq-list">
-    <!-- Virtual scrolling for large lists (more than 20 items) - 仅桌面端 -->
+
     <cdk-virtual-scroll-viewport 
       *ngIf="faqItems.length > 20 && !ui.isMobile" 
       itemSize="120" 

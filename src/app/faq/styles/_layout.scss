@@ -283,7 +283,7 @@ $breakpoint-mobile: 500px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   cursor: zoom-in;
   transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease;
-  opacity: 1; // 默认可见，不依赖JavaScript
+  opacity: 1; 
   transform: scale(1);
 
   &.image-loaded {
@@ -301,14 +301,14 @@ $breakpoint-mobile: 500px;
   }
 }
 
-// 无结果状态
+
 .category-no-results {
   text-align: center;
   padding: 40px 20px;
   color: #666;
 }
 
-// 错误消息样式
+
 .error-message {
   background: #fff3cd;
   border: 1px solid #ffeaa7;

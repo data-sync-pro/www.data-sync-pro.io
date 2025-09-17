@@ -158,10 +158,10 @@ export class SimpleZoomableDirective implements AfterViewInit, OnDestroy {
     this.rd.setStyle(this.clonedImg, 'user-select', 'none');
     this.rd.setStyle(this.clonedImg, 'pointer-events', 'none');
 
-    // 添加图片到背景
+    
     this.rd.appendChild(this.backdropEl, this.clonedImg);
     
-    // 创建下载按钮
+    
     this.downloadBtn = this.rd.createElement('button');
     this.rd.setStyle(this.downloadBtn, 'position', 'fixed');
     this.rd.setStyle(this.downloadBtn, 'top', '20px');
@@ -180,7 +180,7 @@ export class SimpleZoomableDirective implements AfterViewInit, OnDestroy {
     this.rd.setStyle(this.downloadBtn, 'transition', 'background 0.3s ease');
     this.rd.setAttribute(this.downloadBtn, 'title', 'Download image');
     
-    // 添加下载图标 (使用SVG)
+    
     const iconSvg = `
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="white">
         <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
@@ -189,7 +189,7 @@ export class SimpleZoomableDirective implements AfterViewInit, OnDestroy {
     if (this.downloadBtn) {
       this.downloadBtn.innerHTML = iconSvg;
       
-      // 添加悬停效果
+      
       this.downloadBtn.addEventListener('mouseenter', () => {
         if (this.downloadBtn) {
           this.rd.setStyle(this.downloadBtn, 'background', 'rgba(0, 0, 0, 0.8)');
@@ -202,20 +202,20 @@ export class SimpleZoomableDirective implements AfterViewInit, OnDestroy {
         }
       });
       
-      // 添加下载功能
+      
       this.downloadBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         this.downloadImage(img);
       });
       
-      // 添加下载按钮到页面
+      
       this.rd.appendChild(document.body, this.downloadBtn);
     }
     
-    // 添加点击事件
+    
     this.backdropEl?.addEventListener('click', () => this.closeZoom(), { once: true });
     
-    // 添加到页面
+    
     this.rd.appendChild(document.body, this.backdropEl);
     this.rd.setStyle(document.body, 'overflow', 'hidden');
 

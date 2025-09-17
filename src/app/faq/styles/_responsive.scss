@@ -1,12 +1,12 @@
-// ==================== W3Schools风格的响应式设计 ====================
 
-// 使用W3Schools的标准断点
+
+
 $breakpoint-desktop: 992px;
 $breakpoint-mobile: 500px;
 
-// W3Schools风格的网格布局响应式
+
 .faq-layout-container {
-  // 大屏幕：完整的三栏布局
+  
   @media (min-width: $breakpoint-desktop) {
     grid-template-columns: $sidebar-width 1fr $toc-width;
     
@@ -23,7 +23,7 @@ $breakpoint-mobile: 500px;
     }
   }
   
-  // 中等屏幕：隐藏TOC，保留侧边栏
+  
   @media (max-width: $breakpoint-desktop) and (min-width: $breakpoint-mobile) {
     grid-template-areas: "sidebar main";
     grid-template-columns: $sidebar-width 1fr;
@@ -33,7 +33,7 @@ $breakpoint-mobile: 500px;
     }
   }
   
-  // 小屏幕：单栏布局，侧边栏浮动
+  
   @media (max-width: $breakpoint-mobile) {
     grid-template-areas: "main";
     grid-template-columns: 1fr;
@@ -54,8 +54,8 @@ $breakpoint-mobile: 500px;
   }
 
   .faq-sidebar {
-    // Transform已在_sidebar.scss中处理，此处仅控制显示
-    display: block; // 确保移动端显示
+    
+    display: block; 
   }
 
   .faq-toc {
@@ -67,7 +67,7 @@ $breakpoint-mobile: 500px;
     display: flex;
   }
 
-  // FAQ调整
+  
   .faq-list .faq-item {
     .faq-header {
       padding: 20px 24px;
@@ -109,7 +109,7 @@ $breakpoint-mobile: 500px;
 
   .faq-sidebar {
     width: 100%;
-    // Transform已在_sidebar.scss中统一处理，避免重复定义
+    
   }
 
   .faq-toc {
@@ -125,17 +125,17 @@ $breakpoint-mobile: 500px;
   }
 
   .sidebar-overlay {
-    display: none !important; // 移动端不需要遮罩层，因为侧边栏占满全屏
+    display: none !important; 
   }
 
-  // 标题
+  
   .section-title,
   .category-title {
     font-size: 2rem !important;
     padding-bottom: 32px;
   }
 
-  // FAQ项目
+  
   .faq-list .faq-item {
     margin-bottom: 12px;
     border-radius: 8px;
@@ -180,7 +180,7 @@ $breakpoint-mobile: 500px;
     }
   }
 
-  // 热门FAQ
+  
   .trending-faq {
     margin: 16px auto 24px auto;
 
@@ -204,7 +204,7 @@ $breakpoint-mobile: 500px;
     }
   }
 
-  // FAQ详情
+  
   .faq-detail {
     padding: 24px 0;
 
@@ -233,7 +233,7 @@ $breakpoint-mobile: 500px;
     }
   }
 
-  // 搜索无结果
+  
   .search-no-results {
     padding: 32px 16px;
 
@@ -263,7 +263,7 @@ $breakpoint-mobile: 500px;
     }
   }
 
-  // 图片调整
+  
   .faq-image {
     margin: 15px auto;
     border-radius: 6px;

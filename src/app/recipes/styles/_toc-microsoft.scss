@@ -4,10 +4,10 @@
 // Variables
 $ms-toc-text: #242424;
 $ms-toc-text-secondary: #616161;
-$ms-toc-link: #666666; // 改为深灰色，与导航按钮统一
-$ms-toc-link-hover: #333333; // 改为更深灰色，与按钮悬停色统一
+$ms-toc-link: #666666; 
+$ms-toc-link-hover: #333333; 
 $ms-toc-active-bg: #f0f0f0;
-$ms-toc-active-border: #666666; // 边框也统一为深灰色
+$ms-toc-active-border: #666666; 
 $ms-toc-border: #d2d2d2;
 $ms-toc-bg: #ffffff;
 $ms-toc-group-title: #171717;
@@ -249,8 +249,8 @@ $ms-toc-group-title: #171717;
         }
         
         &.active a {
-          color: #d0d0d0; // 使用与普通状态一致的深色模式文字颜色
-          background: rgba(208, 208, 208, 0.1); // 对应的浅灰色背景
+          color: #d0d0d0; 
+          background: rgba(208, 208, 208, 0.1); 
           border-left-color: transparent;
         }
       }
