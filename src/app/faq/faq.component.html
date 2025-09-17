@@ -74,7 +74,7 @@
           <div class="sidebar-search" *ngIf="!ui.sidebarCollapsed">
             <button
               class="sidebar-search-btn"
-              (click)="openSearchOverlay(search.query)"
+              (click)="openSearchOverlay()"
               title="Search FAQs (Press / or Ctrl+K for quick access)"
             >
               <lightning-icon
@@ -108,7 +108,7 @@
             <!-- Search - Collapsed -->
             <div class="nav-item search-nav" 
                  *ngIf="ui.sidebarCollapsed"
-                 (click)="openSearchOverlay(search.query)"
+                 (click)="openSearchOverlay()"
                  title="Search FAQs">
               <div class="nav-content">
                 <lightning-icon

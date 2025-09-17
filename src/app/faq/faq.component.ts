@@ -139,7 +139,6 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
   faqList: FAQItem[] = [];
   categories: FAQCategory[] = [];
 
-  private searchTimeout: any;
   private destroy$ = new Subject<void>();
   private pendingFragment?: string;
   private scrollTimeout: any;
@@ -655,13 +654,6 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     return this.ui.mobileSidebarOpen;
   }
 
-  get searchQuery(): string {
-    return this.search.query;
-  }
-
-  get isSearchActive(): boolean {
-    return this.search.isActive;
-  }
 
   get isSearchOpen(): boolean {
     return this.search.isOpen;
@@ -724,10 +716,6 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
       return false;
     }
 
-    if (this.search.isActive || this.search.query.trim()) {
-      return false;
-    }
-
     if (this.showHome) {
       return this.trendingQuestions.length > 0;
     }
@@ -748,13 +736,7 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   get filteredFAQ(): FAQItem[] {
-    const q = this.search.query.toLowerCase().trim();
-
-    if (q) {
-      return this.performSmartSearch(q);
-    }
-
-    // If no search query, apply category filter
+    // Only apply category filter, search logic removed
     return this.faqList.filter(item => {
       if (this.current.category && item.category !== this.current.category) return false;
       if (this.current.subCategory && item.subCategory !== this.current.subCategory) return false;
@@ -762,63 +744,7 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     });
   }
 
-  private performSmartSearch(query: string): FAQItem[] {
-    return this.performanceService.measure('faq-smart-search-render', () => {
-      const keywords = query.split(/\s+/).filter(k => k.length > 0);
-      const results: SearchResult[] = [];
 
-      this.faqList.forEach(item => {
-        const relevance = this.calculateRelevanceScore(item, query);
-
-        if (relevance.score > 0) {
-          const highlightedQuestion = this.highlightKeywords(item.question, keywords);
-          const highlightedAnswer = this.highlightKeywords(
-            relevance.matchType === 'content' ? relevance.matchedText : item.answer.substring(0, 200) + '...',
-            keywords
-          );
-
-          results.push({
-            item,
-            score: relevance.score,
-            matchType: relevance.matchType,
-            matchedText: relevance.matchedText,
-            highlightedQuestion,
-            highlightedAnswer
-          });
-        }
-      });
-
-      
-      results.sort((a, b) => b.score - a.score);
-
-      
-      this.updateSearchState({
-        results,
-        hasResults: results.length > 0
-      });
-
-      return results.map(r => r.item);
-    }) as FAQItem[];
-  }
-
-  getHighlightedQuestion(item: FAQItem): string {
-    const result = this.search.results.find(r => r.item.id === item.id);
-    return result ? result.highlightedQuestion : item.question;
-  }
-
-  getHighlightedAnswerPreview(item: FAQItem): string {
-    const result = this.search.results.find(r => r.item.id === item.id);
-    return result ? result.highlightedAnswer : 
-           (item.answer.length > 200 ? item.answer.substring(0, 200) + '...' : item.answer);
-  }
-
-  getMatchType(item: FAQItem): string {
-    const result = this.search.results.find(r => r.item.id === item.id);
-    if (!result) return '';
-
-    const types = { title: 'Title Match', content: 'Content Match', category: 'Category Match' };
-    return types[result.matchType] || '';
-  }
 
 
   selectPopularFAQ(faq: FAQItem, event?: Event): void {
@@ -826,9 +752,8 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
       event.preventDefault();
       event.stopPropagation();
     }
-    this.search.query = faq.question;
-    this.search.isActive = false;
-    this.performSearch();
+    // Navigate directly to FAQ without search logic
+    this.autoNavigateToFAQ(faq);
   }
 
   contactSupport(): void {
@@ -839,25 +764,6 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     this.resetState();
   }
 
-  searchAndClear(): void {
-    if (!this.search.query.trim()) return;
-
-    this.current.category = '';
-    this.current.subCategory = '';
-
-    const results = this.filteredFAQ;
-    const exactMatch = results.find(item =>
-      item.question.toLowerCase() === this.search.query.toLowerCase().trim()
-    );
-
-    // FAQ exact match found - content will be displayed directly
-
-    this.search.query = '';
-    this.search.isActive = false;
-    this.search.suggestions = [];
-    this.search.showSuggestions = false;
-    this.search.selectedIndex = -1;
-  }
 
   
 
@@ -1067,149 +973,15 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     }, 200);
   }
 
-  onSearchFocus(): void {
-    this.updateSearchState({ focused: true });
-    if (this.search.query.trim()) {
-      this.updateSuggestions();
-    }
-  }
 
-  onSearchInput(event: any): void {
-    const query = event.target.value;
-    const isActive = query.trim().length > 0;
-    
-    this.updateSearchState({
-      query,
-      isActive
-    });
 
-    if (isActive) {
-      this.updateCurrentState({
-        category: '',
-        subCategory: ''
-      });
-    } else {
-      this.updateSearchState({
-        results: [],
-        hasResults: true
-      });
-    }
 
-    this.updateSuggestions();
-  }
 
-  onSearchKeydown(event: KeyboardEvent): void {
-    if (!this.search.showSuggestions || this.search.suggestions.length === 0) {
-      // If no suggestions, allow Enter to trigger search
-      if (event.key === 'Enter') {
-        event.preventDefault();
-        this.performSearch();
-      }
-      return;
-    }
-
-    switch (event.key) {
-      case 'ArrowDown':
-        event.preventDefault();
-        this.updateSearchState({
-          selectedIndex: Math.min(
-            this.search.selectedIndex + 1,
-            this.search.suggestions.length - 1
-          )
-        });
-        break;
-      case 'ArrowUp':
-        event.preventDefault();
-        this.updateSearchState({
-          selectedIndex: Math.max(this.search.selectedIndex - 1, -1)
-        });
-        break;
-      case 'Enter':
-        event.preventDefault();
-        if (this.search.selectedIndex >= 0) {
-          this.selectSuggestion(this.search.suggestions[this.search.selectedIndex]);
-        } else {
-          this.performSearch();
-        }
-        break;
-      case 'Escape':
-        this.updateSearchState({
-          showSuggestions: false,
-          selectedIndex: -1
-        });
-        break;
-    }
-  }
-
-  performSearch(): void {
-    const query = this.search.query.trim();
-    if (!query) return;
-
-    // Hide suggestions
-    this.updateSearchState({
-      showSuggestions: false,
-      selectedIndex: -1
-    });
-
-    // Check for exact match first
-    const exactMatch = this.faqList.find(item =>
-      item.question.toLowerCase() === query.toLowerCase()
-    );
-
-    if (exactMatch) {
-      // Auto-navigate to exact match
-      this.autoNavigateToFAQ(exactMatch);
-    } else {
-      // If no exact match, just filter the results
-      // The filteredFAQ getter will handle the filtering
-      // Keep the search state active to show filtered results
-    }
-  }
-
-  private updateSuggestions(): void {
-    const query = this.search.query.toLowerCase().trim();
-    if (query.length < 2) {
-      this.search.suggestions = [];
-      this.search.showSuggestions = false;
-      return;
-    }
-
-    // Debounce search to improve performance
-    clearTimeout(this.searchTimeout);
-    this.searchTimeout = setTimeout(() => {
-      // Check for exact match first
-      const exactMatch = this.faqList.find(item =>
-        item.question.toLowerCase() === query
-      );
-
-      if (exactMatch) {
-        // Auto-navigate to exact match
-        this.autoNavigateToFAQ(exactMatch);
-        return;
-      }
-
-      this.search.suggestions = this.faqList
-        .filter(item =>
-          item.question.toLowerCase().includes(query) ||
-          item.category.toLowerCase().includes(query) ||
-          (item.subCategory && item.subCategory.toLowerCase().includes(query))
-        )
-        .map(item => item.question)
-        .slice(0, 8); // Limit to 8 suggestions
-
-      this.search.showSuggestions = this.search.suggestions.length > 0;
-      this.search.selectedIndex = -1;
-    }, 300);
-  }
 
   private autoNavigateToFAQ(faqItem: FAQItem): void {
-    this.search.suggestions = [];
-    this.search.showSuggestions = false;
-    this.search.selectedIndex = -1;
-    this.search.isActive = false;
     this.current.faqTitle = faqItem.question;
 
-    const url = faqItem.subCategory 
+    const url = faqItem.subCategory
       ? ['/', this.encode(faqItem.category), this.encode(faqItem.subCategory)]
       : ['/', this.encode(faqItem.category)];
 
@@ -1219,35 +991,13 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
 
 
 
-  selectSuggestion(suggestion: string): void {
-    this.search.query = suggestion;
-    this.search.showSuggestions = false;
-    this.search.selectedIndex = -1;
 
-    const faqItem = this.faqList.find(item => item.question === suggestion);
-    if (faqItem) {
-      this.showFAQDetail(faqItem);
-    }
-  }
-
-  highlightMatch(text: string, query: string): string {
-    if (!query.trim()) return text;
-
-    const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
-    return text.replace(regex, '<mark>$1</mark>');
-  }
 
   getCategoryForSuggestion(suggestion: string): string {
     const faqItem = this.faqList.find(item => item.question === suggestion);
     return faqItem ? `${faqItem.category}${faqItem.subCategory ? ' > ' + faqItem.subCategory : ''}` : '';
   }
 
-  focusSearch(): void {
-    const searchInput = document.getElementById('faqSearchInput') as HTMLInputElement;
-    if (searchInput) {
-      searchInput.focus();
-    }
-  }
 
 
 
@@ -1441,7 +1191,7 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
   
   get showHome(): boolean {
     return (
-      !this.current.category && !this.current.subCategory && !this.search.query
+      !this.current.category && !this.current.subCategory
     );
   }
 

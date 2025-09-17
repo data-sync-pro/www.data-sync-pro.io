@@ -243,7 +243,20 @@ export class SearchOverlayComponent implements OnInit, OnChanges {
         if (a.priority !== b.priority) {
           return a.priority - b.priority;
         }
-        // Same priority, sort alphabetically by question
+
+        // Same priority, group by category first
+        if (a.item.category !== b.item.category) {
+          return a.item.category.localeCompare(b.item.category);
+        }
+
+        // Same category, group by subCategory
+        const aSubCat = a.item.subCategory || '';
+        const bSubCat = b.item.subCategory || '';
+        if (aSubCat !== bSubCat) {
+          return aSubCat.localeCompare(bSubCat);
+        }
+
+        // Finally, sort alphabetically by question within same category/subcategory
         return a.item.question.localeCompare(b.item.question);
       })
       .map(result => result.item); // Return only the FAQ items
