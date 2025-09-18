@@ -489,7 +489,8 @@
     "Answer__c": "data-list-benefits-of-grouping-into-pipeline.html",
     "isActive": true
   },
-  {    "Id": "a0oEc000005JoiAIAS",
+  {
+    "Id": "a0oEc000005JoiAIAS",
     "Name": "a0oEc000005JoiAIAS",
     "Category__c": "Rules Engines",
     "SubCategory__c": "Data List",
@@ -1706,6 +1707,16 @@
     "SeqNo__c": null,
     "Question__c": "How can I integrate the Query functionality into Lightning pages?",
     "Answer__c": "how-to-integrate-into-lightning.html",
+    "isActive": true
+  },
+  {
+    "Id": "8599ed44-d1a0-43de-b90e-22f64d5c06dc",
+    "Name": "8599ed44-d1a0-43de-b90e-22f64d5c06dc",
+    "Category__c": "Rules Engines",
+    "SubCategory__c": "Batch",
+    "SeqNo__c": null,
+    "Question__c": "Does splitting an Apex batch class with multiple actions into multiple batch Executables slow performance a lot?",
+    "Answer__c": "apex-batch-class-splitting-performance-guide.html",
     "isActive": true
   }
 ]
