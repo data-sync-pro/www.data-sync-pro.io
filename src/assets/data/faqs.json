@@ -1717,6 +1717,6 @@
     "SeqNo__c": null,
     "Question__c": "Does splitting an Apex batch class with multiple actions into multiple batch Executables slow performance a lot?",
     "Answer__c": "apex-batch-class-splitting-performance-guide.html",
-    "isActive": true
+    "isActive": false
   }
 ]
