@@ -200,6 +200,11 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
     this.route.paramMap.pipe(
       takeUntil(this.destroy$)
     ).subscribe(params => {
+      // Skip route param processing in preview mode
+      if (this.isPreviewMode()) {
+        return;
+      }
+
       const catParam = params.get('cat');
       const subCatParam = params.get('subCat');
       
