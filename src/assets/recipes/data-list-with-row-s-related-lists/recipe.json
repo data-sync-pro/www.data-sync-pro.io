@@ -63,7 +63,7 @@
       ]
     },
     {
-      "step": "Data List(Q) Settings",
+      "step": "Data List Settings",
       "config": [
         {
           "field": "SOQL Query",

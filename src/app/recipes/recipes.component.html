@@ -388,7 +388,8 @@
 
   <!-- Right TOC (Table of Contents) - Microsoft Learn Style -->
   <aside class="recipe-toc recipe-toc-outline"
-         *ngIf="shouldShowTOC && !ui.isMobile && showRecipeDetails">
+         *ngIf="shouldShowTOC && !ui.isMobile && showRecipeDetails"
+         [class.hidden]="ui.tocHidden">
     
     <div class="toc-container">
       
@@ -431,7 +432,8 @@
   
   <!-- Recipe List TOC (for Home/Category pages) -->
   <aside class="recipe-toc recipe-list-toc"
-         *ngIf="shouldShowTOC && !ui.isMobile && !showRecipeDetails">
+         *ngIf="shouldShowTOC && !ui.isMobile && !showRecipeDetails"
+         [class.hidden]="ui.tocHidden">
     <div class="toc-container">
       <h3 class="toc-heading">{{ currentTOCTitle }}</h3>
       <nav class="toc-nav">
@@ -463,11 +465,13 @@
   <!-- TOC Toggle Button (Desktop) -->
   <button class="toc-toggle-btn"
           (click)="toggleTOC()"
-          *ngIf="!ui.isMobile"
-          mat-mini-fab
-          color="primary"
-          [matTooltip]="ui.tocHidden ? 'Show Table of Contents' : 'Hide Table of Contents'">
-    <mat-icon>{{ ui.tocHidden ? 'list' : 'list_alt' }}</mat-icon>
+          [title]="ui.tocHidden ? 'Show Table of Contents' : 'Hide Table of Contents'"
+          *ngIf="shouldShowTOC && !ui.isMobile">
+    <lightning-icon
+      [iconName]="ui.tocHidden ? 'utility:chevronleft' : 'utility:chevronright'"
+      size="xx-small"
+      [alternativeText]="ui.tocHidden ? 'Show TOC' : 'Hide TOC'"
+    ></lightning-icon>
   </button>
 
 </div>
