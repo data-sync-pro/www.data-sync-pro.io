@@ -1,6 +1,9 @@
 // Import Salesforce Lightning Design System components
 @import 'salesforce-components';
 
+// Import notification styles
+@import './styles/notification.scss';
+
 html, body { min-height: 100%; height: auto; }
 body {
   margin: 0;
@@ -76,5 +79,39 @@ body.recipe-page app-footer {
   display: none;
 }
 
-// Import notification styles
-@import './styles/notification.scss';
+// Clickable image text styles
+.clickable-image {
+  color: #1a73e8;
+  text-decoration: underline dotted;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  display: inline-block;
+}
+
+.clickable-image:hover {
+  color: #0056b3;
+  text-decoration: underline solid;
+  background-color: rgba(26, 115, 232, 0.05);
+  padding: 0 2px;
+  border-radius: 2px;
+}
+
+.clickable-image::after {
+  content: " 🖼️";
+  font-size: 0.7em;
+  opacity: 0.7;
+  color: #666;
+  font-weight: normal;
+  text-decoration: none;
+  margin-left: 3px;
+  vertical-align: baseline;
+  border: 1px solid #ccc;
+  padding: 1px 3px;
+  border-radius: 2px;
+  background: #f8f9fa;
+}
+
+.clickable-image:active {
+  transform: scale(0.98);
+}
