@@ -111,7 +111,7 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
     'Create Executable',
     'Create Pipeline',
     'Create Scheduler',
-    'Data List(Q) Settings',
+    'Data List Settings',
     'Data Loader Settings',
     'Input',
     'Mapping',
@@ -1172,7 +1172,7 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
         return this.batchSettingsFields;
       case 'Action Button Settings':
         return this.actionButtonSettingsFields;
-      case 'Data List(Q) Settings':
+      case 'Data List Settings':
         return this.dataListSettingsFields;
       case 'Data Loader Settings':
         return this.dataLoaderSettingsFields;

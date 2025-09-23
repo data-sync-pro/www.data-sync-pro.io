@@ -35,10 +35,21 @@ export class SimpleZoomableDirective implements AfterViewInit, OnDestroy {
         event.stopPropagation();
         this.zoomImage(target as HTMLImageElement);
       }
+
+      // Handle clickable text elements
+      if (target.classList.contains('clickable-image')) {
+        event.preventDefault();
+        event.stopPropagation();
+        const imageSrc = target.getAttribute('data-src');
+        if (imageSrc) {
+          this.zoomImageFromSrc(imageSrc);
+        }
+      }
     };
 
     container.addEventListener('click', this.clickListener, true);
     this.updateImageStyles();
+    this.updateClickableTextStyles();
   }
 
   private setupMutationObserver(): void {
@@ -53,6 +64,16 @@ export class SimpleZoomableDirective implements AfterViewInit, OnDestroy {
               } else {
                 const images = element.querySelectorAll('img:not([noZoom])');
                 images.forEach(img => this.styleImage(img as HTMLImageElement));
+
+                // Also process clickable text elements
+                const clickableTexts = element.querySelectorAll('.clickable-image');
+                clickableTexts.forEach((text) => {
+                  const textElement = text as HTMLElement;
+                  if (!textElement.hasAttribute('data-clickable-processed')) {
+                    this.rd.setStyle(textElement, 'cursor', 'pointer');
+                    textElement.setAttribute('data-clickable-processed', 'true');
+                  }
+                });
               }
             }
           });
@@ -243,6 +264,32 @@ export class SimpleZoomableDirective implements AfterViewInit, OnDestroy {
     window.dispatchEvent(new Event('zoomEnd'));
   }
   
+  private zoomImageFromSrc(src: string): void {
+    const tempImg = new Image();
+    tempImg.src = src;
+
+    tempImg.onload = () => {
+      this.openZoom(tempImg);
+    };
+
+    tempImg.onerror = () => {
+      console.error('Failed to load image:', src);
+    };
+  }
+
+  private updateClickableTextStyles(): void {
+    const clickableTexts = this.el.nativeElement.querySelectorAll('.clickable-image');
+    clickableTexts.forEach((element) => {
+      const htmlElement = element as HTMLElement;
+      if (htmlElement.hasAttribute('data-clickable-processed')) {
+        return;
+      }
+
+      this.rd.setStyle(htmlElement, 'cursor', 'pointer');
+      htmlElement.setAttribute('data-clickable-processed', 'true');
+    });
+  }
+
   private downloadImage(img: HTMLImageElement): void {
     const link = document.createElement('a');
     link.href = img.src;

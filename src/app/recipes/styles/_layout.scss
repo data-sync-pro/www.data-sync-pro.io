@@ -149,35 +149,94 @@ $breakpoint-mobile: 576px;
   }
 }
 
-// TOC Toggle Button
+// TOC Toggle Button - positioned to the left of TOC or right edge when hidden
 .toc-toggle-btn {
   position: fixed;
   top: 50%;
-  
-  right: calc($toc-width-percent + 2%); 
   transform: translateY(-50%);
-  z-index: 90;
+  width: 32px;
+  height: 32px;
+  background: #ffffff;
+  border: 1px solid #e1e5e9;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 85; // Higher than TOC but lower than modals
+
+  // Default: hidden by default, only show on hover (when TOC is visible)
   opacity: 0;
   visibility: hidden;
   transition: all 0.3s ease;
-  
+
+  // When TOC is hidden, always show the button
   .recipe-layout-container.toc-hidden & {
-    right: 2%; 
     opacity: 1;
     visibility: visible;
   }
-  
-  
-  @media (min-width: 1400px) {
-    right: calc(16% + 2%); 
 
-    .recipe-layout-container.toc-hidden & {
-      right: 2%;
+  // Default: when TOC is visible, button is at the left edge of TOC
+  right: $toc-width-percent; // TOC width
+  border-radius: 6px 0 0 6px; // Rounded only on the left side
+  box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
+
+  // When TOC is hidden, move button to the right edge of screen and keep it visible
+  .recipe-layout-container.toc-hidden & {
+    right: 0px;
+    border-radius: 6px 0 0 6px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    opacity: 1; // Always visible when TOC is hidden
+    visibility: visible;
+  }
+  &:hover {
+    opacity: 1;
+    visibility: visible;
+    background: #f8f9fa;
+    border-color: #1a73e8;
+    
+    // Default hover shadow (TOC visible)
+    box-shadow: -4px 0 12px rgba(26, 115, 232, 0.15);
+    
+    // When TOC is hidden, use left shadow since button is at right edge
+    .faq-layout-container.toc-hidden & {
+      box-shadow: -4px 0 12px rgba(26, 115, 232, 0.15);
     }
   }
+
+  &:active {
+    transform: translateY(-50%) scale(0.95);
+  }
   
+  @media (min-width: 1400px) {
+    right: 16%; // Adjusted TOC width for larger screens
+
+    .recipe-layout-container.toc-hidden & {
+      right: 10px;
+    }
+  }
+
   @media (max-width: $breakpoint-desktop) {
     display: none !important;
+  }
+}
+
+// Show TOC toggle button when hovering TOC area
+.recipe-toc:hover + .toc-toggle-btn {
+  opacity: 1;
+  visibility: visible;
+}
+
+// When TOC is hidden, expand the button's hover area slightly
+.recipe-layout-container.toc-hidden .toc-toggle-btn {
+  // Expand hover area when TOC is hidden
+  &::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    bottom: -10px;
+    left: -15px;
+    right: -5px;
+    z-index: -1;
   }
 }
 
