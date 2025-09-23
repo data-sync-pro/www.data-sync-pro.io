@@ -1,17 +1,47 @@
 <p>
-  No. Splitting a batch job into modular, rules-driven Executables significantly
-  improves clarity and maintainability without materially impacting performance.
-  The main performance drivers are the number of DML operations executed in each
-  batch and the automation triggered by those DMLs (Flows, Triggers, Processes).
-  Batching itself consumes very little system overhead.
+  No. Splitting a batch job into modular, rules-driven Executables improves
+  clarity and maintainability without materially affecting performance. Runtime
+  is driven by the number of DML operations executed and the automation those
+  DMLs invoke (Flows, Triggers, Processes), not by whether logic runs in one
+  batch or multiple Executables.
 </p>
+
 <p>
-  DSP batch execution logs below confirm this: in <b>three blank updates</b> on <b>300,000
-  records (batch size 200)</b>, DSP finished in <b>~26 minutes</b>, while an
-  equivalent Apex Batch took <b>~1 hour</b>. With identical DML volume and
-  downstream automation, this shows that the overhead comes primarily from DML
-  and triggered automation, not from the act of batching.
+  <strong>Benchmark (same workload, three implementations)</strong><br />
+  Each implementation retrieves 30k Accounts, then updates those Accounts 3
+  times per batch (no field changes), with all automation disabled.
 </p>
+
+<table>
+    <thead>
+      <tr>
+        <th>Implementation</th>
+        <th>Batch Size</th>
+        <th>Bulk API</th>
+        <th>Total Time</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>1) Single Apex batch class; 3 updates in <code>execute</code> method</td>
+        <td>200</td>
+        <td>No</td>
+        <td>62 min</td>
+      </tr>
+      <tr>
+        <td>2) DSP Pipeline; 3 identical batch Executables</td>
+        <td>200</td>
+        <td>No</td>
+        <td>26 min</td>
+      </tr>
+      <tr>
+        <td>3) DSP Pipeline; 3 identical batch Executables</td>
+        <td>2000</td>
+        <td>Yes</td>
+        <td>4 min</td>
+      </tr>
+    </tbody>
+  </table>
 <img
   src="assets/image/apex-batch-class-splitting-performance-guide/apex-batch-class-splitting-performance-guide1.png"
 />
@@ -21,11 +51,6 @@
 <img
   src="assets/image/apex-batch-class-splitting-performance-guide/apex-batch-class-splitting-performance-guide2.png"
 />
-<p>
-  To maximize throughput, DSP provides out-of-the-box performance options such
-  as Incremental Retrieve, Delta Update, and Bulk API (with batch sizes up to
-  2,000).
-</p>
 <img
   src="assets/image/apex-batch-class-splitting-performance-guide/apex-batch-class-splitting-performance-guide4.png"
 />
