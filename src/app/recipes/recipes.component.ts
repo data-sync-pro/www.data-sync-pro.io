@@ -22,11 +22,21 @@ import {
   RecipeSection,
   RecipeTab,
   RecipeTOCStructure,
-  LegacyRecipeWalkthrough
+  LegacyRecipeWalkthrough,
+  RecipeSearchResult
 } from '../shared/models/recipe.model';
 import { RecipeService } from '../shared/services/recipe.service';
 import { RecipePreviewService, RecipePreviewData } from '../shared/services/recipe-preview.service';
-import { SelectedRecipe } from './recipe-search-overlay/recipe-search-overlay.component';
+import { SelectedSuggestion } from './recipe-search-overlay/recipe-search-overlay.component';
+
+interface SearchResult {
+  item: RecipeItem;
+  score: number;
+  matchType: 'title' | 'content' | 'category';
+  matchedText: string;
+  highlightedTitle: string;
+  highlightedOverview: string;
+}
 
 interface UIState {
   isLoading: boolean;
@@ -72,11 +82,17 @@ interface TOCPaginationState {
   endIndex: number;
 }
 
+
 interface SearchState {
   query: string;
+  focused: boolean;
   isActive: boolean;
-  results: RecipeItem[];
+  results: SearchResult[];
   hasResults: boolean;
+  suggestions: string[];
+  showSuggestions: boolean;
+  selectedIndex: number;
+  isOpen: boolean;
   isOverlayOpen: boolean;
 }
 
@@ -147,9 +163,14 @@ export class RecipesComponent implements OnInit, OnDestroy {
 
   search: SearchState = {
     query: '',
+    focused: false,
     isActive: false,
     results: [],
     hasResults: true,
+    suggestions: [],
+    showSuggestions: false,
+    selectedIndex: -1,
+    isOpen: false,
     isOverlayOpen: false
   };
 
@@ -1184,7 +1205,14 @@ export class RecipesComponent implements OnInit, OnDestroy {
         takeUntil(this.destroy$)
       ).subscribe({
         next: (results) => {
-          this.search.results = results;
+          this.search.results = results.map(result => ({
+            item: result,
+            score: result.relevanceScore || 0,
+            matchType: 'title' as const,
+            matchedText: result.highlightedTitle || result.title,
+            highlightedTitle: result.highlightedTitle || result.title,
+            highlightedOverview: result.highlightedDescription || result.overview
+          }));
           this.search.hasResults = results.length > 0;
           this.filteredRecipes = this.sortRecipesByCategoryAndTitle(results);
           this.cdr.markForCheck();
@@ -1344,7 +1372,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
    * Get recipes for current view
    */
   get currentRecipes(): RecipeItem[] {
-    return this.search.isActive ? this.search.results : this.filteredRecipes;
+    return this.search.isActive ? this.search.results.map(result => result.item) : this.filteredRecipes;
   }
 
   /**
@@ -1417,7 +1445,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
   /**
    * Handle search overlay selection
    */
-  handleSearchOverlaySelect(selectedRecipe: SelectedRecipe): void {
+  handleSearchOverlaySelect(selectedRecipe: SelectedSuggestion): void {
     // Navigate to the selected recipe
     this.router.navigate(['/recipes', selectedRecipe.category, selectedRecipe.id]);
     
@@ -1425,7 +1453,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
     this.recipeService.trackRecipeEvent({
       type: 'search',
       recipeId: selectedRecipe.id,
-      recipeTitle: selectedRecipe.title,
+      recipeTitle: selectedRecipe.question,
       recipeCategory: selectedRecipe.category,
       searchQuery: this.searchOverlayInitialQuery,
       timestamp: new Date()

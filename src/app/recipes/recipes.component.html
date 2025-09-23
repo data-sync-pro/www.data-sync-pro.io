@@ -310,7 +310,7 @@
                           <td>
                             <div *ngIf="prereq.quickLinks?.length">
                               <ng-container *ngFor="let link of prereq.quickLinks">
-                                <a *ngIf="link.title && link.title.trim()" [href]="link.url" target="_blank">
+                                <a [href]="link.url" target="_blank" *ngIf="link.title && link.title.trim()">
                                   {{ link.title }}
                                 </a>
                               </ng-container>
@@ -382,8 +382,8 @@
 
         <div class="recipe-grid" *ngIf="search.hasResults">
           <app-recipe-card 
-            *ngFor="let recipe of search.results"
-            [recipe]="recipe"
+            *ngFor="let searchResult of search.results"
+            [recipe]="searchResult.item"
             (recipeSelect)="goToRecipe($event)">
           </app-recipe-card>
         </div>

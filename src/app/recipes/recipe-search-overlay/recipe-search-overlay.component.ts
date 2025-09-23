@@ -13,19 +13,29 @@ import {
 } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { RecipeItem as OriginalRecipeItem } from '../../shared/models/recipe.model';
+import { RecipeService } from '../../shared/services/recipe.service';
 
-interface Recipe {
+interface RawRecipe {
   id: string;
   title: string;
-  description: string;
   category: string;
-  duration: string;
-  tags: string[];
-  steps: any[];
+  overview: string;
+  keywords: string[];
+  isActive?: boolean;
 }
 
-export interface SelectedRecipe extends Recipe {
-  categoryFilterApplied: boolean;
+interface RecipeItem {
+  id: string;
+  question: string;
+  route: string;
+  category: string;
+  subCategory: string | null;
+  tags: string[];
+}
+
+export interface SelectedSuggestion extends RecipeItem {
+  subCatFilterApplied: boolean;
 }
 
 @Component({
@@ -35,90 +45,74 @@ export interface SelectedRecipe extends Recipe {
 })
 export class RecipeSearchOverlayComponent implements OnInit, OnChanges {
   @Input() isOpen = false;
-  @Input() initialQuery = '';
+  @Input() initialQuery = ''; 
   @Output() closed = new EventEmitter<void>();
-  @Output() selectedResult = new EventEmitter<SelectedRecipe>();
+  @Output() selectedResult = new EventEmitter<SelectedSuggestion>();
   @ViewChild('searchInput') searchInputRef!: ElementRef<HTMLInputElement>;
 
   searchQuery = '';
-  selectedCategory = '';
+
+  selectedCategory: string = '';
+  selectedSubCategories: string[] = [];
+
   categories: string[] = [];
-  
+  subCategories: string[] = [];
   isLoading = true;
   loadError = false;
+
+  suggestions: RecipeItem[] = [];
+  filteredSuggestions: RecipeItem[] = [];
   
-  recipes: Recipe[] = [];
-  filteredRecipes: Recipe[] = [];
+  // Cache for FAQ answer text content
+  private answerTexts: Map<string, string> = new Map();
 
   constructor(
-    private http: HttpClient,
+    private http: HttpClient, 
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private recipeService: RecipeService
   ) {}
 
   ngOnInit() {
-    // Load recipes data
     this.loadRecipes();
   }
 
-  loadRecipes() {
-    // TODO: Replace with actual recipe data endpoint
-    // For now, using mock data
-    this.recipes = this.getMockRecipes();
-    this.categories = [...new Set(this.recipes.map(r => r.category))];
-    this.filterRecipes();
-    this.isLoading = false;
-    this.cdr.detectChanges();
-  }
+  private loadRecipes() {
+    this.isLoading = true;
+    this.loadError = false;
+    
+    this.recipeService.getRecipes().subscribe({
+      next: (recipes) => {
+        this.suggestions = recipes
+          .filter(r => r.id) // Only include recipes with valid IDs
+          .map((r) => ({
+            id: r.id,
+            question: r.title,
+            route: `/recipes/${encodeURIComponent(r.category)}/${r.id}`,
+            category: r.category,
+            subCategory: r.keywords && r.keywords.length > 0 ? r.keywords[0] : null,
+            tags: r.keywords && r.keywords.length > 0 
+              ? [r.category, r.keywords[0]]
+              : [r.category],
+          }));
 
-  getMockRecipes(): Recipe[] {
-    return [
-      {
-        id: '1',
-        title: 'Basic Salesforce to SQL Server Sync',
-        description: 'Learn how to set up a basic data synchronization between Salesforce and SQL Server',
-        category: 'Database Integration',
-        duration: '30 mins',
-        tags: ['SQL Server', 'Salesforce', 'Basic'],
-        steps: []
+        this.categories = [...new Set(this.suggestions.map((i) => i.category))];
+        this.filterSubCategoryList();
+        this.filterSuggestions();
+        this.isLoading = false;
+        
+        // Load answer texts asynchronously for search
+        this.loadAnswerTexts();
+        
+        this.cdr.detectChanges();
       },
-      {
-        id: '2',
-        title: 'Real-time Account Sync with Change Data Capture',
-        description: 'Implement real-time synchronization using Salesforce Change Data Capture',
-        category: 'Real-time Sync',
-        duration: '2 hours',
-        tags: ['CDC', 'Real-time', 'Accounts'],
-        steps: []
-      },
-      {
-        id: '3',
-        title: 'Batch Processing Large Data Sets',
-        description: 'Optimize batch processing for large data volumes between systems',
-        category: 'Performance',
-        duration: '1 hour',
-        tags: ['Batch', 'Performance', 'Large Data'],
-        steps: []
-      },
-      {
-        id: '4',
-        title: 'Error Handling and Retry Logic',
-        description: 'Implement robust error handling and retry mechanisms for data sync',
-        category: 'Best Practices',
-        duration: '45 mins',
-        tags: ['Error Handling', 'Retry', 'Reliability'],
-        steps: []
-      },
-      {
-        id: '5',
-        title: 'Multi-Object Relationship Sync',
-        description: 'Synchronize complex object relationships between systems',
-        category: 'Advanced Patterns',
-        duration: '1.5 hours',
-        tags: ['Relationships', 'Complex', 'Multi-Object'],
-        steps: []
+      error: (error) => {
+        console.error('Error loading FAQs:', error);
+        this.loadError = true;
+        this.isLoading = false;
+        this.cdr.detectChanges();
       }
-    ];
+    });
   }
 
   @HostListener('document:keydown.escape')
@@ -126,98 +120,226 @@ export class RecipeSearchOverlayComponent implements OnInit, OnChanges {
     if (this.isOpen) this.close();
   }
 
-  @HostListener('document:keydown./')
-  onSlashKey(event: KeyboardEvent) {
-    if (!this.isOpen && !this.isInputFocused()) {
-      event.preventDefault();
-      this.open();
+  onSelectSuggestion(item: RecipeItem) {
+    const subCatFilterApplied = this.selectedSubCategories.length > 0;
+
+    this.selectedResult.emit({
+      ...item,
+      subCatFilterApplied,
+    } as SelectedSuggestion);
+
+    this.close();
+  }
+
+  selectCategory(cat: string) {
+    this.selectedCategory = this.selectedCategory === cat ? '' : cat;
+    this.filterSubCategoryList();
+    this.filterSuggestions();
+  }
+
+  toggleSubCategory(sc: string) {
+    const i = this.selectedSubCategories.indexOf(sc);
+    i >= 0
+      ? this.selectedSubCategories.splice(i, 1)
+      : this.selectedSubCategories.push(sc);
+    this.filterSuggestions();
+  }
+
+  filterSubCategoryList() {
+    if (!this.selectedCategory) {
+      this.subCategories = [];
+      this.selectedSubCategories = [];
+      return;
     }
+    const subs = this.suggestions
+      .filter((i) => i.category === this.selectedCategory && i.subCategory)
+      .map((i) => i.subCategory!);
+    this.subCategories = [...new Set(subs)];
+    this.selectedSubCategories = this.selectedSubCategories.filter((s) =>
+      this.subCategories.includes(s)
+    );
   }
 
-  @HostListener('document:keydown.control.k', ['$event'])
-  @HostListener('document:keydown.meta.k', ['$event'])
-  onCtrlK(event: KeyboardEvent) {
-    event.preventDefault();
-    if (!this.isOpen) {
-      this.open();
-    }
-  }
-
-  private isInputFocused(): boolean {
-    const activeElement = document.activeElement;
-    return activeElement instanceof HTMLInputElement || 
-           activeElement instanceof HTMLTextAreaElement;
-  }
-
-  private open() {
-    // This would be triggered from parent component
-    // Just here for keyboard shortcut handling
+  clearFilters() {
+    this.searchQuery = '';
+    this.selectedCategory = '';
+    this.selectedSubCategories = [];
+    this.subCategories = [];
+    this.filterSuggestions();
   }
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['isOpen']?.currentValue) {
+      
       if (changes['initialQuery'] || this.initialQuery) {
         this.searchQuery = this.initialQuery;
+        
         setTimeout(() => {
-          this.filterRecipes();
+          this.filterSuggestions();
         }, 0);
       }
       
+      // Immediate focus without delay to improve responsiveness
       setTimeout(() => {
         this.searchInputRef?.nativeElement?.focus();
+        
         if (this.searchQuery) {
           this.searchInputRef?.nativeElement?.select();
         }
       }, 0);
     }
     
+    
     if (changes['initialQuery'] && !changes['isOpen']) {
       this.searchQuery = this.initialQuery;
-      this.filterRecipes();
+      this.filterSuggestions();
     }
-  }
-
-  onSelectRecipe(recipe: Recipe) {
-    const categoryFilterApplied = !!this.selectedCategory;
-    
-    this.selectedResult.emit({
-      ...recipe,
-      categoryFilterApplied,
-    } as SelectedRecipe);
-    
-    this.close();
-  }
-
-  selectCategory(category: string) {
-    this.selectedCategory = this.selectedCategory === category ? '' : category;
-    this.filterRecipes();
-  }
-
-
-  clearFilters() {
-    this.searchQuery = '';
-    this.selectedCategory = '';
-    this.filterRecipes();
   }
 
   close() {
     this.closed.emit();
   }
 
-  filterRecipes() {
-    const query = this.searchQuery.trim().toLowerCase();
-    
-    this.filteredRecipes = this.recipes.filter(recipe => {
-      const matchQuery = !query || 
-        recipe.title.toLowerCase().includes(query) ||
-        recipe.description.toLowerCase().includes(query) ||
-        recipe.tags.some(tag => tag.toLowerCase().includes(query));
-      
-      const matchCategory = !this.selectedCategory || 
-        recipe.category === this.selectedCategory;
-      
-      return matchQuery && matchCategory;
-    });
+  filterSuggestions() {
+    const kw = this.searchQuery.trim().toLowerCase();
+
+    // Filter and add priority information
+    const filteredWithPriority = this.suggestions
+      .filter((i) => {
+        // Search in question
+        const matchQuestion = kw ? i.question.toLowerCase().includes(kw) : true;
+
+        // Search in answer content
+        const answerText = this.answerTexts.get(i.id) || '';
+        const matchAnswer = kw ? answerText.includes(kw) : false;
+
+        // Match keyword in either question or answer
+        const matchKW = !kw || matchQuestion || matchAnswer;
+
+        const matchCat =
+          !this.selectedCategory || i.category === this.selectedCategory;
+
+        const matchSub =
+          this.selectedSubCategories.length === 0 ||
+          (i.subCategory && this.selectedSubCategories.includes(i.subCategory));
+
+        return matchKW && matchCat && matchSub;
+      })
+      .map((i) => {
+        // Add priority based on match type
+        let priority = 999; // Default lowest priority
+
+        if (kw) {
+          // Category match - priority 1 (highest)
+          if (i.category.toLowerCase().includes(kw)) {
+            priority = 1;
+          }
+          // SubCategory match - priority 2
+          else if (i.subCategory && i.subCategory.toLowerCase().includes(kw)) {
+            priority = 2;
+          }
+          // Question match - priority 3
+          else if (i.question.toLowerCase().includes(kw)) {
+            priority = 3;
+          }
+          // Answer match - priority 4 (lowest)
+          else if (this.answerTexts.get(i.id)?.toLowerCase().includes(kw)) {
+            priority = 4;
+          }
+        }
+
+        return { item: i, priority };
+      })
+      .sort((a, b) => {
+        // Sort by priority first
+        if (a.priority !== b.priority) {
+          return a.priority - b.priority;
+        }
+
+        // Same priority, group by category first
+        if (a.item.category !== b.item.category) {
+          return a.item.category.localeCompare(b.item.category);
+        }
+
+        // Same category, group by subCategory
+        const aSubCat = a.item.subCategory || '';
+        const bSubCat = b.item.subCategory || '';
+        if (aSubCat !== bSubCat) {
+          return aSubCat.localeCompare(bSubCat);
+        }
+
+        // Finally, sort alphabetically by question within same category/subcategory
+        return a.item.question.localeCompare(b.item.question);
+      })
+      .map(result => result.item); // Return only the FAQ items
+
+    this.filteredSuggestions = filteredWithPriority;
   }
 
+  get hasActiveFilters(): boolean {
+    return !!(
+      this.searchQuery.trim() ||
+      this.selectedCategory ||
+      this.selectedSubCategories.length > 0
+    );
+  }
+  
+  /**
+   * Load and extract text from all FAQ answer HTML files
+   */
+  private async loadAnswerTexts(): Promise<void> {
+    const loadPromises = this.suggestions.map(async (faq) => {
+      try {
+        const htmlPath = `assets/faq-item/${faq.route}.html`;
+        const response = await fetch(htmlPath);
+        
+        if (response.ok) {
+          const html = await response.text();
+          const cleanText = this.extractTextFromHTML(html);
+          this.answerTexts.set(faq.id, cleanText);
+        }
+      } catch (error) {
+        // Silently handle errors for individual files
+        console.warn(`Failed to load answer for FAQ ${faq.id}:`, error);
+      }
+    });
+    
+    // Load all answers in parallel
+    await Promise.all(loadPromises);
+    
+    // Re-filter suggestions if search query exists
+    if (this.searchQuery.trim()) {
+      this.filterSuggestions();
+      this.cdr.detectChanges();
+    }
+  }
+  
+  /**
+   * Extract clean text from HTML content for searching
+   */
+  private extractTextFromHTML(html: string): string {
+    // Create a temporary DOM element to parse HTML
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = html;
+    
+    // Remove script and style elements
+    const scripts = tempDiv.querySelectorAll('script, style');
+    scripts.forEach(el => el.remove());
+    
+    // Remove img elements as they don't contain searchable text
+    const images = tempDiv.querySelectorAll('img');
+    images.forEach(el => el.remove());
+    
+    // Get text content
+    let text = tempDiv.textContent || tempDiv.innerText || '';
+    
+    // Clean up whitespace
+    text = text
+      .replace(/\s+/g, ' ')  // Replace multiple spaces with single space
+      .replace(/\n{2,}/g, '\n')  // Replace multiple newlines with single newline
+      .trim()
+      .toLowerCase();  // Convert to lowercase for case-insensitive search
+    
+    return text;
+  }
 }

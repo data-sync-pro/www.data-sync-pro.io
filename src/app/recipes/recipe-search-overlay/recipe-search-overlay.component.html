@@ -1,105 +1,81 @@
-<div class="recipe-search-overlay" *ngIf="isOpen" (click)="close()">
+<div class="search-overlay" (click)="close()">
   <div class="search-overlay-content" (click)="$event.stopPropagation()">
-    <!-- Header -->
-    <div class="overlay-header">
-      <h2>Search Recipes</h2>
-      <button class="close-btn" mat-icon-button (click)="close()" aria-label="Close search">
-        <mat-icon>close</mat-icon>
-      </button>
-    </div>
-
-    <!-- Search Input -->
     <div class="overlay-search-wrapper">
-      <mat-icon class="search-icon">search</mat-icon>
       <input
         #searchInput
         type="text"
-        class="overlay-search-input"
+        class="overlay-search-box"
+        placeholder="Search"
         [(ngModel)]="searchQuery"
-        (ngModelChange)="filterRecipes()"
-        placeholder="Search recipes by title, description, or tags..."
-        autocomplete="off"
+        (input)="filterSuggestions()"
       />
-      <span class="shortcut-hint" (click)="close()">ESC</span>
+      <span class="shortcut-hint shortcut-clickable" (click)="close()">Esc</span>
     </div>
 
-    <!-- Filters -->
-    <div class="filters-section" *ngIf="!isLoading">
-      <!-- Category Filter -->
-      <div class="filter-group" *ngIf="categories.length > 0">
+    <div class="filters-section">
+      <div class="filter-group">
         <div class="filter-header">
-          <label class="filter-label">Categories</label>
-          <button 
-            class="clear-filters-btn" 
-            *ngIf="selectedCategory"
-            (click)="clearFilters()">
-            Clear filters
-          </button>
+          <div class="filter-label">Categories</div>
+          <button class="clear-filters-btn" *ngIf="hasActiveFilters" (click)="clearFilters()">Clear Filters</button>
         </div>
-        <div class="filter-chips">
+
+        <div class="filter-chips scrollable-container">
           <span
             class="filter-chip"
             *ngFor="let category of categories"
-            [class.active]="selectedCategory === category"
-            (click)="selectCategory(category)"
+            [class.active]="selectedCategory === category" 
+            (click)="selectCategory(category)"              
           >
             {{ category }}
           </span>
+          <div *ngIf="isLoading" class="loading-placeholder">
+            Loading categories...
+          </div>
+          <div *ngIf="loadError" class="error-placeholder">
+            Failed to load categories
+          </div>
+          <div *ngIf="!isLoading && !loadError && !categories.length" class="empty-placeholder">
+            No categories available
+          </div>
         </div>
       </div>
 
-    </div>
+      <div class="filter-group" *ngIf="subCategories.length">        
+        <div class="filter-header">                                   
+          <div class="filter-label">Sub Categories</div>              
+        </div>                                                        
 
-    <!-- Results Section -->
-    <div class="results-section">
-      <!-- Loading State -->
-      <div class="loading-state" *ngIf="isLoading">
-        <mat-spinner diameter="24"></mat-spinner>
-        <span>Loading recipes...</span>
+        <div class="filter-chips scrollable-container">               
+          <span                                                     
+            class="filter-chip"                                   
+            *ngFor="let sc of subCategories"                        
+            [class.active]="selectedSubCategories.includes(sc)"     
+            (click)="toggleSubCategory(sc)"                         
+          >
+            {{ sc === 'null' ? 'None' : sc }}                        
+          </span>                                                    
+        </div>                                                       
       </div>
 
-      <!-- Error State -->
-      <div class="error-placeholder" *ngIf="loadError && !isLoading">
-        <mat-icon>error_outline</mat-icon>
-        <p>Error loading recipes. Please try again.</p>
-      </div>
-
-      <!-- Results List -->
-      <div class="results-list" *ngIf="!isLoading && !loadError && filteredRecipes.length > 0">
-        <a
-          class="result-item"
-          *ngFor="let recipe of filteredRecipes"
-          (click)="onSelectRecipe(recipe)"
-          role="button"
-          tabindex="0"
-          (keydown.enter)="onSelectRecipe(recipe)"
+      <div
+        class="suggestions-list"
+        *ngIf="
+          (searchQuery.trim() ||
+            selectedCategory ||
+            selectedSubCategories.length) &&
+          filteredSuggestions.length
+        "
+      >
+        <div
+          class="suggestion-item"
+          *ngFor="let item of filteredSuggestions"
+          (click)="onSelectSuggestion(item)"
         >
-          <div class="result-content">
-            <mat-icon>menu_book</mat-icon>
-            <div class="result-text">
-              <div class="result-title">{{ recipe.title }}</div>
-              <div class="result-description">{{ recipe.description }}</div>
-            </div>
+          <div class="suggestion-left">{{ item.question }}</div>
+          <div class="suggestion-categories">
+            <span class="tag" *ngFor="let tag of item.tags">{{ tag }}</span>
           </div>
-          <div class="result-meta">
-            <span class="category-tag">{{ recipe.category }}</span>
-          </div>
-        </a>
-      </div>
-
-      <!-- No Results -->
-      <div class="no-results" *ngIf="!isLoading && !loadError && filteredRecipes.length === 0">
-        <mat-icon>search_off</mat-icon>
-        <h3>No recipes found</h3>
-        <p *ngIf="searchQuery">
-          No recipes match "<strong>{{ searchQuery }}</strong>"
-        </p>
-        <p *ngIf="!searchQuery && selectedCategory">
-          No recipes match the selected filters
-        </p>
-        <p *ngIf="!searchQuery && !selectedCategory">
-          Start typing to search for recipes
-        </p>
+        </div>
       </div>
     </div>
   </div>
