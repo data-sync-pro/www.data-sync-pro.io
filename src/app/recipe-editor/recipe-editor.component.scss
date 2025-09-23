@@ -1,8 +1,11 @@
+// Import typography
+@import '../../styles/typography';
+
 // Global Input Styles
 .dsp-input { 
   width: 100%;
   padding: 0.5rem 0.75rem;
-  font-size: 0.9rem;
+  font-size: $font-size-content;
   font-family: inherit;
   line-height: 1.5;
   color: #495057;
@@ -101,15 +104,14 @@ select.dsp-input {
   }
 
   .editor-title {
+    @include title-secondary;
     margin: 0;
-    font-size: 1.5rem;
-    font-weight: 600;
   }
 
   .editor-stats {
     display: flex;
     gap: 2rem;
-    font-size: 0.9rem;
+    font-size: $font-size-content;
 
     .stat-item {
       &.created {
@@ -138,7 +140,7 @@ select.dsp-input {
       padding: 0.4rem 1rem;
       border: none;
       border-radius: 4px;
-      font-size: 0.9rem;
+      font-size: $font-size-content;
       cursor: pointer;
       transition: all 0.2s;
 
@@ -350,14 +352,14 @@ select.dsp-input {
         margin-bottom: 0.25rem;
 
         .recipe-id {
-          font-size: 0.8rem;
+          font-size: $font-size-caption;
           color: #6c757d;
           font-family: monospace;
         }
 
         .status-indicator {
           margin-right: 0.25rem;
-          font-size: 0.8rem;
+          font-size: $font-size-caption;
           
           &.inactive {
             color: #dc3545;
@@ -365,18 +367,18 @@ select.dsp-input {
         }
 
         .edit-indicator {
-          font-size: 0.9rem;
+          font-size: $font-size-content;
         }
       }
 
       .recipe-title {
         font-weight: 500;
         margin-bottom: 0.25rem;
-        font-size: 0.9rem;
+        font-size: $font-size-content;
       }
 
       .recipe-category {
-        font-size: 0.8rem;
+        font-size: $font-size-caption;
         color: #6c757d;
         background-color: #e9ecef;
         padding: 0.1rem 0.4rem;
@@ -420,9 +422,8 @@ select.dsp-input {
       border: 1px solid #e9ecef;
 
       h2 {
-        margin: 0 0 1.5rem 0;
+        @include title-secondary;
         color: #495057;
-        font-size: 1.3rem;
         border-bottom: 2px solid #667eea;
         padding-bottom: 0.5rem;
       }
@@ -449,8 +450,8 @@ select.dsp-input {
         label {
           display: block;
           margin-bottom: 0.5rem;
-          font-weight: 500;
-          color: #495057;
+          font-weight: $font-weight-medium;
+          color: $text-color-primary;
         }
         
         &.active-field {
@@ -474,7 +475,7 @@ select.dsp-input {
             }
             
             .checkbox-text {
-              font-size: 0.9rem;
+              font-size: $font-size-content;
               white-space: nowrap;
             }
           }
@@ -496,7 +497,7 @@ select.dsp-input {
 
           .btn-sm {
             padding: 0.25rem 0.5rem;
-            font-size: 0.8rem;
+            font-size: $font-size-caption;
             min-width: 30px;
           }
         }
@@ -668,7 +669,7 @@ select.dsp-input {
           margin-top: 1rem;
 
           label {
-            font-size: 0.9rem;
+            font-size: $font-size-content;
             color: #6c757d;
           }
 
@@ -716,16 +717,16 @@ select.dsp-input {
             flex: 1;
             
             .step-toggle-icon {
-              font-size: 0.8rem;
+              font-size: $font-size-caption;
               color: #6c757d;
               min-width: 16px;
               transition: transform 0.2s ease;
             }
             
             h3 {
+              @include title-tertiary;
               margin: 0;
               color: #495057;
-              font-weight: 600;
             }
           }
 
@@ -755,8 +756,9 @@ select.dsp-input {
 
           h4 {
             margin: 0 0 1rem 0;
-            color: #6c757d;
-            font-size: 1rem;
+            color: $text-color-muted;
+            font-size: $font-size-content;
+            font-weight: $font-weight-semibold;
           }
 
           .config-item {
@@ -836,7 +838,7 @@ select.dsp-input {
 
     .preview-actions {
       .btn {
-        font-size: 0.8rem;
+        font-size: $font-size-caption;
         padding: 0.25rem 0.5rem;
         
         .btn-icon {
@@ -854,7 +856,7 @@ select.dsp-input {
     border-radius: 6px;
     overflow: auto;
     font-family: 'Courier New', monospace;
-    font-size: 0.8rem;
+    font-size: $font-size-caption;
     line-height: 1.4;
 
     pre {
@@ -895,11 +897,11 @@ select.dsp-input {
   cursor: pointer;
   text-decoration: none;
   transition: all 0.2s;
-  font-size: 0.9rem;
+  font-size: $font-size-content;
 
   &.btn-sm {
     padding: 0.25rem 0.5rem;
-    font-size: 0.8rem;
+    font-size: $font-size-caption;
   }
 
   &.btn-primary {
@@ -986,7 +988,7 @@ select.dsp-input {
   }
   
   span {
-    font-size: 0.9rem;
+    font-size: $font-size-content;
     font-weight: 500;
   }
 }
@@ -1054,7 +1056,7 @@ select.dsp-input {
 .upload-placeholder {
   text-align: center;
   color: #6c757d;
-  font-size: 0.9rem;
+  font-size: $font-size-content;
   
   &.uploaded {
     color: #28a745;
@@ -1142,7 +1144,7 @@ select.dsp-input {
     .editor-stats {
       flex-direction: column;
       gap: 0.5rem;
-      font-size: 0.8rem;
+      font-size: $font-size-caption;
     }
 
     .editor-actions {
@@ -1150,7 +1152,7 @@ select.dsp-input {
 
       .btn {
         padding: 0.3rem 0.6rem;
-        font-size: 0.8rem;
+        font-size: $font-size-caption;
       }
     }
   }
@@ -1333,7 +1335,7 @@ select.dsp-input {
     .tooltip-header {
       font-weight: 600;
       margin-bottom: 0.5rem;
-      font-size: 0.9rem;
+      font-size: $font-size-content;
       border-bottom: 1px solid #e9ecef;
       padding-bottom: 0.25rem;
     }
@@ -1364,7 +1366,7 @@ select.dsp-input {
     
     .tooltip-more {
       padding: 0.25rem 0.5rem;
-      font-size: 0.8rem;
+      font-size: $font-size-caption;
       color: #868e96;
       font-style: italic;
       text-align: center;

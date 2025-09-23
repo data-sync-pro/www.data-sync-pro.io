@@ -310,9 +310,7 @@
                           <td>
                             <div *ngIf="prereq.quickLinks?.length">
                               <ng-container *ngFor="let link of prereq.quickLinks">
-                                <a *ngIf="link.title && link.title.trim()"
-                                   [href]="link.url" 
-                                   target="_blank">
+                                <a *ngIf="link.title && link.title.trim()" [href]="link.url" target="_blank">
                                   {{ link.title }}
                                 </a>
                               </ng-container>

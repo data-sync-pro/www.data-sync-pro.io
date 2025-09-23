@@ -1550,7 +1550,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
     },
     {
       id: 'when-to-use',
-      title: 'When to Use',
+      title: 'General Use Case',
       icon: 'schedule',
       elementId: 'recipe-when-to-use',
       contentType: 'html',

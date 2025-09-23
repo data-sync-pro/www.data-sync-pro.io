@@ -20,7 +20,7 @@ export interface SourceRecipeRecord {
   category: string;
   DSPVersions: string[];
   overview: string; // Replaces usecase with more detailed description
-  whenToUse?: string; // When to use this recipe
+  whenToUse?: string; // General use case for this recipe
   generalImages: RecipeGeneralImage[]; // Images not tied to specific steps
   prerequisites: RecipePrerequisiteItem[];
   direction: string;
@@ -169,7 +169,7 @@ export interface RecipeItem {
   DSPVersions: string[];
   overview: string; // Updated from usecase
   safeOverview?: SafeHtml; // Safe HTML version of overview
-  whenToUse?: string;
+  whenToUse?: string; // General use case for this recipe
   safeWhenToUse?: SafeHtml;
   generalImages: RecipeGeneralImage[];
   prerequisites: RecipePrerequisiteItem[];

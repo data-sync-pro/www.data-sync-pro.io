@@ -1,3 +1,6 @@
+// Import typography
+@import '../../../styles/typography';
+
 // Recipe Card - FAQ-inspired styling with vertical layout
 .recipe-card {
   cursor: pointer;
@@ -44,8 +47,8 @@
 
 // Simplified category tag with clean design
 .category-tag {
-  font-size: 0.75rem;
-  font-weight: 500;
+  font-size: $font-size-caption;
+  font-weight: $font-weight-medium;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   padding: 4px 10px;
@@ -87,11 +90,7 @@
 
 // Typography aligned with FAQ system
 .recipe-title {
-  font-size: 1.1rem;
-  font-weight: 500;
-  line-height: 1.4;
-  margin: 0;
-  color: #2c3e50;
+  @include title-item;
   
   // Allow multi-line titles in new layout
   display: -webkit-box;

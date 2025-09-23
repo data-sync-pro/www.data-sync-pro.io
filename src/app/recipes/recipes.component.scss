@@ -1,3 +1,6 @@
+// Import typography first
+@import '../../styles/typography';
+
 // Import modular styles
 @import './styles/layout';
 @import './styles/sidebar';
@@ -31,9 +34,8 @@ $breakpoint-mobile: 576px;
 
   // Clean header styling for Use Case
   h4 {
+    @include title-item;
     color: #007bff;
-    font-size: 1.1rem;
-    font-weight: 600;
     margin: 0 0 16px 0;
     display: flex;
     align-items: center;
@@ -48,12 +50,12 @@ $breakpoint-mobile: 576px;
 
 // Use Case content - direct display without nested card
 .use-case-content {
-  font-size: 1rem;
-  line-height: 1.6;
+  @include content-text;
   color: #495057;
 
   // Clean text styling
   p {
+    @include content-text;
     margin: 0 0 12px 0;
 
     &:last-child {
@@ -82,7 +84,7 @@ $breakpoint-mobile: 576px;
 .recipe-section h4 .section-icon {
   font-size: 1.2rem;
   margin-right: 8px;
-  color: #6c757d;
+  color: $text-color-muted;
   transition: color 0.2s ease;
 }
 
@@ -145,8 +147,8 @@ $breakpoint-mobile: 576px;
 .version-tag, .keyword-tag {
   background: #e3f2fd;
   color: #1976d2;
-  font-size: 12px;
-  font-weight: 500;
+  font-size: $font-size-caption;
+  font-weight: $font-weight-medium;
   padding: 4px 12px;
   border-radius: 16px;
   border: 1px solid #bbdefb;
@@ -419,9 +421,9 @@ $breakpoint-mobile: 576px;
 }
 
 .step-counter {
-  font-size: 14px;
-  color: #666;
-  font-weight: 500;
+  font-size: $font-size-content;
+  color: $text-color-muted;
+  font-weight: $font-weight-medium;
   min-width: 120px;
 }
 
@@ -441,10 +443,8 @@ $breakpoint-mobile: 576px;
 }
 
 .step-title {
+  @include title-primary;
   color: #1976d2;
-  margin: 0;
-  font-size: 28px;
-  font-weight: 600;
 }
 
 .walkthrough-step-container {
@@ -502,8 +502,8 @@ app-recipe-step {
   }
   
   span, mat-icon {
-    font-size: 14px;
-    font-weight: 600;
+    font-size: $font-size-content;
+    font-weight: $font-weight-semibold;
   }
 }
 
@@ -563,8 +563,8 @@ app-recipe-step {
   }
   
   span {
-    font-size: 14px;
-    font-weight: 500;
+    font-size: $font-size-content;
+    font-weight: $font-weight-medium;
   }
   
   mat-icon {

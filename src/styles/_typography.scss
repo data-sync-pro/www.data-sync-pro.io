@@ -1,0 +1,97 @@
+// ==================== Typography Variables ====================
+// 统一的字体变量，供FAQ和Recipe组件使用
+
+// ===== 字体大小 =====
+$font-size-h1: 2rem;           // 主标题 (32px)
+$font-size-h2: 1.5rem;         // 二级标题 (24px)  
+$font-size-h3: 1.25rem;        // 三级标题 (20px)
+$font-size-title: 1.1rem;      // 卡片/项目标题 (17.6px)
+$font-size-content: 1rem;      // 正文内容 (16px)
+$font-size-small: 0.9rem;      // 小号文本 (14.4px)
+$font-size-caption: 0.8rem;    // 说明文字 (12.8px)
+
+// ===== 字体粗细 =====
+$font-weight-bold: 700;        // 加粗
+$font-weight-semibold: 600;    // 半粗
+$font-weight-medium: 500;      // 中等
+$font-weight-normal: 400;      // 正常
+
+// ===== 文本颜色 =====
+$text-color-primary: #2c3e50;    // 主要文本颜色（标题）
+$text-color-content: #444;       // 内容文本颜色
+$text-color-muted: #6c757d;      // 次要文本颜色
+$text-color-light: #9aa0a6;      // 浅色文本
+
+// ===== 行高 =====
+$line-height-heading: 1.4;       // 标题行高
+$line-height-content: 1.7;       // 内容行高
+$line-height-compact: 1.5;       // 紧凑行高
+
+// ===== 字间距 =====
+$letter-spacing-normal: normal;
+$letter-spacing-wide: 0.5px;
+$letter-spacing-wider: 0.8px;
+
+// ===== 混合类（Mixins）=====
+
+// 主标题样式
+@mixin title-primary {
+  font-size: $font-size-h1;
+  font-weight: $font-weight-bold;
+  color: $text-color-primary;
+  line-height: $line-height-heading;
+  margin: 0 0 2rem 0;
+}
+
+// 二级标题样式
+@mixin title-secondary {
+  font-size: $font-size-h2;
+  font-weight: $font-weight-semibold;
+  color: $text-color-primary;
+  line-height: $line-height-heading;
+  margin: 2rem 0 1rem 0;
+}
+
+// 三级标题样式
+@mixin title-tertiary {
+  font-size: $font-size-h3;
+  font-weight: $font-weight-semibold;
+  color: $text-color-primary;
+  line-height: $line-height-heading;
+  margin: 1.5rem 0 0.75rem 0;
+}
+
+// 卡片/项目标题样式
+@mixin title-item {
+  font-size: $font-size-title;
+  font-weight: $font-weight-medium;
+  color: $text-color-primary;
+  line-height: $line-height-heading;
+  margin: 0;
+}
+
+// 正文内容样式
+@mixin content-text {
+  font-size: $font-size-content;
+  font-weight: $font-weight-normal;
+  color: $text-color-content;
+  line-height: $line-height-content;
+  margin-bottom: 1.25rem;
+}
+
+// 小号文本样式
+@mixin text-small {
+  font-size: $font-size-small;
+  font-weight: $font-weight-normal;
+  color: $text-color-muted;
+  line-height: $line-height-compact;
+}
+
+// 说明文字样式
+@mixin text-caption {
+  font-size: $font-size-caption;
+  font-weight: $font-weight-medium;
+  color: $text-color-muted;
+  line-height: $line-height-compact;
+  letter-spacing: $letter-spacing-wide;
+}
