@@ -500,11 +500,14 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
   private triggerCrossTabPreviewUpdate(): void {
     if (!this.currentRecipe) return;
     
+    // Use cleanRecipeForExport to handle Custom step names properly
+    const cleanedRecipe = this.cleanRecipeForExport(this.currentRecipe);
+    
     const previewData: RecipePreviewData = {
-      recipeId: this.currentRecipe.id,
-      title: this.currentRecipe.title,
-      category: this.currentRecipe.category,
-      recipeData: this.currentRecipe,
+      recipeId: cleanedRecipe.id,
+      title: cleanedRecipe.title,
+      category: cleanedRecipe.category,
+      recipeData: cleanedRecipe,
       timestamp: Date.now()
     };
     
@@ -1738,9 +1741,15 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
       tab.recipe.id = this.generateRecipeId(tab.recipe.title);
     }
     
-    // Save to storage
-    this.storageService.saveRecipe(tab.recipe);
-    this.editedRecipeIds.add(tab.recipe.id);
+    // Clean recipe to permanently save Custom step names
+    const cleanedRecipe = this.cleanRecipeForExport(tab.recipe);
+    
+    // Save cleaned recipe to storage
+    this.storageService.saveRecipe(cleanedRecipe);
+    this.editedRecipeIds.add(cleanedRecipe.id);
+    
+    // Update tab with cleaned recipe to ensure consistency
+    tab.recipe = cleanedRecipe;
     
     // Save tabs state
     this.storageService.saveTabs(this.state.tabs);
@@ -1769,7 +1778,9 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
       this.saveTab(tab);
     }
     
-    await this.exportService.exportSingleRecipe(tab.recipe);
+    // Use cleanRecipeForExport to handle Custom step names properly
+    const cleanedRecipe = this.cleanRecipeForExport(tab.recipe);
+    await this.exportService.exportSingleRecipe(cleanedRecipe);
   }
   
   async exportAllRecipes(): Promise<void> {
@@ -2613,15 +2624,18 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
   public openPreviewInNewTab(): void {
     if (!this.currentRecipe) return;
 
+    // Use cleanRecipeForExport to handle Custom step names properly
+    const cleanedRecipe = this.cleanRecipeForExport(this.currentRecipe);
+
     const previewData: RecipePreviewData = {
-      recipeId: this.currentRecipe.id,
-      title: this.currentRecipe.title,
-      category: this.currentRecipe.category,
-      recipeData: this.currentRecipe,
+      recipeId: cleanedRecipe.id,
+      title: cleanedRecipe.title,
+      category: cleanedRecipe.category,
+      recipeData: cleanedRecipe,
       timestamp: Date.now()
     };
 
-    const result = this.previewService.openPreviewInNewTab(this.currentRecipe.id, previewData);
+    const result = this.previewService.openPreviewInNewTab(cleanedRecipe.id, previewData);
     
     if (!result.success) {
       // Show fallback dialog or notification
@@ -2655,11 +2669,14 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
   private updateExternalPreview(): void {
     if (!this.currentRecipe) return;
 
+    // Use cleanRecipeForExport to handle Custom step names properly
+    const cleanedRecipe = this.cleanRecipeForExport(this.currentRecipe);
+
     const previewData: RecipePreviewData = {
-      recipeId: this.currentRecipe.id,
-      title: this.currentRecipe.title,
-      category: this.currentRecipe.category,
-      recipeData: this.currentRecipe,
+      recipeId: cleanedRecipe.id,
+      title: cleanedRecipe.title,
+      category: cleanedRecipe.category,
+      recipeData: cleanedRecipe,
       timestamp: Date.now()
     };
 

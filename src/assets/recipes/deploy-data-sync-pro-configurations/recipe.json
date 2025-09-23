@@ -25,17 +25,17 @@
   "connection": "",
   "walkthrough": [
     {
-      "step": "Custom",
+      "step": "Import DSP Configurations Deployment Template",
       "config": [],
       "media": []
     },
     {
-      "step": "Custom",
+      "step": "Preview Source Data Count",
       "config": [],
       "media": []
     },
     {
-      "step": "Custom",
+      "step": "Execute Batches",
       "config": [],
       "media": []
     }
