@@ -3,90 +3,48 @@
   "title": "Deploy Data Sync Pro Configurations",
   "category": "Batch",
   "DSPVersions": [],
-  "overview": "",
-  "whenToUse": "",
+  "overview": "This recipe demonstrates how to deploy Data Sync Pro configurations between environments using a template downloaded from DSP.",
+  "whenToUse": "DSP enables the creation of reusable deployment templates for solutions built on record-based configurations, such as Data Sync Pro, nCino, CPQ, and Salesforce Revenue Cloud. These templates can be imported into any environment for ongoing customization and reuse in record-based configuration deployments.\n",
   "generalImages": [],
   "prerequisites": [
     {
-      "description": "",
+      "description": "Download the DSP deployment template from the portal.",
       "quickLinks": [
         {
-          "title": "",
-          "url": ""
+          "title": "DSP Deployment Template ",
+          "url": "https://www.pushtopic.com/"
         }
       ]
+    },
+    {
+      "description": " Ensure a deployment Pipeline exists with Template Direction configured.",
+      "quickLinks": []
     }
   ],
   "direction": "",
   "connection": "",
   "walkthrough": [
     {
-      "step": "Create Executable",
-      "config": [
-        {
-          "field": "Source Object API Name",
-          "value": ""
-        },
-        {
-          "field": "Target Object API Name",
-          "value": ""
-        },
-        {
-          "field": "Source Matching Field",
-          "value": ""
-        },
-        {
-          "field": "Target Matching Field",
-          "value": ""
-        },
-        {
-          "field": "Action",
-          "value": ""
-        },
-        {
-          "field": "Executable Name",
-          "value": "Deploy Data Sync Pro Configurations"
-        }
-      ],
-      "media": []
-    },
-    {
-      "step": "Batch Settings",
+      "step": "Custom",
       "config": [],
       "media": []
     },
     {
-      "step": "Retrieve",
+      "step": "Custom",
       "config": [],
       "media": []
     },
     {
-      "step": "Scoping",
-      "config": [],
-      "media": []
-    },
-    {
-      "step": "Match",
-      "config": [],
-      "media": []
-    },
-    {
-      "step": "Mapping",
-      "config": [],
-      "media": []
-    },
-    {
-      "step": "Action",
-      "config": [],
-      "media": []
-    },
-    {
-      "step": "Verify",
+      "step": "Custom",
       "config": [],
       "media": []
     }
   ],
-  "downloadableExecutables": [],
+  "downloadableExecutables": [
+    {
+      "filePath": "downloadExecutables/DataSyncPro_Configurations_Deployment_Template.json"
+    }
+  ],
   "relatedRecipes": [],
   "keywords": []
 }
