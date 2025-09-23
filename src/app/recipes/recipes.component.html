@@ -293,19 +293,35 @@
                     </a>
                   </div>
                   
-                  <!-- Prerequisites (complex structure) -->
+                  <!-- Prerequisites (table format) -->
                   <div *ngSwitchCase="'prerequisites'" class="prerequisites-list">
-                    <div *ngFor="let prereq of $any(sectionConfig.data)" class="prerequisite-item">
-                      <p *ngIf="prereq.description && prereq.description.trim()">{{ prereq.description }}</p>
-                      <div *ngIf="prereq.quickLinks?.length" class="quick-links">
-                        <h5>Quick Links:</h5>
-                        <ul>
-                          <li *ngFor="let link of prereq.quickLinks">
-                            <a *ngIf="link.title && link.title.trim()" [href]="link.url" target="_blank">{{ link.title }}</a>
-                          </li>
-                        </ul>
-                      </div>
-                    </div>
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>Prerequisite</th>
+                          <th>Quick Links</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr *ngFor="let prereq of $any(sectionConfig.data)">
+                          <td>
+                            {{ prereq.description && prereq.description.trim() ? prereq.description : 'N/A' }}
+                          </td>
+                          <td>
+                            <div *ngIf="prereq.quickLinks?.length">
+                              <ng-container *ngFor="let link of prereq.quickLinks">
+                                <a *ngIf="link.title && link.title.trim()"
+                                   [href]="link.url" 
+                                   target="_blank">
+                                  {{ link.title }}
+                                </a>
+                              </ng-container>
+                            </div>
+                            <span *ngIf="!prereq.quickLinks?.length">-</span>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
                   </div>
                   
                   <!-- Component (legacy download) -->
