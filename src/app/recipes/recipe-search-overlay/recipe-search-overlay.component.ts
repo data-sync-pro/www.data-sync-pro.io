@@ -62,9 +62,6 @@ export class RecipeSearchOverlayComponent implements OnInit, OnChanges {
 
   suggestions: RecipeItem[] = [];
   filteredSuggestions: RecipeItem[] = [];
-  
-  // Cache for FAQ answer text content
-  private answerTexts: Map<string, string> = new Map();
 
   constructor(
     private http: HttpClient, 
@@ -100,14 +97,11 @@ export class RecipeSearchOverlayComponent implements OnInit, OnChanges {
         this.filterSubCategoryList();
         this.filterSuggestions();
         this.isLoading = false;
-        
-        // Load answer texts asynchronously for search
-        this.loadAnswerTexts();
-        
+
         this.cdr.detectChanges();
       },
       error: (error) => {
-        console.error('Error loading FAQs:', error);
+        console.error('Error loading recipes:', error);
         this.loadError = true;
         this.isLoading = false;
         this.cdr.detectChanges();
@@ -206,15 +200,8 @@ export class RecipeSearchOverlayComponent implements OnInit, OnChanges {
     // Filter and add priority information
     const filteredWithPriority = this.suggestions
       .filter((i) => {
-        // Search in question
+        // Search in recipe title
         const matchQuestion = kw ? i.question.toLowerCase().includes(kw) : true;
-
-        // Search in answer content
-        const answerText = this.answerTexts.get(i.id) || '';
-        const matchAnswer = kw ? answerText.includes(kw) : false;
-
-        // Match keyword in either question or answer
-        const matchKW = !kw || matchQuestion || matchAnswer;
 
         const matchCat =
           !this.selectedCategory || i.category === this.selectedCategory;
@@ -223,7 +210,7 @@ export class RecipeSearchOverlayComponent implements OnInit, OnChanges {
           this.selectedSubCategories.length === 0 ||
           (i.subCategory && this.selectedSubCategories.includes(i.subCategory));
 
-        return matchKW && matchCat && matchSub;
+        return matchQuestion && matchCat && matchSub;
       })
       .map((i) => {
         // Add priority based on match type
@@ -238,13 +225,9 @@ export class RecipeSearchOverlayComponent implements OnInit, OnChanges {
           else if (i.subCategory && i.subCategory.toLowerCase().includes(kw)) {
             priority = 2;
           }
-          // Question match - priority 3
+          // Recipe title match - priority 3
           else if (i.question.toLowerCase().includes(kw)) {
             priority = 3;
-          }
-          // Answer match - priority 4 (lowest)
-          else if (this.answerTexts.get(i.id)?.toLowerCase().includes(kw)) {
-            priority = 4;
           }
         }
 
@@ -268,10 +251,10 @@ export class RecipeSearchOverlayComponent implements OnInit, OnChanges {
           return aSubCat.localeCompare(bSubCat);
         }
 
-        // Finally, sort alphabetically by question within same category/subcategory
+        // Finally, sort alphabetically by recipe title within same category/subcategory
         return a.item.question.localeCompare(b.item.question);
       })
-      .map(result => result.item); // Return only the FAQ items
+      .map(result => result.item); // Return only the recipe items
 
     this.filteredSuggestions = filteredWithPriority;
   }
@@ -282,64 +265,5 @@ export class RecipeSearchOverlayComponent implements OnInit, OnChanges {
       this.selectedCategory ||
       this.selectedSubCategories.length > 0
     );
-  }
-  
-  /**
-   * Load and extract text from all FAQ answer HTML files
-   */
-  private async loadAnswerTexts(): Promise<void> {
-    const loadPromises = this.suggestions.map(async (faq) => {
-      try {
-        const htmlPath = `assets/faq-item/${faq.route}.html`;
-        const response = await fetch(htmlPath);
-        
-        if (response.ok) {
-          const html = await response.text();
-          const cleanText = this.extractTextFromHTML(html);
-          this.answerTexts.set(faq.id, cleanText);
-        }
-      } catch (error) {
-        // Silently handle errors for individual files
-        console.warn(`Failed to load answer for FAQ ${faq.id}:`, error);
-      }
-    });
-    
-    // Load all answers in parallel
-    await Promise.all(loadPromises);
-    
-    // Re-filter suggestions if search query exists
-    if (this.searchQuery.trim()) {
-      this.filterSuggestions();
-      this.cdr.detectChanges();
-    }
-  }
-  
-  /**
-   * Extract clean text from HTML content for searching
-   */
-  private extractTextFromHTML(html: string): string {
-    // Create a temporary DOM element to parse HTML
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = html;
-    
-    // Remove script and style elements
-    const scripts = tempDiv.querySelectorAll('script, style');
-    scripts.forEach(el => el.remove());
-    
-    // Remove img elements as they don't contain searchable text
-    const images = tempDiv.querySelectorAll('img');
-    images.forEach(el => el.remove());
-    
-    // Get text content
-    let text = tempDiv.textContent || tempDiv.innerText || '';
-    
-    // Clean up whitespace
-    text = text
-      .replace(/\s+/g, ' ')  // Replace multiple spaces with single space
-      .replace(/\n{2,}/g, '\n')  // Replace multiple newlines with single newline
-      .trim()
-      .toLowerCase();  // Convert to lowercase for case-insensitive search
-    
-    return text;
   }
 }

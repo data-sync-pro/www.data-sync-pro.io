@@ -161,10 +161,6 @@
       "active": true
     },
     {
-      "folderId": "new-recipe",
-      "active": true
-    },
-    {
       "folderId": "notify-new-owner-by-email-on-owner-change",
       "active": true
     },
