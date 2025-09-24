@@ -88,9 +88,12 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
   
   // Recipe active states from index.json
   private recipeActiveStates = new Map<string, boolean>();
-  
+
   // Preview update timer
   private previewUpdateTimer: any;
+
+  // Previous title for change detection
+  private previousTitle: string = '';
   
   
   // Step expansion state
@@ -534,6 +537,7 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
     this.state.tabs.push(tab);
     this.state.activeTabId = tab.id;
     this.currentRecipe = newRecipe;
+    this.previousTitle = newRecipe.title || ''; // Initialize previous title for new recipe
     this.initializeExpandedSteps();
     this.triggerPreviewUpdate();
   }
@@ -554,6 +558,7 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
     this.state.activeTabId = tabId;
     this.currentRecipe = tab.recipe;
     this.currentIsActive = this.isRecipeActive(tab.recipe.id);
+    this.previousTitle = tab.recipe.title || ''; // Initialize previous title
     this.initializeExpandedSteps();
     this.triggerPreviewUpdate();
     
@@ -628,6 +633,7 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
           this.state.activeTabId = tab.id;
           this.currentRecipe = sourceRecipe;
           this.currentIsActive = this.isRecipeActive(sourceRecipe.id);
+          this.previousTitle = sourceRecipe.title || ''; // Initialize previous title for loaded recipe
           this.initializeExpandedSteps();
           this.triggerPreviewUpdate();
           this.state.isLoading = false;
@@ -672,10 +678,23 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
     if (tab) {
       tab.hasChanges = true;
       tab.recipe = this.currentRecipe!;
-      
-      // Update tab title if recipe title changed
-      if (this.currentRecipe?.title) {
+
+      // Check if title changed and ID needs to be updated to UUID
+      if (this.currentRecipe?.title && this.currentRecipe.title !== this.previousTitle) {
+        // Update tab title
         tab.title = this.currentRecipe.title;
+
+        // If current ID is not UUID format, generate new UUID
+        if (this.currentRecipe.id && !this.isUUID(this.currentRecipe.id)) {
+          const oldId = this.currentRecipe.id;
+          const newId = this.generateUUID();
+          this.currentRecipe.id = newId;
+
+          console.log(`Recipe ID updated from "${oldId}" to "${newId}" due to title change`);
+        }
+
+        // Update previous title for next comparison
+        this.previousTitle = this.currentRecipe.title;
       }
     }
     
@@ -1765,7 +1784,7 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
     
     // Generate ID if needed
     if (!tab.recipe.id) {
-      tab.recipe.id = this.generateRecipeId(tab.recipe.title);
+      tab.recipe.id = this.generateRecipeId();
     }
     
     // Clean recipe to permanently save Custom step names
@@ -2613,11 +2632,17 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
     };
   }
   
-  private generateRecipeId(title: string): string {
-    return title
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-|-$/g, '');
+  private generateRecipeId(): string {
+    return this.generateUUID();
+  }
+
+  /**
+   * Check if a string is in UUID format
+   */
+  private isUUID(id: string): boolean {
+    if (!id) return false;
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    return uuidRegex.test(id);
   }
   
   private generateUUID(): string {
