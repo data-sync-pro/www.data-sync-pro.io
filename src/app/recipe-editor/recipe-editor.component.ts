@@ -1723,6 +1723,31 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
     }
   }
   
+  /**
+   * Merge original recipe data with edited data
+   */
+  private mergeRecipeData(originalRecipes: RecipeItem[], editedRecipes: SourceRecipeRecord[]): SourceRecipeRecord[] {
+    // Create a map of edited recipes by ID
+    const editedMap = new Map<string, SourceRecipeRecord>();
+    editedRecipes.forEach(recipe => {
+      if (recipe.id) {
+        editedMap.set(recipe.id, recipe);
+      }
+    });
+
+    // Convert original recipes to SourceRecipeRecord and apply edits
+    return originalRecipes.map(originalRecipe => {
+      const editedRecipe = editedMap.get(originalRecipe.id);
+      if (editedRecipe) {
+        // Use edited version
+        return editedRecipe;
+      } else {
+        // Convert original to SourceRecipeRecord format
+        return this.convertToSourceRecord(originalRecipe);
+      }
+    });
+  }
+
   // Save and export
   saveCurrentTab(isAutoSave = false): void {
     const tab = this.getCurrentTab();
@@ -1788,17 +1813,19 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
   async exportAllRecipes(): Promise<void> {
     // Save all tabs first
     this.saveAllTabs();
-    
-    // Get all edited recipes
-    const recipes = this.storageService.getAllEditedRecipes();
-    
-    if (recipes.length === 0) {
-      this.notificationService.warning('No edited recipes to export');
+
+    // Get all current recipes (for index.json)
+    const allCurrentRecipes = this.mergeRecipeData(this.recipeList, this.storageService.getAllEditedRecipes());
+    // Get only edited recipes (for file export)
+    const editedRecipes = this.storageService.getAllEditedRecipes();
+
+    if (allCurrentRecipes.length === 0) {
+      this.notificationService.warning('No recipes to export');
       return;
     }
-    
-    // Export as ZIP with images
-    await this.exportService.exportAllAsZip(recipes, this.fileStorageService);
+
+    // Export as ZIP: edited recipes as files, all recipes in index.json
+    await this.exportService.exportAllAsZip(editedRecipes, this.fileStorageService, allCurrentRecipes);
   }
   
   triggerImport(): void {

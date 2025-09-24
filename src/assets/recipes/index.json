@@ -1,71 +1,7 @@
 {
   "recipes": [
     {
-      "folderId": "account-360-view-all-related-records",
-      "active": true
-    },
-    {
-      "folderId": "account-open-opportunities-with-multiple-actions",
-      "active": true
-    },
-    {
-      "folderId": "account-related-opportunities-from-connected-org",
-      "active": true
-    },
-    {
-      "folderId": "active-users-list-with-add-permission-set-action",
-      "active": true
-    },
-    {
-      "folderId": "add-sharing-records-based-on-roles",
-      "active": true
-    },
-    {
-      "folderId": "allow-only-one-primary-related-record-per-parent",
-      "active": true
-    },
-    {
-      "folderId": "apply-dynamic-record-assignment-rules",
-      "active": true
-    },
-    {
-      "folderId": "assign-default-permission-sets-to-user",
-      "active": true
-    },
-    {
-      "folderId": "assign-permission-sets-with-existence-check",
-      "active": true
-    },
-    {
-      "folderId": "auto_close-stagnant-cases",
-      "active": true
-    },
-    {
-      "folderId": "auto-add-opportunity-products-when-creating-quotes",
-      "active": true
-    },
-    {
-      "folderId": "auto-assign-default-permission-sets-to-new-users",
-      "active": true
-    },
-    {
-      "folderId": "auto-create-follow-up-task-based-on-record-status",
-      "active": true
-    },
-    {
-      "folderId": "auto-create-parent-record-for-new-child-record",
-      "active": true
-    },
-    {
-      "folderId": "auto-create-related-records-based-on-parent-criteria",
-      "active": true
-    },
-    {
-      "folderId": "auto-transfer-records-upon-user-deactivation",
-      "active": true
-    },
-    {
-      "folderId": "backup-cases-to-big-object",
+      "folderId": "auto‑close-stagnant-cases",
       "active": true
     },
     {
@@ -77,55 +13,7 @@
       "active": true
     },
     {
-      "folderId": "cascade-owner-changes-from-parent-to-child-records",
-      "active": true
-    },
-    {
-      "folderId": "close-all-open-account-tasks",
-      "active": true
-    },
-    {
-      "folderId": "close-case-with-editable-default-values",
-      "active": true
-    },
-    {
-      "folderId": "convert-leads-in-bulk",
-      "active": true
-    },
-    {
-      "folderId": "copy-related-records-on-parent-record-clone",
-      "active": true
-    },
-    {
-      "folderId": "create-batch-migration-executables-via-migration-builder",
-      "active": true
-    },
-    {
       "folderId": "create-follow-up-task-in-7-days",
-      "active": true
-    },
-    {
-      "folderId": "create-quote-from-data-list",
-      "active": true
-    },
-    {
-      "folderId": "create-quote-include-opportunity-products",
-      "active": true
-    },
-    {
-      "folderId": "dashboard-with-actionable-data-lists",
-      "active": true
-    },
-    {
-      "folderId": "data-list-with-row-s-related-lists",
-      "active": true
-    },
-    {
-      "folderId": "data-lists-in-lightning-web-components",
-      "active": true
-    },
-    {
-      "folderId": "delete-closed-cases-older-than-two-years",
       "active": true
     },
     {
@@ -133,15 +21,7 @@
       "active": true
     },
     {
-      "folderId": "download-record-based-configurations-to-vs-code",
-      "active": true
-    },
-    {
       "folderId": "download-record-based-configurations-via-vs-code-extension",
-      "active": true
-    },
-    {
-      "folderId": "enable-bulk-api-to-boost-performance",
       "active": true
     },
     {
@@ -149,59 +29,7 @@
       "active": true
     },
     {
-      "folderId": "import-child-records-from-data-list",
-      "active": true
-    },
-    {
-      "folderId": "mask-sensitive-data-in-sandbox",
-      "active": true
-    },
-    {
-      "folderId": "merge-duplicate-accounts-with-principal-record-selection-rule",
-      "active": true
-    },
-    {
-      "folderId": "migrate-contentdocument-data-to-remote-org",
-      "active": true
-    },
-    {
-      "folderId": "migrate-relational-data-to-remote-org",
-      "active": true
-    },
-    {
-      "folderId": "my-open-cases-with-actions",
-      "active": true
-    },
-    {
-      "folderId": "notify-new-owner-by-email-on-owner-change",
-      "active": true
-    },
-    {
-      "folderId": "notify-previous-owner-by-bell-notification-on-owner-change",
-      "active": true
-    },
-    {
-      "folderId": "open-cases-in-my-queues",
-      "active": true
-    },
-    {
-      "folderId": "prevent-parent-record-deletion-with-open-child-records",
-      "active": true
-    },
-    {
-      "folderId": "prevent-record-closure-without-required-related-records",
-      "active": true
-    },
-    {
       "folderId": "reassign-opportunity-owners-for-inactive-users",
-      "active": true
-    },
-    {
-      "folderId": "reassign-owners-for-queue-owned-cases",
-      "active": true
-    },
-    {
-      "folderId": "recalculate-record-types",
       "active": true
     },
     {
@@ -209,63 +37,7 @@
       "active": true
     },
     {
-      "folderId": "record-histories-with-restore-action",
-      "active": true
-    },
-    {
-      "folderId": "renew-opportunity-clone-with-related-data",
-      "active": true
-    },
-    {
-      "folderId": "restore-cases-from-archived-big-object",
-      "active": true
-    },
-    {
-      "folderId": "restore-soft-deleted-records-from-recycle-bin",
-      "active": true
-    },
-    {
-      "folderId": "route-approver-by-amount-threshold",
-      "active": true
-    },
-    {
-      "folderId": "send-email-notifications-on-field-changes",
-      "active": true
-    },
-    {
-      "folderId": "send-overdue-task-emails",
-      "active": true
-    },
-    {
-      "folderId": "store-record-versions-in-big-object-upon-save",
-      "active": true
-    },
-    {
       "folderId": "transfer-open-opportunities-on-user-deactivation",
-      "active": true
-    },
-    {
-      "folderId": "trigger-delayed-batch-execution",
-      "active": true
-    },
-    {
-      "folderId": "upload-leads-prevent-duplicates-by-email",
-      "active": true
-    },
-    {
-      "folderId": "upload-records-maintain-relationships-via-external-id",
-      "active": true
-    },
-    {
-      "folderId": "upload-records-transform-record-types",
-      "active": true
-    },
-    {
-      "folderId": "use-delta-update-to-skip-unnecessary-dmls",
-      "active": true
-    },
-    {
-      "folderId": "validate-date-range-end-date-after-start-date",
       "active": true
     }
   ]
