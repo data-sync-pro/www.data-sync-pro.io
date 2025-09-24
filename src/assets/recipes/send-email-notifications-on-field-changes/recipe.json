@@ -1,7 +1,7 @@
 {
   "id": "send-email-notifications-on-field-changes",
   "title": "Send Email Notifications on Field Changes",
-  "category": "Triggers",
+  "category": "Trigger",
   "DSPVersions": [],
   "overview": "",
   "whenToUse": "",

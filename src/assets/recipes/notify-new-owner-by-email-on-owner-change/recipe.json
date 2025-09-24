@@ -1,7 +1,7 @@
 {
   "id": "notify-new-owner-by-email-on-owner-change",
   "title": "Notify New Owner by Email on Owner Change",
-  "category": "Triggers",
+  "category": "Trigger",
   "DSPVersions": [],
   "overview": "",
   "whenToUse": "",

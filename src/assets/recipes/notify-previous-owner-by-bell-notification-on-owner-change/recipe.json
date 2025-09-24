@@ -1,7 +1,7 @@
 {
   "id": "notify-previous-owner-by-bell-notification-on-owner-change",
   "title": "Notify Previous Owner by Bell Notification on Owner Change",
-  "category": "Triggers",
+  "category": "Trigger",
   "DSPVersions": [],
   "overview": "",
   "whenToUse": "",

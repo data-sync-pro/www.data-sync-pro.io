@@ -48,7 +48,7 @@ export class RecipeService implements OnDestroy {
   private categoriesCache: RecipeCategory[] = [];
   
   // Local Storage Cache Keys
-  private readonly STORAGE_KEY_RECIPE_CONTENT = 'recipe_content_cache';
+  private readonly STORAGE_KEY_RECIPE_CONTENT = 'recipe_content_cache_v2'; // Updated to force cache refresh
   private readonly STORAGE_KEY_RECIPE_PROGRESS = 'recipe_progress_cache';
   private readonly STORAGE_KEY_POPULAR_RECIPES = 'popular_recipes_cache';
   private readonly CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
@@ -65,10 +65,10 @@ export class RecipeService implements OnDestroy {
   // Categories mapping
   private readonly CATEGORY_DISPLAY_NAMES: { [key in RecipeCategoryType]: string } = {
     'action-button': 'Action Button',
-    'batch': 'Batch Processing',
+    'batch': 'Batch',
     'data-list': 'Data List',
     'data-loader': 'Data Loader',
-    'triggers': 'Triggers'
+    'triggers': 'Trigger'
   };
   
   private readonly CATEGORY_DESCRIPTIONS: { [key in RecipeCategoryType]: string } = {
@@ -78,6 +78,15 @@ export class RecipeService implements OnDestroy {
     'data-loader': 'A tool for transforming and loading CSV data into Salesforce efficiently, with matching, access control, and centralized error logging.',
     'triggers': 'A modular, bulk-safe routine that reacts to DML events, applies scoping, transforms fields, validates, and performs DML actions.'
   };
+
+  // Define the display order for categories in sidebar
+  private readonly CATEGORY_ORDER: string[] = [
+    'Batch',
+    'Trigger',
+    'Data List',
+    'Action Button',
+    'Data Loader'
+  ];
 
   constructor(
     private http: HttpClient,
@@ -369,7 +378,7 @@ export class RecipeService implements OnDestroy {
       .filter(([_, count]) => count > 0)  // Only include categories with at least one recipe
       .map(([category, count]) => ({
         name: category,
-        displayName: this.CATEGORY_DISPLAY_NAMES[category as RecipeCategoryType] || category,
+        displayName: this.getCategoryDisplayName(category),
         description: this.CATEGORY_DESCRIPTIONS[category as RecipeCategoryType] || '',
         count
       }));
@@ -410,12 +419,49 @@ export class RecipeService implements OnDestroy {
    */
   getCategories(): Observable<RecipeCategory[]> {
     if (this.categoriesCache.length > 0) {
-      return of(this.categoriesCache);
+      return of(this.sortCategories(this.categoriesCache));
     }
-    
+
     return this.recipesCache$.pipe(
-      map(() => this.categoriesCache)
+      map(() => this.sortCategories(this.categoriesCache))
     );
+  }
+
+  /**
+   * Get display name for category
+   */
+  private getCategoryDisplayName(category: string): string {
+    const mapping: { [key: string]: string } = {
+      'Batch': 'Batch',
+      'Trigger': 'Trigger',
+      'Data List': 'Data List',
+      'Action Button': 'Action Button',
+      'Data Loader': 'Data Loader'
+    };
+    return mapping[category] || category;
+  }
+
+  /**
+   * Sort categories according to predefined order
+   */
+  private sortCategories(categories: RecipeCategory[]): RecipeCategory[] {
+    return [...categories].sort((a, b) => {
+      // Sort categories according to CATEGORY_ORDER
+      const indexA = this.CATEGORY_ORDER.indexOf(a.name);
+      const indexB = this.CATEGORY_ORDER.indexOf(b.name);
+
+      // If both categories are in the order array, sort by their position
+      if (indexA !== -1 && indexB !== -1) {
+        return indexA - indexB;
+      }
+
+      // If only one is in the order array, prioritize it
+      if (indexA !== -1) return -1;
+      if (indexB !== -1) return 1;
+
+      // If neither is in the order array, maintain original order
+      return 0;
+    });
   }
 
   /**

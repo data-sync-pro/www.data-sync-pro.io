@@ -1,7 +1,7 @@
 {
   "id": "auto-create-related-records-based-on-parent-criteria",
   "title": "Auto-Create Related Records Based on Parent Criteria",
-  "category": "Triggers",
+  "category": "Trigger",
   "DSPVersions": [],
   "overview": "",
   "whenToUse": "",

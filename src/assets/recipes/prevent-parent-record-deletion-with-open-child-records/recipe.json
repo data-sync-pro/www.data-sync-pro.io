@@ -1,7 +1,7 @@
 {
   "id": "prevent-parent-record-deletion-with-open-child-records",
   "title": "Prevent Parent Record Deletion with Open Child Records",
-  "category": "Triggers",
+  "category": "Trigger",
   "DSPVersions": [],
   "overview": "",
   "whenToUse": "",

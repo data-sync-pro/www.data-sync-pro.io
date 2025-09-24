@@ -1,7 +1,7 @@
 {
   "id": "auto-add-opportunity-products-when-creating-quotes",
   "title": "Auto-Add Opportunity Products When Creating Quotes",
-  "category": "Triggers",
+  "category": "Trigger",
   "DSPVersions": [],
   "overview": "",
   "whenToUse": "",

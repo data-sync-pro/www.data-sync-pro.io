@@ -1,7 +1,7 @@
 {
   "id": "store-record-versions-in-big-object-upon-save",
   "title": "Store Record Versions in Big Object upon Save",
-  "category": "Triggers",
+  "category": "Trigger",
   "DSPVersions": [],
   "overview": "",
   "whenToUse": "",

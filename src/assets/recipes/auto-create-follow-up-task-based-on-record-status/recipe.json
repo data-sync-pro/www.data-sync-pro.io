@@ -1,7 +1,7 @@
 {
   "id": "auto-create-follow-up-task-based-on-record-status",
   "title": "Auto-Create Follow-up Task Based on Record Status",
-  "category": "Triggers",
+  "category": "Trigger",
   "DSPVersions": [],
   "overview": "",
   "whenToUse": "",

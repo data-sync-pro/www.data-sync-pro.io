@@ -1,7 +1,7 @@
 {
   "id": "copy-related-records-on-parent-record-clone",
   "title": "Copy Related Records on Parent Record Clone",
-  "category": "Triggers",
+  "category": "Trigger",
   "DSPVersions": [],
   "overview": "",
   "whenToUse": "",

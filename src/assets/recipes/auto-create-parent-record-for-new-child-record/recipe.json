@@ -1,7 +1,7 @@
 {
   "id": "auto-create-parent-record-for-new-child-record",
   "title": "Auto-Create Parent Record for New Child Record",
-  "category": "Triggers",
+  "category": "Trigger",
   "DSPVersions": [],
   "overview": "",
   "whenToUse": "",

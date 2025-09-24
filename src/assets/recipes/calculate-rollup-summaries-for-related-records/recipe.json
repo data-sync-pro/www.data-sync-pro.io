@@ -1,7 +1,7 @@
 {
   "id": "calculate-rollup-summaries-for-related-records",
   "title": "Calculate Rollup Summaries for Related Records",
-  "category": "Triggers",
+  "category": "Trigger",
   "DSPVersions": [],
   "usecase": "",
   "prerequisites": [

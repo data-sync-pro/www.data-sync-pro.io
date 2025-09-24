@@ -1,7 +1,7 @@
 {
   "id": "allow-only-one-primary-related-record-per-parent",
   "title": "Allow Only One Primary Related Record per Parent",
-  "category": "Triggers",
+  "category": "Trigger",
   "DSPVersions": [],
   "overview": "",
   "whenToUse": "",

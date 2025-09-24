@@ -1,7 +1,7 @@
 {
   "id": "auto-assign-default-permission-sets-to-new-users",
   "title": "Auto-Assign Default Permission Sets to New Users",
-  "category": "Triggers",
+  "category": "Trigger",
   "DSPVersions": [],
   "overview": "",
   "whenToUse": "",

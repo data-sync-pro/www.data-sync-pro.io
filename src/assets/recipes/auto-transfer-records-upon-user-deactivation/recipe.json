@@ -1,7 +1,7 @@
 {
   "id": "auto-transfer-records-upon-user-deactivation",
   "title": "Auto-Transfer Records upon User Deactivation",
-  "category": "Triggers",
+  "category": "Trigger",
   "DSPVersions": [],
   "overview": "",
   "whenToUse": "",
