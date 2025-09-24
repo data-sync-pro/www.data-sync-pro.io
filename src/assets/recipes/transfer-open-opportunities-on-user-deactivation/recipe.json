@@ -1,0 +1,112 @@
+{
+  "id": "transfer-open-opportunities-on-user-deactivation",
+  "title": "Transfer Open Opportunities on User Deactivation",
+  "category": "Trigger",
+  "DSPVersions": [],
+  "overview": "When Users are deactivated, automatically reassign their open Opportunities to their manager.",
+  "whenToUse": "For scenarios where trigger actions must run asynchronously, enable \"Action in Future Method in Triggers?\" to execute them in future methods.",
+  "generalImages": [
+    {
+      "type": "image",
+      "url": "",
+      "alt": ""
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "",
+      "quickLinks": [
+        {
+          "title": "",
+          "url": ""
+        }
+      ]
+    }
+  ],
+  "direction": "",
+  "connection": "",
+  "walkthrough": [
+    {
+      "step": "Create Executable",
+      "config": [
+        {
+          "field": "Source Object API Name",
+          "value": "User"
+        },
+        {
+          "field": "Target Object API Name",
+          "value": "Opportunity"
+        },
+        {
+          "field": "Action",
+          "value": "Update"
+        },
+        {
+          "field": "Executable Name",
+          "value": "Transfer Open Opportunities on User Deactivation"
+        },
+        {
+          "field": "Seq No",
+          "value": "10"
+        },
+        {
+          "field": "Target Matching Field",
+          "value": "Id"
+        }
+      ],
+      "media": [
+        {
+          "type": "image",
+          "url": "",
+          "alt": ""
+        }
+      ]
+    },
+    {
+      "step": "Trigger Settings",
+      "config": [],
+      "media": []
+    },
+    {
+      "step": "Scoping",
+      "config": [
+        {
+          "field": "Scope Filter (After Update Trigger)",
+          "value": "TRIGGER_IS_CHANGED_TO(\"IsActive\", FALSE)"
+        },
+        {
+          "field": "Joiner",
+          "value": "JOIN_OBJECT(\"$Source\", \"Opportunity\", \"OwnerId\", Id, \"IsClosed = FALSE\")"
+        }
+      ],
+      "media": []
+    },
+    {
+      "step": "Mapping",
+      "config": [
+        {
+          "field": "Id",
+          "value": "$Joiner.Id"
+        },
+        {
+          "field": "OwnerId",
+          "value": "ManagerId"
+        }
+      ],
+      "media": []
+    },
+    {
+      "step": "Action",
+      "config": [],
+      "media": []
+    }
+  ],
+  "downloadableExecutables": [],
+  "relatedRecipes": [
+    {
+      "title": "",
+      "url": ""
+    }
+  ],
+  "keywords": []
+}

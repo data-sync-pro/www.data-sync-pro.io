@@ -229,6 +229,10 @@
       "active": true
     },
     {
+      "folderId": "transfer-open-opportunities-on-user-deactivation",
+      "active": true
+    },
+    {
       "folderId": "trigger-delayed-batch-execution",
       "active": true
     },
