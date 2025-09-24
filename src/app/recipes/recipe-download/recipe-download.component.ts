@@ -8,7 +8,7 @@ import { RecipeExecutable } from '../../shared/models/recipe.model';
       <mat-card>
         <mat-card-header>
           <div mat-card-avatar>
-            <mat-icon>download</mat-icon>
+            <lightning-icon iconName="utility:download" size="xx-small" alternativeText="Download"></lightning-icon>
           </div>
           <mat-card-title>{{ executable.fileName }}</mat-card-title>
           <mat-card-subtitle>Version {{ executable.version }}</mat-card-subtitle>
@@ -24,7 +24,7 @@ import { RecipeExecutable } from '../../shared/models/recipe.model';
         
         <mat-card-actions>
           <button mat-raised-button color="primary" (click)="downloadFile()">
-            <mat-icon>download</mat-icon>
+            <lightning-icon iconName="utility:download" size="xx-small" alternativeText="Download"></lightning-icon>
             Download Executable
           </button>
         </mat-card-actions>

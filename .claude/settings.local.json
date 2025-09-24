@@ -46,7 +46,9 @@
       "Bash(del \"D:\\www.data-sync-pro.io\\test-autolink.html\")",
       "Bash(start http://localhost:4201/recipes)",
       "Bash(del update_faq_answers.js)",
-      "Bash(python:*)"
+      "Bash(python:*)",
+      "WebSearch",
+      "WebFetch(domain:www.salesforceicons.com)"
     ],
     "deny": []
   }

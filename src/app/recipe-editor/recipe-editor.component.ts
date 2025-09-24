@@ -79,7 +79,7 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
   // Search and filter
   searchQuery = '';
   selectedCategory = '';
-  categories = ['Batch', 'Triggers', 'Data List', 'Action Button', 'Data Loader'];
+  categories = ['Batch', 'Trigger', 'Data List', 'Action Button', 'Data Loader'];
   
   // Current editing recipe
   currentRecipe: SourceRecipeRecord | null = null;

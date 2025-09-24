@@ -278,7 +278,7 @@
                       <button type="button" 
                               class="download-link" 
                               (click)="downloadExecutable(executable.url, executable.title, executable.originalFileName)">
-                        <mat-icon>download</mat-icon>
+                        <lightning-icon iconName="utility:download" size="xx-small" alternativeText="Download"></lightning-icon>
                         {{ executable.title }}
                       </button>
                     </div>
@@ -293,33 +293,22 @@
                     </a>
                   </div>
                   
-                  <!-- Prerequisites (table format) -->
+                  <!-- Prerequisites (bullet points format) -->
                   <div *ngSwitchCase="'prerequisites'" class="prerequisites-list">
-                    <table>
-                      <thead>
-                        <tr>
-                          <th>Prerequisite</th>
-                          <th>Quick Links</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr *ngFor="let prereq of $any(sectionConfig.data)">
-                          <td>
-                            {{ prereq.description && prereq.description.trim() ? prereq.description : 'N/A' }}
-                          </td>
-                          <td>
-                            <div *ngIf="prereq.quickLinks?.length">
-                              <ng-container *ngFor="let link of prereq.quickLinks">
-                                <a [href]="link.url" target="_blank" *ngIf="link.title && link.title.trim()">
-                                  {{ link.title }}
-                                </a>
-                              </ng-container>
-                            </div>
-                            <span *ngIf="!prereq.quickLinks?.length">-</span>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
+                    <ul>
+                      <li *ngFor="let prereq of $any(sectionConfig.data)">
+                        <div class="prerequisite-description">
+                          {{ prereq.description && prereq.description.trim() ? prereq.description : 'N/A' }}
+                          <ng-container *ngIf="prereq.quickLinks?.length">
+                            <ng-container *ngFor="let link of prereq.quickLinks">
+                              <a [href]="link.url" target="_blank" *ngIf="link.title && link.title.trim()" class="inline-download-icon">
+                                <lightning-icon iconName="utility:download" size="xx-small" alternativeText="Download"></lightning-icon>
+                              </a>
+                            </ng-container>
+                          </ng-container>
+                        </div>
+                      </li>
+                    </ul>
                   </div>
                   
                   <!-- Component (legacy download) -->
