@@ -1,10 +1,10 @@
 {
-  "id": "transfer-open-opportunities-on-user-deactivation",
-  "title": "Transfer Open Opportunities on User Deactivation",
+  "id": "cascade-account-owner-to-open-cases",
+  "title": "Cascade Account Owner to Open Cases",
   "category": "Trigger",
   "DSPVersions": [],
-  "overview": "When Users are deactivated, automatically reassign their open Opportunities to their manager.",
-  "whenToUse": "For scenarios where trigger actions must run asynchronously, enable \"Action in Future Method in Triggers?\" to execute them in future methods.",
+  "overview": "When the Account Owner changes, the automation in this recipe reassigns related open Cases from the previous owner to the new owner.",
+  "whenToUse": "When a parent record changes, automatically update related child records to maintain consistency across relationships. This is typically achieved by using a Joiner to left-join the triggering records with their children, with the option to apply dynamic filters as needed.",
   "generalImages": [
     {
       "type": "image",
@@ -31,11 +31,11 @@
       "config": [
         {
           "field": "Source Object API Name",
-          "value": "User"
+          "value": "Account"
         },
         {
           "field": "Target Object API Name",
-          "value": "Opportunity"
+          "value": "Case"
         },
         {
           "field": "Action",
@@ -43,15 +43,15 @@
         },
         {
           "field": "Executable Name",
-          "value": "Transfer Open Opportunities on User Deactivation"
-        },
-        {
-          "field": "Seq No.",
-          "value": "10"
+          "value": "Cascade Account Owner to Open Cases"
         },
         {
           "field": "Target Matching Field",
           "value": "Id"
+        },
+        {
+          "field": "Seq No.",
+          "value": "10"
         }
       ],
       "media": [
@@ -77,11 +77,15 @@
       "config": [
         {
           "field": "Scope Filter (After Update Trigger)",
-          "value": "TRIGGER_IS_CHANGED_TO(\"IsActive\", FALSE)"
+          "value": "TRIGGER_IS_CHANGED(\"OwnerId\")"
         },
         {
           "field": "Joiner",
-          "value": "JOIN_OBJECT(\"$Source\", \"Opportunity\", \"OwnerId\", Id, \"IsClosed = FALSE\")"
+          "value": "JOIN_OBJECT(\"$Source\", \"Case\", \"AccountId\", Id, \"isClosed = FALSE\")"
+        },
+        {
+          "field": "Scope Filter(Post Join)",
+          "value": "$Joiner.Id != NULL && TRIGGER_OLD_VALUE(\"OwnerId\") == $Joiner.OwnerId"
         }
       ],
       "media": []
@@ -95,17 +99,7 @@
         },
         {
           "field": "OwnerId",
-          "value": "ManagerId"
-        }
-      ],
-      "media": []
-    },
-    {
-      "step": "Action",
-      "config": [
-        {
-          "field": "Action in Future Method in Triggers?",
-          "value": "TRUE"
+          "value": "OwnerId"
         }
       ],
       "media": []

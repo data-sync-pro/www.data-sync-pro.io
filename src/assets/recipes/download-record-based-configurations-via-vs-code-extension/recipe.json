@@ -1,0 +1,63 @@
+{
+  "id": "download-record-based-configurations-via-vs-code-extension",
+  "title": "Download Record-Based Configurations via VS Code Extension",
+  "category": "General",
+  "DSPVersions": [],
+  "overview": "Data Sync Pro configurations are stored as records. This recipe shows how to export them as JSON files into your local workspace with the VS Code extension for backup and version control.",
+  "whenToUse": "Use the VS Code extension to export any record-based configurations as JSON files into your local workspace for easy backup and version control. ",
+  "generalImages": [
+    {
+      "type": "image",
+      "url": "",
+      "alt": ""
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "Existing Batch Executables for deploying record-based configurations between Salesforce orgs.",
+      "quickLinks": [
+        {
+          "title": "",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "description": "DSP: Download Record-Based Configurations extension installed and enabled in VS Code.",
+      "quickLinks": []
+    }
+  ],
+  "direction": "",
+  "connection": "",
+  "walkthrough": [
+    {
+      "step": "Custom",
+      "config": [
+        {
+          "field": "Record-Based Configurations Deployment?",
+          "value": "TRUE"
+        }
+      ],
+      "media": [
+        {
+          "type": "image",
+          "url": "",
+          "alt": ""
+        }
+      ]
+    },
+    {
+      "step": "Custom",
+      "config": [],
+      "media": []
+    }
+  ],
+  "downloadableExecutables": [],
+  "relatedRecipes": [
+    {
+      "title": "",
+      "url": ""
+    }
+  ],
+  "keywords": []
+}

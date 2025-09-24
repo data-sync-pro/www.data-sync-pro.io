@@ -1,0 +1,67 @@
+{
+  "id": "export-and-import-a-pipeline",
+  "title": "Export and Import a Pipeline",
+  "category": "General",
+  "DSPVersions": [],
+  "overview": "This recipe demonstrates how to export a Pipeline from one Salesforce org and import it into another.",
+  "whenToUse": "Export a Pipeline and import it into another Salesforce org.",
+  "generalImages": [
+    {
+      "type": "image",
+      "url": "",
+      "alt": ""
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "For export: A functional Pipeline containing Executables.",
+      "quickLinks": [
+        {
+          "title": "",
+          "url": ""
+        }
+      ]
+    },
+    {
+      "description": "For import: A Pipeline with the Template Direction field configured.",
+      "quickLinks": []
+    }
+  ],
+  "direction": "",
+  "connection": "",
+  "walkthrough": [
+    {
+      "step": "Export a Pipeline",
+      "config": [
+        {
+          "field": "",
+          "value": ""
+        }
+      ],
+      "media": [
+        {
+          "type": "image",
+          "url": "",
+          "alt": ""
+        }
+      ]
+    },
+    {
+      "step": "Import a Pipeline",
+      "config": [],
+      "media": []
+    }
+  ],
+  "downloadableExecutables": [
+    {
+      "filePath": "downloadExecutables/DataSyncPro_Configurations_Deployment_Template.json"
+    }
+  ],
+  "relatedRecipes": [
+    {
+      "title": "",
+      "url": ""
+    }
+  ],
+  "keywords": []
+}

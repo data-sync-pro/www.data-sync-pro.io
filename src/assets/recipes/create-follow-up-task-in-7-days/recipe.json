@@ -1,17 +1,11 @@
 {
   "id": "create-follow-up-task-in-7-days",
-  "title": "Create Follow-up Task in 7 Days",
-  "category": "Action Button",
+  "title": "Create Follow-up Task When Case Closes",
+  "category": "Trigger",
   "DSPVersions": [],
-  "overview": "",
-  "whenToUse": "",
-  "generalImages": [
-    {
-      "type": "image",
-      "url": "",
-      "alt": ""
-    }
-  ],
+  "overview": "When a Case is closed, automatically create a follow-up task assigned to the Case Owner with a 7 days due date to verify customer satisfaction.",
+  "whenToUse": "When a parent record is saved and meets specific criteria, automatically create related child records.",
+  "generalImages": [],
   "prerequisites": [
     {
       "description": "",
@@ -23,7 +17,7 @@
       ]
     }
   ],
-  "direction": "Current ⇒ Current ",
+  "direction": "",
   "connection": "",
   "walkthrough": [
     {
@@ -31,7 +25,7 @@
       "config": [
         {
           "field": "Source Object API Name",
-          "value": "Opportunity"
+          "value": "Case"
         },
         {
           "field": "Target Object API Name",
@@ -43,68 +37,67 @@
         },
         {
           "field": "Executable Name",
-          "value": "Create Follow-up Task"
+          "value": "Create Follow-up Task When Case Closes"
+        },
+        {
+          "field": "Seq No.",
+          "value": "10"
         }
       ],
-      "media": [
-        {
-          "type": "image",
-          "url": "",
-          "alt": ""
-        }
-      ]
+      "media": []
     },
     {
-      "step": "Action Button Settings",
+      "step": "Trigger Settings",
       "config": [
         {
-          "field": "Action Button Label",
-          "value": "Create Task"
+          "field": "After Update Trigger?",
+          "value": "TRUE"
         }
       ],
       "media": []
     },
     {
       "step": "Scoping",
-      "config": [],
-      "media": []
-    },
-    {
-      "step": "Match",
-      "config": [],
+      "config": [
+        {
+          "field": "Scope Filter (After Update Trigger)",
+          "value": "TRIGGER_IS_CHANGED_TO(\"IsClosed\", TRUE)"
+        }
+      ],
       "media": []
     },
     {
       "step": "Mapping",
       "config": [
         {
+          "field": "OwnerId",
+          "value": "OwnerId"
+        },
+        {
+          "field": "WhatId",
+          "value": "Id"
+        },
+        {
+          "field": "WhoId",
+          "value": "ContactId"
+        },
+        {
           "field": "ActivityDate",
-          "value": "ADD_DAYS(TODAY(),7)"
+          "value": "TO_DATE(ADD_DAYS(ClosedDate, 7))"
         },
         {
           "field": "Subject",
-          "value": "\"Follow-up \" & Name"
+          "value": "\"Follow up on Case in 7 days - \" & Subject"
         }
       ],
       "media": []
-    },
-    {
-      "step": "Action",
-      "config": [],
-      "media": []
-    },
-    {
-      "step": "Preview",
-      "config": [],
-      "media": []
     }
   ],
-  "downloadableExecutables": [],
-  "relatedRecipes": [
+  "downloadableExecutables": [
     {
-      "title": "",
-      "url": ""
+      "filePath": "downloadExecutables/Create_Follow-up_Task_When_Case_Closes.json"
     }
   ],
+  "relatedRecipes": [],
   "keywords": []
 }

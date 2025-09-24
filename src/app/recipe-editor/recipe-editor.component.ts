@@ -79,7 +79,7 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
   // Search and filter
   searchQuery = '';
   selectedCategory = '';
-  categories = ['Batch', 'Trigger', 'Data List', 'Action Button', 'Data Loader'];
+  categories = ['Batch', 'Trigger', 'Data List', 'Action Button', 'Data Loader', 'General'];
   
   // Current editing recipe
   currentRecipe: SourceRecipeRecord | null = null;
@@ -140,7 +140,8 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
     'Source Matching Field',
     'Source Object API Name',
     'Target Matching Field',
-    'Target Object API Name'
+    'Target Object API Name',
+    'Seq NO.'
   ];
 
   triggerFields = [
@@ -194,7 +195,8 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
     'Source Object Writeback Field',
     'Target Connection Name',
     'Target Object API Name',
-    'Use Salesforce Upsert API?'
+    'Use Salesforce Upsert API?',
+    'Action in Future Method in Triggers?'
   ];
 
   retrieveVerifyPreviewFields = [
