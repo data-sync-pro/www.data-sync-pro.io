@@ -117,7 +117,7 @@ $breakpoint-mobile: 576px;
 
 .recipe-main {
   grid-area: main;
-  padding: 60px 1.5vw; // Match FAQ's responsive padding
+  padding: 60px 3vw; // Match FAQ's responsive padding
   overflow-x: hidden;
   overflow-y: auto;
   background: #ffffff;
@@ -257,7 +257,6 @@ $breakpoint-mobile: 576px;
 .recipe-category-view,
 .recipe-detail-view,
 .search-results {
-  max-width: $content-max-width;
   margin: 0 auto;
 }
 
@@ -546,7 +545,6 @@ $breakpoint-mobile: 576px;
 
 // Recipe detail container
 .recipe-detail {
-  max-width: $content-max-width;
   padding-top: 20px; // Match FAQ's top padding
   margin: 0 auto;
 }

@@ -176,12 +176,10 @@ $breakpoint-mobile: 576px;
         margin-bottom: 4px;
         font-weight: 500;
         display: flex;
-        align-items: center;
         gap: 8px;
 
         .inline-download-icon {
           display: inline-flex;
-          align-items: center;
           color: #1976d2;
           &:hover {
             color: #0d47a1;
