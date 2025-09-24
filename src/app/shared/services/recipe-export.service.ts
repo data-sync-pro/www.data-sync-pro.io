@@ -135,7 +135,7 @@ export class RecipeExportService {
       const zip = new JSZip();
       let processedCount = 0;
       const totalSteps = recipes.length * 2; // Recipe + images for each
-      
+
       // Progress update helper
       const updateProgress = (step: string) => {
         if (onProgress) {
@@ -147,7 +147,19 @@ export class RecipeExportService {
           });
         }
       };
-      
+
+      // Generate folder names for all recipes to avoid conflicts
+      const existingFolders = new Set<string>();
+      const recipeFolderMap = new Map<string, string>(); // recipe.id -> folder name
+
+      recipes.forEach(recipe => {
+        if (recipe.id && recipe.title) {
+          const folderName = this.generateFolderName(recipe.title, existingFolders);
+          existingFolders.add(folderName);
+          recipeFolderMap.set(recipe.id, folderName);
+        }
+      });
+
       // Process each recipe
       for (const recipe of recipes) {
         if (!recipe.id) continue;
@@ -156,9 +168,10 @@ export class RecipeExportService {
         
         // Clean the recipe before export
         const cleanedRecipe = this.storageService.cleanRecipeForStorage(recipe);
-        
-        // Create recipe folder
-        const recipeFolder = zip.folder(cleanedRecipe.id);
+
+        // Create recipe folder using title-based name
+        const folderName = recipeFolderMap.get(recipe.id) || recipe.id;
+        const recipeFolder = zip.folder(folderName);
         if (!recipeFolder) continue;
         
         // Add recipe.json with cleaned data
@@ -707,17 +720,56 @@ export class RecipeExportService {
   }
   
   /**
+   * Generate folder name based on recipe title
+   */
+  private generateFolderName(title: string, existingFolders?: Set<string>): string {
+    if (!title) return 'unnamed-recipe';
+
+    // Generate base folder name from title
+    const baseName = title
+      .toLowerCase()
+      .trim()
+      .replace(/[/\\?<>\\:*|"]/g, '') // Remove invalid filename characters
+      .replace(/[^\w\s-]/g, '') // Keep only word characters, spaces, and hyphens
+      .replace(/\s+/g, '-') // Replace spaces with hyphens
+      .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
+      .replace(/^-|-$/g, '') // Remove leading/trailing hyphens
+      .substring(0, 50) // Limit length
+      || 'unnamed-recipe';
+
+    // Handle conflicts if existingFolders is provided
+    if (existingFolders) {
+      let finalName = baseName;
+      let counter = 2;
+
+      while (existingFolders.has(finalName)) {
+        finalName = `${baseName}-${counter}`;
+        counter++;
+      }
+
+      return finalName;
+    }
+
+    return baseName;
+  }
+
+  /**
    * Generate recipe index for ZIP export - based on actual recipes being exported
    */
   private async generateRecipeIndex(recipes: SourceRecipeRecord[]): Promise<any> {
+    const validRecipes = recipes.filter(recipe => recipe.id && recipe.title);
+    const existingFolders = new Set<string>();
+
     // Generate index based only on recipes that will be exported
-    const indexRecipes = recipes
-      .filter(recipe => recipe.id && recipe.title) // Only include recipes with valid id and title
-      .map(recipe => ({
-        folderId: recipe.id,
+    const indexRecipes = validRecipes.map(recipe => {
+      const folderId = this.generateFolderName(recipe.title, existingFolders);
+      existingFolders.add(folderId); // Track used folder names
+
+      return {
+        folderId: folderId,
         active: true
-      }))
-      .sort((a, b) => a.folderId.localeCompare(b.folderId)); // Sort by folderId for consistency
+      };
+    }).sort((a, b) => a.folderId.localeCompare(b.folderId)); // Sort by folderId for consistency
 
     return {
       recipes: indexRecipes
