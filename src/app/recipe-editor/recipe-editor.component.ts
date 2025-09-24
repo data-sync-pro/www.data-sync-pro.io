@@ -1182,7 +1182,7 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
       case 'Input':
         return this.inputFields;
       default:
-        return this.executableFields; // Default fallback
+        return []; // Default fallback
     }
   }
   
