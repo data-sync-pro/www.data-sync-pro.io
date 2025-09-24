@@ -1,10 +1,6 @@
 {
   "recipes": [
     {
-      "folderId": "auto‑close-stagnant-cases",
-      "active": true
-    },
-    {
       "folderId": "calculate-rollup-summaries-for-related-records",
       "active": true
     },
@@ -13,7 +9,7 @@
       "active": true
     },
     {
-      "folderId": "create-follow-up-task-in-7-days",
+      "folderId": "create-follow-up-task-when-case-closes",
       "active": true
     },
     {
@@ -21,7 +17,7 @@
       "active": true
     },
     {
-      "folderId": "download-record-based-configurations-via-vs-code-extension",
+      "folderId": "download-record-based-configurations-via-vs-code-e",
       "active": true
     },
     {
@@ -38,6 +34,9 @@
     },
     {
       "folderId": "transfer-open-opportunities-on-user-deactivation",
+      "active": true
+    },{
+      "folderId": "auto_close-stagnant-cases",
       "active": true
     }
   ]

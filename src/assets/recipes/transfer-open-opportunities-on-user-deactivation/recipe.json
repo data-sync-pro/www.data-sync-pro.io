@@ -1,6 +1,6 @@
 {
-  "id": "transfer-open-opportunities-on-user-deactivation",
-  "title": "Transfer Open Opportunities on User Deactivation",
+  "id": "7a4f5738-d87e-4881-ab42-574c3fe8b5b1",
+  "title": "Transfer Open Opportunities on User Deactivation ",
   "category": "Trigger",
   "DSPVersions": [],
   "overview": "When Users are deactivated, automatically reassign their open Opportunities to their manager.",

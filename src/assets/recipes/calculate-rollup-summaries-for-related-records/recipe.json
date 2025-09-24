@@ -1,9 +1,11 @@
 {
-  "id": "calculate-rollup-summaries-for-related-records",
-  "title": "Calculate Rollup Summaries for Related Records",
+  "id": "4a6703a8-9ade-4816-8644-584ddcd34942",
+  "title": "Calculate Rollup Summaries for Related Records ",
   "category": "Trigger",
   "DSPVersions": [],
-  "usecase": "",
+  "overview": "Automatically calculate and update rollup summary fields on a parent record whenever related child records are inserted, updated, or deleted. A trigger on the child object listens for DML events, aggregates relevant data (such as SUM, COUNT, MIN, MAX), and updates the parent record's summary fields accordingly.",
+  "whenToUse": "",
+  "generalImages": [],
   "prerequisites": [
     {
       "description": "",
@@ -53,8 +55,7 @@
         {
           "type": "image",
           "url": "images/triggers-create-executable-image.png",
-          "alt": "",
-          "imageKey": "triggers-create-executable-image.png"
+          "alt": ""
         }
       ]
     },
@@ -70,8 +71,7 @@
         {
           "type": "image",
           "url": "images/triggers-trigger-settings-image.jpg",
-          "alt": "",
-          "imageKey": "triggers-trigger-settings-image.jpg"
+          "alt": ""
         }
       ]
     },
@@ -82,8 +82,7 @@
         {
           "type": "image",
           "url": "images/triggers-scoping-image.jpg",
-          "alt": "",
-          "imageKey": "triggers-scoping-image.jpg"
+          "alt": ""
         }
       ]
     },
@@ -107,8 +106,7 @@
         {
           "type": "image",
           "url": "images/triggers-match-image.jpg",
-          "alt": "",
-          "imageKey": "triggers-match-image.jpg"
+          "alt": ""
         }
       ]
     },
@@ -152,8 +150,7 @@
         {
           "type": "image",
           "url": "images/triggers-mapping-image.jpg",
-          "alt": "",
-          "imageKey": "triggers-mapping-image.jpg"
+          "alt": ""
         }
       ]
     },
@@ -173,8 +170,7 @@
         {
           "type": "image",
           "url": "images/triggers-action-image.jpg",
-          "alt": "",
-          "imageKey": "triggers-action-image.jpg"
+          "alt": ""
         }
       ]
     },
@@ -190,8 +186,7 @@
         {
           "type": "image",
           "url": "images/triggers-preview-image.jpg",
-          "alt": "",
-          "imageKey": "triggers-preview-image.jpg"
+          "alt": ""
         }
       ]
     },
@@ -202,8 +197,7 @@
         {
           "type": "image",
           "url": "images/triggers-preview-transformed-image.jpg",
-          "alt": "",
-          "imageKey": "triggers-preview-transformed-image.jpg"
+          "alt": ""
         }
       ]
     }
@@ -215,8 +209,5 @@
       "url": ""
     }
   ],
-  "keywords": [],
-  "overview": "Automatically calculate and update rollup summary fields on a parent record whenever related child records are inserted, updated, or deleted. A trigger on the child object listens for DML events, aggregates relevant data (such as SUM, COUNT, MIN, MAX), and updates the parent record's summary fields accordingly.",
-  "whenToUse": "",
-  "generalImages": []
+  "keywords": []
 }

@@ -1,6 +1,6 @@
 {
-  "id": "create-follow-up-task-in-7-days",
-  "title": "Create Follow-up Task When Case Closes",
+  "id": "a138ba21-5fd9-4b2c-a488-dc6891232569",
+  "title": "Create Follow-up Task When Case Closes ",
   "category": "Trigger",
   "DSPVersions": [],
   "overview": "When a Case is closed, automatically create a follow-up task assigned to the Case Owner with a 7 days due date to verify customer satisfaction.",

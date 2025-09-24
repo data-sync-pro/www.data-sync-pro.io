@@ -1,6 +1,6 @@
 {
-  "id": "export-and-import-a-pipeline",
-  "title": "Export and Import a Pipeline",
+  "id": "a67b15ff-e35c-4412-a36e-c494bb7b03bb",
+  "title": "Export and Import a Pipeline ",
   "category": "General",
   "DSPVersions": [],
   "overview": "This recipe demonstrates how to export a Pipeline from one Salesforce org and import it into another.",
@@ -31,7 +31,7 @@
   "connection": "",
   "walkthrough": [
     {
-      "step": "Export a Pipeline",
+      "step": "Custom",
       "config": [
         {
           "field": "",
@@ -47,7 +47,7 @@
       ]
     },
     {
-      "step": "Import a Pipeline",
+      "step": "Custom",
       "config": [],
       "media": []
     }

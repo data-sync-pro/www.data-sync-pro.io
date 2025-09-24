@@ -1,6 +1,6 @@
 {
-  "id": "download-record-based-configurations-via-vs-code-extension",
-  "title": "Download Record-Based Configurations via VS Code Extension",
+  "id": "85162156-f867-4d6f-aec5-163eb7fd80d0",
+  "title": "Download Record-Based Configurations via VS Code Extension ",
   "category": "General",
   "DSPVersions": [],
   "overview": "Data Sync Pro configurations are stored as records. This recipe shows how to export them as JSON files into your local workspace with the VS Code extension for backup and version control.",
