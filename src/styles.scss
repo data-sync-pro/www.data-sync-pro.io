@@ -90,11 +90,12 @@ body.recipe-page app-footer {
   cursor: pointer;
   position: relative;
   display: inline-block;
+  background-color: rgba(26, 115, 232, 0.05);
 }
 
 .clickable-image:hover {
   color: #0056b3;
-  background-color: rgba(26, 115, 232, 0.05);
+  background-color: rgb(11, 85, 182, 0.1);
 }
 
 .clickable-image::after {
@@ -103,7 +104,6 @@ body.recipe-page app-footer {
   width: 18px;
   height: 18px;
   opacity: 0.7;
-  margin-left: 4px;
   vertical-align: text-top;
   background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 24 24' fill='%23666' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z'/%3e%3c/svg%3e");
 
