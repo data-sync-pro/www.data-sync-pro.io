@@ -7,6 +7,7 @@ export class SimpleZoomableDirective implements AfterViewInit, OnDestroy {
   private backdropEl?: HTMLElement;
   private clonedImg?: HTMLImageElement;
   private downloadBtn?: HTMLElement;
+  private closeBtn?: HTMLElement;
   private zoomed = false;
   private clickListener?: (event: Event) => void;
   private mutationObserver?: MutationObserver;
@@ -182,11 +183,58 @@ export class SimpleZoomableDirective implements AfterViewInit, OnDestroy {
     
     this.rd.appendChild(this.backdropEl, this.clonedImg);
     
-    
+
+    this.closeBtn = this.rd.createElement('button');
+    this.rd.setStyle(this.closeBtn, 'position', 'fixed');
+    this.rd.setStyle(this.closeBtn, 'top', '20px');
+    this.rd.setStyle(this.closeBtn, 'right', '20px');
+    this.rd.setStyle(this.closeBtn, 'z-index', '10001');
+    this.rd.setStyle(this.closeBtn, 'width', '48px');
+    this.rd.setStyle(this.closeBtn, 'height', '48px');
+    this.rd.setStyle(this.closeBtn, 'border-radius', '50%');
+    this.rd.setStyle(this.closeBtn, 'background', 'rgba(0, 0, 0, 0.6)');
+    this.rd.setStyle(this.closeBtn, 'border', 'none');
+    this.rd.setStyle(this.closeBtn, 'color', 'white');
+    this.rd.setStyle(this.closeBtn, 'cursor', 'pointer');
+    this.rd.setStyle(this.closeBtn, 'display', 'flex');
+    this.rd.setStyle(this.closeBtn, 'align-items', 'center');
+    this.rd.setStyle(this.closeBtn, 'justify-content', 'center');
+    this.rd.setStyle(this.closeBtn, 'transition', 'background 0.3s ease');
+    this.rd.setAttribute(this.closeBtn, 'title', 'Close');
+
+    const closeIconSvg = `
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    `;
+    if (this.closeBtn) {
+      this.closeBtn.innerHTML = closeIconSvg;
+
+      this.closeBtn.addEventListener('mouseenter', () => {
+        if (this.closeBtn) {
+          this.rd.setStyle(this.closeBtn, 'background', 'rgba(0, 0, 0, 0.8)');
+        }
+      });
+
+      this.closeBtn.addEventListener('mouseleave', () => {
+        if (this.closeBtn) {
+          this.rd.setStyle(this.closeBtn, 'background', 'rgba(0, 0, 0, 0.6)');
+        }
+      });
+
+      this.closeBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.closeZoom();
+      });
+
+      this.rd.appendChild(document.body, this.closeBtn);
+    }
+
     this.downloadBtn = this.rd.createElement('button');
     this.rd.setStyle(this.downloadBtn, 'position', 'fixed');
     this.rd.setStyle(this.downloadBtn, 'top', '20px');
-    this.rd.setStyle(this.downloadBtn, 'right', '20px');
+    this.rd.setStyle(this.downloadBtn, 'right', '80px');
     this.rd.setStyle(this.downloadBtn, 'z-index', '10001');
     this.rd.setStyle(this.downloadBtn, 'width', '48px');
     this.rd.setStyle(this.downloadBtn, 'height', '48px');
@@ -249,16 +297,21 @@ export class SimpleZoomableDirective implements AfterViewInit, OnDestroy {
       this.rd.removeChild(document.body, this.backdropEl);
       this.backdropEl = undefined;
     }
-    
+
     if (this.downloadBtn) {
       this.rd.removeChild(document.body, this.downloadBtn);
       this.downloadBtn = undefined;
     }
-    
+
+    if (this.closeBtn) {
+      this.rd.removeChild(document.body, this.closeBtn);
+      this.closeBtn = undefined;
+    }
+
     if (this.clonedImg) {
       this.clonedImg = undefined;
     }
-    
+
     this.rd.removeStyle(document.body, 'overflow');
     this.zoomed = false;
     window.dispatchEvent(new Event('zoomEnd'));
