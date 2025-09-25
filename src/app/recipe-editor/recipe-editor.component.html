@@ -154,7 +154,6 @@
              [class.inactive]="!isRecipeActive(recipe.id)"
              (click)="loadRecipeToEditor(recipe)">
           <div class="recipe-item-header">
-            <span class="recipe-id">{{ recipe.id }}</span>
             <span class="status-indicator inactive" *ngIf="!isRecipeActive(recipe.id)" title="Inactive Recipe">🚫</span>
             <span class="edit-indicator" *ngIf="isRecipeEdited(recipe.id)">✏️</span>
           </div>

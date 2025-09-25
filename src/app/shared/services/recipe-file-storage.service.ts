@@ -42,7 +42,6 @@ export class RecipeFileStorageService {
       
       request.onsuccess = () => {
         this.db = request.result;
-        console.log('IndexedDB initialized successfully');
         resolve(this.db);
       };
       

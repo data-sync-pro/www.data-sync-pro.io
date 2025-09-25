@@ -1,6 +1,10 @@
 {
   "recipes": [
     {
+      "folderId": "autoclose-stagnant-cases",
+      "active": true
+    },
+    {
       "folderId": "calculate-rollup-summaries-for-related-records",
       "active": true
     },
@@ -34,9 +38,6 @@
     },
     {
       "folderId": "transfer-open-opportunities-on-user-deactivation",
-      "active": true
-    },{
-      "folderId": "auto_close-stagnant-cases",
       "active": true
     }
   ]

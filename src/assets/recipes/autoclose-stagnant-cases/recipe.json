@@ -1,5 +1,5 @@
 {
-  "id": "auto‑close-stagnant-cases",
+  "id": "556511d8-c844-4fdb-b230-044af087a158",
   "title": "Auto‑Close Stagnant Cases",
   "category": "Batch",
   "DSPVersions": [],
@@ -55,8 +55,7 @@
         {
           "type": "image",
           "url": "images/batch-create-executable-image.png",
-          "alt": "",
-          "imageKey": "batch-create-executable-image.png"
+          "alt": ""
         }
       ]
     },
@@ -72,8 +71,7 @@
         {
           "type": "image",
           "url": "images/batch-retrieve-image.jpg",
-          "alt": "",
-          "imageKey": "batch-retrieve-image.jpg"
+          "alt": ""
         }
       ]
     },
@@ -89,8 +87,7 @@
         {
           "type": "image",
           "url": "images/batch-scoping-image.jpg",
-          "alt": "",
-          "imageKey": "batch-scoping-image.jpg"
+          "alt": ""
         }
       ]
     },
@@ -110,8 +107,7 @@
         {
           "type": "image",
           "url": "images/batch-match-image.jpg",
-          "alt": "",
-          "imageKey": "batch-match-image.jpg"
+          "alt": ""
         }
       ]
     },
@@ -127,8 +123,7 @@
         {
           "type": "image",
           "url": "images/batch-mapping-image.jpg",
-          "alt": "",
-          "imageKey": "batch-mapping-image.jpg"
+          "alt": ""
         }
       ]
     },
@@ -139,8 +134,7 @@
         {
           "type": "image",
           "url": "images/batch-action-image.jpg",
-          "alt": "",
-          "imageKey": "batch-action-image.jpg"
+          "alt": ""
         }
       ]
     }
