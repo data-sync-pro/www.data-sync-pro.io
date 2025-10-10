@@ -162,7 +162,7 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
     'Bypass Triggers Custom Permissions',
     'Do Not Track AGG Sources in Trigger?',
     'Pipeline',
-    'Required Custom Permissions to Execute',
+    'Execute Access Permissions',
     'Run Once on Recursive Updates?',
     'Seq No.'
   ];
@@ -218,7 +218,7 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
     'Notify Email Addresses',
     'Notify Owner?',
     'Notify When Execution Completes',
-    'Required Custom Permissions to Execute',
+    'Execute Access Permissions',
     'Retrieve Limit',
     'Serial Mode?',
     'Stop Execution When a Batch Fails?',
@@ -234,7 +234,7 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
     'Edit Target Fields Before Action',
     'Q: List Action?',
     'Q: Row Action?',
-    'Required Custom Permissions to Execute',
+    'Execute Access Permissions',
     'Success Message (UI)'
   ];
 
@@ -269,7 +269,7 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
     'Q: Override Columns',
     'Q: Page Size',
     'Q: Query Manager Toggleable?',
-    'Q: Required Custom Permissions to View',
+    'Data List(s) Access Permissions',
     'Q: Results Icon Name',
     'Q: Results Title',
     'Q: Retrieve All?',
@@ -286,7 +286,7 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
     'Q: Small Screen Viewport Width',
     'Q: Sorted By',
     'Q: Sorted Direction',
-    'Required Custom Permissions to Execute',
+    'Execute Access Permissions',
     'Success Message (UI)'
   ];
 
@@ -297,7 +297,7 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
     'Log to File?',
     'Pipeline',
     'Relax Field Mapping\'s Type Check?',
-    'Required Custom Permissions to Execute',
+    'Execute Access Permissions',
     'Seq No.',
     'Serial Mode?',
     'Stop Execution When a Batch Fails?'
