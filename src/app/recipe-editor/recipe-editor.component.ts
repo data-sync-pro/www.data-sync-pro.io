@@ -1748,6 +1748,8 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
   private mergeRecipeData(originalRecipes: RecipeItem[], editedRecipes: SourceRecipeRecord[]): SourceRecipeRecord[] {
     // Create a map of edited recipes by ID
     const editedMap = new Map<string, SourceRecipeRecord>();
+    const processedIds = new Set<string>();
+
     editedRecipes.forEach(recipe => {
       if (recipe.id) {
         editedMap.set(recipe.id, recipe);
@@ -1755,7 +1757,8 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
     });
 
     // Convert original recipes to SourceRecipeRecord and apply edits
-    return originalRecipes.map(originalRecipe => {
+    const mergedRecipes = originalRecipes.map(originalRecipe => {
+      processedIds.add(originalRecipe.id);
       const editedRecipe = editedMap.get(originalRecipe.id);
       if (editedRecipe) {
         // Use edited version
@@ -1765,6 +1768,15 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
         return this.convertToSourceRecord(originalRecipe);
       }
     });
+
+    // Add new recipes that are not in the original list
+    editedRecipes.forEach(recipe => {
+      if (recipe.id && !processedIds.has(recipe.id)) {
+        mergedRecipes.push(recipe);
+      }
+    });
+
+    return mergedRecipes;
   }
 
   // Save and export
