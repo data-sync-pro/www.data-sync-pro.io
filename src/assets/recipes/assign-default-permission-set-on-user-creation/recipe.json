@@ -1,0 +1,54 @@
+{
+  "id": "3fadea2b-f493-4bec-a6c0-86fa542fd220",
+  "title": "Assign Default Permission Set on User Creation",
+  "category": "Trigger",
+  "DSPVersions": [],
+  "overview": "Automatically assign the Data Sync Pro Starter permission set to newly created internal users, granting them baseline access to Data Sync Pro.",
+  "whenToUse": "1. Automated Permission Assignment – Use automation to grant appropriate permissions to the right users as soon as they are created, ensuring consistent access control.\n\n2. Automatic Record Creation – Use automation to create an associated child record tied to a parent record based on conditions.",
+  "generalImages": [
+    {
+      "type": "image",
+      "url": "",
+      "alt": ""
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "",
+      "quickLinks": [
+        {
+          "title": "",
+          "url": ""
+        }
+      ]
+    }
+  ],
+  "direction": "",
+  "connection": "",
+  "walkthrough": [
+    {
+      "step": "",
+      "config": [
+        {
+          "field": "",
+          "value": ""
+        }
+      ],
+      "media": [
+        {
+          "type": "image",
+          "url": "",
+          "alt": ""
+        }
+      ]
+    }
+  ],
+  "downloadableExecutables": [],
+  "relatedRecipes": [
+    {
+      "title": "",
+      "url": ""
+    }
+  ],
+  "keywords": []
+}

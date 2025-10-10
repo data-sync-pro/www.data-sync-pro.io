@@ -1,0 +1,54 @@
+{
+  "id": "4fbf5448-4466-4ea2-9db0-048c81520f9a",
+  "title": "Auto-Generate Quote Line Items on Quote Creation",
+  "category": "Trigger",
+  "DSPVersions": [],
+  "overview": "When a Quote is created on an Opportunity, the automation generates Quote Line Items from the Opportunity Products.\n",
+  "whenToUse": "Use $Joiner to left-join the parent (source) with its related records, then use the joined data to act on the target object. Applicable across all rule engines: #Trigger, #Data List, #Action Button, #Data Loader or #Batch.",
+  "generalImages": [
+    {
+      "type": "image",
+      "url": "",
+      "alt": ""
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "",
+      "quickLinks": [
+        {
+          "title": "",
+          "url": ""
+        }
+      ]
+    }
+  ],
+  "direction": "",
+  "connection": "",
+  "walkthrough": [
+    {
+      "step": "",
+      "config": [
+        {
+          "field": "",
+          "value": ""
+        }
+      ],
+      "media": [
+        {
+          "type": "image",
+          "url": "",
+          "alt": ""
+        }
+      ]
+    }
+  ],
+  "downloadableExecutables": [],
+  "relatedRecipes": [
+    {
+      "title": "",
+      "url": ""
+    }
+  ],
+  "keywords": []
+}

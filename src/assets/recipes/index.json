@@ -1,7 +1,27 @@
 {
   "recipes": [
     {
+      "folderId": "accept-cases-from-my-queues",
+      "active": true
+    },
+    {
+      "folderId": "assign-default-permission-set-on-user-creation",
+      "active": true
+    },
+    {
+      "folderId": "auto-create-contract-on-opportunity-closed-won",
+      "active": true
+    },
+    {
+      "folderId": "auto-generate-quote-line-items-on-quote-creation",
+      "active": true
+    },
+    {
       "folderId": "autoclose-stagnant-cases",
+      "active": true
+    },
+    {
+      "folderId": "bell-notification-to-previous-owner-upon-case-owne",
       "active": true
     },
     {
@@ -10,6 +30,10 @@
     },
     {
       "folderId": "cascade-account-owner-to-open-cases",
+      "active": true
+    },
+    {
+      "folderId": "copy-related-records-on-parent-record-clone",
       "active": true
     },
     {
@@ -29,11 +53,23 @@
       "active": true
     },
     {
+      "folderId": "mask-sensitive-contact-data-in-sandboxes",
+      "active": true
+    },
+    {
       "folderId": "reassign-opportunity-owners-for-inactive-users",
       "active": true
     },
     {
       "folderId": "recalculate-rollup-summaries-in-bulk-api",
+      "active": true
+    },
+    {
+      "folderId": "rows-related-lists-on-opportunity-data-list",
+      "active": true
+    },
+    {
+      "folderId": "send-email-notification-on-checkbox-check",
       "active": true
     },
     {
