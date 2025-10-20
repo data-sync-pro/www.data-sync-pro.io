@@ -138,18 +138,18 @@
                   [class.expanded]="current.category === category.name"
                   (click)="selectCategory(category.name, $event)"
                   (touchstart)="handleTouchStart()"
+                  *ngIf="!ui.sidebarCollapsed"
                 >
                   <div class="nav-content">
                     <lightning-icon
-                      *ngIf="!ui.sidebarCollapsed"
                       iconName="utility:folder"
                       size="xx-small"
                       [alternativeText]="category.name + ' category'"
                       class="nav-icon"
                     ></lightning-icon>
-                    <span class="nav-text" *ngIf="!ui.sidebarCollapsed">{{ category.name }}</span>
-                    <span class="nav-count" *ngIf="!ui.sidebarCollapsed">{{ category.count }}</span>
+                    <span class="nav-text">{{ category.name }}</span>
                   </div>
+                  <span class="nav-count">{{ category.count }}</span>
                 </div>
 
                 <!-- Subcategories -->
@@ -173,8 +173,8 @@
                         class="nav-icon"
                       ></lightning-icon>
                       <span class="nav-text">{{ subCategory.name }}</span>
-                      <span class="nav-count">{{ subCategory.count }}</span>
                     </div>
+                     <span class="nav-count">{{ subCategory.count }}</span>
                   </div>
                 </div>
               </div>
