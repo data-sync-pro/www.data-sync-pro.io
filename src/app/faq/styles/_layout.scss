@@ -14,12 +14,13 @@ $breakpoint-mobile: 500px;
 
 .faq-layout-container {
   display: grid;
-  grid-template-areas: 
+  grid-template-areas:
     "sidebar main toc";
   grid-template-columns: $sidebar-width 1fr $toc-width;
   margin-top: $header-height;
   min-height: 0;
-  
+  transition: grid-template-columns 0s cubic-bezier(0.4, 0.0, 0.2, 1);
+
   @media (max-width: $breakpoint-desktop) {
     grid-template-areas: "main main main";
     grid-template-columns: 1fr;
@@ -30,7 +31,6 @@ $breakpoint-mobile: 500px;
   grid-area: main;
   padding: 20px 1.5vw;
   background: #ffffff;
-  transition: margin 0.3s ease; 
 
   &.toc-hidden {
     
