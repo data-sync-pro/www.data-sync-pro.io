@@ -1634,7 +1634,7 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
 
   // Mobile functionality
   private checkMobileView(): void {
-    this.updateUIState({ isMobile: window.innerWidth <= 992 });
+    this.updateUIState({ isMobile: window.innerWidth <= 768 });
   }
 
   toggleMobileSidebar(event?: Event): void {

@@ -9,8 +9,7 @@ $sidebar-width: 280px;
 $sidebar-collapsed: 56px;
 $toc-width: 320px;
 
-$breakpoint-desktop: 992px;
-$breakpoint-mobile: 500px;
+$breakpoint-desktop: 768px;
 
 .faq-layout-container {
   display: grid;
@@ -54,16 +53,11 @@ $breakpoint-mobile: 500px;
   position: sticky;
   top: $header-height; // Stick below the main header
   z-index: 90; // Higher than TOC but below main header
-  padding: 15px 1.5vw 12px 0vw; // Match faq-main horizontal padding
-  margin: 0 1.5vw 0 1.5vw;
+  padding: 15px 0 10px 1.5vw; // Match faq-main horizontal padding
+  margin: 0 1.5vw 0 0;
   background: rgba(255, 255, 255, 0.95); // Semi-transparent white background
   backdrop-filter: blur(8px); // Modern blur effect for better visibility
   -webkit-backdrop-filter: blur(8px); // Safari support
-  
-  // Add subtle shadow when scrolled
-  &.scrolled {
-    border-bottom: 1px solid rgba(0, 0, 0, 0.051);
-  }
   
   // Mobile responsive adjustments - hide breadcrumb on mobile
   @media (max-width: 768px) {
@@ -81,6 +75,7 @@ $breakpoint-mobile: 500px;
   margin: 0;
   padding: 0 0 8px 0; // Add bottom padding for the border
   list-style: none;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.051);
 }
 
 .breadcrumb-item {
@@ -114,14 +109,10 @@ $breakpoint-mobile: 500px;
     max-width: 120px;
     overflow: hidden;
     text-overflow: ellipsis;
-    
+
     // Mobile responsive text truncation
-    @media (max-width: 768px) {
+    @media (max-width: $breakpoint-desktop) {
       max-width: 80px;
-    }
-    
-    @media (max-width: 480px) {
-      max-width: 60px;
     }
   }
 }
