@@ -9,17 +9,17 @@ $sidebar-width: 280px;
 $sidebar-collapsed: 56px;
 $toc-width: 320px;
 
-$breakpoint-desktop: 992px;
-$breakpoint-mobile: 500px;
+$breakpoint-desktop: 768px;
 
 .faq-layout-container {
   display: grid;
-  grid-template-areas: 
+  grid-template-areas:
     "sidebar main toc";
   grid-template-columns: $sidebar-width 1fr $toc-width;
   margin-top: $header-height;
   min-height: 0;
-  
+  transition: grid-template-columns 0s cubic-bezier(0.4, 0.0, 0.2, 1);
+
   @media (max-width: $breakpoint-desktop) {
     grid-template-areas: "main main main";
     grid-template-columns: 1fr;
@@ -30,7 +30,6 @@ $breakpoint-mobile: 500px;
   grid-area: main;
   padding: 20px 1.5vw;
   background: #ffffff;
-  transition: margin 0.3s ease; 
 
   &.toc-hidden {
     
@@ -54,18 +53,11 @@ $breakpoint-mobile: 500px;
   position: sticky;
   top: $header-height; // Stick below the main header
   z-index: 90; // Higher than TOC but below main header
-  padding: 8px 1.5vw; // Match faq-main horizontal padding
-
-  margin-bottom: 12px;
+  padding: 15px 0 10px 1.5vw; // Match faq-main horizontal padding
+  margin: 0 1.5vw 0 0;
   background: rgba(255, 255, 255, 0.95); // Semi-transparent white background
   backdrop-filter: blur(8px); // Modern blur effect for better visibility
   -webkit-backdrop-filter: blur(8px); // Safari support
-  transition: all 0.2s ease;
-  
-  // Add subtle shadow when scrolled
-  &.scrolled {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  }
   
   // Mobile responsive adjustments - hide breadcrumb on mobile
   @media (max-width: 768px) {
@@ -83,7 +75,7 @@ $breakpoint-mobile: 500px;
   margin: 0;
   padding: 0 0 8px 0; // Add bottom padding for the border
   list-style: none;
-  border-bottom: 1px solid #f1f3f4; // Move border to content level
+  border-bottom: 1px solid rgba(0, 0, 0, 0.051);
 }
 
 .breadcrumb-item {
@@ -96,7 +88,7 @@ $breakpoint-mobile: 500px;
   font-size: 1rem;
   font-weight: 400;
   cursor: pointer;
-  padding: 2px 6px;
+  padding: 2px 6px 2px 0px;
   border-radius: 3px;
   text-decoration: none;
   transition: all 0.15s ease;
@@ -117,14 +109,10 @@ $breakpoint-mobile: 500px;
     max-width: 120px;
     overflow: hidden;
     text-overflow: ellipsis;
-    
+
     // Mobile responsive text truncation
-    @media (max-width: 768px) {
+    @media (max-width: $breakpoint-desktop) {
       max-width: 80px;
-    }
-    
-    @media (max-width: 480px) {
-      max-width: 60px;
     }
   }
 }
