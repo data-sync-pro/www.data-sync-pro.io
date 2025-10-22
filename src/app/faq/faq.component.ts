@@ -1642,7 +1642,16 @@ export class FaqComponent implements OnInit, OnDestroy, AfterViewInit {
       event.preventDefault();
       event.stopPropagation();
     }
-    this.updateUIState({ mobileSidebarOpen: !this.ui.mobileSidebarOpen });
+    const willOpen = !this.ui.mobileSidebarOpen;
+    // When opening mobile sidebar, always expand it to show full content
+    if (willOpen) {
+      this.updateUIState({
+        mobileSidebarOpen: true,
+        sidebarCollapsed: false
+      });
+    } else {
+      this.updateUIState({ mobileSidebarOpen: false });
+    }
   }
 
   closeMobileSidebar(event?: Event): void {

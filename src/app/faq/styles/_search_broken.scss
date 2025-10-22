@@ -513,21 +513,3 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     opacity: 0.8;
   }
 }
-
-
-@media (max-width: 480px) {
-  .mobile-toc {
-    &.mobile-toc {
-      width: 100vw;
-      max-width: 100vw;
-    }
-  }
-
-  .mobile-toc-item {
-    padding: 14px 16px;
-
-    .mobile-toc-item-title {
-      font-size: 0.85rem;
-    }
-  }
-}
