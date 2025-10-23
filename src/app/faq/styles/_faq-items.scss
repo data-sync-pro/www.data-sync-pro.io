@@ -9,7 +9,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 // Virtual scrolling viewport
 .faq-virtual-viewport {
   // Optimized calculation: 100vh - (header:60px + layout-margin:60px + title-area:90px + spacing:20px)
-  height: calc(100vh - 230px);
+  height: calc(100vh - 285px);
   width: 100%;
   border-radius: 8px;
   overflow: hidden;
