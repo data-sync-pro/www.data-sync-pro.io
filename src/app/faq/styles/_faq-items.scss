@@ -8,18 +8,18 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
 // Virtual scrolling viewport
 .faq-virtual-viewport {
-  // Precise calculation: 100vh - (header:60px + layout-margin:60px + breadcrumb:32px + container-padding:40px + main-padding:40px)
-  height: calc(100vh - 325px);
+  // Optimized calculation: 100vh - (header:60px + layout-margin:60px + title-area:90px + spacing:20px)
+  height: calc(100vh - 230px);
   width: 100%;
   border-radius: 8px;
   overflow: hidden;
   pointer-events: auto;
   z-index: 10;
   position: relative;
-  
+
   // When on homepage (all-faqs) without breadcrumb navigation
   .all-faqs & {
-    height: calc(100vh - 270px); 
+    height: calc(100vh - 200px);
   }
   
   // Mobile responsive adjustments

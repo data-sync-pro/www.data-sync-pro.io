@@ -6,7 +6,7 @@ $breakpoint-desktop: 768px;
 
 .faq-layout-container {
 
-  @media (min-width: $breakpoint-desktop) {
+  @media (min-width: #{$breakpoint-desktop + 1px}) {
     grid-template-columns: $sidebar-width 1fr $toc-width;
 
     &.sidebar-collapsed {
