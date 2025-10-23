@@ -18,17 +18,17 @@ $z-index-mobile-toggle: 1001;
   grid-area: sidebar;
   background: #ffffff;
   border-right: 1px solid #e1e5e9;
-  transition: $transition;
   z-index: $z-index-sidebar-desktop;
-  
-  
+
+
   @media (min-width: #{$breakpoint-desktop + 1px}) {
-    
+
     position: sticky;
     height: calc(100vh - $header-height);
     overflow: hidden;
     transform: none;
-     top: $header-height
+     top: $header-height;
+    transition: $transition;
   }
   
   
@@ -71,7 +71,8 @@ $z-index-mobile-toggle: 1001;
     width: $sidebar-collapsed;
 
     ~ .faq-container {
-      margin-left: $sidebar-collapsed;
+      margin-left: 20px;
+      margin-right: 20px;
     }
 
     .sidebar-title-section {
