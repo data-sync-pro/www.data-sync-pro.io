@@ -71,7 +71,8 @@ $z-index-mobile-toggle: 1001;
     width: $sidebar-collapsed;
 
     ~ .faq-container {
-      margin-left: $sidebar-collapsed;
+      margin-left: 20px;
+      margin-right: 20px;
     }
 
     .sidebar-title-section {
