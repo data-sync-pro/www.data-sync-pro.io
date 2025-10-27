@@ -48,7 +48,6 @@ interface UIState {
   tocFooterApproaching: boolean;
   activeRecipeTab: string;
   activeSectionId: string; 
-  highlightedTOCTab: string; 
   userHasScrolled: boolean;
   scrollTicking: boolean;
   disableScrollHighlight: boolean;
@@ -100,12 +99,11 @@ export class RecipesComponent implements OnInit, OnDestroy {
     isMobile: false,
     currentView: 'home',
     isPreviewMode: false,
-    tocHidden: true,
+    tocHidden: false,
     tocInFooterZone: false,
     tocFooterApproaching: false,
     activeRecipeTab: 'overview',
     activeSectionId: 'use-case',
-    highlightedTOCTab: '', // No longer used since TOC doesn't show tabs
     userHasScrolled: false,
     scrollTicking: false,
     disableScrollHighlight: false,
@@ -196,7 +194,6 @@ export class RecipesComponent implements OnInit, OnDestroy {
     this.loadInitialData();
     this.checkMobileView();
     this.loadSidebarState();
-    this.loadTOCState();
     this.setupOptimizedScrollListener();
     
     // Add body class to hide footer on recipe pages
@@ -304,22 +301,19 @@ export class RecipesComponent implements OnInit, OnDestroy {
    * Check if user has scrolled to the bottom of the page
    */
   private isAtPageBottom(): boolean {
-    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    const scrollTop = document.documentElement.scrollTop;
     const windowHeight = window.innerHeight;
     const documentHeight = document.documentElement.scrollHeight;
     
-    // Allow 50px tolerance for "bottom"
-    const tolerance = 50;
-    return (scrollTop + windowHeight) >= (documentHeight - tolerance);
+
+    return (scrollTop + windowHeight) >= documentHeight;
   }
 
   /**
    * Check if user is at the top of the page
    */
   private isAtPageTop(): boolean {
-    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-    // Consider "at top" if scroll is less than 50px
-    return scrollTop < 50;
+    return document.documentElement.scrollTop < 50;
   }
 
   private isInputFocused(): boolean {
@@ -360,12 +354,10 @@ export class RecipesComponent implements OnInit, OnDestroy {
    */
   private sortRecipesByCategoryAndTitle(recipes: RecipeItem[]): RecipeItem[] {
     return [...recipes].sort((a, b) => {
-      // Primary sort: by category
       const categoryCompare = a.category.localeCompare(b.category);
       if (categoryCompare !== 0) {
         return categoryCompare;
       }
-      // Secondary sort: by title A-Z within same category
       return a.title.localeCompare(b.title);
     });
   }
@@ -374,7 +366,6 @@ export class RecipesComponent implements OnInit, OnDestroy {
    * Setup route parameter handling
    */
   private setupRouteHandling(): void {
-    // Monitor both params and query params
     this.route.paramMap.pipe(
       takeUntil(this.destroy$)
     ).subscribe(params => {
@@ -411,7 +402,6 @@ export class RecipesComponent implements OnInit, OnDestroy {
         }
       });
       
-      this.updatePageMetadata();
       this.cdr.markForCheck();
     });
 
@@ -584,7 +574,6 @@ export class RecipesComponent implements OnInit, OnDestroy {
         this.updateUIState({ isLoading: false });
         
         if (recipe) {
-          this.trackRecipeView(recipe);
           // Generate TOC structure for the loaded recipe
           this.generateRecipeTOCStructure();
           // Clear scroll cache for new recipe
@@ -625,7 +614,6 @@ export class RecipesComponent implements OnInit, OnDestroy {
       //console.log('📖 Loaded recipe preview data for:', recipeId);
       this.cdr.markForCheck();
     } else {
-      console.warn('⚠️ No preview data found for recipe:', recipeId);
       this.updateUIState({ isLoading: false });
     }
   }
@@ -799,215 +787,10 @@ export class RecipesComponent implements OnInit, OnDestroy {
       this.ui.activeRecipeTab = 'overview';
       this.ui.activeSectionId = 'use-case';
       this.ui.currentWalkthroughStep = 0;
-      
-      // Reset scroll tracking states when navigating to different recipe
-      this.ui.hasScrolledToBottomOnce = false;
-      this.ui.hasScrolledToTopOnce = false;
     }
     
-    if (this.ui.isMobile) {
-      this.closeMobileSidebar();
-    }
   }
 
-  /**
-   * Change recipe tab - Optimized for smooth animation without conflicts
-   */
-  changeRecipeTab(tabName: string, withAnimation: boolean = false): void {
-    //console.log('Changing recipe tab to:', tabName);
-    
-    // Clear previous animation state at the start
-    this.ui.tabAnimationDirection = null;
-    
-    // Determine animation direction if animation is requested
-    if (withAnimation) {
-      const currentTab = this.ui.activeRecipeTab;
-      if (currentTab === 'overview' && tabName === 'walkthrough') {
-        this.ui.tabAnimationDirection = 'forward';
-      } else if (currentTab === 'walkthrough' && tabName === 'overview') {
-        this.ui.tabAnimationDirection = 'backward';
-      }
-    }
-    
-    // Set active tab for content display
-    this.ui.activeRecipeTab = tabName;
-    this.recipeTOC.currentTabId = tabName;
-    
-    // Clear active section when clicking on tab directly
-    this.ui.activeSectionId = '';
-    this.recipeTOC.currentSectionId = '';
-    
-    // Reset scroll tracking states when switching tabs
-    this.ui.hasScrolledToBottomOnce = false;
-    this.ui.hasScrolledToTopOnce = false;
-    
-    // Update URL with tab information
-    this.updateUrlParams(tabName, null);
-    
-    // If switching to walkthrough tab, sync with current step
-    if (tabName === 'walkthrough') {
-      this.syncTOCSectionWithWalkthrough();
-      // Update URL with current step
-      this.updateUrlParams(tabName, this.ui.currentWalkthroughStep);
-    }
-    
-    // Clear section cache when switching tabs since DOM content changes
-    this.clearSectionElementsCache();
-    
-    // Close mobile TOC after tab change
-    if (this.ui.isMobile) {
-      this.closeMobileTOC();
-    }
-    
-    // Use requestAnimationFrame to avoid interrupting animations
-    if (withAnimation) {
-      requestAnimationFrame(() => {
-        this.cdr.markForCheck();
-      });
-    } else {
-      this.cdr.markForCheck();
-    }
-    
-    // Refresh cache after UI updates for the new active tab
-    setTimeout(() => {
-      this.refreshSectionElementsCacheForActiveTab();
-    }, 100);
-  }
-
-  /**
-   * Change recipe section
-   */
-  changeRecipeSection(sectionId: string): void {
-    //console.log('Changing recipe section to:', sectionId);
-    
-    this.ui.activeSectionId = sectionId;
-    this.recipeTOC.currentSectionId = sectionId;
-    
-    // Clear TOC tab highlighting when selecting a specific section
-    // Keep activeRecipeTab for content display, but clear highlightedTOCTab for visual highlighting
-    this.ui.highlightedTOCTab = '';
-    
-    // Ensure the parent tab is expanded and set as active for content display
-    this.ensureParentTabActive(sectionId);
-    
-    // Check if this is a walkthrough section and navigate to corresponding step
-    if (this.ui.activeRecipeTab === 'walkthrough') {
-      const stepIndex = this.getWalkthroughStepFromSectionId(sectionId);
-      if (stepIndex >= 0) {
-        //console.log('Navigating to walkthrough step:', stepIndex);
-        this.ui.currentWalkthroughStep = stepIndex;
-      }
-    }
-    
-    // Temporarily disable scroll highlighting to avoid conflicts during navigation
-    this.ui.disableScrollHighlight = true;
-    
-    // Scroll to the section element
-    this.scrollToSection(sectionId);
-    
-    // Re-enable scroll highlighting after navigation completes
-    setTimeout(() => {
-      this.ui.disableScrollHighlight = false;
-    }, 1000);
-    
-    this.cdr.markForCheck();
-  }
-
-  /**
-   * Ensure the parent tab of a section is expanded and active for content display
-   */
-  private ensureParentTabActive(sectionId: string): void {
-    const parentTab = this.recipeTOC.tabs.find(tab => 
-      tab.sections.some(section => section.id === sectionId)
-    );
-    
-    if (parentTab) {
-      //console.log('Ensuring parent tab is active for content display and expanded for section:', sectionId);
-      // Set the parent tab as active for content display (needed for *ngIf in template)
-      this.ui.activeRecipeTab = parentTab.id;
-      this.recipeTOC.currentTabId = parentTab.id;
-      
-      // Parent tab is automatically active for content display
-    }
-  }
-
-  /**
-   * Toggle tab expansion in TOC - No longer needed since tabs are not shown in TOC
-   */
-  toggleTabExpansion(tabId: string): void {
-    // This method is no longer used since TOC doesn't show tabs
-    console.warn('toggleTabExpansion is deprecated - TOC no longer shows tabs');
-  }
-
-  /**
-   * Enhanced intelligent section scrolling with multiple strategies
-   */
-  private scrollToSection(sectionId: string): void {
-    // Add small delay to ensure DOM is ready
-    setTimeout(() => {
-      const section = this.recipeTOC.tabs
-        .flatMap(tab => tab.sections)
-        .find(s => s.id === sectionId);
-
-      let targetElement: HTMLElement | null = null;
-
-      // Strategy 1: Find by section's elementId
-      if (section?.elementId) {
-        targetElement = document.getElementById(section.elementId);
-      }
-
-      // Strategy 2: Try to find by sectionId directly
-      if (!targetElement) {
-        targetElement = document.getElementById(sectionId);
-      }
-
-      // Strategy 3: Find by data attribute
-      if (!targetElement) {
-        const dataElement = document.querySelector(`[data-section-id="${sectionId}"]`);
-        if (dataElement) {
-          targetElement = dataElement as HTMLElement;
-        }
-      }
-
-      // Strategy 4: Find by class name pattern
-      if (!targetElement) {
-        const classElement = document.querySelector(`.recipe-${sectionId}, .${sectionId}-section`);
-        if (classElement) {
-          targetElement = classElement as HTMLElement;
-        }
-      }
-
-      if (targetElement) {
-        // Calculate optimal scroll position with header offset
-        const headerOffset = 80; // Account for fixed header
-        const elementRect = targetElement.getBoundingClientRect();
-        const elementPosition = elementRect.top + window.pageYOffset;
-        const optimalScrollPosition = Math.max(0, elementPosition - headerOffset);
-
-        // Smooth scroll to the target
-        window.scrollTo({
-          top: optimalScrollPosition,
-          behavior: 'smooth'
-        });
-
-        // Add visual feedback to show scroll target
-        this.addScrollVisualFeedback(targetElement);
-
-      } else {
-        // Fallback 1: Try to scroll to tab content area
-        const activeTabContent = document.querySelector(`[data-tab="${this.ui.activeRecipeTab}"]`);
-        if (activeTabContent) {
-          (activeTabContent as HTMLElement).scrollIntoView({
-            behavior: 'smooth',
-            block: 'start'
-          });
-        } else {
-          // Fallback 2: Scroll to top if no target found
-          this.scrollToTop();
-        }
-      }
-    }, 100); // Small delay to ensure DOM updates are complete
-  }
 
   /**
    * Search recipes
@@ -1058,40 +841,8 @@ export class RecipesComponent implements OnInit, OnDestroy {
   /**
    * Track recipe view
    */
-  private trackRecipeView(recipe: RecipeItem): void {
-    this.recipeService.trackRecipeEvent({
-      type: 'view',
-      recipeId: recipe.id,
-      recipeTitle: recipe.title,
-      recipeCategory: recipe.category,
-      timestamp: new Date()
-    });
-  }
 
-  /**
-   * Update recipe progress
-   */
-  updateRecipeProgress(recipe: RecipeItem, stepNumber: number): void {
-    const progress: RecipeProgress = {
-      recipeId: recipe.id,
-      currentStep: stepNumber,
-      completedSteps: recipe.completedSteps || [],
-      timeSpent: 0, // Could be calculated based on time tracking
-      lastAccessed: new Date()
-    };
-    
-    if (!progress.completedSteps.includes(stepNumber)) {
-      progress.completedSteps.push(stepNumber);
-    }
-    
-    this.recipeService.saveRecipeProgress(progress);
-    
-    // Update local recipe state
-    recipe.currentStep = stepNumber;
-    recipe.completedSteps = progress.completedSteps;
-    
-    this.cdr.markForCheck();
-  }
+
 
   /**
    * Check if mobile view
@@ -1133,30 +884,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * Update page metadata
-   */
-  private updatePageMetadata(): void {
-    let pageTitle = 'Recipes - Data Sync Pro';
-    let pageDescription = 'Step-by-step recipes for Data Sync Pro implementation';
-
-    if (this.currentRecipe) {
-      pageTitle = `${this.currentRecipe.title} - Recipe - Data Sync Pro`;
-      pageDescription = this.currentRecipe.overview || this.currentRecipe.description || this.currentRecipe.usecase || 'Recipe for Data Sync Pro';
-    } else if (this.navigation.category) {
-      const category = this.categories.find(cat => cat.name === this.navigation.category);
-      if (category) {
-        pageTitle = `${category.displayName} Recipes - Data Sync Pro`;
-        pageDescription = category.description;
-      }
-    }
-
-    this.title.setTitle(pageTitle);
-    this.meta.updateTag({ name: 'description', content: pageDescription });
-    this.meta.updateTag({ property: 'og:title', content: pageTitle });
-    this.meta.updateTag({ property: 'og:description', content: pageDescription });
-    this.meta.updateTag({ property: 'og:url', content: window.location.href });
-  }
+  
 
   /**
    * State update helper for OnPush optimization
@@ -1220,20 +948,6 @@ export class RecipesComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Get category icon for sidebar - Updated with more semantic and visually appealing icons
-   */
-  getCategoryIcon(categoryName: string): string {
-    switch (categoryName) {
-      case 'action-button': return 'touch_app';        // More intuitive touch/action icon
-      case 'batch': return 'batch_prediction';         // Specialized batch processing icon  
-      case 'data-list': return 'view_list';           // Clearer list visualization icon
-      case 'data-loader': return 'cloud_upload';      // Modern cloud upload icon
-      case 'triggers': return 'flash_on';             // Dynamic lightning icon
-      default: return 'article';                      // More semantic document icon
-    }
-  }
-
-  /**
    * Open search overlay
    */
   openSearchOverlay(initialQuery = ''): void {
@@ -1265,78 +979,15 @@ export class RecipesComponent implements OnInit, OnDestroy {
     // Navigate to the selected recipe
     this.router.navigate(['/recipes', selectedRecipe.category, selectedRecipe.id]);
     
-    // Track search usage
-    this.recipeService.trackRecipeEvent({
-      type: 'search',
-      recipeId: selectedRecipe.id,
-      recipeTitle: selectedRecipe.question,
-      recipeCategory: selectedRecipe.category,
-      searchQuery: this.searchOverlayInitialQuery,
-      timestamp: new Date()
-    });
     
     this.closeSearchOverlay();
   }
 
-  // ==================== TOC Methods ====================
 
-  /**
-   * Check if TOC should be shown
-   */
-  get shouldShowTOC(): boolean {
-    // Don't show during search
-    if (this.search.isActive || this.search.query.trim()) return false;
-    
-    // Show on home page if we have trending recipes
-    if (this.showHome) return this.trendingRecipes.length > 0;
-    
-    // Show on recipe detail page
-    if (this.showRecipeDetails) return true;
-    
-    // Show on category pages if we have at least one recipe
-    return (!!this.navigation.category) && this.currentRecipes.length >= 1;
-  }
 
-  /**
-   * Get trending recipes for home page TOC
-   */
-  get trendingRecipes(): RecipeItem[] {
-    if (!this._cachedTrendingRecipes || this._lastRecipesLength !== this.recipes.length) {
-      // Sort by category first, then by title A-Z
-      this._cachedTrendingRecipes = this.sortRecipesByCategoryAndTitle(this.recipes)
-        .slice(0, 20); // Limit to 20 trending recipes
-      
-      this._lastRecipesLength = this.recipes.length;
-    }
-    return this._cachedTrendingRecipes;
-  }
 
-  /**
-   * Get current TOC title
-   */
-  get currentTOCTitle(): string {
-    if (this.showHome) return 'Trending recipes';
-    if (this.navigation.category) {
-      const category = this.categories.find(c => c.name === this.navigation.category);
-      return category ? `${category.displayName} Recipes` : 'Category Recipes';
-    }
-    return 'Recipes';
-  }
 
-  /**
-   * Get TOC item count
-   */
-  get tocItemCount(): number {
-    if (this.showHome) return this.trendingRecipes.length;
-    return this.currentRecipes.length;
-  }
 
-  /**
-   * Get recipe tab count for TOC
-   */
-  getRecipeTabCount(): number {
-    return 2; // Overview and Walkthrough are always available (Download merged into Overview)
-  }
 
   /**
    * Generate recipe TOC structure based on current recipe - Dynamic generation
@@ -1354,8 +1005,6 @@ export class RecipesComponent implements OnInit, OnDestroy {
     tabs.push({
       id: 'overview',
       title: 'Overview',
-      icon: 'article',
-      description: '',
       sections: overviewSections
     });
 
@@ -1365,12 +1014,9 @@ export class RecipesComponent implements OnInit, OnDestroy {
       tabs.push({
         id: 'walkthrough',
         title: 'Walkthrough',
-        icon: 'timeline',
-        description: 'Step-by-step Guide',
         sections: walkthroughSections
       });
     }
-
 
     this.recipeTOC.tabs = tabs;
     this.recipeTOC.currentTabId = this.ui.activeRecipeTab;
@@ -1384,9 +1030,8 @@ export class RecipesComponent implements OnInit, OnDestroy {
     {
       id: 'overview',
       title: 'Overview',
-      icon: 'lightbulb',
       elementId: 'recipe-overview',
-      contentType: 'use-case-highlight',
+      contentType: 'html',
       isVisible: () => this.hasValidOverview(),
       getData: () => this.currentRecipe?.overview,
       alwaysShow: true,
@@ -1395,7 +1040,6 @@ export class RecipesComponent implements OnInit, OnDestroy {
     {
       id: 'when-to-use',
       title: 'General Use Case',
-      icon: 'schedule',
       elementId: 'recipe-when-to-use',
       contentType: 'html',
       isVisible: () => this.hasValidWhenToUse(),
@@ -1404,7 +1048,6 @@ export class RecipesComponent implements OnInit, OnDestroy {
     {
       id: 'dsp-versions',
       title: 'Supported DSP Versions',
-      icon: 'verified',
       elementId: 'recipe-dsp-versions',
       contentType: 'tag-list',
       isVisible: () => !!(this.currentRecipe?.DSPVersions?.length && this.currentRecipe.DSPVersions.length > 0),
@@ -1414,7 +1057,6 @@ export class RecipesComponent implements OnInit, OnDestroy {
     {
       id: 'prerequisites',
       title: 'Prerequisites',
-      icon: 'checklist',
       elementId: 'recipe-prerequisites',
       contentType: 'prerequisites',
       isVisible: () => this.hasArrayPrerequisites(),
@@ -1423,7 +1065,6 @@ export class RecipesComponent implements OnInit, OnDestroy {
     {
       id: 'building-permissions',
       title: 'Permission Sets for Building',
-      icon: 'build',
       elementId: 'recipe-building-permissions',
       contentType: 'list',
       isVisible: () => this.getPermissionSetsForBuilding().length > 0,
@@ -1432,7 +1073,6 @@ export class RecipesComponent implements OnInit, OnDestroy {
     {
       id: 'using-permissions',
       title: 'Permission Sets for Using',
-      icon: 'group',
       elementId: 'recipe-using-permissions',
       contentType: 'list',
       isVisible: () => this.getPermissionSetsForUsing().length > 0,
@@ -1441,7 +1081,6 @@ export class RecipesComponent implements OnInit, OnDestroy {
     {
       id: 'download-executables',
       title: 'Download Executable Files',
-      icon: 'download',
       elementId: 'recipe-download-executables',
       contentType: 'download-list',
       isVisible: () => this.hasValidDownloadableExecutables(),
@@ -1450,21 +1089,10 @@ export class RecipesComponent implements OnInit, OnDestroy {
     {
       id: 'related-recipes',
       title: 'Related Recipes',
-      icon: 'link',
       elementId: 'recipe-related',
       contentType: 'link-list',
       isVisible: () => this.hasValidRelatedRecipes(),
       getData: () => this.getValidRelatedRecipes()
-    },
-    {
-      id: 'keywords',
-      title: 'Keywords',
-      icon: 'label',
-      elementId: 'recipe-keywords',
-      contentType: 'tag-list',
-      isVisible: () => !!(this.currentRecipe?.keywords?.length && this.currentRecipe.keywords.length > 0),
-      getData: () => this.currentRecipe?.keywords,
-      tagClass: 'keyword-tag'
     },
   ];
 
@@ -1481,7 +1109,6 @@ export class RecipesComponent implements OnInit, OnDestroy {
         sections.push({
           id: config.id,
           title: config.title,
-          icon: config.icon,
           elementId: config.elementId
         });
       }
@@ -1515,7 +1142,6 @@ export class RecipesComponent implements OnInit, OnDestroy {
         sections.push({
           id: `step-${index}`,
           title: step.step || `Step ${index + 1}`,
-          icon: 'settings',
           elementId: `recipe-step-${index}`
         });
       });
@@ -1523,55 +1149,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
     return sections;
   }
 
-  /**
-   * Toggle TOC visibility
-   */
-  toggleTOC(): void {
-    this.ui.tocHidden = !this.ui.tocHidden;
-    this.saveTOCState();
-    this.cdr.markForCheck();
-  }
 
-  /**
-   * Toggle mobile TOC
-   */
-  toggleMobileTOC(): void {
-    this.ui.mobileTOCOpen = !this.ui.mobileTOCOpen;
-    this.cdr.markForCheck();
-  }
-
-  /**
-   * Close mobile TOC
-   */
-  closeMobileTOC(): void {
-    this.ui.mobileTOCOpen = false;
-    this.cdr.markForCheck();
-  }
-
-  /**
-   * Save TOC state to localStorage
-   */
-  private saveTOCState(): void {
-    try {
-      localStorage.setItem('recipe_toc_hidden', JSON.stringify(this.ui.tocHidden));
-    } catch (error) {
-      console.warn('Failed to save TOC state:', error);
-    }
-  }
-
-  /**
-   * Load TOC state from localStorage
-   */
-  private loadTOCState(): void {
-    try {
-      const saved = localStorage.getItem('recipe_toc_hidden');
-      if (saved !== null) {
-        this.ui.tocHidden = JSON.parse(saved);
-      }
-    } catch (error) {
-      console.warn('Failed to load TOC state:', error);
-    }
-  }
 
   // ==================== Scroll Tracking Methods ====================
 
@@ -1656,9 +1234,6 @@ export class RecipesComponent implements OnInit, OnDestroy {
       this.ui.activeSectionId = activeSectionId;
       this.recipeTOC.currentSectionId = activeSectionId;
       
-      // When scrolling updates the section, clear TOC tab highlighting
-      // This ensures only the section is highlighted, not the parent tab
-      this.ui.highlightedTOCTab = '';
       
       // No need to call ensureParentTabActive since we're already in the correct tab
       
@@ -1752,8 +1327,6 @@ export class RecipesComponent implements OnInit, OnDestroy {
       this.recipeTOC.currentTabId = 'overview';
     }
     
-    // Navigate to the section
-    this.changeRecipeSection(sectionId);
   }
 
   /**
@@ -1773,18 +1346,9 @@ export class RecipesComponent implements OnInit, OnDestroy {
     // Update URL with new step
     this.updateUrlParams('walkthrough', stepIndex);
     
-    // Navigate to the section
-    this.changeRecipeSection(sectionId);
   }
 
-  /**
-   * Handle step completion in walkthrough
-   */
-  onStepComplete(stepNumber: number): void {
-    if (this.currentRecipe) {
-      this.updateRecipeProgress(this.currentRecipe, stepNumber);
-    }
-  }
+
 
   // ==================== Walkthrough Step Navigation ====================
 
@@ -1907,14 +1471,8 @@ export class RecipesComponent implements OnInit, OnDestroy {
       this.updateUrlParams('walkthrough', this.ui.currentWalkthroughStep);
       this.cdr.markForCheck();
       
-      // Scroll to the specific step section instead of top
-      const sectionId = this.getSectionIdFromWalkthroughStep(this.ui.currentWalkthroughStep);
-      if (sectionId) {
-        this.scrollToSection(sectionId);
-      } else {
-        // Fallback to top if section not found
-        this.scrollToTop();
-      }
+      this.scrollToTop();
+  
       
       // Reset animation direction after animation completes
       setTimeout(() => {
@@ -1940,14 +1498,9 @@ export class RecipesComponent implements OnInit, OnDestroy {
       this.updateUrlParams('walkthrough', this.ui.currentWalkthroughStep);
       this.cdr.markForCheck();
       
-      // Scroll to the specific step section instead of top
-      const sectionId = this.getSectionIdFromWalkthroughStep(this.ui.currentWalkthroughStep);
-      if (sectionId) {
-        this.scrollToSection(sectionId);
-      } else {
-        // Fallback to top if section not found
-        this.scrollToTop();
-      }
+
+      this.scrollToTop();
+      
       
       // Reset animation direction after animation completes
       setTimeout(() => {
@@ -1971,18 +1524,10 @@ export class RecipesComponent implements OnInit, OnDestroy {
       if (this.ui.scrollHintDirection === 'bottom' && this.canSwitchToWalkthrough) {
         // Switch to Walkthrough tab at first step
         this.ui.currentWalkthroughStep = 0;
-        this.changeRecipeTab('walkthrough', true); // Enable animation
         
         // Scroll to first step section
         setTimeout(() => {
-          const firstStepSectionId = this.getSectionIdFromWalkthroughStep(0);
-          if (firstStepSectionId) {
-            this.scrollToSection(firstStepSectionId);
-          } else {
             this.scrollToTop();
-          }
-          
-          // Re-evaluate scroll hints after tab switch and scroll complete
           setTimeout(() => {
             this.updateScrollHint();
           }, 200);
@@ -2004,7 +1549,6 @@ export class RecipesComponent implements OnInit, OnDestroy {
         // Check if we should go back to Overview or previous step
         if (this.ui.currentWalkthroughStep === 0 && this.canSwitchToOverview) {
           // Switch back to Overview
-          this.changeRecipeTab('overview', true); // Enable animation
           
           // Scroll to top of overview for intuitive navigation
           setTimeout(() => {
@@ -2038,15 +1582,9 @@ export class RecipesComponent implements OnInit, OnDestroy {
       this.syncTOCSectionWithWalkthrough();
       this.updateUrlParams('walkthrough', this.ui.currentWalkthroughStep);
       this.cdr.markForCheck();
+
+      this.scrollToTop();
       
-      // Scroll to the specific step section instead of top
-      const sectionId = this.getSectionIdFromWalkthroughStep(this.ui.currentWalkthroughStep);
-      if (sectionId) {
-        this.scrollToSection(sectionId);
-      } else {
-        // Fallback to top if section not found
-        this.scrollToTop();
-      }
       
       // Reset animation direction after animation completes
       setTimeout(() => {
@@ -2056,27 +1594,6 @@ export class RecipesComponent implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * Mark current step as completed
-   */
-  markCurrentStepComplete(): void {
-    this.ui.walkthroughStepsCompleted.add(this.ui.currentWalkthroughStep);
-    this.onStepComplete(this.ui.currentWalkthroughStep);
-    
-    // Auto advance to next step if not the last one
-    if (this.ui.currentWalkthroughStep < this.walkthroughSteps.length - 1) {
-      setTimeout(() => {
-        this.goToNextWalkthroughStep();
-      }, 500);
-    }
-  }
-
-  /**
-   * Check if step is completed
-   */
-  isStepCompleted(stepIndex: number): boolean {
-    return this.ui.walkthroughStepsCompleted.has(stepIndex);
-  }
 
   /**
    * Check if can go to next step

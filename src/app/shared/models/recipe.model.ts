@@ -324,8 +324,6 @@ export interface RecipeEvent {
 export interface RecipeSection {
   id: string;
   title: string;
-  icon: string;
-  description?: string;
   elementId?: string; // DOM element ID for scrolling
   isVisible?: boolean; // Whether this section exists in current recipe
 }
@@ -336,8 +334,6 @@ export interface RecipeSection {
 export interface RecipeTab {
   id: string;
   title: string;
-  icon: string;
-  description: string;
   sections: RecipeSection[];
   isExpanded?: boolean;
 }

@@ -386,10 +386,7 @@
   </main>
 
   <!-- Right TOC (Table of Contents) - Microsoft Learn Style -->
-  <aside class="recipe-toc recipe-toc-outline"
-         *ngIf="shouldShowTOC && !ui.isMobile && showRecipeDetails"
-         [class.hidden]="ui.tocHidden">
-    
+  <aside class="recipe-toc recipe-toc-outline">
     <div class="toc-container">
       
       <!-- TOC Navigation -->
@@ -430,15 +427,12 @@
   </aside>
   
   <!-- Recipe List TOC (for Home/Category pages) -->
-  <aside class="recipe-toc recipe-list-toc"
-         *ngIf="shouldShowTOC && !ui.isMobile && !showRecipeDetails"
-         [class.hidden]="ui.tocHidden">
+  <aside class="recipe-toc recipe-list-toc">
     <div class="toc-container">
-      <h3 class="toc-heading">{{ currentTOCTitle }}</h3>
       <nav class="toc-nav">
         <ul class="toc-items">
           <li class="toc-item" 
-              *ngFor="let recipe showHome"
+              *ngFor="let recipe of currentRecipes"
               [class.active]="recipe.id === currentRecipe?.id">
             <a (click)="goToRecipe(recipe)">
               <span>{{ recipe.title }}</span>
@@ -449,83 +443,8 @@
     </div>
   </aside>
 
-  <!-- Mobile TOC Toggle Button - DISABLED -->
-  <!--
-  <button class="mobile-toc-toggle" 
-          (click)="toggleMobileTOC()" 
-          *ngIf="false"
-          mat-fab
-          color="primary"
-          matTooltip="Table of Contents">
-    <mat-icon>list</mat-icon>
-  </button>
-  -->
-
-  <!-- TOC Toggle Button (Desktop) -->
-  <button class="toc-toggle-btn"
-          (click)="toggleTOC()"
-          [title]="ui.tocHidden ? 'Show Table of Contents' : 'Hide Table of Contents'"
-          *ngIf="shouldShowTOC && !ui.isMobile">
-    <lightning-icon
-      [iconName]="ui.tocHidden ? 'utility:chevronleft' : 'utility:chevronright'"
-      size="xx-small"
-      [alternativeText]="ui.tocHidden ? 'Show TOC' : 'Hide TOC'"
-    ></lightning-icon>
-  </button>
 
 </div>
-
-<!-- Mobile TOC Drawer - DISABLED -->
-<!--
-<aside class="recipe-toc mobile-toc" 
-       *ngIf="false"
-       [class.open]="ui.mobileTOCOpen">
-  
-  <div class="mobile-toc-overlay" 
-       (click)="closeMobileTOC()"></div>
-  
-  <div class="mobile-toc-content">
-    <div class="mobile-toc-header">
-      <h3>{{ showRecipeDetails ? 'Sections' : 'Recipes' }}</h3>
-      <button class="mobile-toc-close" 
-              (click)="closeMobileTOC()"
-              mat-icon-button>
-        <mat-icon>close</mat-icon>
-      </button>
-    </div>
-    
-    <div class="mobile-toc-list">
-      <ng-container *ngIf="showRecipeDetails">
-        <div class="toc-sections" *ngIf="ui.activeRecipeTab">
-          <div *ngFor="let section of getActiveTabSections(); let i = index" 
-               class="toc-item toc-section-item"
-               [class.active]="ui.activeSectionId === section.id"
-               (click)="changeRecipeSection(section.id); closeMobileTOC()">
-            <div class="toc-section-number">{{ i + 1 }}</div>
-            <div class="toc-item-content">
-              <div class="toc-item-title">{{ section.title }}</div>
-            </div>
-          </div>
-        </div>
-      </ng-container>
-      
-      <ng-container *ngIf="!showRecipeDetails">
-        <div class="toc-item" 
-             *ngFor="let recipe of (showHome ? paginatedTrendingRecipes : paginatedCategoryRecipes)"
-             [class.active]="recipe.id === currentRecipe?.id"
-             (click)="goToRecipe(recipe); closeMobileTOC()">
-          <div class="toc-item-icon">
-            <mat-icon>{{ getCategoryIcon(recipe.category) }}</mat-icon>
-          </div>
-          <div class="toc-item-content">
-            <div class="toc-item-title">{{ recipe.title }}</div>
-          </div>
-        </div>
-      </ng-container>
-    </div>
-  </div>
-</aside>
--->
 
 <!-- Recipe Search Overlay -->
 <app-recipe-search-overlay
