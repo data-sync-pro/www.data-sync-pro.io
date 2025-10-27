@@ -46,38 +46,26 @@ interface UIState {
   tocHidden: boolean;
   tocInFooterZone: boolean;
   tocFooterApproaching: boolean;
-  activeRecipeTab: string; // Used for content display - determines which tab content to show
-  activeSectionId: string; // Used for section highlighting within a tab
-  highlightedTOCTab: string; // Used for TOC visual highlighting - can be empty to show no tab highlight
-  // expandedTabs: Set<string>; // No longer used since TOC doesn't show tabs
+  activeRecipeTab: string;
+  activeSectionId: string; 
+  highlightedTOCTab: string; 
   userHasScrolled: boolean;
   scrollTicking: boolean;
   disableScrollHighlight: boolean;
-  // Walkthrough step navigation
   currentWalkthroughStep: number;
   walkthroughStepsCompleted: Set<number>;
-  // Scroll-to-next-step control
   isTransitioningStep: boolean;
   lastStepTransitionTime: number;
-  // Two-scroll logic for bottom navigation
   hasScrolledToBottomOnce: boolean;
   hasScrolledToTopOnce: boolean;
-  // Scroll hint display
   showScrollHint: boolean;
   scrollHintDirection: 'top' | 'bottom' | null;
   scrollHintOpacity: number;
-  // Animation control
   stepAnimationDirection: 'forward' | 'backward' | null;
   tabAnimationDirection: 'forward' | 'backward' | null;
 }
 
-interface TOCPaginationState {
-  currentPage: number;
-  itemsPerPage: number;
-  totalPages: number;
-  startIndex: number;
-  endIndex: number;
-}
+
 
 
 interface SearchState {
@@ -99,7 +87,6 @@ interface SearchState {
   styleUrls: ['./recipes.component.scss'],
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush
-  // Removed animations array to prevent conflicts with CSS animations
 })
 export class RecipesComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
@@ -140,14 +127,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
     tabAnimationDirection: null
   };
 
-  // TOC pagination state
-  tocPagination: TOCPaginationState = {
-    currentPage: 1,
-    itemsPerPage: 8,
-    totalPages: 1,
-    startIndex: 0,
-    endIndex: 0
-  };
+
 
   // TOC data
   private _cachedTrendingRecipes?: RecipeItem[];
@@ -250,171 +230,13 @@ export class RecipesComponent implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * Handle wheel scroll events for walkthrough auto-navigation
-   */
-  @HostListener('window:wheel', ['$event'])
-  onWheelScroll(event: WheelEvent) {
-    // Only handle when viewing recipe details
-    if (!this.showRecipeDetails) {
-      return;
-    }
 
-    // Handle Overview to Walkthrough transition
-    if (this.ui.activeRecipeTab === 'overview') {
-      // Prevent transitions if already transitioning
-      if (this.ui.isTransitioningStep) {
-        return;
-      }
-
-      // Check cooldown period (800ms between transitions)
-      const now = Date.now();
-      if (now - this.ui.lastStepTransitionTime < 800) {
-        return;
-      }
-
-      // If scrolling down at bottom of Overview, implement two-scroll logic
-      if (event.deltaY > 0 && this.isAtPageBottom()) {
-        if (!this.ui.hasScrolledToBottomOnce) {
-          // First time reaching bottom - just mark it and don't transition
-          this.ui.hasScrolledToBottomOnce = true;
-          this.cdr.markForCheck();
-        } else {
-          // Second scroll action while at bottom - perform transition
-          this.ui.isTransitioningStep = true;
-          this.ui.lastStepTransitionTime = now;
-          
-          // Reset scroll tracking state
-          this.ui.hasScrolledToBottomOnce = false;
-          
-          // Switch to Walkthrough tab at first step with animation
-          this.ui.currentWalkthroughStep = 0;
-          this.changeRecipeTab('walkthrough', true); // Enable animation
-          
-          // Scroll to first step section instead of top
-          setTimeout(() => {
-            const firstStepSectionId = this.getSectionIdFromWalkthroughStep(0);
-            if (firstStepSectionId) {
-              this.scrollToSection(firstStepSectionId);
-            } else {
-              // Fallback to top if section not found
-              this.scrollToTop();
-            }
-          }, 100); // Small delay to let animation start
-          
-          // Reset transition flag after animation completes
-          setTimeout(() => {
-            this.ui.isTransitioningStep = false;
-          }, 1000); // After animation (0.9s) + buffer
-        }
-      }
-      return;
-    }
-
-    // Only handle in walkthrough tab from here
-    if (this.ui.activeRecipeTab !== 'walkthrough') {
-      return;
-    }
-
-    // Prevent transitions if already transitioning
-    if (this.ui.isTransitioningStep) {
-      return;
-    }
-
-    // Check cooldown period (800ms between transitions)
-    const now = Date.now();
-    if (now - this.ui.lastStepTransitionTime < 800) {
-      return;
-    }
-
-    // If in walkthrough first step and scrolling up at top, switch to overview
-    if (event.deltaY < 0 && this.isAtPageTop() && 
-        this.ui.currentWalkthroughStep === 0 && 
-        this.ui.activeRecipeTab === 'walkthrough') {
-      
-      this.ui.isTransitioningStep = true;
-      this.ui.lastStepTransitionTime = now;
-      
-      // Hide hint before transitioning
-      this.ui.showScrollHint = false;
-      
-      // Switch to Overview tab with animation
-      this.changeRecipeTab('overview', true); // Enable animation
-      
-      // Scroll to top of overview for intuitive navigation
-      setTimeout(() => {
-        this.scrollToTop();
-      }, 100); // Small delay to let animation start
-      
-      // Reset transition flag after animation completes
-      setTimeout(() => {
-        this.ui.isTransitioningStep = false;
-        // Update scroll hint based on new state
-        this.updateScrollHint();
-      }, 1000); // After animation (0.9s) + buffer
-      
-      return; // Prevent further processing
-    }
-
-    // Check if scrolling down and at bottom - implement two-scroll logic
-    if (event.deltaY > 0 && this.isAtPageBottom() && this.canGoToNextStep) {
-      if (!this.ui.hasScrolledToBottomOnce) {
-        // First time reaching bottom - just mark it and don't transition
-        this.ui.hasScrolledToBottomOnce = true;
-        this.cdr.markForCheck();
-      } else {
-        // Second scroll action while at bottom - perform transition
-        this.ui.isTransitioningStep = true;
-        this.ui.lastStepTransitionTime = now;
-        
-        // Reset scroll tracking state
-        this.ui.hasScrolledToBottomOnce = false;
-        
-        // Hide hint before transitioning
-        this.ui.showScrollHint = false;
-        
-        // Navigate to next step
-        this.goToNextWalkthroughStep();
-        
-        // Reset transition flag after animation - extended time to prevent hint from reappearing
-        setTimeout(() => {
-          this.ui.isTransitioningStep = false;
-        }, 1500);
-      }
-    }
-    // Check if scrolling up and at top - implement two-scroll logic  
-    else if (event.deltaY < 0 && this.isAtPageTop() && this.canGoToPreviousStep) {
-      if (!this.ui.hasScrolledToTopOnce) {
-        // First time reaching top - just mark it and don't transition
-        this.ui.hasScrolledToTopOnce = true;
-        this.cdr.markForCheck();
-      } else {
-        // Second scroll action while at top - perform transition
-        this.ui.isTransitioningStep = true;
-        this.ui.lastStepTransitionTime = now;
-        
-        // Reset scroll tracking state
-        this.ui.hasScrolledToTopOnce = false;
-        
-        // Hide hint before transitioning
-        this.ui.showScrollHint = false;
-        
-        // Navigate to previous step
-        this.goToPreviousWalkthroughStep();
-        
-        // Reset transition flag after animation - extended time to prevent hint from reappearing
-        setTimeout(() => {
-          this.ui.isTransitioningStep = false;
-        }, 1500);
-      }
-    }
-  }
 
   /**
    * Update scroll hint based on scroll position - Unified logic for both tabs
    */
   private updateScrollHint(): void {
-    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    const scrollTop = document.documentElement.scrollTop;
     const windowHeight = window.innerHeight;
     const documentHeight = document.documentElement.scrollHeight;
     
@@ -700,7 +522,6 @@ export class RecipesComponent implements OnInit, OnDestroy {
         if (this.ui.currentView === 'home') {
           this.filteredRecipes = this.sortRecipesByCategoryAndTitle(recipes);
         }
-        this.resetTOCPagination();
         this.updateUIState({ isLoading: false });
         this.cdr.markForCheck();
       },
@@ -1107,8 +928,6 @@ export class RecipesComponent implements OnInit, OnDestroy {
       this.recipeTOC.currentTabId = parentTab.id;
       
       // Parent tab is automatically active for content display
-      
-      // Note: highlightedTOCTab is handled separately and should be empty when a section is selected
     }
   }
 
@@ -1592,24 +1411,6 @@ export class RecipesComponent implements OnInit, OnDestroy {
       getData: () => this.currentRecipe?.DSPVersions,
       tagClass: 'version-tag'
     },
-    // {
-    //   id: 'connection',
-    //   title: 'Connection Type',
-    //   icon: 'link',
-    //   elementId: 'recipe-connection',
-    //   contentType: 'text',
-    //   isVisible: () => this.hasValidConnection(),
-    //   getData: () => this.currentRecipe?.connection
-    // },
-    // {
-    //   id: 'direction',
-    //   title: 'Direction',
-    //   icon: 'trending_flat',
-    //   elementId: 'recipe-direction',
-    //   contentType: 'html',
-    //   isVisible: () => this.hasValidDirection(),
-    //   getData: () => this.currentRecipe?.safeDirection || this.currentRecipe?.direction
-    // },
     {
       id: 'prerequisites',
       title: 'Prerequisites',
@@ -1720,88 +1521,6 @@ export class RecipesComponent implements OnInit, OnDestroy {
       });
     }
     return sections;
-  }
-
-  /**
-   * Get paginated trending recipes
-   */
-  get paginatedTrendingRecipes(): RecipeItem[] {
-    if (!this.showHome) return [];
-    return this.trendingRecipes.slice(this.tocPagination.startIndex, this.tocPagination.endIndex);
-  }
-
-  /**
-   * Get paginated category recipes
-   */
-  get paginatedCategoryRecipes(): RecipeItem[] {
-    if (this.showHome) return [];
-    return this.currentRecipes.slice(this.tocPagination.startIndex, this.tocPagination.endIndex);
-  }
-
-  /**
-   * Get TOC pagination info
-   */
-  get tocPaginationInfo(): string {
-    const start = this.tocPagination.startIndex + 1;
-    const end = Math.min(this.tocPagination.endIndex, this.tocItemCount);
-    return `${start}-${end} of ${this.tocItemCount}`;
-  }
-
-  /**
-   * Check if has previous TOC page
-   */
-  get hasPreviousTOCPage(): boolean {
-    return this.tocPagination.currentPage > 1;
-  }
-
-  /**
-   * Check if has next TOC page
-   */
-  get hasNextTOCPage(): boolean {
-    return this.tocPagination.currentPage < this.tocPagination.totalPages;
-  }
-
-  /**
-   * Go to previous TOC page
-   */
-  goToPreviousTOCPage(): void {
-    if (this.tocPagination.currentPage > 1) {
-      this.tocPagination.currentPage--;
-      this.updateTOCPaginationIndices();
-      this.cdr.markForCheck();
-    }
-  }
-
-  /**
-   * Go to next TOC page
-   */
-  goToNextTOCPage(): void {
-    if (this.tocPagination.currentPage < this.tocPagination.totalPages) {
-      this.tocPagination.currentPage++;
-      this.updateTOCPaginationIndices();
-      this.cdr.markForCheck();
-    }
-  }
-
-  /**
-   * Update TOC pagination indices
-   */
-  private updateTOCPaginationIndices(): void {
-    const totalItems = this.tocItemCount;
-    this.tocPagination.totalPages = Math.ceil(totalItems / this.tocPagination.itemsPerPage);
-    this.tocPagination.startIndex = (this.tocPagination.currentPage - 1) * this.tocPagination.itemsPerPage;
-    this.tocPagination.endIndex = Math.min(
-      this.tocPagination.startIndex + this.tocPagination.itemsPerPage,
-      totalItems
-    );
-  }
-
-  /**
-   * Reset TOC pagination
-   */
-  private resetTOCPagination(): void {
-    this.tocPagination.currentPage = 1;
-    this.updateTOCPaginationIndices();
   }
 
   /**

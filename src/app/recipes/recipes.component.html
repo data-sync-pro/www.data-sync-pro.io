@@ -438,7 +438,7 @@
       <nav class="toc-nav">
         <ul class="toc-items">
           <li class="toc-item" 
-              *ngFor="let recipe of (showHome ? paginatedTrendingRecipes : paginatedCategoryRecipes)"
+              *ngFor="let recipe showHome"
               [class.active]="recipe.id === currentRecipe?.id">
             <a (click)="goToRecipe(recipe)">
               <span>{{ recipe.title }}</span>
