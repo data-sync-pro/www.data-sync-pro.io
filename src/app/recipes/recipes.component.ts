@@ -531,16 +531,16 @@ export class RecipesComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Load specific recipe details
+   * Load specific recipe details by slug
    */
-  private loadRecipeDetails(category: string, recipeName: string): void {
-    this.recipeService.getRecipe(category, recipeName).pipe(
+  private loadRecipeDetails(category: string, recipeSlug: string): void {
+    this.recipeService.getRecipe(category, recipeSlug).pipe(
       takeUntil(this.destroy$)
     ).subscribe({
       next: (recipe) => {
         this.currentRecipe = recipe;
         this.updateUIState({ isLoading: false });
-        
+
         if (recipe) {
           // Generate TOC structure for the loaded recipe
           this.generateRecipeTOCStructure();
@@ -549,7 +549,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
           // Reset scroll state
           this.ui.userHasScrolled = false;
         }
-        
+
         this.cdr.markForCheck();
       },
       error: (error) => {
@@ -740,22 +740,22 @@ export class RecipesComponent implements OnInit, OnDestroy {
    * Navigate to recipe
    */
   goToRecipe(recipe: RecipeItem): void {
-    //console.log('Navigating to recipe:', recipe.title, '(id:', recipe.id, ') Category:', recipe.category);
-    
+    //console.log('Navigating to recipe:', recipe.title, '(slug:', recipe.slug, ') Category:', recipe.category);
+
     // Check if navigating to the same recipe
-    const isSameRecipe = this.currentRecipe && 
-                        this.currentRecipe.id === recipe.id && 
+    const isSameRecipe = this.currentRecipe &&
+                        this.currentRecipe.id === recipe.id &&
                         this.currentRecipe.category === recipe.category;
-    
-    this.router.navigate(['/recipes', recipe.category, recipe.id]);
-    
+
+    this.router.navigate(['/recipes', recipe.category, recipe.slug]);
+
     // Only reset to overview tab when navigating to a different recipe
     if (!isSameRecipe) {
       this.ui.activeRecipeTab = 'overview';
       this.ui.activeSectionId = 'use-case';
       this.ui.currentWalkthroughStep = 0;
     }
-    
+
   }
 
 
@@ -943,10 +943,10 @@ export class RecipesComponent implements OnInit, OnDestroy {
    * Handle search overlay selection
    */
   handleSearchOverlaySelect(selectedRecipe: SelectedSuggestion): void {
-    // Navigate to the selected recipe
-    this.router.navigate(['/recipes', selectedRecipe.category, selectedRecipe.id]);
-    
-    
+    // Navigate to the selected recipe using slug
+    this.router.navigate(['/recipes', selectedRecipe.category, selectedRecipe.slug]);
+
+
     this.closeSearchOverlay();
   }
 

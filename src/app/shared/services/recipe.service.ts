@@ -4,6 +4,7 @@ import { Observable, BehaviorSubject, of, throwError, combineLatest } from 'rxjs
 import { map, catchError, shareReplay, tap, finalize, switchMap } from 'rxjs/operators';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { AutoLinkService } from './auto-link.service';
+import { generateSlug } from '../utils/slug.utils';
 
 import {
   SourceRecipeRecord,
@@ -11,13 +12,10 @@ import {
   RecipeCategory,
   RecipeSearchResult,
   RecipeFilter,
-  RecipeSortOptions,
   RecipeStats,
   RecipeProgress,
   RecipeEvent,
-  RecipeContentStatus,
   RecipeCategoryType,
-  RecipeWalkthroughStep,
   LegacyRecipeWalkthrough
 } from '../models/recipe.model';
 
@@ -256,6 +254,7 @@ export class RecipeService implements OnDestroy {
         // New format fields
         id: record.id,
         title: record.title,
+        slug: generateSlug(record.title),
         category: record.category,
         DSPVersions: record.DSPVersions || [],
         overview: record.overview || record.usecase || '',
@@ -310,6 +309,7 @@ export class RecipeService implements OnDestroy {
         // Required new format fields (with defaults)
         id: record.id,
         title: record.title,
+        slug: generateSlug(record.title),
         category: record.category,
         DSPVersions: [],
         overview: record.useCase || record.description || '',
@@ -401,13 +401,13 @@ export class RecipeService implements OnDestroy {
   }
 
   /**
-   * Get single recipe by id and category
+   * Get single recipe by slug and category
    */
-  getRecipe(category: string, recipeId: string): Observable<RecipeItem | null> {
+  getRecipe(category: string, recipeSlug: string): Observable<RecipeItem | null> {
     return this.recipesCache$.pipe(
       map(recipes => {
-        const foundRecipe = recipes.find(recipe => 
-          recipe.category === category && recipe.id === recipeId
+        const foundRecipe = recipes.find(recipe =>
+          recipe.category === category && recipe.slug === recipeSlug
         );
         return foundRecipe || null;
       })

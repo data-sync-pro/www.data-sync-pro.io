@@ -27,6 +27,7 @@ interface RawRecipe {
 
 interface RecipeItem {
   id: string;
+  slug?: string;
   question: string;
   route: string;
   category: string;
@@ -93,11 +94,12 @@ export class RecipeSearchOverlayComponent implements OnInit, OnChanges {
           .filter(r => r.id) // Only include recipes with valid IDs
           .map((r) => ({
             id: r.id,
+            slug: r.slug,
             question: r.title,
-            route: `/recipes/${encodeURIComponent(r.category)}/${r.id}`,
+            route: `/recipes/${encodeURIComponent(r.category)}/${r.slug}`,
             category: r.category,
             subCategory: r.keywords && r.keywords.length > 0 ? r.keywords[0] : null,
-            tags: r.keywords && r.keywords.length > 0 
+            tags: r.keywords && r.keywords.length > 0
               ? [r.category, r.keywords[0]]
               : [r.category],
           }));

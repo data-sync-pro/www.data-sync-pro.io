@@ -165,6 +165,7 @@ export interface CodeExample {
 export interface RecipeItem {
   id: string;
   title: string;
+  slug?: string; // URL-friendly version of title (runtime generated)
   category: string;
   DSPVersions: string[];
   overview: string; // Updated from usecase
