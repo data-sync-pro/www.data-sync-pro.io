@@ -21,20 +21,7 @@ $header-height: 60px; // Match the global header height
   top: $header-height;
   height: calc(100vh - $header-height);
   overflow: hidden;
-  
-  // Responsive hiding: W3Schools breakpoint strategy
-  @media (max-width: $breakpoint-desktop) {
-    position: fixed;
-    left: 0;
-    top: $header-height;
-    transform: translateX(-100%);
-    z-index: 1000;
-    width: $sidebar-width;
-    
-    &.mobile-open {
-      transform: translateX(0);
-    }
-  }
+
   
   &.collapsed {
     width: $sidebar-collapsed;

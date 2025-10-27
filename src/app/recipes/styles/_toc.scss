@@ -686,42 +686,4 @@ $toc-text-muted: #5f6368;
   }
 }
 
-// Responsive adjustments - matching FAQ breakpoint strategy
-@media (max-width: $breakpoint-desktop) {
-  .recipe-toc.desktop-toc {
-    display: none; // Hide desktop TOC on mobile
-  }
-}
 
-// Mobile responsive adjustments
-@media (max-width: 480px) {
-  .recipe-toc.mobile-toc .mobile-toc-content {
-    width: 100%;
-    max-width: 100%;
-  }
-  
-  .recipe-toc.mobile-toc {
-    .mobile-toc-header {
-      padding: 10px 12px;
-      min-height: 48px;
-      
-      h3 {
-        font-size: 0.8125rem;
-      }
-      
-      .mobile-toc-close {
-        width: 28px;
-        height: 28px;
-        min-width: 28px;
-      }
-    }
-    
-    .mobile-toc-list .toc-item {
-      padding: 6px 12px;
-      
-      .toc-item-content .toc-item-title {
-        font-size: 0.75rem;
-      }
-    }
-  }
-}

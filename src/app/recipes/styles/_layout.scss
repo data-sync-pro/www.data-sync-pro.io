@@ -82,7 +82,7 @@ $breakpoint-mobile: 576px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.15);
   
   @media (min-width: $breakpoint-desktop) {
-    display: none !important;
+    display: none ;
   }
 }
 
@@ -117,7 +117,7 @@ $breakpoint-mobile: 576px;
 
 .recipe-main {
   grid-area: main;
-  padding: 60px 3vw; // Match FAQ's responsive padding
+  padding: 60px 3vw;
   overflow-x: hidden;
   overflow-y: auto;
   background: #ffffff;
@@ -216,7 +216,7 @@ $breakpoint-mobile: 576px;
   }
 
   @media (max-width: $breakpoint-desktop) {
-    display: none !important;
+    display: none ;
   }
 }
 
@@ -248,7 +248,7 @@ $breakpoint-mobile: 576px;
   z-index: 100;
   
   @media (min-width: $breakpoint-desktop) {
-    display: none !important;
+    display: none ;
   }
 }
 
@@ -468,10 +468,6 @@ $breakpoint-mobile: 576px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   }
 
-  // Mobile responsive adjustments - hide breadcrumb on mobile
-  @media (max-width: 768px) {
-    display: none; // Hide breadcrumb completely on mobile devices
-  }
 
   // Ensure proper stacking context
   isolation: isolate;
@@ -523,14 +519,6 @@ $breakpoint-mobile: 576px;
     overflow: hidden;
     text-overflow: ellipsis;
 
-    // Mobile responsive text truncation
-    @media (max-width: 768px) {
-      max-width: 80px;
-    }
-
-    @media (max-width: 480px) {
-      max-width: 60px;
-    }
   }
 }
 

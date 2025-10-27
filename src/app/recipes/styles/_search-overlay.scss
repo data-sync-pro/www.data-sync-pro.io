@@ -338,31 +338,3 @@
     margin-right: 1rem;
   }
 }
-
-// Mobile responsive styles
-@media (max-width: 768px) {
-  .recipe-search-overlay {
-    padding-top: 2rem;
-  }
-
-  .search-overlay-content {
-    width: 95%;
-    max-height: 95%;
-    padding: 1rem;
-  }
-
-  .overlay-header h2 {
-    font-size: 1.25rem;
-  }
-
-  .result-item {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.75rem;
-
-    .result-meta {
-      width: 100%;
-      justify-content: flex-start;
-    }
-  }
-}

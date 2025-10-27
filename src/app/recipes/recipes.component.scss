@@ -7,8 +7,6 @@
 @import './styles/search-overlay';
 // @import './styles/toc'; // Old TOC styles - replaced with Microsoft style
 @import './styles/toc-microsoft'; // New Microsoft Learn style TOC
-@import './styles/responsive';
-
 // Import layout variables for precise button positioning
 $sidebar-width: 240px;
 $sidebar-collapsed-width: 56px;
@@ -21,31 +19,6 @@ $breakpoint-mobile: 576px;
 // The main layout is handled by modular styles
 
 // ==================== Recipe Detail Content Styles ====================
-
-// ==================== Use Case Highlight Styles ====================
-
-// Use Case section with simple card-style design
-.recipe-section.use-case-highlight {
-  background: #f8f9fa;
-  border-radius: 8px;
-  padding: 20px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-
-  // Clean header styling for Use Case
-  h4 {
-    @include title-item;
-    color: #007bff;
-    margin: 0 0 16px 0;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-
-    .section-icon {
-      font-size: 1.1rem;
-      color: #007bff;
-    }
-  }
-}
 
 // Use Case content - direct display without nested card
 .use-case-content {
@@ -61,25 +34,8 @@ $breakpoint-mobile: 576px;
       margin-bottom: 0;
     }
   }
-
-  // Subtle highlight for important terms
-  strong, b {
-    color: #007bff;
-    font-weight: 600;
-  }
-
-  // Simple link styling
-  a {
-    color: #007bff;
-    text-decoration: none;
-
-    &:hover {
-      text-decoration: underline;
-    }
-  }
 }
 
-// Section icons for all sections
 .recipe-section h4 .section-icon {
   font-size: 1.2rem;
   margin-right: 8px;
@@ -87,53 +43,6 @@ $breakpoint-mobile: 576px;
   transition: color 0.2s ease;
 }
 
-// Responsive adjustments for Use Case highlight
-@media (max-width: 768px) {
-  .recipe-section.use-case-highlight {
-    padding: 16px;
-    margin-bottom: 20px;
-
-    h4 {
-      font-size: 1rem;
-    }
-  }
-
-  .use-case-content {
-    font-size: 0.95rem;
-  }
-}
-
-// Dark theme support for Use Case highlight
-@media (prefers-color-scheme: dark) {
-  .recipe-section.use-case-highlight {
-    background: #2d3748;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
-
-    h4 {
-      color: #4299e1;
-
-      .section-icon {
-        color: #4299e1;
-      }
-    }
-  }
-
-  .use-case-content {
-    color: #e2e8f0;
-
-    strong, b {
-      color: #4299e1;
-    }
-
-    a {
-      color: #4299e1;
-
-      &:hover {
-        text-decoration: underline;
-      }
-    }
-  }
-}
 
 // Version and keyword tags
 .version-tags, .keyword-tags {
@@ -469,13 +378,13 @@ app-recipe-step {
   
   // Direction-aware horizontal animations for step navigation
   &.slide-forward {
-    animation: slideFromRight 0.9s cubic-bezier(0.25, 0.1, 0.25, 1) !important;
-    animation-fill-mode: both !important;
+    animation: slideFromRight 0.9s cubic-bezier(0.25, 0.1, 0.25, 1) ;
+    animation-fill-mode: both ;
   }
   
   &.slide-backward {
-    animation: slideFromLeft 0.9s cubic-bezier(0.25, 0.1, 0.25, 1) !important;
-    animation-fill-mode: both !important;
+    animation: slideFromLeft 0.9s cubic-bezier(0.25, 0.1, 0.25, 1) ;
+    animation-fill-mode: both ;
   }
 }
 
@@ -489,18 +398,18 @@ app-recipe-step {
 }
 
 .step-indicator {
-  width: 36px !important;
-  height: 36px !important;
-  min-width: 36px !important;
+  width: 36px ;
+  height: 36px ;
+  min-width: 36px ;
   
   &.active {
-    background-color: #1976d2 !important;
-    color: white !important;
+    background-color: #1976d2 ;
+    color: white ;
   }
   
   &.completed {
-    background-color: #4caf50 !important;
-    color: white !important;
+    background-color: #4caf50 ;
+    color: white ;
   }
   
   span, mat-icon {
@@ -523,33 +432,33 @@ app-recipe-step {
 }
 
 .nav-button {
-  display: flex !important;
+  display: flex ;
   align-items: center;
   gap: 8px;
   min-width: 120px;
   height: 44px;
-  font-weight: 500 !important;
-  border-radius: 8px !important;
-  transition: all 0.2s ease !important;
-  padding: 0 20px !important;
+  font-weight: 500 ;
+  border-radius: 8px ;
+  transition: all 0.2s ease ;
+  padding: 0 20px ;
   
   
-  background-color: #f5f5f5 !important; 
-  color: #666666 !important; 
-  border: 1px solid #e0e0e0 !important;
-  box-shadow: none !important;
+  background-color: #f5f5f5 ; 
+  color: #666666 ; 
+  border: 1px solid #e0e0e0 ;
+  box-shadow: none ;
   
   &:hover:not([disabled]) {
-    background-color: #eeeeee !important; 
-    color: #333333 !important; 
-    border-color: #d0d0d0 !important;
-    transform: translateY(-1px) !important;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+    background-color: #eeeeee ; 
+    color: #333333 ; 
+    border-color: #d0d0d0 ;
+    transform: translateY(-1px) ;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) ;
   }
   
   &:active:not([disabled]) {
-    transform: translateY(0) !important;
-    box-shadow: none !important;
+    transform: translateY(0) ;
+    box-shadow: none ;
   }
   
   &.prev-button {
@@ -570,18 +479,18 @@ app-recipe-step {
   }
   
   mat-icon {
-    font-size: 20px !important;
-    width: 20px !important;
-    height: 20px !important;
-    color: inherit !important;
+    font-size: 20px ;
+    width: 20px ;
+    height: 20px ;
+    color: inherit ;
   }
   
   &[disabled] {
-    background-color: #fafafa !important;
-    color: #cccccc !important;
-    border-color: #f0f0f0 !important;
-    cursor: not-allowed !important;
-    opacity: 1 !important; 
+    background-color: #fafafa ;
+    color: #cccccc ;
+    border-color: #f0f0f0 ;
+    cursor: not-allowed ;
+    opacity: 1 ; 
   }
   
   
@@ -589,7 +498,7 @@ app-recipe-step {
     min-width: 44px;
     max-width: 44px;
     height: 40px;
-    padding: 0 !important;
+    padding: 0 ;
     
     span {
       display: none; 
@@ -631,18 +540,6 @@ app-recipe-step {
   min-height: 500px;
 }
 
-// Step indicators responsive styles
-@media (max-width: #{$breakpoint-tablet}) {
-  .step-indicators {
-    gap: 6px;
-  }
-  
-  .step-indicator {
-    width: 32px !important;
-    height: 32px !important;
-    min-width: 32px !important;
-  }
-}
 
 // Animations
 @keyframes fadeIn {
@@ -703,85 +600,4 @@ app-recipe-step {
 // Recipe page styling
 :host-context(body.recipe-page) {
   display: block;
-}
-
-// Note: Footer is now allowed to display normally
-// Users can scroll to see footer at bottom of page
-
-// Enhanced CSS Variables for theming
-:root {
-  // Base colors
-  --background-color: #ffffff;
-  --surface-color: #f8f9fa;
-  --background-muted: #e9ecef;
-  --text-color: #202124;
-  --text-muted: #5f6368;
-  --border-color: #e1e5e9;
-  --hover-color: #f1f3f4;
-  
-  // Brand colors - Google Material Design palette
-  --primary-color: #1a73e8;
-  --primary-light: #4285f4;
-  --primary-dark: #1557b0;
-  --secondary-color: #34a853;
-  --accent-color: #fbbc04;
-  
-  // Functional colors
-  --success-color: #137333;
-  --success-bg: #e8f5e8;
-  --warning-color: #f57c00;
-  --warning-bg: #fef7e0;
-  --error-color: #d93025;
-  --error-bg: #fce8e6;
-  --info-color: #1a73e8;
-  --info-bg: #e8f0fe;
-  
-  
-  // Interactive states
-  --hover-bg: #f1f3f4;
-  --active-bg: #e8f0fe;
-  --focus-ring: #4285f4;
-  --shadow-light: rgba(0, 0, 0, 0.08);
-  --shadow-medium: rgba(0, 0, 0, 0.12);
-  --shadow-strong: rgba(0, 0, 0, 0.16);
-}
-
-// Enhanced dark theme support
-@media (prefers-color-scheme: dark) {
-  :root {
-    // Base colors
-    --background-color: #121212;
-    --surface-color: #1e1e1e;
-    --background-muted: #2d2d2d;
-    --text-color: #e8eaed;
-    --text-muted: #9aa0a6;
-    --border-color: #3c4043;
-    --hover-color: #2a2a2a;
-    
-    // Adjusted brand colors for dark theme
-    --primary-color: #4285f4;
-    --primary-light: #669df6;
-    --primary-dark: #1a73e8;
-    --secondary-color: #34a853;
-    --accent-color: #fbbc04;
-    
-    // Dark theme functional colors
-    --success-color: #81c995;
-    --success-bg: #1e3a1e;
-    --warning-color: #fdd663;
-    --warning-bg: #2d2111;
-    --error-color: #f28b82;
-    --error-bg: #3b1612;
-    --info-color: #8ab4f8;
-    --info-bg: #1a237e;
-    
-    
-    // Dark theme interactive states
-    --hover-bg: #313235;
-    --active-bg: #1e3a8a;
-    --focus-ring: #8ab4f8;
-    --shadow-light: rgba(0, 0, 0, 0.2);
-    --shadow-medium: rgba(0, 0, 0, 0.3);
-    --shadow-strong: rgba(0, 0, 0, 0.4);
-  }
 }

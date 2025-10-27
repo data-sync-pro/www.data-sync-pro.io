@@ -137,79 +137,7 @@
   }
 }
 
-// Responsive design enhancements
-@media (max-width: 768px) {
-  .recipe-card {
-    padding: 18px 20px;
-    
-    &:hover {
-      transform: none; // Disable hover effects on touch devices
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    }
-  }
-  
-  .card-header {
-    margin-bottom: 10px;
-  }
-  
-  .recipe-title {
-    font-size: 1rem;
-  }
-  
-  .category-tag {
-    font-size: 0.7rem;
-    padding: 3px 8px;
-  }
-  
-  .download-button {
-    min-width: 28px;
-    min-height: 28px;
-    width: 28px;
-    height: 28px;
-    padding: 4px;
-    
-    lightning-icon {
-      font-size: 16px;
-      width: 16px;
-      height: 16px;
-      flex-shrink: 0;
-    }
-  }
-}
 
-// Dark theme support (if implemented)
-@media (prefers-color-scheme: dark) {
-  .recipe-card {
-    background: #1e1e1e;
-    border-color: #333;
-    color: #e0e0e0;
-    
-    &:hover {
-      background: #252525;
-      border-color: #4a4a4a;
-    }
-    
-    &.active {
-      background: rgba(26, 115, 232, 0.1);
-    }
-  }
-  
-  .recipe-title {
-    color: #e0e0e0;
-  }
-  
-  .download-button {
-    background: #2d2d2d;
-    border-color: #404040;
-    color: #b0b0b0;
-    
-    &:hover {
-      background: #1a73e8;
-      border-color: #1a73e8;
-      color: #ffffff;
-    }
-  }
-}
 
 // Loading state (for future use)
 .recipe-card.loading {

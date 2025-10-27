@@ -7,7 +7,6 @@ import {
   ViewEncapsulation,
   HostListener
 } from '@angular/core';
-// Removed Angular animations to prevent conflicts with CSS animations
 import { ActivatedRoute, Router } from '@angular/router';
 import { Meta, Title } from '@angular/platform-browser';
 import { Subject } from 'rxjs';
@@ -21,8 +20,7 @@ import {
   RecipeNavigationState,
   RecipeSection,
   RecipeTab,
-  RecipeTOCStructure,
-  RecipeSearchResult
+  RecipeTOCStructure
 } from '../shared/models/recipe.model';
 import { RecipeService } from '../shared/services/recipe.service';
 import { RecipePreviewService, RecipePreviewData } from '../shared/services/recipe-preview.service';
@@ -845,7 +843,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
     const updateInterval = setInterval(() => {
       //console.log('⏰ Periodic check for recipe preview updates...');
       this.checkForPreviewUpdates(recipeId);
-    }, 1000); // Check every 1 second for better responsiveness
+    }, 1000);
     
     // Cleanup on destroy
     this.destroy$.subscribe(() => {
