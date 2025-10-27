@@ -8,7 +8,6 @@ import {
   HostListener
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Meta, Title } from '@angular/platform-browser';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
@@ -38,22 +37,15 @@ interface UIState {
   isLoading: boolean;
   sidebarCollapsed: boolean;
   mobileSidebarOpen: boolean;
-  mobileTOCOpen: boolean;
   isMobile: boolean;
   currentView: 'home' | 'category' | 'recipe';
   isPreviewMode: boolean;
   tocHidden: boolean;
-  tocInFooterZone: boolean;
-  tocFooterApproaching: boolean;
   activeRecipeTab: string;
-  activeSectionId: string; 
+  activeSectionId: string;
   userHasScrolled: boolean;
   scrollTicking: boolean;
-  disableScrollHighlight: boolean;
   currentWalkthroughStep: number;
-  walkthroughStepsCompleted: Set<number>;
-  isTransitioningStep: boolean;
-  lastStepTransitionTime: number;
   hasScrolledToBottomOnce: boolean;
   hasScrolledToTopOnce: boolean;
   showScrollHint: boolean;
@@ -65,14 +57,9 @@ interface UIState {
 
 interface SearchState {
   query: string;
-  focused: boolean;
   isActive: boolean;
   results: SearchResult[];
   hasResults: boolean;
-  suggestions: string[];
-  showSuggestions: boolean;
-  selectedIndex: number;
-  isOpen: boolean;
   isOverlayOpen: boolean;
 }
 
@@ -91,49 +78,31 @@ export class RecipesComponent implements OnInit, OnDestroy {
     isLoading: false,
     sidebarCollapsed: false,
     mobileSidebarOpen: false,
-    mobileTOCOpen: false,
     isMobile: false,
     currentView: 'home',
     isPreviewMode: false,
     tocHidden: false,
-    tocInFooterZone: false,
-    tocFooterApproaching: false,
     activeRecipeTab: 'overview',
     activeSectionId: 'use-case',
     userHasScrolled: false,
     scrollTicking: false,
-    disableScrollHighlight: false,
-    // Walkthrough step navigation
     currentWalkthroughStep: 0,
-    walkthroughStepsCompleted: new Set<number>(),
-    // Scroll-to-next-step control
-    isTransitioningStep: false,
-    lastStepTransitionTime: 0,
-    // Two-scroll logic for bottom navigation
     hasScrolledToBottomOnce: false,
     hasScrolledToTopOnce: false,
-    // Scroll hint display
     showScrollHint: false,
     scrollHintDirection: null,
     scrollHintOpacity: 0,
-    // Animation control
     stepAnimationDirection: null,
     tabAnimationDirection: null
   };
 
-  private cachedSectionPositions: Map<string, number> = new Map();
   private optimizedScrollListener?: () => void;
 
   search: SearchState = {
     query: '',
-    focused: false,
     isActive: false,
     results: [],
     hasResults: true,
-    suggestions: [],
-    showSuggestions: false,
-    selectedIndex: -1,
-    isOpen: false,
     isOverlayOpen: false
   };
 
@@ -589,21 +558,15 @@ export class RecipesComponent implements OnInit, OnDestroy {
    * Setup preview synchronization for cross-tab updates
    */
   private setupPreviewSync(recipeId: string): void {
-    //console.log('🎧 Setting up recipe preview update listeners for Recipe ID:', recipeId);
-    
     // Enhanced storage event listener
     const handleStorageChange = (event: StorageEvent) => {
       const sessionKey = `recipe-preview-${recipeId}`;
       const backupKey = `backup-recipe-preview-${recipeId}`;
-      
 
-      
       // Check both sessionStorage and localStorage keys
       if ((event.key === sessionKey || event.key === backupKey) && event.newValue) {
         try {
           const previewData = JSON.parse(event.newValue) as RecipePreviewData;
-          //console.log('🔄 Updating recipe preview content from storage event');
-          
           this.updatePreviewContent(previewData);
         } catch (error) {
           console.error('❌ Error parsing recipe preview update data:', error);
@@ -613,17 +576,14 @@ export class RecipesComponent implements OnInit, OnDestroy {
 
     // Listen for storage changes (cross-tab communication)
     window.addEventListener('storage', handleStorageChange);
-    //console.log('✅ Storage event listener added for recipe preview');
-    
+
     // Enhanced periodic check for updates (fallback mechanism)
     const updateInterval = setInterval(() => {
-      //console.log('⏰ Periodic check for recipe preview updates...');
       this.checkForPreviewUpdates(recipeId);
     }, 1000);
     
     // Cleanup on destroy
     this.destroy$.subscribe(() => {
-      //console.log('🧹 Cleaning up recipe preview update listeners');
       clearInterval(updateInterval);
       window.removeEventListener('storage', handleStorageChange);
     });
@@ -635,8 +595,6 @@ export class RecipesComponent implements OnInit, OnDestroy {
   private updatePreviewContent(previewData: RecipePreviewData): void {
     if (!this.currentRecipe) return;
 
-    //console.log('🖼️ Updating recipe preview UI with new content');
-    
     // Convert and update the current recipe item
     this.currentRecipe = this.convertPreviewToRecipeItem(previewData);
     
@@ -652,8 +610,6 @@ export class RecipesComponent implements OnInit, OnDestroy {
     
     // Trigger change detection
     this.cdr.markForCheck();
-    
-    //console.log('✅ Recipe preview UI updated successfully');
   }
 
   /**
@@ -664,9 +620,8 @@ export class RecipesComponent implements OnInit, OnDestroy {
     if (!currentData || !this.currentRecipe) return;
 
     const currentTimestamp = this.getPreviewTimestamp();
-    
+
     if (currentData.timestamp > currentTimestamp) {
-      //console.log('📅 Found newer recipe content via periodic check, updating...');
       this.updatePreviewContent(currentData);
     }
   }
@@ -740,8 +695,6 @@ export class RecipesComponent implements OnInit, OnDestroy {
    * Navigate to recipe
    */
   goToRecipe(recipe: RecipeItem): void {
-    //console.log('Navigating to recipe:', recipe.title, '(slug:', recipe.slug, ') Category:', recipe.category);
-
     // Check if navigating to the same recipe
     const isSameRecipe = this.currentRecipe &&
                         this.currentRecipe.id === recipe.id &&
@@ -806,12 +759,6 @@ export class RecipesComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Track recipe view
-   */
-
-
-
-  /**
    * Check if mobile view
    */
   private checkMobileView(): void {
@@ -850,8 +797,6 @@ export class RecipesComponent implements OnInit, OnDestroy {
       this.updateUIState({ sidebarCollapsed: savedState === 'true' });
     }
   }
-
-  
 
   /**
    * State update helper for OnPush optimization
@@ -1158,21 +1103,10 @@ export class RecipesComponent implements OnInit, OnDestroy {
    * Clear section elements cache (call when recipe changes)
    */
   private clearSectionElementsCache(): void {
-    this.cachedSectionPositions.clear();
+    // Cache clearing placeholder - can be expanded if needed
   }
 
 
-  /**
-   * Get sections for currently active tab
-   */
-  getActiveTabSections(): RecipeSection[] {
-    if (!this.ui.activeRecipeTab || !this.recipeTOC.tabs) {
-      return [];
-    }
-    
-    const activeTab = this.recipeTOC.tabs.find(tab => tab.id === this.ui.activeRecipeTab);
-    return activeTab ? activeTab.sections : [];
-  }
 
   /**
    * Get Overview sections for TOC display
@@ -1257,36 +1191,6 @@ export class RecipesComponent implements OnInit, OnDestroy {
 
   }
 
-  /**
-   * Get current step type
-   */
-  get currentStepType(): string {
-    if (!this.currentRecipe?.walkthrough) return '';
-    
-    const steps = this.currentRecipe.walkthrough;
-    if (this.ui.currentWalkthroughStep >= 0 && this.ui.currentWalkthroughStep < steps.length) {
-      return 'custom'; // All new format steps use 'custom' type
-    }
-    return '';
-  }
-
-  /**
-   * Get step title
-   */
-  getStepTitle(stepType: string): string {
-    const titles: { [key: string]: string } = {
-      'createExecutable': 'Create Executable',
-      'retrieve': 'Retrieve Data',
-      'scoping': 'Scoping',
-      'match': 'Match',
-      'mapping': 'Mapping',
-      'action': 'Action',
-      'verify': 'Verify',
-      'previewTransformed': 'Preview Transformed', 
-      'addSchedule': 'Add Schedule'
-    };
-    return titles[stepType] || stepType;
-  }
 
 
   /**
@@ -1307,7 +1211,6 @@ export class RecipesComponent implements OnInit, OnDestroy {
     if (this.ui.activeRecipeTab === 'walkthrough') {
       const sectionId = this.getSectionIdFromWalkthroughStep(this.ui.currentWalkthroughStep);
       if (sectionId) {
-        //console.log('Syncing TOC section with walkthrough step:', sectionId);
         this.ui.activeSectionId = sectionId;
         this.recipeTOC.currentSectionId = sectionId;
       }
@@ -1510,24 +1413,6 @@ export class RecipesComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Get progress percentage
-   */
-  get walkthroughProgress(): number {
-    const steps = this.walkthroughSteps;
-    if (steps.length === 0) return 0;
-    return ((this.ui.currentWalkthroughStep + 1) / steps.length) * 100;
-  }
-
-  /**
-   * Reset walkthrough to first step
-   */
-  resetWalkthrough(): void {
-    this.ui.currentWalkthroughStep = 0;
-    this.ui.walkthroughStepsCompleted.clear();
-    this.cdr.markForCheck();
-  }
-
-  /**
    * Scroll to top of page smoothly
    */
   private scrollToTop(): void {
@@ -1597,14 +1482,6 @@ export class RecipesComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Check if current recipe has valid use case
-   */
-  hasValidUseCase(): boolean {
-    const usecase = this.currentRecipe?.usecase || this.currentRecipe?.useCase;
-    return !!(usecase && usecase.trim().length > 0);
-  }
-
-  /**
    * Check if current recipe has valid overview
    */
   hasValidOverview(): boolean {
@@ -1619,8 +1496,6 @@ export class RecipesComponent implements OnInit, OnDestroy {
     const whenToUse = this.currentRecipe?.whenToUse;
     return !!(whenToUse && whenToUse.trim().length > 0);
   }
-
-
 
   /**
    * Check if current recipe has valid downloadable executables

@@ -1,5 +1,4 @@
-import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
-import { RecipeWalkthroughStep, RecipeStepConfig, RecipeStepMedia } from '../../shared/models/recipe.model';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 
 @Component({
   selector: 'app-recipe-step',
