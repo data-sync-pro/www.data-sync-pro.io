@@ -399,7 +399,7 @@
               <li *ngFor="let section of getOverviewSectionsForTOC()" 
                   class="toc-item"
                   [class.active]="ui.activeSectionId === section.id && ui.activeRecipeTab === 'overview'">
-                <a (click)="navigateToOverviewSection(section.id)" 
+                <a (click)="navigateToOverviewSection()" 
                    [attr.aria-current]="ui.activeSectionId === section.id ? 'location' : null">
                   {{ section.title }}
                 </a>
@@ -414,29 +414,12 @@
               <li *ngFor="let section of getWalkthroughSectionsForTOC(); let i = index" 
                   class="toc-item"
                   [class.active]="ui.activeSectionId === section.id && ui.activeRecipeTab === 'walkthrough'">
-                <a (click)="navigateToWalkthroughSection(section.id, i)" 
+                <a (click)="navigateToWalkthroughSection(i)" 
                    [attr.aria-current]="ui.activeSectionId === section.id ? 'location' : null">
                   {{ section.title }}
                 </a>
               </li>
             </ul>
-          </li>
-        </ul>
-      </nav>
-    </div>
-  </aside>
-  
-  <!-- Recipe List TOC (for Home/Category pages) -->
-  <aside class="recipe-toc recipe-list-toc">
-    <div class="toc-container">
-      <nav class="toc-nav">
-        <ul class="toc-items">
-          <li class="toc-item" 
-              *ngFor="let recipe of currentRecipes"
-              [class.active]="recipe.id === currentRecipe?.id">
-            <a (click)="goToRecipe(recipe)">
-              <span>{{ recipe.title }}</span>
-            </a>
           </li>
         </ul>
       </nav>

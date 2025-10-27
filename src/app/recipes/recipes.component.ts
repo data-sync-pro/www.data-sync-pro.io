@@ -10,13 +10,12 @@ import {
 import { ActivatedRoute, Router } from '@angular/router';
 import { Meta, Title } from '@angular/platform-browser';
 import { Subject } from 'rxjs';
-import { takeUntil, debounceTime } from 'rxjs/operators';
+import { takeUntil } from 'rxjs/operators';
 
 import {
   RecipeItem,
   RecipeCategory,
   RecipeFilter,
-  RecipeProgress,
   RecipeNavigationState,
   RecipeSection,
   RecipeTab,
@@ -63,9 +62,6 @@ interface UIState {
   stepAnimationDirection: 'forward' | 'backward' | null;
   tabAnimationDirection: 'forward' | 'backward' | null;
 }
-
-
-
 
 interface SearchState {
   query: string;
@@ -125,14 +121,6 @@ export class RecipesComponent implements OnInit, OnDestroy {
     tabAnimationDirection: null
   };
 
-
-
-  // TOC data
-  private _cachedTrendingRecipes?: RecipeItem[];
-  private _lastRecipesLength?: number;
-  
-  // Scroll tracking and caching
-  private cachedSectionElements: Element[] | null = null;
   private cachedSectionPositions: Map<string, number> = new Map();
   private optimizedScrollListener?: () => void;
 
@@ -183,8 +171,6 @@ export class RecipesComponent implements OnInit, OnDestroy {
     private router: Router,
     private recipeService: RecipeService,
     private previewService: RecipePreviewService,
-    private meta: Meta,
-    private title: Title,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -297,24 +283,6 @@ export class RecipesComponent implements OnInit, OnDestroy {
     this.cdr.markForCheck();
   }
 
-  /**
-   * Check if user has scrolled to the bottom of the page
-   */
-  private isAtPageBottom(): boolean {
-    const scrollTop = document.documentElement.scrollTop;
-    const windowHeight = window.innerHeight;
-    const documentHeight = document.documentElement.scrollHeight;
-    
-
-    return (scrollTop + windowHeight) >= documentHeight;
-  }
-
-  /**
-   * Check if user is at the top of the page
-   */
-  private isAtPageTop(): boolean {
-    return document.documentElement.scrollTop < 50;
-  }
 
   private isInputFocused(): boolean {
     const activeElement = document.activeElement;
@@ -610,8 +578,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
         // Set initial timestamp for comparison
         this.setPreviewTimestamp(previewData.timestamp);
       }
-      
-      //console.log('📖 Loaded recipe preview data for:', recipeId);
+    
       this.cdr.markForCheck();
     } else {
       this.updateUIState({ isLoading: false });
@@ -1167,7 +1134,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
       
       if (!this.ui.scrollTicking) {
         requestAnimationFrame(() => {
-          this.handleOptimizedScroll(window.pageYOffset);
+          this.handleOptimizedScroll();
           this.ui.scrollTicking = false;
         });
         this.ui.scrollTicking = true;
@@ -1180,114 +1147,20 @@ export class RecipesComponent implements OnInit, OnDestroy {
   /**
    * Handle scroll events and update active section
    */
-  private handleOptimizedScroll(scrollPosition: number): void {
+  private handleOptimizedScroll(): void {
     // Reset scroll tracking states when user leaves bottom/top areas
-    if (this.showRecipeDetails) {
-      this.resetScrollTrackingIfNeeded();
-    }
-    
-    // Only update active section when viewing recipe details and auto-highlighting is enabled
-    if (this.showRecipeDetails && this.ui.userHasScrolled && !this.ui.disableScrollHighlight) {
-      this.updateActiveScrollElement(scrollPosition);
-    }
-    
-    // Update scroll hint for all scroll events (not just wheel events)
     if (this.showRecipeDetails) {
       this.updateScrollHint();
     }
   }
 
   /**
-   * Update active section based on scroll position
-   * Only tracks sections within the currently active tab to prevent unwanted tab switches
-   */
-  private updateActiveScrollElement(scrollPosition: number): void {
-    const offset = scrollPosition + 150; // Account for header height
-    
-    // Only process if we have an active tab
-    if (!this.ui.activeRecipeTab) return;
-    
-    // Cache section elements and their positions for current active tab only
-    if (!this.cachedSectionElements || this.cachedSectionElements.length === 0) {
-      this.refreshSectionElementsCacheForActiveTab();
-    }
-    
-    let activeSectionId = '';
-    let closestDistance = Infinity;
-
-    // Find the section that is currently in view (only from active tab)
-    this.cachedSectionPositions.forEach((position, sectionId) => {
-      // Double-check that this section belongs to the active tab
-      if (!this.sectionBelongsToActiveTab(sectionId)) {
-        return;
-      }
-      
-      const distance = Math.abs(position - offset);
-      if (distance < closestDistance && position <= offset + 100) {
-        closestDistance = distance;
-        activeSectionId = sectionId;
-      }
-    });
-
-    // Update active section if it has changed
-    if (activeSectionId && activeSectionId !== this.ui.activeSectionId) {
-      this.ui.activeSectionId = activeSectionId;
-      this.recipeTOC.currentSectionId = activeSectionId;
-      
-      
-      // No need to call ensureParentTabActive since we're already in the correct tab
-      
-      this.cdr.markForCheck();
-    }
-  }
-
-
-  /**
-   * Refresh cache of section elements and their positions for active tab only
-   * This prevents scroll detection from switching between tabs
-   */
-  private refreshSectionElementsCacheForActiveTab(): void {
-    if (!this.currentRecipe || !this.ui.activeRecipeTab) return;
-
-    this.cachedSectionElements = [];
-    this.cachedSectionPositions.clear();
-
-    // Get section elements only from the currently active tab
-    const activeTab = this.recipeTOC.tabs.find(tab => tab.id === this.ui.activeRecipeTab);
-    if (!activeTab) return;
-
-    activeTab.sections.forEach(section => {
-      if (section.elementId) {
-        const element = document.getElementById(section.elementId);
-        if (element) {
-          this.cachedSectionElements!.push(element);
-          const rect = element.getBoundingClientRect();
-          const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-          this.cachedSectionPositions.set(section.id, rect.top + scrollTop);
-        }
-      }
-    });
-  }
-
-  /**
    * Clear section elements cache (call when recipe changes)
    */
   private clearSectionElementsCache(): void {
-    this.cachedSectionElements = null;
     this.cachedSectionPositions.clear();
   }
 
-  /**
-   * Check if a section belongs to the currently active tab
-   */
-  private sectionBelongsToActiveTab(sectionId: string): boolean {
-    if (!this.ui.activeRecipeTab) return false;
-    
-    const activeTab = this.recipeTOC.tabs.find(tab => tab.id === this.ui.activeRecipeTab);
-    if (!activeTab) return false;
-    
-    return activeTab.sections.some(section => section.id === sectionId);
-  }
 
   /**
    * Get sections for currently active tab
@@ -1320,26 +1193,24 @@ export class RecipesComponent implements OnInit, OnDestroy {
   /**
    * Navigate to Overview section
    */
-  navigateToOverviewSection(sectionId: string): void {
+  navigateToOverviewSection(): void {
     // Switch to overview tab if not already there
     if (this.ui.activeRecipeTab !== 'overview') {
       this.ui.activeRecipeTab = 'overview';
       this.recipeTOC.currentTabId = 'overview';
     }
-    
   }
 
   /**
    * Navigate to Walkthrough section
    */
-  navigateToWalkthroughSection(sectionId: string, stepIndex: number): void {
+  navigateToWalkthroughSection(stepIndex: number): void {
     // Switch to walkthrough tab if not already there
     if (this.ui.activeRecipeTab !== 'walkthrough') {
       this.ui.activeRecipeTab = 'walkthrough';
       this.recipeTOC.currentTabId = 'walkthrough';
       this.ui.currentWalkthroughStep = stepIndex;
     } else {
-      // If already in walkthrough tab, just update the step
       this.ui.currentWalkthroughStep = stepIndex;
     }
     
@@ -1417,17 +1288,6 @@ export class RecipesComponent implements OnInit, OnDestroy {
     return titles[stepType] || stepType;
   }
 
-  /**
-   * Get walkthrough step index from section ID
-   */
-  private getWalkthroughStepFromSectionId(sectionId: string): number {
-
-    const stepIndex = parseInt(sectionId.replace('step-', ''), 10);
-    return isNaN(stepIndex) ? -1 : stepIndex;
-    
-
-
-  }
 
   /**
    * Get section ID from walkthrough step index
@@ -1677,53 +1537,6 @@ export class RecipesComponent implements OnInit, OnDestroy {
     });
   }
 
-  /**
-   * Add visual feedback to indicate successful scroll target
-   */
-  private addScrollVisualFeedback(element: HTMLElement): void {
-    // Add a brief highlight effect to show the user which section was targeted
-    const originalBoxShadow = element.style.boxShadow;
-    const originalTransition = element.style.transition;
-    
-    element.style.transition = 'box-shadow 0.3s ease';
-    element.style.boxShadow = '0 0 0 3px rgba(26, 115, 232, 0.3)';
-    
-    // Remove the highlight after a short duration
-    setTimeout(() => {
-      element.style.boxShadow = originalBoxShadow;
-      // Remove transition after effect is complete
-      setTimeout(() => {
-        element.style.transition = originalTransition;
-      }, 300);
-    }, 1000);
-  }
-
-  /**
-   * Reset scroll tracking states if user has moved away from bottom/top areas
-   */
-  private resetScrollTrackingIfNeeded(): void {
-    const isAtBottom = this.isAtPageBottom();
-    const isAtTop = this.isAtPageTop();
-    
-    // Reset bottom tracking if user is no longer at bottom
-    if (!isAtBottom && this.ui.hasScrolledToBottomOnce) {
-      this.ui.hasScrolledToBottomOnce = false;
-    }
-    
-    // Reset top tracking if user is no longer at top  
-    if (!isAtTop && this.ui.hasScrolledToTopOnce) {
-      this.ui.hasScrolledToTopOnce = false;
-    }
-  }
-
-  // ==================== Compatibility Helper Methods ====================
-
-  /**
-   * Check if prerequisites is an array (for template use)
-   */
-  isArrayPrerequisites(prerequisites: any): boolean {
-    return Array.isArray(prerequisites);
-  }
 
   /**
    * Check if current recipe has array prerequisites with valid items
@@ -1746,7 +1559,6 @@ export class RecipesComponent implements OnInit, OnDestroy {
    */
   getPermissionSetsForBuilding(): string[] {
     if (!this.currentRecipe) return [];
-    
     
     // New format - extract from prerequisites array
     const buildingPermissions: string[] = [];
@@ -1785,16 +1597,6 @@ export class RecipesComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Get safe directions
-   */
-  getSafeDirections(): any {
-    if (!this.currentRecipe) return '';
-    
-
-    return this.currentRecipe.safeDirection || this.currentRecipe.direction || '';
-  }
-
-  /**
    * Check if current recipe has valid use case
    */
   hasValidUseCase(): boolean {
@@ -1818,21 +1620,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
     return !!(whenToUse && whenToUse.trim().length > 0);
   }
 
-  /**
-   * Check if current recipe has valid connection
-   */
-  hasValidConnection(): boolean {
-    const connection = this.currentRecipe?.connection;
-    return !!(connection && connection.trim().length > 0);
-  }
 
-  /**
-   * Check if current recipe has valid direction
-   */
-  hasValidDirection(): boolean {
-    const direction = this.currentRecipe?.direction;
-    return !!(direction && direction.trim().length > 0);
-  }
 
   /**
    * Check if current recipe has valid downloadable executables
@@ -1913,11 +1701,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
     
     // Replace em dash and other dash characters with underscore in the URL to match actual folder names
     const normalizedUrl = url.replace(/[\u2010-\u2015]/g, '_');
-    
-    //console.log('Original URL:', url);
-    //console.log('Normalized URL:', normalizedUrl);
-    //console.log('Download title:', title);
-    
+
     // Create a temporary anchor element to force download
     const link = document.createElement('a');
     link.href = normalizedUrl;
