@@ -27,12 +27,6 @@ import { RecipesRoutingModule } from './recipes-routing.module';
 import { RecipesComponent } from './recipes.component';
 import { RecipeCardComponent } from './recipe-card/recipe-card.component';
 import { RecipeStepComponent } from './recipe-step/recipe-step.component';
-import { RecipeNavigationComponent } from './recipe-navigation/recipe-navigation.component';
-import { RecipeSearchComponent } from './recipe-search/recipe-search.component';
-import { RecipeDownloadComponent } from './recipe-download/recipe-download.component';
-import { RecipeProgressComponent } from './recipe-progress/recipe-progress.component';
-import { RecipeCategoryComponent } from './recipe-category/recipe-category.component';
-import { CodeHighlightComponent } from './code-highlight/code-highlight.component';
 import { RecipeSearchOverlayComponent } from './recipe-search-overlay/recipe-search-overlay.component';
 
 // Shared Modules and Components
@@ -43,12 +37,6 @@ import { SharedModule } from '../shared/shared.module';
     RecipesComponent,
     RecipeCardComponent,
     RecipeStepComponent,
-    RecipeNavigationComponent,
-    RecipeSearchComponent,
-    RecipeDownloadComponent,
-    RecipeProgressComponent,
-    RecipeCategoryComponent,
-    CodeHighlightComponent,
     RecipeSearchOverlayComponent
   ],
   imports: [

@@ -310,11 +310,7 @@
                       </li>
                     </ul>
                   </div>
-                  
-                  <!-- Component (legacy download) -->
-                  <app-recipe-download *ngSwitchCase="'component'" 
-                                     [executable]="$any(sectionConfig.data)">
-                  </app-recipe-download>
+
                   
                   <!-- Version info -->
                   <div *ngSwitchCase="'version-info'">

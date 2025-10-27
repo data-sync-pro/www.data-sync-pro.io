@@ -22,7 +22,6 @@ import {
   RecipeSection,
   RecipeTab,
   RecipeTOCStructure,
-  LegacyRecipeWalkthrough,
   RecipeSearchResult
 } from '../shared/models/recipe.model';
 import { RecipeService } from '../shared/services/recipe.service';
@@ -1668,28 +1667,6 @@ export class RecipesComponent implements OnInit, OnDestroy {
       getData: () => this.currentRecipe?.keywords,
       tagClass: 'keyword-tag'
     },
-    // Legacy download support sections
-    {
-      id: 'download-executable',
-      title: 'Download Executable',
-      icon: 'get_app',
-      elementId: 'recipe-download-executable',
-      contentType: 'component',
-      componentName: 'app-recipe-download',
-      isVisible: () => !!this.currentRecipe?.downloadableExecutable,
-      getData: () => this.currentRecipe?.downloadableExecutable,
-      isLegacy: true
-    },
-    {
-      id: 'version-info',
-      title: 'Version Information',
-      icon: 'info',
-      elementId: 'recipe-version-info',
-      contentType: 'version-info',
-      isVisible: () => !!this.currentRecipe?.downloadableExecutable,
-      getData: () => this.currentRecipe?.downloadableExecutable,
-      isLegacy: true
-    }
   ];
 
   /**
@@ -1732,7 +1709,6 @@ export class RecipesComponent implements OnInit, OnDestroy {
   private generateWalkthroughSections(): RecipeSection[] {
     const sections: RecipeSection[] = [];
     const walkthrough = this.currentRecipe?.walkthrough;
-    const legacyWalkthrough = this.currentRecipe?.legacyWalkthrough;
 
     // Handle new array format
     if (Array.isArray(walkthrough)) {
@@ -1744,32 +1720,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
           elementId: `recipe-step-${index}`
         });
       });
-    } else if (legacyWalkthrough) {
-      // Legacy format - dynamic detection of available steps
-      const legacySteps = [
-        { key: 'createExecutable', title: 'Create Executable', icon: 'add_circle', elementId: 'recipe-create-executable' },
-        { key: 'retrieve', title: 'Retrieve Data', icon: 'download', elementId: 'recipe-retrieve-data' },
-        { key: 'scoping', title: 'Scoping', icon: 'filter_list', elementId: 'recipe-scoping' },
-        { key: 'match', title: 'Match', icon: 'compare_arrows', elementId: 'recipe-match' },
-        { key: 'mapping', title: 'Mapping', icon: 'swap_horiz', elementId: 'recipe-mapping' },
-        { key: 'action', title: 'Action', icon: 'play_arrow', elementId: 'recipe-action' },
-        { key: 'verify', title: 'Verify', icon: 'check_circle', elementId: 'recipe-verify' },
-        { key: 'previewTransformed', title: 'Preview Transformed', icon: 'preview', elementId: 'recipe-preview-transformed' },
-        { key: 'addSchedule', title: 'Add Schedule', icon: 'schedule', elementId: 'recipe-add-schedule' }
-      ];
-
-      legacySteps.forEach(step => {
-        if ((legacyWalkthrough as any)[step.key]) {
-          sections.push({
-            id: step.key.replace(/([A-Z])/g, '-$1').toLowerCase(),
-            title: step.title,
-            icon: step.icon,
-            elementId: step.elementId
-          });
-        }
-      });
     }
-
     return sections;
   }
 
@@ -1998,13 +1949,6 @@ export class RecipesComponent implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * Refresh cache of section elements and their positions
-   * Legacy method - now delegates to active tab specific method
-   */
-  private refreshSectionElementsCache(): void {
-    this.refreshSectionElementsCacheForActiveTab();
-  }
 
   /**
    * Refresh cache of section elements and their positions for active tab only
@@ -2135,23 +2079,10 @@ export class RecipesComponent implements OnInit, OnDestroy {
     
     const steps: string[] = [];
     const walkthrough = this.currentRecipe.walkthrough;
-    const legacyWalkthrough = this.currentRecipe.legacyWalkthrough;
     
-    // Handle both new array format and legacy object format
     if (Array.isArray(walkthrough)) {
       // New format - return step names
       return walkthrough.map((step, index) => step.step || `Step ${index + 1}`);
-    } else if (legacyWalkthrough) {
-      // Legacy format - check for named properties
-      if (legacyWalkthrough.createExecutable) steps.push('createExecutable');
-      if (legacyWalkthrough.retrieve) steps.push('retrieve');
-      if (legacyWalkthrough.scoping) steps.push('scoping');
-      if (legacyWalkthrough.match) steps.push('match');
-      if (legacyWalkthrough.mapping) steps.push('mapping');
-      if (legacyWalkthrough.action) steps.push('action');
-      if (legacyWalkthrough.verify) steps.push('verify');
-      if (legacyWalkthrough.previewTransformed) steps.push('previewTransformed');
-      if (legacyWalkthrough.addSchedule) steps.push('addSchedule');
     }
     
     return steps;
@@ -2171,14 +2102,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
       }
       return null;
     }
-    
-    // Legacy format handling
-    const steps = this.walkthroughSteps;
-    if (steps.length === 0 || this.ui.currentWalkthroughStep >= steps.length) return null;
-    
-    const stepType = steps[this.ui.currentWalkthroughStep];
-    const walkthrough = this.currentRecipe?.legacyWalkthrough as any;
-    return walkthrough?.[stepType] || null;
+
   }
 
   /**
@@ -2187,20 +2111,11 @@ export class RecipesComponent implements OnInit, OnDestroy {
   get currentStepType(): string {
     if (!this.currentRecipe?.walkthrough) return '';
     
-    // Handle new array format
-    if (Array.isArray(this.currentRecipe.walkthrough)) {
-      const steps = this.currentRecipe.walkthrough;
-      if (this.ui.currentWalkthroughStep >= 0 && this.ui.currentWalkthroughStep < steps.length) {
-        return 'custom'; // All new format steps use 'custom' type
-      }
-      return '';
+    const steps = this.currentRecipe.walkthrough;
+    if (this.ui.currentWalkthroughStep >= 0 && this.ui.currentWalkthroughStep < steps.length) {
+      return 'custom'; // All new format steps use 'custom' type
     }
-    
-    // Legacy format handling
-    const steps = this.walkthroughSteps;
-    if (steps.length === 0 || this.ui.currentWalkthroughStep >= steps.length) return '';
-    
-    return steps[this.ui.currentWalkthroughStep];
+    return '';
   }
 
   /**
@@ -2225,29 +2140,12 @@ export class RecipesComponent implements OnInit, OnDestroy {
    * Get walkthrough step index from section ID
    */
   private getWalkthroughStepFromSectionId(sectionId: string): number {
-    // Handle new array format - section IDs are like "step-0", "step-1", etc.
-    if (sectionId.startsWith('step-')) {
-      const stepIndex = parseInt(sectionId.replace('step-', ''), 10);
-      return isNaN(stepIndex) ? -1 : stepIndex;
-    }
 
-    // Legacy format mapping
-    const sectionToStepMap: { [key: string]: string } = {
-      'create-executable': 'createExecutable',
-      'retrieve-data': 'retrieve',
-      'scoping': 'scoping',
-      'match': 'match',
-      'mapping': 'mapping',
-      'action': 'action',
-      'verify': 'verify',
-      'preview-transformed': 'previewTransformed',
-      'add-schedule': 'addSchedule'
-    };
+    const stepIndex = parseInt(sectionId.replace('step-', ''), 10);
+    return isNaN(stepIndex) ? -1 : stepIndex;
+    
 
-    const stepType = sectionToStepMap[sectionId];
-    if (!stepType) return -1;
 
-    return this.walkthroughSteps.indexOf(stepType);
   }
 
   /**
@@ -2255,33 +2153,10 @@ export class RecipesComponent implements OnInit, OnDestroy {
    */
   private getSectionIdFromWalkthroughStep(stepIndex: number): string {
     if (!this.currentRecipe?.walkthrough) return '';
-
-    // Handle new array format - section IDs are "step-0", "step-1", etc.
-    if (Array.isArray(this.currentRecipe.walkthrough)) {
       if (stepIndex >= 0 && stepIndex < this.currentRecipe.walkthrough.length) {
         return `step-${stepIndex}`;
       }
       return '';
-    }
-
-    // Legacy format mapping
-    const stepToSectionMap: { [key: string]: string } = {
-      'createExecutable': 'create-executable',
-      'retrieve': 'retrieve-data',
-      'scoping': 'scoping',
-      'match': 'match',
-      'mapping': 'mapping',
-      'action': 'action',
-      'verify': 'verify',
-      'previewTransformed': 'preview-transformed',
-      'addSchedule': 'add-schedule'
-    };
-
-    const steps = this.walkthroughSteps;
-    if (stepIndex < 0 || stepIndex >= steps.length) return '';
-
-    const stepType = steps[stepIndex];
-    return stepToSectionMap[stepType] || '';
   }
 
   /**
@@ -2536,19 +2411,8 @@ export class RecipesComponent implements OnInit, OnDestroy {
    * Get step title by index
    */
   private getStepTitleByIndex(index: number): string {
-    // Handle new array format
-    if (Array.isArray(this.currentRecipe?.walkthrough)) {
-      const step = this.currentRecipe?.walkthrough[index];
-      return step?.step || `Step ${index + 1}`;
-    }
-    
-    // Handle legacy format
-    const steps = this.walkthroughSteps;
-    if (index >= 0 && index < steps.length) {
-      return this.getStepTitle(steps[index]);
-    }
-    
-    return `Step ${index + 1}`;
+    const step = this.currentRecipe?.walkthrough[index];
+    return step?.step || `Step ${index + 1}`;
   }
 
   /**
@@ -2644,16 +2508,11 @@ export class RecipesComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Get permission sets for building (supports both new and legacy formats)
+   * Get permission sets for building
    */
   getPermissionSetsForBuilding(): string[] {
     if (!this.currentRecipe) return [];
     
-    // Check if recipe has legacy prerequisites structure
-    const legacyPrereqs = this.currentRecipe.prerequisites as any;
-    if (legacyPrereqs?.permissionSetsForBuilding) {
-      return legacyPrereqs.permissionSetsForBuilding;
-    }
     
     // New format - extract from prerequisites array
     const buildingPermissions: string[] = [];
@@ -2671,17 +2530,11 @@ export class RecipesComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Get permission sets for using (supports both new and legacy formats)
+   * Get permission sets for using
    */
   getPermissionSetsForUsing(): string[] {
     if (!this.currentRecipe) return [];
-    
-    // Check if recipe has legacy prerequisites structure
-    const legacyPrereqs = this.currentRecipe.prerequisites as any;
-    if (legacyPrereqs?.permissionSetsForUsing) {
-      return legacyPrereqs.permissionSetsForUsing;
-    }
-    
+
     // New format - extract from prerequisites array
     const usingPermissions: string[] = [];
     if (Array.isArray(this.currentRecipe.prerequisites)) {
@@ -2698,18 +2551,12 @@ export class RecipesComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Get safe directions (supports both new and legacy formats)
+   * Get safe directions
    */
   getSafeDirections(): any {
     if (!this.currentRecipe) return '';
     
-    // Check if recipe has legacy prerequisites structure
-    const legacyPrereqs = this.currentRecipe.prerequisites as any;
-    if (legacyPrereqs?.safeDirections) {
-      return legacyPrereqs.safeDirections;
-    }
-    
-    // New format - return direction
+
     return this.currentRecipe.safeDirection || this.currentRecipe.direction || '';
   }
 
@@ -2760,11 +2607,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
     const executables = this.currentRecipe?.downloadableExecutables;
     return !!(executables && executables.length > 0 && 
               executables.some(exe => 
-                // Support new format with filePath
-                (exe.filePath && exe.filePath.trim().length > 0) ||
-                // Support legacy format with title and url
-                (exe.title && exe.title.trim().length > 0 && 
-                 exe.url && exe.url.trim().length > 0)
+                (exe.filePath && exe.filePath.trim().length > 0) 
               ));
   }
 
@@ -2775,10 +2618,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
     const executables = this.currentRecipe?.downloadableExecutables || [];
     return executables.filter(exe => 
       // Support new format with filePath
-      (exe.filePath && exe.filePath.trim().length > 0) ||
-      // Support legacy format with title and url
-      (exe.title && exe.title.trim().length > 0 && 
-       exe.url && exe.url.trim().length > 0)
+      (exe.filePath && exe.filePath.trim().length > 0)
     ).map(exe => {
       // Transform new format to legacy format for template compatibility
       if (exe.filePath && !exe.title && !exe.url) {
