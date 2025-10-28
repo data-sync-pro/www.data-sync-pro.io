@@ -1,0 +1,84 @@
+// ==================== Recipe System Variables ====================
+// Centralized variable management for all recipe-related styles
+// This file provides a single source of truth for design tokens
+
+// ==================== Layout Dimensions ====================
+$header-height: 60px;               // Global header height
+$sidebar-width: 240px;              // Sidebar width (expanded)
+$sidebar-collapsed-width: 56px;     // Sidebar width (collapsed)
+$toc-width: 240px;                  // Table of contents width
+$content-max-width: 1200px;         // Maximum content width
+
+// Percentage-based widths (for grid layouts)
+$sidebar-width-percent: 18%;
+$sidebar-collapsed-width-percent: 5%;
+$toc-width-percent: 18%;
+
+// ==================== Breakpoints ====================
+$breakpoint-desktop: 992px;         // Desktop breakpoint
+$breakpoint-tablet: 768px;          // Tablet breakpoint
+$breakpoint-mobile: 576px;          // Mobile breakpoint
+
+// ==================== Colors ====================
+// Based on Google Material Design color palette
+
+// Primary Colors
+$color-primary: #1a73e8;            // Primary blue (links, CTAs, active states)
+$color-primary-hover: #1557b0;      // Darker blue for hover states
+$color-primary-light: #e8f0fe;      // Light blue background for active/selected items
+
+// Text Colors
+$color-text-primary: #202124;       // Main text color
+$color-text-secondary: #5f6368;     // Secondary text, icons, labels
+$color-text-muted: #666666;         // Muted text, placeholders
+
+// Background Colors
+$color-bg-primary: #ffffff;         // White background
+$color-bg-light: #f8f9fa;           // Light gray background
+$color-bg-lighter: #f1f3f4;         // Lighter gray (hover states, subtle backgrounds)
+$color-bg-active: #e8f0fe;          // Active/selected background (light blue)
+
+// Border Colors
+$color-border: #e1e5e9;             // Main border color
+$color-border-light: #dadce0;       // Light borders
+$color-border-lighter: #f1f3f4;     // Lighter borders, dividers
+
+// Scrollbar Colors
+$color-scrollbar: #dadce0;          // Scrollbar thumb
+$color-scrollbar-hover: #bdc1c6;    // Scrollbar thumb hover
+
+// ==================== Spacing System ====================
+// Consistent spacing scale based on 4px grid
+$spacing-xs: 4px;                   // Extra small spacing
+$spacing-sm: 8px;                   // Small spacing
+$spacing-md: 12px;                  // Medium spacing
+$spacing-lg: 16px;                  // Large spacing
+$spacing-xl: 20px;                  // Extra large spacing
+$spacing-xxl: 24px;                 // Extra extra large spacing
+$spacing-xxxl: 32px;                // 3X large spacing
+
+// ==================== Border Radius ====================
+$radius-sm: 3px;                    // Small radius (scrollbars, subtle elements)
+$radius-md: 6px;                    // Medium radius (buttons, tags)
+$radius-lg: 8px;                    // Large radius (cards, inputs)
+$radius-xl: 12px;                   // Extra large radius (modals, overlays)
+$radius-full: 9999px;               // Fully rounded (pills, badges)
+
+// ==================== Transitions ====================
+$transition-fast: all 0.15s ease;                           // Fast transitions
+$transition-normal: all 0.2s ease;                          // Normal transitions
+$transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); // Smooth Material Design easing
+
+// ==================== Shadows ====================
+$shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);    // Small shadow (sidebar, cards)
+$shadow-md: 0 2px 8px rgba(0, 0, 0, 0.1);     // Medium shadow (hover states)
+$shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.3);   // Large shadow (modals, overlays)
+
+// ==================== Z-Index Layers ====================
+// Consistent stacking order for UI elements
+$z-toc: 80;                         // TOC (Table of Contents)
+$z-sidebar: 90;                     // Sidebar
+$z-mobile-toggle: 1000;             // Mobile toggle buttons
+$z-overlay: 999;                    // General overlays
+$z-sidebar-mobile: 1100;            // Mobile sidebar (above overlays)
+$z-search-overlay: 9999;            // Search overlay (top layer)

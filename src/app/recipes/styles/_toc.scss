@@ -1,15 +1,18 @@
 // ==================== Microsoft Learn Style TOC ====================
 // Clean, minimal design inspired by Microsoft documentation
 
-// Variables
+// Import centralized variables for layout/spacing
+@import './recipe-variables';
+
+// Microsoft-specific color variables (preserving MS Learn design)
 $ms-toc-text: #242424;
 $ms-toc-text-secondary: #616161;
-$ms-toc-link: #666666; 
-$ms-toc-link-hover: #333333; 
+$ms-toc-link: #666666;
+$ms-toc-link-hover: #333333;
 $ms-toc-active-bg: #f0f0f0;
-$ms-toc-active-border: #666666; 
+$ms-toc-active-border: #666666;
 $ms-toc-border: #d2d2d2;
-$ms-toc-bg: #ffffff;
+$ms-toc-bg: $color-bg-primary; // Use centralized white
 $ms-toc-group-title: #171717;
 
 // Microsoft Learn Style TOC

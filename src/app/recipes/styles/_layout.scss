@@ -1,19 +1,7 @@
 // ==================== Recipe Layout Styles ====================
 
-// Layout variables
-$header-height: 60px; // Global header height
-
-$sidebar-width-percent: 18%; 
-$sidebar-collapsed-width-percent: 5%; 
-$toc-width-percent: 18%; 
-
-$sidebar-width: 240px;
-$sidebar-collapsed-width: 56px;
-$toc-width: 240px;
-$content-max-width: 1200px;
-$breakpoint-desktop: 992px;
-$breakpoint-tablet: 768px;
-$breakpoint-mobile: 576px;
+// Import centralized variables
+@import './recipe-variables';
 
 
 .recipe-layout-container {

@@ -1,24 +1,28 @@
 // Import typography first
 @import '../../styles/typography';
 
+// Import recipe variables
+@import './styles/recipe-variables';
+
 // Import modular styles
 @import './styles/layout';
 @import './styles/sidebar';
 @import './styles/search-overlay';
 @import './styles/toc'; // Microsoft Learn style TOC
-// Import layout variables for precise button positioning
+
+// Note: Layout variables ($sidebar-width, $toc-width, breakpoints, etc.) are imported from ./styles/layout
 
 // ==================== Recipe Detail Content Styles ====================
 
 // Use Case content - direct display without nested card
 .use-case-content {
   @include content-text;
-  color: #495057;
+  color: $color-text-secondary;
 
   // Clean text styling
   p {
     @include content-text;
-    margin: 0 0 12px 0;
+    margin: 0 0 $spacing-md 0;
 
     &:last-child {
       margin-bottom: 0;
@@ -28,9 +32,9 @@
 
 .recipe-section h4 .section-icon {
   font-size: 1.2rem;
-  margin-right: 8px;
+  margin-right: $spacing-sm;
   color: $text-color-muted;
-  transition: color 0.2s ease;
+  transition: $transition-normal;
 }
 
 
@@ -38,19 +42,19 @@
 .version-tags, .keyword-tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 12px;
+  gap: $spacing-sm;
+  margin-top: $spacing-md;
 }
 
 .version-tag, .keyword-tag {
-  background: #e3f2fd;
-  color: #1976d2;
+  background: $color-primary-light;
+  color: $color-primary;
   font-size: $font-size-caption;
   font-weight: $font-weight-medium;
-  padding: 4px 12px;
+  padding: $spacing-xs $spacing-md;
   border-radius: 16px;
   border: 1px solid #bbdefb;
-  transition: all 0.2s ease;
+  transition: $transition-normal;
 }
 
 .version-tag:hover, .keyword-tag:hover {
@@ -60,28 +64,28 @@
 
 // Prerequisites styling - bullet points design
 .prerequisites-list {
-  margin-top: 16px;
+  margin-top: $spacing-lg;
 
   ul {
     list-style-type: disc;
-    padding-left: 20px;
+    padding-left: $spacing-xl;
     margin: 0;
 
     li {
-      margin-bottom: 12px;
+      margin-bottom: $spacing-md;
       line-height: 1.5;
 
       .prerequisite-description {
-        margin-bottom: 4px;
+        margin-bottom: $spacing-xs;
         font-weight: 500;
         display: flex;
-        gap: 8px;
+        gap: $spacing-sm;
 
         .inline-download-icon {
           display: inline-flex;
-          color: #1976d2;
+          color: $color-primary;
           &:hover {
-            color: #0d47a1;
+            color: $color-primary-hover;
           }
 
           lightning-icon {
@@ -89,7 +93,7 @@
             width: 18px;
             height: 18px;
             flex-shrink: 0;
-            
+
           }
         }
       }
@@ -101,30 +105,30 @@
 .download-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin-top: 16px;
+  gap: $spacing-md;
+  margin-top: $spacing-lg;
 }
 
 .download-item {
-  background: #f8f9fa;
-  border: 1px solid #e9ecef;
-  border-radius: 8px;
-  padding: 12px;
-  transition: all 0.2s ease;
+  background: $color-bg-light;
+  border: 1px solid $color-border;
+  border-radius: $radius-lg;
+  padding: $spacing-md;
+  transition: $transition-normal;
 }
 
 .download-item:hover {
-  background: #e9ecef;
-  border-color: #007bff;
+  background: $color-border;
+  border-color: $color-primary;
 }
 
 .download-link {
   display: flex;
-  gap: 8px;
-  color: #007bff;
+  gap: $spacing-sm;
+  color: $color-primary;
   text-decoration: none;
   font-weight: 500;
-  transition: color 0.2s ease;
+  transition: $transition-normal;
   background: none;
   border: none;
   cursor: pointer;
@@ -134,7 +138,7 @@
 }
 
 .download-link:hover {
-  color: #0056b3;
+  color: $color-primary-hover;
 }
 
 .download-link lightning-icon {
@@ -145,22 +149,22 @@
 .related-recipes {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-top: 16px;
+  gap: $spacing-sm;
+  margin-top: $spacing-lg;
 }
 
 .related-recipe-link {
-  color: #007bff;
+  color: $color-primary;
   text-decoration: none;
   font-weight: 500;
-  padding: 8px 12px;
-  border-radius: 6px;
-  transition: all 0.2s ease;
+  padding: $spacing-sm $spacing-md;
+  border-radius: $radius-md;
+  transition: $transition-normal;
   border: 1px solid transparent;
 }
 
 .related-recipe-link:hover {
-  background: #e3f2fd;
+  background: $color-primary-light;
   border-color: #bbdefb;
   text-decoration: none;
 }
@@ -205,85 +209,85 @@
   left: 50%;
   transform: translateX(-50%);
   z-index: 100;
-  transition: opacity 0.3s ease;
+  transition: $transition-smooth;
   pointer-events: none;
   opacity: 0;
-  
+
   &.visible {
     opacity: 1;
     pointer-events: auto; // Enable clicks when visible
   }
-  
+
   &.bottom {
     bottom: 40px; // Closer to bottom for better visibility
   }
-  
+
   &.top {
     top: 100px; // Account for header, but not too far down
   }
-  
+
   .hint-content {
     background: rgba(255, 255, 255, 1); // Full white background for better contrast
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border-radius: 18px; // Scaled down from 24px
-    padding: 10px 20px; // Scaled down from 14px 28px
+    padding: 10px $spacing-xl; // Scaled down from 14px 28px
     display: flex;
     align-items: center;
     gap: 10px; // Scaled down from 12px
-    color: #1a1a1a; // Darker text for better contrast
+    color: $color-text-primary; // Darker text for better contrast
     box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15), // Stronger shadow
-                0 2px 8px rgba(0, 0, 0, 0.1),
+                0 2px $spacing-sm rgba(0, 0, 0, 0.1),
                 0 0 0 1px rgba(0, 0, 0, 0.05); // Subtle outline
     border: 1px solid rgba(26, 115, 232, 0.2); // Light blue border
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: $transition-normal;
     user-select: none;
-    
+
     &:hover {
       transform: scale(1.03); // Scaled down from 1.05 for more subtle effect
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15), 0 2px 6px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 4px $spacing-xl rgba(0, 0, 0, 0.15), 0 2px 6px rgba(0, 0, 0, 0.1);
       background: rgba(255, 255, 255, 1);
       border-color: rgba(26, 115, 232, 0.3); // Add blue border on hover
     }
-    
+
     &:active {
       transform: scale(0.98);
-      box-shadow: 0 1px 8px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 1px $spacing-sm rgba(0, 0, 0, 0.1);
     }
   }
-  
+
   .hint-arrow {
-    color: #1976d2; // Use primary blue color
+    color: $color-primary; // Use primary blue color
     font-size: 22px; // Scaled down from 28px
     height: 22px;
     width: 22px;
-    transition: color 0.2s ease;
-    
+    transition: $transition-normal;
+
     // Pulse animation for bottom arrow
     .bottom & {
       animation: pulseDown 1.5s infinite;
     }
-    
+
     // Pulse animation for top arrow
     .top & {
       animation: pulseUp 1.5s infinite;
     }
-    
+
     .hint-content:hover & {
-      color: #1565c0; // Darker blue on hover
+      color: $color-primary-hover; // Darker blue on hover
     }
   }
-  
+
   .hint-text {
     font-size: 13px; // Scaled down from 15px
     font-weight: 500; // Slightly lighter from 600
     letter-spacing: 0.3px;
-    color: #2c2c2c; // Much darker for better contrast
-    transition: color 0.2s ease;
-    
+    color: $color-text-primary; // Much darker for better contrast
+    transition: $transition-normal;
+
     .hint-content:hover & {
-      color: #333333; // Darker text on hover
+      color: $color-text-primary; // Darker text on hover
     }
   }
 }
@@ -309,16 +313,16 @@
 
 
 .walkthrough-header {
-  margin-bottom: 32px;
-  padding-bottom: 24px;
-  border-bottom: 2px solid #e0e0e0;
+  margin-bottom: $spacing-xxxl;
+  padding-bottom: $spacing-xxl;
+  border-bottom: 2px solid $color-border;
 }
 
 .step-progress {
   display: flex;
   align-items: center;
-  gap: 16px;
-  margin-bottom: 16px;
+  gap: $spacing-lg;
+  margin-bottom: $spacing-lg;
 }
 
 .step-counter {
@@ -330,22 +334,22 @@
 
 .progress-bar {
   flex: 1;
-  height: 8px;
-  background: #e0e0e0;
-  border-radius: 4px;
+  height: $spacing-sm;
+  background: $color-border;
+  border-radius: $radius-sm;
   overflow: hidden;
 }
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #1976d2 0%, #42a5f5 100%);
-  border-radius: 4px;
+  background: linear-gradient(90deg, $color-primary 0%, #42a5f5 100%);
+  border-radius: $radius-sm;
   transition: width 0.3s ease;
 }
 
 .step-title {
   @include title-primary;
-  color: #1976d2;
+  color: $color-primary;
 }
 
 .walkthrough-step-container {
@@ -353,9 +357,9 @@
 }
 
 .step-content-wrapper {
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  background: $color-bg-primary;
+  border-radius: $radius-xl;
+  box-shadow: 0 4px $spacing-md rgba(0,0,0,0.1);
   overflow: hidden;
   min-height: 450px;
 }
@@ -365,13 +369,13 @@ app-recipe-step {
   display: block;
   height: 100%;
   will-change: transform, opacity;
-  
+
   // Direction-aware horizontal animations for step navigation
   &.slide-forward {
     animation: slideFromRight 0.9s cubic-bezier(0.25, 0.1, 0.25, 1) ;
     animation-fill-mode: both ;
   }
-  
+
   &.slide-backward {
     animation: slideFromLeft 0.9s cubic-bezier(0.25, 0.1, 0.25, 1) ;
     animation-fill-mode: both ;
@@ -382,8 +386,8 @@ app-recipe-step {
 .step-indicators {
   display: flex;
   justify-content: center;
-  gap: 8px;
-  margin-bottom: 32px;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-xxxl;
   flex-wrap: wrap;
 }
 
@@ -391,17 +395,17 @@ app-recipe-step {
   width: 36px ;
   height: 36px ;
   min-width: 36px ;
-  
+
   &.active {
-    background-color: #1976d2 ;
+    background-color: $color-primary ;
     color: white ;
   }
-  
+
   &.completed {
     background-color: #4caf50 ;
     color: white ;
   }
-  
+
   span, mat-icon {
     font-size: $font-size-content;
     font-weight: $font-weight-semibold;
@@ -411,89 +415,89 @@ app-recipe-step {
 // ==================== Bottom Navigation Buttons ====================
 .walkthrough-bottom-nav {
   display: flex;
-  justify-content: space-between; 
-  padding: 32px 16px 16px 16px;
-  margin-top: 24px;
-  border-top: 1px solid #e0e0e0;
-  
+  justify-content: space-between;
+  padding: $spacing-xxxl $spacing-lg $spacing-lg $spacing-lg;
+  margin-top: $spacing-xxl;
+  border-top: 1px solid $color-border;
+
   @media (max-width: #{$breakpoint-mobile}) {
-    padding: 24px 12px 12px 12px;
+    padding: $spacing-xxl $spacing-md $spacing-md $spacing-md;
   }
 }
 
 .nav-button {
   display: flex ;
   align-items: center;
-  gap: 8px;
+  gap: $spacing-sm;
   min-width: 120px;
   height: 44px;
   font-weight: 500 ;
-  border-radius: 8px ;
-  transition: all 0.2s ease ;
-  padding: 0 20px ;
-  
-  
-  background-color: #f5f5f5 ; 
-  color: #666666 ; 
-  border: 1px solid #e0e0e0 ;
+  border-radius: $radius-lg ;
+  transition: $transition-normal ;
+  padding: 0 $spacing-xl ;
+
+
+  background-color: $color-bg-lighter ;
+  color: $color-text-muted ;
+  border: 1px solid $color-border ;
   box-shadow: none ;
-  
+
   &:hover:not([disabled]) {
-    background-color: #eeeeee ; 
-    color: #333333 ; 
-    border-color: #d0d0d0 ;
+    background-color: $color-bg-light ;
+    color: $color-text-primary ;
+    border-color: $color-border ;
     transform: translateY(-1px) ;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) ;
+    box-shadow: 0 2px $spacing-xs rgba(0, 0, 0, 0.1) ;
   }
-  
+
   &:active:not([disabled]) {
     transform: translateY(0) ;
     box-shadow: none ;
   }
-  
+
   &.prev-button {
     mat-icon {
-      order: -1; 
+      order: -1;
     }
   }
-  
+
   &.next-button {
     mat-icon {
-      order: 1; 
+      order: 1;
     }
   }
-  
+
   span {
     font-size: $font-size-content;
     font-weight: $font-weight-medium;
   }
-  
+
   mat-icon {
     font-size: 20px ;
     width: 20px ;
     height: 20px ;
     color: inherit ;
   }
-  
+
   &[disabled] {
-    background-color: #fafafa ;
-    color: #cccccc ;
-    border-color: #f0f0f0 ;
+    background-color: $color-bg-light ;
+    color: $color-border-light ;
+    border-color: $color-bg-lighter ;
     cursor: not-allowed ;
-    opacity: 1 ; 
+    opacity: 1 ;
   }
-  
-  
+
+
   @media (max-width: #{$breakpoint-mobile}) {
     min-width: 44px;
     max-width: 44px;
     height: 40px;
     padding: 0 ;
-    
+
     span {
-      display: none; 
+      display: none;
     }
-    
+
     mat-icon {
       margin: 0;
     }
@@ -502,22 +506,22 @@ app-recipe-step {
 
 .no-steps {
   text-align: center;
-  padding: 64px 24px;
-  color: #666;
-  
+  padding: 64px $spacing-xxl;
+  color: $color-text-muted;
+
   mat-icon {
     font-size: 48px;
     width: 48px;
     height: 48px;
-    margin-bottom: 16px;
-    color: #bbb;
+    margin-bottom: $spacing-lg;
+    color: $color-border-light;
   }
-  
+
   h3 {
-    margin-bottom: 8px;
-    color: #333;
+    margin-bottom: $spacing-sm;
+    color: $color-text-primary;
   }
-  
+
   p {
     margin: 0;
     max-width: 400px;

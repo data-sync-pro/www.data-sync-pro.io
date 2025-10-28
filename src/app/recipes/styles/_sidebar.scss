@@ -1,20 +1,19 @@
 // ==================== Recipe Sidebar Styles ====================
 
-// Shared variables
-$sidebar-width: 280px;
-$sidebar-collapsed: 56px;
-$transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-$breakpoint-desktop: 992px;
-$header-height: 60px; // Match the global header height
+// Import centralized variables
+@import './recipe-variables';
+
+// Sidebar-specific transition (uses Material Design easing)
+$transition: $transition-smooth;
 
 // W3Schools-style sidebar: Grid positioning + Sticky behavior
 .recipe-sidebar {
   grid-area: sidebar;
-  background: #ffffff;
-  border-right: 1px solid #e1e5e9;
+  background: $color-bg-primary;
+  border-right: 1px solid $color-border;
   transition: $transition;
-  z-index: 90;
-  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.08);
+  z-index: $z-sidebar;
+  box-shadow: $shadow-sm;
   
   // W3Schools-style sticky positioning
   position: sticky;
@@ -24,7 +23,7 @@ $header-height: 60px; // Match the global header height
 
   
   &.collapsed {
-    width: $sidebar-collapsed;
+    width: $sidebar-collapsed-width;
 
     .sidebar-header h2 {
       opacity: 0;
@@ -62,26 +61,26 @@ $header-height: 60px; // Match the global header height
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 16px 20px;
-    border-bottom: 1px solid #f1f3f4;
+    padding: $spacing-lg $spacing-xl;
+    border-bottom: 1px solid $color-border-lighter;
     min-height: 64px;
 
     .sidebar-main-title {
       font-size: 1.125rem;
       font-weight: 600;
-      color: #202124;
+      color: $color-text-primary;
       margin: 0;
     }
 
     .sidebar-subtitle {
       font-size: 0.75rem;
-      color: #5f6368;
+      color: $color-text-secondary;
     }
 
     .sidebar-toggle-btn {
       background: transparent;
       border: none;
-      border-radius: 4px;
+      border-radius: $radius-sm;
       width: 32px;
       height: 32px;
       display: flex;
@@ -89,12 +88,12 @@ $header-height: 60px; // Match the global header height
       justify-content: center;
       cursor: pointer;
       transition: $transition;
-      color: #5f6368;
+      color: $color-text-secondary;
       padding: 0;
-      
+
       &:hover {
-        background-color: #f1f3f4;
-        color: #202124;
+        background-color: $color-bg-lighter;
+        color: $color-text-primary;
       }
       
       .toggle-icon {
@@ -109,44 +108,44 @@ $header-height: 60px; // Match the global header height
     flex: 1;
     overflow-y: auto;
     overflow-x: hidden;
-    padding: 8px 0;
+    padding: $spacing-sm 0;
 
     &::-webkit-scrollbar {
       width: 6px;
     }
 
     &::-webkit-scrollbar-track {
-      background: #f1f1f1;
-      border-radius: 3px;
+      background: $color-bg-lighter;
+      border-radius: $radius-sm;
     }
 
     &::-webkit-scrollbar-thumb {
-      background: #dadce0;
-      border-radius: 3px;
+      background: $color-scrollbar;
+      border-radius: $radius-sm;
 
       &:hover {
-        background: #bdc1c6;
+        background: $color-scrollbar-hover;
       }
     }
   }
 
   .sidebar-search {
-    padding: 12px 16px;
-    border-bottom: 1px solid #f1f3f4;
+    padding: $spacing-md $spacing-lg;
+    border-bottom: 1px solid $color-border-lighter;
 
     .sidebar-search-btn {
       width: 100%;
-      padding: 10px 16px;
-      border: 1px solid #dadce0;
-      border-radius: 8px;
-      background: #f8f9fa;
-      color: #5f6368;
+      padding: 10px $spacing-lg;
+      border: 1px solid $color-border-light;
+      border-radius: $radius-lg;
+      background: $color-bg-light;
+      color: $color-text-secondary;
       font-size: 0.875rem;
       cursor: pointer;
       transition: $transition;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: $spacing-sm;
 
       .search-text {
         flex: 1;
@@ -156,18 +155,18 @@ $header-height: 60px; // Match the global header height
       .search-shortcut {
         background: rgba(95, 99, 104, 0.1);
         border: 1px solid rgba(95, 99, 104, 0.2);
-        border-radius: 4px;
+        border-radius: $radius-sm;
         padding: 2px 6px;
         font-size: 0.75rem;
         font-weight: 500;
-        color: #5f6368;
+        color: $color-text-secondary;
         font-family: monospace;
         line-height: 1;
       }
 
       &:hover {
-        background: #f1f3f4;
-        border-color: #bdc1c6;
+        background: $color-bg-lighter;
+        border-color: $color-scrollbar-hover;
 
         .search-shortcut {
           background: rgba(95, 99, 104, 0.15);
@@ -176,7 +175,7 @@ $header-height: 60px; // Match the global header height
       }
 
       &:focus {
-        outline: 2px solid #1a73e8;
+        outline: 2px solid $color-primary;
         outline-offset: 2px;
       }
     }
@@ -185,24 +184,24 @@ $header-height: 60px; // Match the global header height
   .sidebar-nav {
     .section-divider {
       height: 1px;
-      background: #f1f3f4;
-      margin: 16px 20px 8px;
+      background: $color-border-lighter;
+      margin: $spacing-lg $spacing-xl $spacing-sm;
     }
 
     .section-label {
       font-size: 0.75rem;
       font-weight: 600;
-      color: #5f6368;
+      color: $color-text-secondary;
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      padding: 0 20px 8px;
+      padding: 0 $spacing-xl $spacing-sm;
     }
 
     .nav-item {
       display: flex;
       align-items: center;
-      padding: 8px 20px;
-      color: #5f6368;
+      padding: $spacing-sm $spacing-xl;
+      color: $color-text-secondary;
       font-size: 0.875rem;
       transition: $transition;
       cursor: pointer;
@@ -210,15 +209,15 @@ $header-height: 60px; // Match the global header height
       position: relative;
 
       &:hover {
-        background-color: #f1f3f4;
-        color: #202124;
+        background-color: $color-bg-lighter;
+        color: $color-text-primary;
       }
 
       &.active {
-        background-color: #e8f0fe;
-        color: #1a73e8;
+        background-color: $color-bg-active;
+        color: $color-primary;
         font-weight: 500;
-        transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: $transition-fast;
 
         &::before {
           content: '';
@@ -227,7 +226,7 @@ $header-height: 60px; // Match the global header height
           top: 0;
           bottom: 0;
           width: 3px;
-          background-color: #1a73e8;
+          background-color: $color-primary;
           transition: width 0.2s ease-out, background-color 0.15s ease;
         }
       }
@@ -268,12 +267,12 @@ $header-height: 60px; // Match the global header height
       }
 
       .nav-count {
-        background: #f1f3f4;
-        color: #5f6368;
+        background: $color-bg-lighter;
+        color: $color-text-secondary;
         font-size: 0.75rem;
         padding: 2px 6px;
         border-radius: 10px;
-        margin-left: 8px;
+        margin-left: $spacing-sm;
         font-weight: 500;
       }
     }
@@ -285,11 +284,11 @@ $header-height: 60px; // Match the global header height
   display: none;
   position: fixed;
   top: 70px;
-  left: 16px;
-  z-index: 1001;
-  background: #ffffff;
-  border: 1px solid #e1e5e9;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  left: $spacing-lg;
+  z-index: $z-mobile-toggle;
+  background: $color-bg-primary;
+  border: 1px solid $color-border;
+  box-shadow: $shadow-md;
 
   @media (max-width: $breakpoint-desktop) {
     display: flex;
