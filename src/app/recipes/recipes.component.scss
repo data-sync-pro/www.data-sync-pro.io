@@ -5,18 +5,8 @@
 @import './styles/layout';
 @import './styles/sidebar';
 @import './styles/search-overlay';
-// @import './styles/toc'; // Old TOC styles - replaced with Microsoft style
-@import './styles/toc-microsoft'; // New Microsoft Learn style TOC
+@import './styles/toc'; // Microsoft Learn style TOC
 // Import layout variables for precise button positioning
-$sidebar-width: 240px;
-$sidebar-collapsed-width: 56px;
-$toc-width: 240px;
-$breakpoint-desktop: 992px;
-$breakpoint-tablet: 768px;
-$breakpoint-mobile: 576px;
-
-// Component-specific overrides and adjustments
-// The main layout is handled by modular styles
 
 // ==================== Recipe Detail Content Styles ====================
 
