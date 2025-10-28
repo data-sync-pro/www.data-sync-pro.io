@@ -2,7 +2,24 @@
 @import '../styles/recipe-variables';
 
 .recipe-step-container {
-  padding: $spacing-xxl $spacing-xxl 0px $spacing-xxl;
+  padding: $spacing-xxl $spacing-xxl $spacing-xxxl $spacing-xxl;
+
+  // Add visual separation between steps
+  &:not(:last-child) {
+    border-bottom: 2px solid #e0e0e0;
+    margin-bottom: $spacing-xl;
+  }
+
+  // Smooth scroll anchor positioning (account for header + breadcrumb height)
+  scroll-margin-top: 110px;
+
+  // Optional: Add subtle background for better step distinction
+  position: relative;
+
+  @media (max-width: 768px) {
+    padding: $spacing-xl $spacing-lg $spacing-xxl $spacing-lg;
+    scroll-margin-top: 80px;
+  }
 }
 
 

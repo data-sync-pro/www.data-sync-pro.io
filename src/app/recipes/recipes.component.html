@@ -202,155 +202,111 @@
           <!-- Recipe Content -->
           <div class="recipe-content">
             
-            <!-- Global Scroll Navigation Hint -->
-            <div class="scroll-navigation-hint" 
-                 [class.visible]="ui.showScrollHint" 
-                 [class.bottom]="ui.scrollHintDirection === 'bottom'"
-                 [class.top]="ui.scrollHintDirection === 'top'"
-                 [style.opacity]="ui.scrollHintOpacity">
-              <div class="hint-content" 
-                   (click)="onScrollHintClick()"
-                   [attr.role]="'button'"
-                   [attr.tabindex]="0"
-                   [attr.aria-label]="ui.scrollHintDirection === 'bottom' ? 'Click to go to next step or switch tab' : 'Click to go to previous step or switch tab'">
-                <mat-icon class="hint-arrow">
-                  {{ ui.scrollHintDirection === 'bottom' ? 'keyboard_double_arrow_down' : 'keyboard_double_arrow_up' }}
-                </mat-icon>
-                <span class="hint-text">
-                  <!-- Dynamic hint text based on context -->
-                  <ng-container *ngIf="ui.activeRecipeTab === 'overview' && ui.scrollHintDirection === 'bottom'">
-                    Scroll or click to switch to Walkthrough
-                  </ng-container>
-                  <ng-container *ngIf="ui.activeRecipeTab === 'walkthrough' && ui.scrollHintDirection === 'top' && canSwitchToOverview">
-                    Scroll or click to return to Overview
-                  </ng-container>
-                  <ng-container *ngIf="ui.activeRecipeTab === 'walkthrough' && ui.scrollHintDirection === 'bottom'">
-                    Scroll or click to {{ nextStepTitle }} Section
-                  </ng-container>
-                  <ng-container *ngIf="ui.activeRecipeTab === 'walkthrough' && ui.scrollHintDirection === 'top' && !canSwitchToOverview">
-                    Scroll or click to {{ previousStepTitle }} Section
-                  </ng-container>
-                </span>
-              </div>
-            </div>
-            <!-- Overview Content -->
-            <div class="tab-content" 
-                 *ngIf="ui.activeRecipeTab === 'overview'"
-                 [class.tab-slide-forward]="ui.tabAnimationDirection === 'forward' && ui.activeRecipeTab === 'overview'"
-                 [class.tab-slide-backward]="ui.tabAnimationDirection === 'backward' && ui.activeRecipeTab === 'overview'">
-              <!-- Dynamic sections using configuration -->
-              <section *ngFor="let sectionConfig of getVisibleOverviewSections()" 
-                       [id]="sectionConfig.elementId" 
-                       class="recipe-section"
-                       [class.use-case-highlight]="sectionConfig.isHighlight">
-                <h4>
-                  {{ sectionConfig.title }}
-                </h4>
-                
-                <!-- Switch based on content type -->
-                <ng-container [ngSwitch]="sectionConfig.contentType">
-                  
-                  <!-- Use Case Highlight (special treatment) -->
-                  <div *ngSwitchCase="'use-case-highlight'" class="use-case-content">
-                    <div [innerHTML]="sectionConfig.data"></div>
-                  </div>
-                  
-                  <!-- HTML content -->
-                  <div *ngSwitchCase="'html'" [innerHTML]="sectionConfig.data"></div>
-                  
-                  <!-- Simple text content -->
-                  <p *ngSwitchCase="'text'">{{ sectionConfig.data }}</p>
-                  
-                  <!-- Tag list (versions, keywords) -->
-                  <div *ngSwitchCase="'tag-list'" [class]="sectionConfig.tagClass === 'version-tag' ? 'version-tags' : 'keyword-tags'">
-                    <span *ngFor="let item of $any(sectionConfig.data)" 
-                          [class]="sectionConfig.tagClass || 'tag'">{{ item }}</span>
-                  </div>
-                  
-                  <!-- Simple list -->
-                  <ul *ngSwitchCase="'list'">
-                    <li *ngFor="let item of $any(sectionConfig.data)">{{ item }}</li>
-                  </ul>
-                  
-                  <!-- Download list -->
-                  <div *ngSwitchCase="'download-list'" class="download-list">
-                    <div *ngFor="let executable of $any(sectionConfig.data)" class="download-item">
-                      <button type="button" 
-                              class="download-link" 
-                              (click)="downloadExecutable(executable.url, executable.title, executable.originalFileName)">
-                        {{ executable.title }}
-                        <lightning-icon iconName="utility:download" size="xx-small" alternativeText="Download"></lightning-icon>
-                      </button>
+            <!-- Unified Recipe Content - Overview + Walkthrough -->
+            <div class="recipe-unified-content">
+
+              <!-- Overview Sections -->
+              <div class="overview-sections">
+                <section *ngFor="let sectionConfig of getVisibleOverviewSections()"
+                         [id]="sectionConfig.elementId"
+                         class="recipe-section"
+                         [class.use-case-highlight]="sectionConfig.isHighlight">
+                  <h4>
+                    {{ sectionConfig.title }}
+                  </h4>
+
+                  <!-- Switch based on content type -->
+                  <ng-container [ngSwitch]="sectionConfig.contentType">
+
+                    <!-- Use Case Highlight (special treatment) -->
+                    <div *ngSwitchCase="'use-case-highlight'" class="use-case-content">
+                      <div [innerHTML]="sectionConfig.data"></div>
                     </div>
-                  </div>
-                  
-                  <!-- Link list (related recipes) -->
-                  <div *ngSwitchCase="'link-list'" class="related-recipes">
-                    <a *ngFor="let related of $any(sectionConfig.data)" 
-                       [href]="related.url" 
-                       class="related-recipe-link">
-                      {{ related.title }}
-                    </a>
-                  </div>
-                  
-                  <!-- Prerequisites (bullet points format) -->
-                  <div *ngSwitchCase="'prerequisites'" class="prerequisites-list">
-                    <ul>
-                      <li *ngFor="let prereq of $any(sectionConfig.data)">
-                        <div class="prerequisite-description">
-                          {{ prereq.description && prereq.description.trim() ? prereq.description : 'N/A' }}
-                          <ng-container *ngIf="prereq.quickLinks?.length">
-                            <ng-container *ngFor="let link of prereq.quickLinks">
-                              <a [href]="link.url" target="_blank" *ngIf="link.title && link.title.trim()" class="inline-download-icon">
-                                <lightning-icon iconName="utility:download" size="xx-small" alternativeText="Download"></lightning-icon>
-                              </a>
-                            </ng-container>
-                          </ng-container>
-                        </div>
-                      </li>
+
+                    <!-- HTML content -->
+                    <div *ngSwitchCase="'html'" [innerHTML]="sectionConfig.data"></div>
+
+                    <!-- Simple text content -->
+                    <p *ngSwitchCase="'text'">{{ sectionConfig.data }}</p>
+
+                    <!-- Tag list (versions, keywords) -->
+                    <div *ngSwitchCase="'tag-list'" [class]="sectionConfig.tagClass === 'version-tag' ? 'version-tags' : 'keyword-tags'">
+                      <span *ngFor="let item of $any(sectionConfig.data)"
+                            [class]="sectionConfig.tagClass || 'tag'">{{ item }}</span>
+                    </div>
+
+                    <!-- Simple list -->
+                    <ul *ngSwitchCase="'list'">
+                      <li *ngFor="let item of $any(sectionConfig.data)">{{ item }}</li>
                     </ul>
-                  </div>
 
-                  
-                  <!-- Version info -->
-                  <div *ngSwitchCase="'version-info'">
-                    <p>Version: {{ $any(sectionConfig.data)?.version }}</p>
-                    <p>{{ $any(sectionConfig.data)?.description }}</p>
-                  </div>
-                  
-                </ng-container>
-              </section>
-            </div>
-            
-            <!-- Walkthrough Content -->
-            <div class="tab-content walkthrough-content" 
-                 *ngIf="ui.activeRecipeTab === 'walkthrough'"
-                 [class.tab-slide-forward]="ui.tabAnimationDirection === 'forward' && ui.activeRecipeTab === 'walkthrough'"
-                 [class.tab-slide-backward]="ui.tabAnimationDirection === 'backward' && ui.activeRecipeTab === 'walkthrough'">
-              
-              <!-- Step Container -->
-              <div class="walkthrough-container" *ngIf="walkthroughSteps.length > 0">
-                
-                <!-- Step Content -->
-                <div class="walkthrough-step-container">
-                  <div class="step-content-wrapper">
-                    <app-recipe-step 
-                      [stepData]="currentStepData"
-                      [class.slide-forward]="ui.stepAnimationDirection === 'forward'"
-                      [class.slide-backward]="ui.stepAnimationDirection === 'backward'">
-                    </app-recipe-step>
-                  </div>
-                  
-                </div>
+                    <!-- Download list -->
+                    <div *ngSwitchCase="'download-list'" class="download-list">
+                      <div *ngFor="let executable of $any(sectionConfig.data)" class="download-item">
+                        <button type="button"
+                                class="download-link"
+                                (click)="downloadExecutable(executable.url, executable.title, executable.originalFileName)">
+                          {{ executable.title }}
+                          <lightning-icon iconName="utility:download" size="xx-small" alternativeText="Download"></lightning-icon>
+                        </button>
+                      </div>
+                    </div>
 
+                    <!-- Link list (related recipes) -->
+                    <div *ngSwitchCase="'link-list'" class="related-recipes">
+                      <a *ngFor="let related of $any(sectionConfig.data)"
+                         [href]="related.url"
+                         class="related-recipe-link">
+                        {{ related.title }}
+                      </a>
+                    </div>
+
+                    <!-- Prerequisites (bullet points format) -->
+                    <div *ngSwitchCase="'prerequisites'" class="prerequisites-list">
+                      <ul>
+                        <li *ngFor="let prereq of $any(sectionConfig.data)">
+                          <div class="prerequisite-description">
+                            {{ prereq.description && prereq.description.trim() ? prereq.description : 'N/A' }}
+                            <ng-container *ngIf="prereq.quickLinks?.length">
+                              <ng-container *ngFor="let link of prereq.quickLinks">
+                                <a [href]="link.url" target="_blank" *ngIf="link.title && link.title.trim()" class="inline-download-icon">
+                                  <lightning-icon iconName="utility:download" size="xx-small" alternativeText="Download"></lightning-icon>
+                                </a>
+                              </ng-container>
+                            </ng-container>
+                          </div>
+                        </li>
+                      </ul>
+                    </div>
+
+
+                    <!-- Version info -->
+                    <div *ngSwitchCase="'version-info'">
+                      <p>Version: {{ $any(sectionConfig.data)?.version }}</p>
+                      <p>{{ $any(sectionConfig.data)?.description }}</p>
+                    </div>
+
+                  </ng-container>
+                </section>
               </div>
-              
+
+              <!-- Walkthrough Sections -->
+              <div class="walkthrough-sections" *ngIf="walkthroughSteps.length > 0">
+                <app-recipe-step
+                  *ngFor="let step of walkthroughStepsData; let i = index"
+                  [stepData]="step"
+                  [id]="'step-' + i"
+                  [attr.data-step-index]="i">
+                </app-recipe-step>
+              </div>
+
               <!-- No Steps Available -->
               <div class="no-steps" *ngIf="walkthroughSteps.length === 0">
                 <mat-icon>info</mat-icon>
                 <h3>No walkthrough steps available</h3>
                 <p>This recipe doesn't have detailed walkthrough steps configured.</p>
               </div>
+
             </div>
           </div>
         </div>
@@ -396,25 +352,25 @@
           <li class="toc-section-group" *ngIf="getOverviewSectionsForTOC().length > 0">
             <span class="toc-group-title">Overview</span>
             <ul class="toc-items">
-              <li *ngFor="let section of getOverviewSectionsForTOC()" 
+              <li *ngFor="let section of getOverviewSectionsForTOC()"
                   class="toc-item"
-                  [class.active]="ui.activeSectionId === section.id && ui.activeRecipeTab === 'overview'">
-                <a (click)="navigateToOverviewSection()" 
+                  [class.active]="ui.activeSectionId === section.id">
+                <a (click)="section.elementId && navigateToOverviewSection(section.elementId)"
                    [attr.aria-current]="ui.activeSectionId === section.id ? 'location' : null">
                   {{ section.title }}
                 </a>
               </li>
             </ul>
           </li>
-          
+
           <!-- Walkthrough Section Group -->
           <li class="toc-section-group" *ngIf="getWalkthroughSectionsForTOC().length > 0">
             <span class="toc-group-title">Walkthrough</span>
             <ul class="toc-items">
-              <li *ngFor="let section of getWalkthroughSectionsForTOC(); let i = index" 
+              <li *ngFor="let section of getWalkthroughSectionsForTOC(); let i = index"
                   class="toc-item"
-                  [class.active]="ui.activeSectionId === section.id && ui.activeRecipeTab === 'walkthrough'">
-                <a (click)="navigateToWalkthroughSection(i)" 
+                  [class.active]="ui.activeSectionId === section.id">
+                <a (click)="navigateToWalkthroughSection(i)"
                    [attr.aria-current]="ui.activeSectionId === section.id ? 'location' : null">
                   {{ section.title }}
                 </a>

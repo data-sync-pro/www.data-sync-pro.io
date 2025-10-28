@@ -41,18 +41,9 @@ interface UIState {
   currentView: 'home' | 'category' | 'recipe';
   isPreviewMode: boolean;
   tocHidden: boolean;
-  activeRecipeTab: string;
   activeSectionId: string;
   userHasScrolled: boolean;
   scrollTicking: boolean;
-  currentWalkthroughStep: number;
-  hasScrolledToBottomOnce: boolean;
-  hasScrolledToTopOnce: boolean;
-  showScrollHint: boolean;
-  scrollHintDirection: 'top' | 'bottom' | null;
-  scrollHintOpacity: number;
-  stepAnimationDirection: 'forward' | 'backward' | null;
-  tabAnimationDirection: 'forward' | 'backward' | null;
 }
 
 interface SearchState {
@@ -82,21 +73,14 @@ export class RecipesComponent implements OnInit, OnDestroy {
     currentView: 'home',
     isPreviewMode: false,
     tocHidden: false,
-    activeRecipeTab: 'overview',
     activeSectionId: 'use-case',
     userHasScrolled: false,
-    scrollTicking: false,
-    currentWalkthroughStep: 0,
-    hasScrolledToBottomOnce: false,
-    hasScrolledToTopOnce: false,
-    showScrollHint: false,
-    scrollHintDirection: null,
-    scrollHintOpacity: 0,
-    stepAnimationDirection: null,
-    tabAnimationDirection: null
+    scrollTicking: false
   };
 
   private optimizedScrollListener?: () => void;
+  private sectionObserver?: IntersectionObserver;
+  private visibleSections = new Set<string>();
 
   search: SearchState = {
     query: '',
@@ -123,7 +107,6 @@ export class RecipesComponent implements OnInit, OnDestroy {
   // Recipe TOC structure
   recipeTOC: RecipeTOCStructure = {
     tabs: [],
-    currentTabId: 'overview',
     currentSectionId: 'use-case'
   };
   
@@ -150,7 +133,8 @@ export class RecipesComponent implements OnInit, OnDestroy {
     this.checkMobileView();
     this.loadSidebarState();
     this.setupOptimizedScrollListener();
-    
+    this.setupSectionObserver();
+
     // Add body class to hide footer on recipe pages
     document.body.classList.add('recipe-page');
   }
@@ -184,73 +168,6 @@ export class RecipesComponent implements OnInit, OnDestroy {
 
 
 
-  /**
-   * Update scroll hint based on scroll position - Unified logic for both tabs
-   */
-  private updateScrollHint(): void {
-    const scrollTop = document.documentElement.scrollTop;
-    const windowHeight = window.innerHeight;
-    const documentHeight = document.documentElement.scrollHeight;
-    
-    const distanceToBottom = documentHeight - (scrollTop + windowHeight);
-    const distanceToTop = scrollTop;
-    
-    // Threshold for showing hint (150px)
-    const hintThreshold = 150;
-    
-    // Determine what actions are available based on current context
-    let canScrollDown = false;
-    let canScrollUp = false;
-    
-    if (this.ui.activeRecipeTab === 'overview') {
-      // In Overview: can scroll down to switch to Walkthrough
-      canScrollDown = this.canSwitchToWalkthrough;
-      canScrollUp = false; // No upward action in Overview
-    } else if (this.ui.activeRecipeTab === 'walkthrough') {
-      // In Walkthrough: check both step navigation and tab switching
-      canScrollDown = this.canGoToNextStep; // Can go to next step
-      canScrollUp = this.canGoToPreviousStep || this.canSwitchToOverview; // Can go to previous step OR back to Overview
-    }
-    
-    // Determine which hint to show based on distance comparison when both conditions are met
-    const canShowTopHint = distanceToTop < hintThreshold && canScrollUp;
-    const canShowBottomHint = distanceToBottom < hintThreshold && canScrollDown;
-    
-    if (canShowTopHint && canShowBottomHint) {
-      // Both conditions are met - show the hint for the closer edge
-      if (distanceToTop <= distanceToBottom) {
-        // User is closer to top - show top hint
-        this.ui.showScrollHint = true;
-        this.ui.scrollHintDirection = 'top';
-        const rawOpacity = (hintThreshold - distanceToTop) / hintThreshold;
-        this.ui.scrollHintOpacity = Math.max(0.8, Math.min(1, rawOpacity));
-      } else {
-        // User is closer to bottom - show bottom hint
-        this.ui.showScrollHint = true;
-        this.ui.scrollHintDirection = 'bottom';
-        const rawOpacity = (hintThreshold - distanceToBottom) / hintThreshold;
-        this.ui.scrollHintOpacity = Math.max(0.8, Math.min(1, rawOpacity));
-      }
-    } else if (canShowBottomHint) {
-      // Only bottom hint condition is met
-      this.ui.showScrollHint = true;
-      this.ui.scrollHintDirection = 'bottom';
-      const rawOpacity = (hintThreshold - distanceToBottom) / hintThreshold;
-      this.ui.scrollHintOpacity = Math.max(0.8, Math.min(1, rawOpacity));
-    } else if (canShowTopHint) {
-      // Only top hint condition is met
-      this.ui.showScrollHint = true;
-      this.ui.scrollHintDirection = 'top';
-      const rawOpacity = (hintThreshold - distanceToTop) / hintThreshold;
-      this.ui.scrollHintOpacity = Math.max(0.8, Math.min(1, rawOpacity));
-    } else {
-      // No hint conditions are met
-      this.ui.showScrollHint = false;
-      this.ui.scrollHintOpacity = 0;
-    }
-    
-    this.cdr.markForCheck();
-  }
 
 
   private isInputFocused(): boolean {
@@ -264,17 +181,17 @@ export class RecipesComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
-    
+
     // Clean up scroll listener
     if (this.optimizedScrollListener) {
       window.removeEventListener('scroll', this.optimizedScrollListener);
     }
-    
-    // Clean up scroll hint state to prevent it from showing on other pages
-    this.ui.showScrollHint = false;
-    this.ui.scrollHintOpacity = 0;
-    this.ui.scrollHintDirection = null;
-    
+
+    // Clean up section observer
+    if (this.sectionObserver) {
+      this.sectionObserver.disconnect();
+    }
+
     // Remove body class when leaving recipe pages
     document.body.classList.remove('recipe-page');
   }
@@ -341,84 +258,9 @@ export class RecipesComponent implements OnInit, OnDestroy {
       
       this.cdr.markForCheck();
     });
-
-    // Monitor query parameters for tab and step state
-    this.route.queryParamMap.pipe(
-      takeUntil(this.destroy$)
-    ).subscribe(queryParams => {
-      const tab = queryParams.get('tab');
-      const step = queryParams.get('step');
-      
-      // Only process if we're viewing a recipe and recipe is loaded
-      if (this.ui.currentView === 'recipe' && this.currentRecipe) {
-        // Small delay to ensure recipe TOC is generated
-        setTimeout(() => {
-          this.restoreStateFromUrl(tab, step);
-        }, 50);
-      }
-    });
   }
 
-  /**
-   * Update URL parameters without causing navigation
-   */
-  private updateUrlParams(tab: string | null, step: number | null): void {
-    if (!this.navigation.category || !this.navigation.recipeName) {
-      return; // Can't update URL without recipe context
-    }
 
-    const queryParams: any = {};
-    
-    // Add tab parameter if not overview (which is default)
-    if (tab && tab !== 'overview') {
-      queryParams.tab = tab;
-    }
-    
-    // Add step parameter for walkthrough tab
-    if (tab === 'walkthrough' && step !== null && step >= 0) {
-      queryParams.step = step.toString();
-    }
-    
-    // Update URL without triggering navigation
-    // Don't use 'merge' to ensure old parameters are cleared when switching tabs
-    this.router.navigate([], {
-      relativeTo: this.route,
-      queryParams,
-      queryParamsHandling: '', // Empty string means replace all query params
-      replaceUrl: true // Replace current URL in history instead of adding new entry
-    });
-  }
-
-  /**
-   * Restore UI state from URL parameters
-   */
-  private restoreStateFromUrl(tab: string | null, step: string | null): void {
-    // Restore tab state
-    if (tab && (tab === 'overview' || tab === 'walkthrough')) {
-      this.ui.activeRecipeTab = tab;
-      this.recipeTOC.currentTabId = tab;
-    }
-    
-    // Restore step state for walkthrough
-    if (tab === 'walkthrough' && step !== null) {
-      const stepIndex = parseInt(step, 10);
-      const walkthroughSteps = this.walkthroughSteps;
-      
-      // Validate step index
-      if (!isNaN(stepIndex) && stepIndex >= 0 && stepIndex < walkthroughSteps.length) {
-        this.ui.currentWalkthroughStep = stepIndex;
-        
-        // Update section ID for TOC highlighting
-        const sectionId = this.getSectionIdFromWalkthroughStep(stepIndex);
-        if (sectionId) {
-          this.ui.activeSectionId = sectionId;
-          this.recipeTOC.currentSectionId = sectionId;
-        }
-      }
-    }
-    
-    this.cdr.markForCheck();
-  }
 
   /**
    * Load initial data
@@ -513,10 +355,12 @@ export class RecipesComponent implements OnInit, OnDestroy {
         if (recipe) {
           // Generate TOC structure for the loaded recipe
           this.generateRecipeTOCStructure();
-          // Clear scroll cache for new recipe
-          this.clearSectionElementsCache();
           // Reset scroll state
           this.ui.userHasScrolled = false;
+          // Re-observe all sections after recipe loads
+          this.observeAllSections();
+          // Handle initial URL hash if present
+          this.handleInitialHash();
         }
 
         this.cdr.markForCheck();
@@ -541,9 +385,12 @@ export class RecipesComponent implements OnInit, OnDestroy {
       
       if (this.currentRecipe) {
         this.generateRecipeTOCStructure();
-        this.clearSectionElementsCache();
         this.ui.userHasScrolled = false;
-        
+        // Re-observe all sections after preview recipe loads
+        this.observeAllSections();
+        // Handle initial URL hash if present
+        this.handleInitialHash();
+
         // Set initial timestamp for comparison
         this.setPreviewTimestamp(previewData.timestamp);
       }
@@ -603,8 +450,9 @@ export class RecipesComponent implements OnInit, OnDestroy {
     
     // Regenerate TOC structure for updated content
     this.generateRecipeTOCStructure();
-    this.clearSectionElementsCache();
-    
+    // Re-observe all sections after content update
+    this.observeAllSections();
+
     // Update timestamp for comparison
     this.setPreviewTimestamp(previewData.timestamp);
     
@@ -702,11 +550,9 @@ export class RecipesComponent implements OnInit, OnDestroy {
 
     this.router.navigate(['/recipes', recipe.category, recipe.slug]);
 
-    // Only reset to overview tab when navigating to a different recipe
+    // Reset to top section when navigating to a different recipe
     if (!isSameRecipe) {
-      this.ui.activeRecipeTab = 'overview';
       this.ui.activeSectionId = 'use-case';
-      this.ui.currentWalkthroughStep = 0;
     }
 
   }
@@ -931,7 +777,6 @@ export class RecipesComponent implements OnInit, OnDestroy {
     }
 
     this.recipeTOC.tabs = tabs;
-    this.recipeTOC.currentTabId = this.ui.activeRecipeTab;
     this.recipeTOC.currentSectionId = this.ui.activeSectionId;
   }
 
@@ -1090,22 +935,82 @@ export class RecipesComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Handle scroll events and update active section
+   * Handle scroll events
+   * Note: Section highlighting is handled by Intersection Observer
    */
   private handleOptimizedScroll(): void {
-    // Reset scroll tracking states when user leaves bottom/top areas
-    if (this.showRecipeDetails) {
-      this.updateScrollHint();
-    }
+    // Reserved for future scroll-based features if needed
   }
 
   /**
-   * Clear section elements cache (call when recipe changes)
+   * Setup Intersection Observer for automatic TOC highlighting
    */
-  private clearSectionElementsCache(): void {
-    // Cache clearing placeholder - can be expanded if needed
+  private setupSectionObserver(): void {
+    if (typeof window === 'undefined' || !('IntersectionObserver' in window)) {
+      return;
+    }
+
+    const options: IntersectionObserverInit = {
+      root: null,
+      rootMargin: '-80px 0px -60% 0px', // Account for header and focus on top sections
+      threshold: 0
+    };
+
+    this.sectionObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        const sectionId = entry.target.id;
+        if (entry.isIntersecting) {
+          this.visibleSections.add(sectionId);
+        } else {
+          this.visibleSections.delete(sectionId);
+        }
+      });
+
+      // Update active section to the first visible one
+      if (this.visibleSections.size > 0) {
+        const firstVisible = Array.from(this.visibleSections)[0];
+        this.updateActiveSection(firstVisible);
+      }
+    }, options);
+
+    // Start observing sections
+    this.observeAllSections();
   }
 
+  /**
+   * Observe all sections for TOC highlighting
+   */
+  private observeAllSections(): void {
+    // Delay to ensure DOM is rendered
+    setTimeout(() => {
+      // Observe Overview sections
+      this.getOverviewSectionsForTOC().forEach(section => {
+        const element = document.getElementById(section.elementId || '');
+        if (element) {
+          this.sectionObserver?.observe(element);
+        }
+      });
+
+      // Observe Walkthrough steps
+      this.walkthroughStepsData.forEach((_, index) => {
+        const element = document.getElementById(`step-${index}`);
+        if (element) {
+          this.sectionObserver?.observe(element);
+        }
+      });
+    }, 100);
+  }
+
+  /**
+   * Update active section for TOC highlighting
+   */
+  private updateActiveSection(sectionId: string): void {
+    if (this.ui.activeSectionId !== sectionId) {
+      this.ui.activeSectionId = sectionId;
+      this.recipeTOC.currentSectionId = sectionId;
+      this.cdr.markForCheck();
+    }
+  }
 
 
   /**
@@ -1125,32 +1030,111 @@ export class RecipesComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Navigate to Overview section
+   * Navigate to Overview section - Scroll to section anchor
    */
-  navigateToOverviewSection(): void {
-    // Switch to overview tab if not already there
-    if (this.ui.activeRecipeTab !== 'overview') {
-      this.ui.activeRecipeTab = 'overview';
-      this.recipeTOC.currentTabId = 'overview';
+  navigateToOverviewSection(sectionId: string): void {
+    const sectionElement = document.getElementById(sectionId);
+    if (sectionElement) {
+      sectionElement.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      });
+
+      // Update URL hash for anchor support
+      this.updateUrlHash(sectionId);
+
+      // Update active section for TOC highlighting
+      this.ui.activeSectionId = sectionId;
+      this.recipeTOC.currentSectionId = sectionId;
+      this.cdr.markForCheck();
     }
   }
 
   /**
-   * Navigate to Walkthrough section
+   * Navigate to Walkthrough section - Scroll to step anchor
    */
   navigateToWalkthroughSection(stepIndex: number): void {
-    // Switch to walkthrough tab if not already there
-    if (this.ui.activeRecipeTab !== 'walkthrough') {
-      this.ui.activeRecipeTab = 'walkthrough';
-      this.recipeTOC.currentTabId = 'walkthrough';
-      this.ui.currentWalkthroughStep = stepIndex;
-    } else {
-      this.ui.currentWalkthroughStep = stepIndex;
+    // Scroll to the step immediately (no tab switching needed)
+    this.scrollToStep(stepIndex);
+    // Update URL hash for anchor support
+    this.updateUrlHash(`step-${stepIndex}`);
+  }
+
+  /**
+   * Scroll to a specific step by index
+   */
+  private scrollToStep(stepIndex: number): void {
+    const stepElement = document.getElementById(`step-${stepIndex}`);
+    if (stepElement) {
+      stepElement.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      });
+
+      // Update active section for TOC highlighting
+      this.ui.activeSectionId = `step-${stepIndex}`;
+      this.recipeTOC.currentSectionId = `step-${stepIndex}`;
+      this.cdr.markForCheck();
     }
-    
-    // Update URL with new step
-    this.updateUrlParams('walkthrough', stepIndex);
-    
+  }
+
+  /**
+   * Update URL hash without triggering page reload
+   */
+  private updateUrlHash(sectionId: string): void {
+    if (typeof window !== 'undefined' && window.history) {
+      const currentUrl = window.location.pathname + window.location.search;
+      const newUrl = `${currentUrl}#${sectionId}`;
+      window.history.replaceState(null, '', newUrl);
+    }
+  }
+
+  /**
+   * Handle initial URL hash on page load
+   */
+  private handleInitialHash(): void {
+    if (typeof window === 'undefined') return;
+
+    const hash = window.location.hash.slice(1); // Remove '#' prefix
+    if (hash) {
+      // Delay to ensure DOM is rendered
+      setTimeout(() => {
+        const element = document.getElementById(hash);
+        if (element) {
+          element.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          });
+
+          // Update active section
+          this.ui.activeSectionId = hash;
+          this.recipeTOC.currentSectionId = hash;
+          this.cdr.markForCheck();
+        }
+      }, 300);
+    }
+  }
+
+  /**
+   * Listen for hash changes (back/forward navigation)
+   */
+  @HostListener('window:hashchange', ['$event'])
+  onHashChange(): void {
+    const hash = window.location.hash.slice(1);
+    if (hash) {
+      const element = document.getElementById(hash);
+      if (element) {
+        element.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
+
+        // Update active section
+        this.ui.activeSectionId = hash;
+        this.recipeTOC.currentSectionId = hash;
+        this.cdr.markForCheck();
+      }
+    }
   }
 
 
@@ -1162,265 +1146,38 @@ export class RecipesComponent implements OnInit, OnDestroy {
    */
   get walkthroughSteps(): string[] {
     if (!this.currentRecipe?.walkthrough) return [];
-    
+
     const steps: string[] = [];
     const walkthrough = this.currentRecipe.walkthrough;
-    
+
     if (Array.isArray(walkthrough)) {
       // New format - return step names
       return walkthrough.map((step, index) => step.step || `Step ${index + 1}`);
     }
-    
+
     return steps;
   }
 
   /**
-   * Get current step data
+   * Get walkthrough steps data for template iteration
    */
-  get currentStepData(): any {
-    if (!this.currentRecipe?.walkthrough) return null;
-    
-    // Handle new array format
-    if (Array.isArray(this.currentRecipe.walkthrough)) {
-      const steps = this.currentRecipe.walkthrough;
-      if (this.ui.currentWalkthroughStep >= 0 && this.ui.currentWalkthroughStep < steps.length) {
-        return steps[this.ui.currentWalkthroughStep];
-      }
-      return null;
+  get walkthroughStepsData(): any[] {
+    if (!this.currentRecipe?.walkthrough || !Array.isArray(this.currentRecipe.walkthrough)) {
+      return [];
     }
-
+    return this.currentRecipe.walkthrough;
   }
 
 
 
-  /**
-   * Get section ID from walkthrough step index
-   */
-  private getSectionIdFromWalkthroughStep(stepIndex: number): string {
-    if (!this.currentRecipe?.walkthrough) return '';
-      if (stepIndex >= 0 && stepIndex < this.currentRecipe.walkthrough.length) {
-        return `step-${stepIndex}`;
-      }
-      return '';
-  }
-
-  /**
-   * Sync TOC section with current walkthrough step
-   */
-  private syncTOCSectionWithWalkthrough(): void {
-    if (this.ui.activeRecipeTab === 'walkthrough') {
-      const sectionId = this.getSectionIdFromWalkthroughStep(this.ui.currentWalkthroughStep);
-      if (sectionId) {
-        this.ui.activeSectionId = sectionId;
-        this.recipeTOC.currentSectionId = sectionId;
-      }
-    }
-  }
-
-  /**
-   * Navigate to next step with section-based scrolling
-   */
-  goToNextWalkthroughStep(): void {
-    const steps = this.walkthroughSteps;
-    if (this.ui.currentWalkthroughStep < steps.length - 1) {
-      this.ui.stepAnimationDirection = 'forward';
-      this.ui.currentWalkthroughStep++;
-      
-      // Reset scroll tracking states when navigating to new step
-      this.ui.hasScrolledToBottomOnce = false;
-      this.ui.hasScrolledToTopOnce = false;
-      
-      this.syncTOCSectionWithWalkthrough();
-      this.updateUrlParams('walkthrough', this.ui.currentWalkthroughStep);
-      this.cdr.markForCheck();
-      
-      this.scrollToTop();
-  
-      
-      // Reset animation direction after animation completes
-      setTimeout(() => {
-        this.ui.stepAnimationDirection = null;
-        this.cdr.markForCheck();
-      }, 950); // Slightly after animation ends
-    }
-  }
-
-  /**
-   * Navigate to previous step with section-based scrolling
-   */
-  goToPreviousWalkthroughStep(): void {
-    if (this.ui.currentWalkthroughStep > 0) {
-      this.ui.stepAnimationDirection = 'backward';
-      this.ui.currentWalkthroughStep--;
-      
-      // Reset scroll tracking states when navigating to new step
-      this.ui.hasScrolledToBottomOnce = false;
-      this.ui.hasScrolledToTopOnce = false;
-      
-      this.syncTOCSectionWithWalkthrough();
-      this.updateUrlParams('walkthrough', this.ui.currentWalkthroughStep);
-      this.cdr.markForCheck();
-      
-
-      this.scrollToTop();
-      
-      
-      // Reset animation direction after animation completes
-      setTimeout(() => {
-        this.ui.stepAnimationDirection = null;
-        this.cdr.markForCheck();
-      }, 950); // Slightly after animation ends
-    }
-  }
-
-  /**
-   * Handle scroll hint click - unified logic for both tabs
-   */
-  onScrollHintClick(): void {
-    // Hide hint immediately
-    this.ui.showScrollHint = false;
-    this.ui.scrollHintOpacity = 0;
-    
-    // Determine action based on current context
-    if (this.ui.activeRecipeTab === 'overview') {
-      // In Overview: clicking bottom hint switches to Walkthrough
-      if (this.ui.scrollHintDirection === 'bottom' && this.canSwitchToWalkthrough) {
-        // Switch to Walkthrough tab at first step
-        this.ui.currentWalkthroughStep = 0;
-        
-        // Scroll to first step section
-        setTimeout(() => {
-            this.scrollToTop();
-          setTimeout(() => {
-            this.updateScrollHint();
-          }, 200);
-        }, 100);
-      }
-    } else if (this.ui.activeRecipeTab === 'walkthrough') {
-      // In Walkthrough: handle both step navigation and tab switching
-      if (this.ui.scrollHintDirection === 'bottom') {
-        // Navigate to next step
-        if (this.canGoToNextStep) {
-          this.goToNextWalkthroughStep();
-          
-          // Re-evaluate scroll hints after step switch complete
-          setTimeout(() => {
-            this.updateScrollHint();
-          }, 200);
-        }
-      } else if (this.ui.scrollHintDirection === 'top') {
-        // Check if we should go back to Overview or previous step
-        if (this.ui.currentWalkthroughStep === 0 && this.canSwitchToOverview) {
-          // Switch back to Overview
-          
-          // Scroll to top of overview for intuitive navigation
-          setTimeout(() => {
-            this.scrollToTop();
-            
-            // Re-evaluate scroll hints after tab switch and scroll complete
-            setTimeout(() => {
-              this.updateScrollHint();
-            }, 200);
-          }, 100);
-        } else if (this.canGoToPreviousStep) {
-          // Navigate to previous step
-          this.goToPreviousWalkthroughStep();
-          
-          // Re-evaluate scroll hints after step switch complete
-          setTimeout(() => {
-            this.updateScrollHint();
-          }, 200);
-        }
-      }
-    }
-  }
-
-  /**
-   * Navigate to specific step with section-based scrolling
-   */
-  goToWalkthroughStep(stepIndex: number): void {
-    const steps = this.walkthroughSteps;
-    if (stepIndex >= 0 && stepIndex < steps.length) {
-      this.ui.currentWalkthroughStep = stepIndex;
-      this.syncTOCSectionWithWalkthrough();
-      this.updateUrlParams('walkthrough', this.ui.currentWalkthroughStep);
-      this.cdr.markForCheck();
-
-      this.scrollToTop();
-      
-      
-      // Reset animation direction after animation completes
-      setTimeout(() => {
-        this.ui.stepAnimationDirection = null;
-        this.cdr.markForCheck();
-      }, 950); // Slightly after animation ends
-    }
-  }
 
 
-  /**
-   * Check if can go to next step
-   */
-  get canGoToNextStep(): boolean {
-    return this.ui.currentWalkthroughStep < this.walkthroughSteps.length - 1;
-  }
 
-  /**
-   * Check if can go to previous step
-   */
-  get canGoToPreviousStep(): boolean {
-    return this.ui.currentWalkthroughStep > 0;
-  }
 
-  /**
-   * Check if can switch from Overview to Walkthrough
-   */
-  get canSwitchToWalkthrough(): boolean {
-    return this.ui.activeRecipeTab === 'overview' && this.walkthroughSteps.length > 0;
-  }
 
-  /**
-   * Check if can switch from Walkthrough back to Overview
-   */
-  get canSwitchToOverview(): boolean {
-    return this.ui.activeRecipeTab === 'walkthrough' && this.ui.currentWalkthroughStep === 0;
-  }
 
-  /**
-   * Get previous step title
-   */
-  get previousStepTitle(): string {
-    if (!this.canGoToPreviousStep) return 'Previous';
-    const prevIndex = this.ui.currentWalkthroughStep - 1;
-    return this.getStepTitleByIndex(prevIndex);
-  }
 
-  /**
-   * Get next step title  
-   */
-  get nextStepTitle(): string {
-    if (!this.canGoToNextStep) return 'Next';
-    const nextIndex = this.ui.currentWalkthroughStep + 1;
-    return this.getStepTitleByIndex(nextIndex);
-  }
 
-  /**
-   * Get step title by index
-   */
-  private getStepTitleByIndex(index: number): string {
-    const step = this.currentRecipe?.walkthrough[index];
-    return step?.step || `Step ${index + 1}`;
-  }
-
-  /**
-   * Scroll to top of page smoothly
-   */
-  private scrollToTop(): void {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth'
-    });
-  }
 
 
   /**

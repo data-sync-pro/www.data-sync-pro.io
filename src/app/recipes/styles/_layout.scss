@@ -625,7 +625,7 @@
 .recipe-section {
   padding: 1.5rem 0;
   border-bottom: 1px solid #f0f0f0;
-  scroll-margin-top: 100px;
+  scroll-margin-top: 110px;
 
   &:last-child {
     border-bottom: none;
@@ -661,6 +661,10 @@
     line-height: 1.6;
     color: #202124;
     margin-bottom: 1rem;
+  }
+
+  @media (max-width: 768px) {
+    scroll-margin-top: 80px;
   }
 }
 
