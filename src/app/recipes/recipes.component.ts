@@ -18,20 +18,12 @@ import {
   RecipeNavigationState,
   RecipeSection,
   RecipeTab,
-  RecipeTOCStructure
+  RecipeTOCStructure,
+  RecipeSearchResult
 } from '../shared/models/recipe.model';
 import { RecipeService } from '../shared/services/recipe.service';
 import { RecipePreviewService, RecipePreviewData } from '../shared/services/recipe-preview.service';
 import { SelectedSuggestion } from './recipe-search-overlay/recipe-search-overlay.component';
-
-interface SearchResult {
-  item: RecipeItem;
-  score: number;
-  matchType: 'title' | 'content' | 'category';
-  matchedText: string;
-  highlightedTitle: string;
-  highlightedOverview: string;
-}
 
 interface UIState {
   isLoading: boolean;
@@ -49,7 +41,7 @@ interface UIState {
 interface SearchState {
   query: string;
   isActive: boolean;
-  results: SearchResult[];
+  results: RecipeSearchResult[];
   hasResults: boolean;
   isOverlayOpen: boolean;
 }
@@ -570,14 +562,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
         takeUntil(this.destroy$)
       ).subscribe({
         next: (results) => {
-          this.search.results = results.map(result => ({
-            item: result,
-            score: result.relevanceScore || 0,
-            matchType: 'title' as const,
-            matchedText: result.highlightedTitle || result.title,
-            highlightedTitle: result.highlightedTitle || result.title,
-            highlightedOverview: result.highlightedDescription || result.overview
-          }));
+          this.search.results = results;
           this.search.hasResults = results.length > 0;
           this.filteredRecipes = this.sortRecipesByCategoryAndTitle(results);
           this.cdr.markForCheck();
@@ -674,7 +659,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
    * Get recipes for current view
    */
   get currentRecipes(): RecipeItem[] {
-    return this.search.isActive ? this.search.results.map(result => result.item) : this.filteredRecipes;
+    return this.search.isActive ? this.search.results : this.filteredRecipes;
   }
 
   /**
@@ -1383,12 +1368,49 @@ export class RecipesComponent implements OnInit, OnDestroy {
   getValidPrerequisites() {
     const prerequisites = this.currentRecipe?.prerequisites || [];
     if (!Array.isArray(prerequisites)) return [];
-    
-    return prerequisites.filter(prereq => 
+
+    return prerequisites.filter(prereq =>
       (prereq.description && prereq.description.trim().length > 0) ||
-      (prereq.quickLinks && prereq.quickLinks.length > 0 && 
+      (prereq.quickLinks && prereq.quickLinks.length > 0 &&
        prereq.quickLinks.some(link => link.title && link.title.trim().length > 0))
     );
+  }
+
+  // ==================== TrackBy Functions for Performance ====================
+
+  /**
+   * TrackBy function for recipe lists
+   */
+  trackByRecipeId(_: number, recipe: RecipeItem): string {
+    return recipe.id;
+  }
+
+  /**
+   * TrackBy function for categories
+   */
+  trackByCategoryName(_: number, category: RecipeCategory): string {
+    return category.name;
+  }
+
+  /**
+   * TrackBy function for sections
+   */
+  trackBySectionId(index: number, section: any): string {
+    return section.id || section.elementId || index.toString();
+  }
+
+  /**
+   * TrackBy function for walkthrough steps
+   */
+  trackByStepIndex(index: number): number {
+    return index;
+  }
+
+  /**
+   * TrackBy function for breadcrumb path
+   */
+  trackByBreadcrumbUrl(_: number, crumb: {name: string; url: string}): string {
+    return crumb.url;
   }
 
 }

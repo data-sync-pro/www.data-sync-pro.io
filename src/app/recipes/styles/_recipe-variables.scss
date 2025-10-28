@@ -26,26 +26,41 @@ $breakpoint-mobile: 576px;          // Mobile breakpoint
 $color-primary: #1a73e8;            // Primary blue (links, CTAs, active states)
 $color-primary-hover: #1557b0;      // Darker blue for hover states
 $color-primary-light: #e8f0fe;      // Light blue background for active/selected items
+$color-primary-teal: #418796;       // Alternative primary color (teal variant)
+$color-primary-teal-hover: #367080; // Teal hover state
 
 // Text Colors
 $color-text-primary: #202124;       // Main text color
 $color-text-secondary: #5f6368;     // Secondary text, icons, labels
 $color-text-muted: #666666;         // Muted text, placeholders
+$color-text-dark: #555555;          // Dark text for emphasis
 
 // Background Colors
 $color-bg-primary: #ffffff;         // White background
 $color-bg-light: #f8f9fa;           // Light gray background
 $color-bg-lighter: #f1f3f4;         // Lighter gray (hover states, subtle backgrounds)
 $color-bg-active: #e8f0fe;          // Active/selected background (light blue)
+$color-bg-overlay: #e8eaed;         // Overlay background
+$color-bg-gray-light: #eeeeee;      // Light gray for sections
+$color-bg-gray: #dddddd;            // Medium gray
 
 // Border Colors
 $color-border: #e1e5e9;             // Main border color
 $color-border-light: #dadce0;       // Light borders
 $color-border-lighter: #f1f3f4;     // Lighter borders, dividers
+$color-border-gray: #e0e0e0;        // Gray border for separators
 
 // Scrollbar Colors
 $color-scrollbar: #dadce0;          // Scrollbar thumb
 $color-scrollbar-hover: #bdc1c6;    // Scrollbar thumb hover
+
+// Error/Warning Colors
+$color-error-bg: #fee;              // Light red background
+$color-error-border: #fcc;          // Light red border
+$color-error-hover: #fdd;           // Light red hover state
+$color-error-text: #c5221f;         // Error text (red)
+$color-error-button: #eb9090;       // Error button background
+$color-error-button-hover: #b95252; // Error button hover state
 
 // ==================== Spacing System ====================
 // Consistent spacing scale based on 4px grid
@@ -82,3 +97,55 @@ $z-mobile-toggle: 1000;             // Mobile toggle buttons
 $z-overlay: 999;                    // General overlays
 $z-sidebar-mobile: 1100;            // Mobile sidebar (above overlays)
 $z-search-overlay: 9999;            // Search overlay (top layer)
+
+// ==================== Scroll Anchoring ====================
+$scroll-margin-top-desktop: 110px;  // Desktop: Header + breadcrumb height
+$scroll-margin-top-mobile: 80px;    // Mobile: Header height
+
+// ==================== Mixins ====================
+
+// Responsive Mixins - Simplify media queries
+@mixin mobile {
+  @media (max-width: $breakpoint-mobile) {
+    @content;
+  }
+}
+
+@mixin tablet {
+  @media (max-width: $breakpoint-tablet) {
+    @content;
+  }
+}
+
+@mixin desktop {
+  @media (max-width: $breakpoint-desktop) {
+    @content;
+  }
+}
+
+@mixin large-desktop {
+  @media (min-width: 1400px) {
+    @content;
+  }
+}
+
+// Custom Scrollbar Mixin
+@mixin custom-scrollbar($width: 6px, $track-bg: $color-bg-lighter, $thumb-bg: $color-scrollbar) {
+  &::-webkit-scrollbar {
+    width: $width;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: $track-bg;
+    border-radius: $radius-sm;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: $thumb-bg;
+    border-radius: $radius-sm;
+
+    &:hover {
+      background: $color-scrollbar-hover;
+    }
+  }
+}

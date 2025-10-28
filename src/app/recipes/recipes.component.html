@@ -94,8 +94,8 @@
             </div>
 
             <div class="nav-tree">
-              <div class="nav-item" 
-                   *ngFor="let category of categories"
+              <div class="nav-item"
+                   *ngFor="let category of categories; trackBy: trackByCategoryName"
                    [class.active]="navigation.category === category.name"
                    (click)="goToCategory(category.name)">
                 <div class="nav-content">
@@ -113,7 +113,7 @@
   <!-- Breadcrumb Navigation -->
   <nav class="breadcrumb-nav" *ngIf="breadcrumbPath.length > 1" aria-label="breadcrumb">
     <div class="breadcrumb">
-      <ng-container *ngFor="let crumb of breadcrumbPath; let last = last; let first = first">
+      <ng-container *ngFor="let crumb of breadcrumbPath; trackBy: trackByBreadcrumbUrl; let last = last; let first = first">
         <button class="breadcrumb-item"
                 [class.active]="last && !showRecipeDetails"
                 [routerLink]="crumb.url"
@@ -147,8 +147,8 @@
 
         <!-- Recipe Grid -->
         <div class="recipe-grid" *ngIf="currentRecipes.length > 0">
-          <app-recipe-card 
-            *ngFor="let recipe of currentRecipes"
+          <app-recipe-card
+            *ngFor="let recipe of currentRecipes; trackBy: trackByRecipeId"
             [recipe]="recipe"
             (recipeSelect)="goToRecipe($event)">
           </app-recipe-card>
@@ -172,8 +172,8 @@
 
         <!-- Recipe Grid -->
         <div class="recipe-grid" *ngIf="currentRecipes.length > 0">
-          <app-recipe-card 
-            *ngFor="let recipe of currentRecipes"
+          <app-recipe-card
+            *ngFor="let recipe of currentRecipes; trackBy: trackByRecipeId"
             [recipe]="recipe"
             (recipeSelect)="goToRecipe($event)">
           </app-recipe-card>
@@ -207,7 +207,7 @@
 
               <!-- Overview Sections -->
               <div class="overview-sections">
-                <section *ngFor="let sectionConfig of getVisibleOverviewSections()"
+                <section *ngFor="let sectionConfig of getVisibleOverviewSections(); trackBy: trackBySectionId"
                          [id]="sectionConfig.elementId"
                          class="recipe-section"
                          [class.use-case-highlight]="sectionConfig.isHighlight">
@@ -293,9 +293,9 @@
               <!-- Walkthrough Sections -->
               <div class="walkthrough-sections" *ngIf="walkthroughSteps.length > 0">
                 <app-recipe-step
-                  *ngFor="let step of walkthroughStepsData; let i = index"
+                  *ngFor="let step of walkthroughStepsData; let i = index; trackBy: trackByStepIndex"
                   [stepData]="step"
-                  [id]="'step-' + i"
+                  [stepId]="'step-' + i"
                   [attr.data-step-index]="i">
                 </app-recipe-step>
               </div>
@@ -322,9 +322,9 @@
         </div>
 
         <div class="recipe-grid" *ngIf="search.hasResults">
-          <app-recipe-card 
-            *ngFor="let searchResult of search.results"
-            [recipe]="searchResult.item"
+          <app-recipe-card
+            *ngFor="let searchResult of search.results; trackBy: trackByRecipeId"
+            [recipe]="searchResult"
             (recipeSelect)="goToRecipe($event)">
           </app-recipe-card>
         </div>
@@ -352,7 +352,7 @@
           <li class="toc-section-group" *ngIf="getOverviewSectionsForTOC().length > 0">
             <span class="toc-group-title">Overview</span>
             <ul class="toc-items">
-              <li *ngFor="let section of getOverviewSectionsForTOC()"
+              <li *ngFor="let section of getOverviewSectionsForTOC(); trackBy: trackBySectionId"
                   class="toc-item"
                   [class.active]="ui.activeSectionId === section.id">
                 <a (click)="section.elementId && navigateToOverviewSection(section.elementId)"
@@ -367,7 +367,7 @@
           <li class="toc-section-group" *ngIf="getWalkthroughSectionsForTOC().length > 0">
             <span class="toc-group-title">Walkthrough</span>
             <ul class="toc-items">
-              <li *ngFor="let section of getWalkthroughSectionsForTOC(); let i = index"
+              <li *ngFor="let section of getWalkthroughSectionsForTOC(); let i = index; trackBy: trackBySectionId"
                   class="toc-item"
                   [class.active]="ui.activeSectionId === section.id">
                 <a (click)="navigateToWalkthroughSection(i)"

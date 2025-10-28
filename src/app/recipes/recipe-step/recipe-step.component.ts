@@ -8,6 +8,7 @@ import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 })
 export class RecipeStepComponent {
   @Input() stepData: any;
+  @Input() stepId!: string;
 
   /**
    * Check if a field is a boolean field (ends with ?)

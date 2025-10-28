@@ -110,23 +110,7 @@ $transition: $transition-smooth;
     overflow-x: hidden;
     padding: $spacing-sm 0;
 
-    &::-webkit-scrollbar {
-      width: 6px;
-    }
-
-    &::-webkit-scrollbar-track {
-      background: $color-bg-lighter;
-      border-radius: $radius-sm;
-    }
-
-    &::-webkit-scrollbar-thumb {
-      background: $color-scrollbar;
-      border-radius: $radius-sm;
-
-      &:hover {
-        background: $color-scrollbar-hover;
-      }
-    }
+    @include custom-scrollbar(6px);
   }
 
   .sidebar-search {

@@ -10,15 +10,11 @@
     margin-bottom: $spacing-xl;
   }
 
-  // Smooth scroll anchor positioning (account for header + breadcrumb height)
-  scroll-margin-top: 110px;
-
-  // Optional: Add subtle background for better step distinction
+  // Note: scroll-margin-top is managed globally in _layout.scss
   position: relative;
 
   @media (max-width: 768px) {
     padding: $spacing-xl $spacing-lg $spacing-xxl $spacing-lg;
-    scroll-margin-top: 80px;
   }
 }
 

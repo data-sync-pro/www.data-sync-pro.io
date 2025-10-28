@@ -13,7 +13,8 @@ import {
 } from '@angular/core';
 import { RecipeService } from '../../shared/services/recipe.service';
 
-interface RecipeItem {
+// Search-specific item structure for the overlay
+interface RecipeSearchItem {
   id: string;
   slug?: string;
   question: string;
@@ -23,7 +24,7 @@ interface RecipeItem {
   tags: string[];
 }
 
-export interface SelectedSuggestion extends RecipeItem {
+export interface SelectedSuggestion extends RecipeSearchItem {
   subCatFilterApplied: boolean;
 }
 
@@ -58,8 +59,8 @@ export class RecipeSearchOverlayComponent implements OnInit, OnChanges {
     'Data Loader'
   ];
 
-  suggestions: RecipeItem[] = [];
-  filteredSuggestions: RecipeItem[] = [];
+  suggestions: RecipeSearchItem[] = [];
+  filteredSuggestions: RecipeSearchItem[] = [];
 
   constructor(
     private cdr: ChangeDetectorRef,
@@ -111,7 +112,7 @@ export class RecipeSearchOverlayComponent implements OnInit, OnChanges {
     if (this.isOpen) this.close();
   }
 
-  onSelectSuggestion(item: RecipeItem) {
+  onSelectSuggestion(item: RecipeSearchItem) {
     const subCatFilterApplied = this.selectedSubCategories.length > 0;
 
     this.selectedResult.emit({

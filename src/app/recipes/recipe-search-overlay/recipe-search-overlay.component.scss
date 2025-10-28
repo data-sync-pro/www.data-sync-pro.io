@@ -36,7 +36,7 @@
   width: 100%;
   box-sizing: border-box;
   padding: $spacing-md 48px $spacing-md $spacing-md;
-  border: 1px solid #ccc;
+  border: 1px solid $color-border-light;
   border-radius: $radius-md;
   height: 44px;
   font-size: 1rem;
@@ -46,7 +46,7 @@
 
 .overlay-search-box:focus {
   outline: none;
-  border-color: #418796;
+  border-color: $color-primary-teal;
   border-width: 1.75px;
 }
 
@@ -55,11 +55,11 @@
   right: 10px;
   top: 50%;
   transform: translateY(-50%);
-  background-color: #eee;
+  background-color: $color-bg-gray-light;
   font-size: 1rem;
   padding: 2px 6px;
   border-radius: $radius-sm;
-  color: #555;
+  color: $color-text-dark;
 }
 
 .shortcut-clickable {
@@ -68,7 +68,7 @@
 }
 
 .shortcut-clickable:hover {
-  background-color: #ddd;
+  background-color: $color-bg-gray;
 }
 
 .filters-section {
@@ -95,7 +95,7 @@
 .filter-label {
   font-weight: 600;
   font-size: 1.1rem;
-  color: #418796;
+  color: $color-primary-teal;
   margin-bottom: 0.5rem;
 }
 
@@ -116,34 +116,34 @@
 
 .filter-chip {
   padding: 6px 14px;
-  background-color: #f1f1f1;
+  background-color: $color-bg-lighter;
   border-radius: $radius-full;
   font-size: 1rem;
   cursor: pointer;
-  border: 1px solid #ccc;
+  border: 1px solid $color-border-light;
   transition: $transition-normal;
   user-select: none;
 }
 
 .filter-chip.active {
-  background-color: #418796;
-  border-color: #418796;
+  background-color: $color-primary-teal;
+  border-color: $color-primary-teal;
   color: white;
 }
 
 .clear-filters-btn {
   padding: $spacing-xs $spacing-md;
-  background-color: #eb9090;
+  background-color: $color-error-button;
   border: none;
   border-radius: $radius-sm;
   cursor: pointer;
   font-size: 0.9rem;
-  color: #333;
+  color: $color-text-primary;
   transition: $transition-normal;
 }
 
 .clear-filters-btn:hover {
-  background-color: #b95252;
+  background-color: $color-error-button-hover;
 }
 
 .suggestions-list {
@@ -165,7 +165,7 @@
   gap: 0.5rem;
   cursor: pointer;
   transition: $transition-normal;
-  color: #333;
+  color: $color-text-primary;
   flex-wrap: wrap;
 }
 
@@ -181,7 +181,7 @@
   font-weight: 600;
   font-size: 1rem;
   line-height: 1.3;
-  color: #333;
+  color: $color-text-primary;
 }
 
 .suggestion-overview {
@@ -204,8 +204,8 @@
 }
 
 .tag {
-  background-color: #d9e4e8;
-  color: #333;
+  background-color: $color-primary-light;
+  color: $color-text-primary;
   padding: 3px 8px;
   font-size: 0.8rem;
   border-radius: 12px;
@@ -214,11 +214,11 @@
 }
 
 .suggestion-item:hover {
-  background-color: #d9e4e8;
+  background-color: $color-primary-light;
 }
 
 .suggestion-item:hover .tag {
-  background-color: #418796;
+  background-color: $color-primary-teal;
   color: white;
 }
 
@@ -234,7 +234,7 @@
 .loading-placeholder,
 .error-placeholder,
 .empty-placeholder {
-  color: #999;
+  color: $color-text-muted;
   font-size: 0.9rem;
   padding: $spacing-sm $spacing-md;
   font-style: italic;
@@ -242,7 +242,7 @@
 }
 
 .error-placeholder {
-  color: #d32f2f;
+  color: $color-error-text;
 }
 
 .no-results-text,
@@ -256,6 +256,6 @@
 .no-results-subtitle,
 .default-subtitle {
   font-size: 0.9rem;
-  color: #999;
+  color: $color-text-muted;
   line-height: 1.4;
 }
