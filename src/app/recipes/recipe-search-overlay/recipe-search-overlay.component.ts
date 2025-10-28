@@ -11,19 +11,7 @@ import {
   HostListener,
   ChangeDetectorRef,
 } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Router } from '@angular/router';
-import { RecipeItem as OriginalRecipeItem } from '../../shared/models/recipe.model';
 import { RecipeService } from '../../shared/services/recipe.service';
-
-interface RawRecipe {
-  id: string;
-  title: string;
-  category: string;
-  overview: string;
-  keywords: string[];
-  isActive?: boolean;
-}
 
 interface RecipeItem {
   id: string;
@@ -74,8 +62,6 @@ export class RecipeSearchOverlayComponent implements OnInit, OnChanges {
   filteredSuggestions: RecipeItem[] = [];
 
   constructor(
-    private http: HttpClient, 
-    private router: Router,
     private cdr: ChangeDetectorRef,
     private recipeService: RecipeService
   ) {}
