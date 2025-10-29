@@ -10,6 +10,14 @@ import { ClipboardUtil } from '../../shared/utils/clipboard.util';
 export class RecipeStepComponent {
   @Input() stepData: any;
   @Input() stepId!: string;
+  @Input() stepIndex!: number;
+
+  /**
+   * Get display step number (1-based)
+   */
+  get displayStepNumber(): number {
+    return (this.stepIndex ?? 0) + 1;
+  }
 
   /**
    * Check if a field is a boolean field (ends with ?)

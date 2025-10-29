@@ -1,9 +1,11 @@
-import { Directive, ElementRef, Renderer2, HostListener, AfterViewInit, OnDestroy } from '@angular/core';
+import { Directive, ElementRef, Renderer2, HostListener, AfterViewInit, OnDestroy, Input } from '@angular/core';
 
 @Directive({
   selector: '[appSimpleZoomable]'
 })
 export class SimpleZoomableDirective implements AfterViewInit, OnDestroy {
+  @Input() enableHoverZoom: boolean = true; // Control hover zoom effect, default enabled for backward compatibility
+
   private backdropEl?: HTMLElement;
   private clonedImg?: HTMLImageElement;
   private downloadBtn?: HTMLElement;
@@ -99,24 +101,28 @@ export class SimpleZoomableDirective implements AfterViewInit, OnDestroy {
     if (img.hasAttribute('data-zoomable-processed')) {
       return;
     }
-    
+
     this.rd.setStyle(img, 'cursor', 'zoom-in');
     this.rd.setStyle(img, 'transition', 'transform 0.2s ease');
-    
-    const mouseEnterHandler = () => {
-      if (!this.zoomed) {
-        this.rd.setStyle(img, 'transform', 'scale(1.02)');
-      }
-    };
-    
-    const mouseLeaveHandler = () => {
-      if (!this.zoomed) {
-        this.rd.setStyle(img, 'transform', 'scale(1)');
-      }
-    };
-    
-    img.addEventListener('mouseenter', mouseEnterHandler);
-    img.addEventListener('mouseleave', mouseLeaveHandler);
+
+    // Only add hover zoom effect if enabled
+    if (this.enableHoverZoom) {
+      const mouseEnterHandler = () => {
+        if (!this.zoomed) {
+          this.rd.setStyle(img, 'transform', 'scale(1.02)');
+        }
+      };
+
+      const mouseLeaveHandler = () => {
+        if (!this.zoomed) {
+          this.rd.setStyle(img, 'transform', 'scale(1)');
+        }
+      };
+
+      img.addEventListener('mouseenter', mouseEnterHandler);
+      img.addEventListener('mouseleave', mouseLeaveHandler);
+    }
+
     img.setAttribute('data-zoomable-processed', 'true');
     
     if (img.complete) {

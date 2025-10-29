@@ -181,27 +181,10 @@ app-recipe-step {
   display: block;
 }
 
-// Walkthrough sections with subtle separation from Overview
+// Walkthrough sections with separation from Overview
 .walkthrough-sections {
   margin-top: 64px;
-  padding-top: 32px;
-  position: relative;
-
-  // Subtle gradient divider line
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: linear-gradient(
-      90deg,
-      transparent 0%,
-      rgba($color-primary, 0.2) 50%,
-      transparent 100%
-    );
-  }
+  // Removed gradient divider line - unified border provides visual separation
 }
 
 .no-steps {

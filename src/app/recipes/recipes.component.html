@@ -296,6 +296,7 @@
                   *ngFor="let step of walkthroughStepsData; let i = index; trackBy: trackByStepIndex"
                   [stepData]="step"
                   [stepId]="'step-' + i"
+                  [stepIndex]="i"
                   [attr.data-step-index]="i">
                 </app-recipe-step>
               </div>
@@ -372,7 +373,7 @@
                   [class.active]="ui.activeSectionId === section.id">
                 <a (click)="navigateToWalkthroughSection(i)"
                    [attr.aria-current]="ui.activeSectionId === section.id ? 'location' : null">
-                  {{ section.title }}
+                  {{ i + 1 }}. {{ section.title }}
                 </a>
               </li>
             </ul>

@@ -4,11 +4,14 @@
 .recipe-step-container {
   padding: $spacing-xxl $spacing-xxl $spacing-xxxl $spacing-xxl;
 
-  // Card style - simple border with small radius
-  border: 1px solid $color-border;
-  border-radius: $radius-md;
+  // Unified container design - divider line between steps
   background: #ffffff;
-  margin-bottom: $spacing-xxl; // 24px spacing between steps
+  border-bottom: 1px solid #e9ecef;
+
+  // Last step doesn't need bottom border
+  &:last-child {
+    border-bottom: none;
+  }
 
   // Note: scroll-margin-top is managed globally in _layout.scss
   position: relative;

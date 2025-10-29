@@ -674,3 +674,13 @@
   }
 }
 
+// ==================== Walkthrough Container Styles ====================
+.walkthrough-sections {
+  border: 1px solid $color-border;
+  border-radius: $radius-md;
+  background: #ffffff;
+
+  @include tablet {
+    border-radius: $radius-sm;
+  }
+}
