@@ -211,7 +211,7 @@ $transition: $transition-smooth;
           bottom: 0;
           width: 3px;
           background-color: $color-primary;
-          transition: width 0.2s ease-out, background-color 0.15s ease;
+          transition: width 0.2s ease-out, background-color $transition-fast;
         }
       }
 
@@ -255,7 +255,7 @@ $transition: $transition-smooth;
         color: $color-text-secondary;
         font-size: 0.75rem;
         padding: 2px 6px;
-        border-radius: 10px;
+        border-radius: $radius-md;
         margin-left: $spacing-sm;
         font-weight: 500;
       }
@@ -274,7 +274,7 @@ $transition: $transition-smooth;
   border: 1px solid $color-border;
   box-shadow: $shadow-md;
 
-  @media (max-width: $breakpoint-desktop) {
+  @include desktop {
     display: flex;
   }
 }
@@ -289,7 +289,7 @@ $transition: $transition-smooth;
   opacity: 0;
   transition: opacity 0.3s ease;
 
-  @media (max-width: $breakpoint-desktop) {
+  @include desktop {
     display: block;
   }
 

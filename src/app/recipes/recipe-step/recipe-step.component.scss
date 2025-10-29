@@ -4,16 +4,16 @@
 .recipe-step-container {
   padding: $spacing-xxl $spacing-xxl $spacing-xxxl $spacing-xxl;
 
-  // Add visual separation between steps
-  &:not(:last-child) {
-    border-bottom: 2px solid #e0e0e0;
-    margin-bottom: $spacing-xl;
-  }
+  // Card style - simple border with small radius
+  border: 1px solid $color-border;
+  border-radius: $radius-md;
+  background: #ffffff;
+  margin-bottom: $spacing-xxl; // 24px spacing between steps
 
   // Note: scroll-margin-top is managed globally in _layout.scss
   position: relative;
 
-  @media (max-width: 768px) {
+  @include tablet {
     padding: $spacing-xl $spacing-lg $spacing-xxl $spacing-lg;
   }
 }
@@ -131,11 +131,6 @@
   gap: $spacing-lg;
 }
 
-.media-item {
-  background: $color-bg-light;
-  border-radius: $radius-lg;
-  border: 1px solid #e9ecef;
-}
 
 .media-image {
   text-align: center;
@@ -145,17 +140,17 @@
   max-width: 100%;
   height: auto;
   border-radius: $radius-sm;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: $shadow-md;
 }
 
 .zoomable-image {
   cursor: zoom-in;
-  transition: $transition-normal;
 }
 
-.zoomable-image:hover {
-  transform: scale(1.02);
-}
+// Removed hover scale effect for cleaner UX
+// .zoomable-image:hover {
+//   transform: scale(1.02);
+// }
 
 .responsive-video {
   width: 100%;

@@ -7,7 +7,6 @@
 // Import modular styles
 @import './styles/layout';
 @import './styles/sidebar';
-@import './styles/search-overlay';
 @import './styles/toc'; // Microsoft Learn style TOC
 
 // Note: Layout variables ($sidebar-width, $toc-width, breakpoints, etc.) are imported from ./styles/layout
@@ -52,7 +51,7 @@
   font-size: $font-size-caption;
   font-weight: $font-weight-medium;
   padding: $spacing-xs $spacing-md;
-  border-radius: 16px;
+  border-radius: $radius-xxl;
   border: 1px solid #bbdefb;
   transition: $transition-normal;
 }
@@ -199,7 +198,7 @@ app-recipe-step {
     background: linear-gradient(
       90deg,
       transparent 0%,
-      rgba(26, 115, 232, 0.2) 50%,
+      rgba($color-primary, 0.2) 50%,
       transparent 100%
     );
   }

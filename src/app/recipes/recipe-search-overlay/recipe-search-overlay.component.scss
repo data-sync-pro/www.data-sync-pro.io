@@ -23,7 +23,7 @@
   max-width: 900px;
   margin: 0 auto;
   padding: 1rem 1.5rem;
-  border-radius: 10px;
+  border-radius: $radius-xl;
   box-shadow: $shadow-lg;
   box-sizing: border-box;
 }
@@ -208,7 +208,7 @@
   color: $color-text-primary;
   padding: 3px 8px;
   font-size: 0.8rem;
-  border-radius: 12px;
+  border-radius: $radius-xl;
   white-space: nowrap;
   line-height: 1.2;
 }

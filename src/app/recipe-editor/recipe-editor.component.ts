@@ -7,6 +7,7 @@ import { RecipeFileStorageService } from '../shared/services/recipe-file-storage
 import { RecipeService } from '../shared/services/recipe.service';
 import { NotificationService } from '../shared/services/notification.service';
 import { RecipePreviewService, RecipePreviewData } from '../shared/services/recipe-preview.service';
+import { ClipboardUtil } from '../shared/utils/clipboard.util';
 import { 
   RecipeItem, 
   SourceRecipeRecord,
@@ -987,12 +988,13 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
     return index;
   }
   
-  copyToClipboard(text: string): void {
-    navigator.clipboard.writeText(text).then(() => {
+  async copyToClipboard(text: string): Promise<void> {
+    const success = await ClipboardUtil.copyToClipboard(text);
+    if (success) {
       this.notificationService.success('JSON copied to clipboard');
-    }).catch(() => {
+    } else {
       this.notificationService.error('Failed to copy to clipboard');
-    });
+    }
   }
 
   // Autocomplete functionality

@@ -28,7 +28,7 @@
   // Active/selected state
   &.active {
     border-color: $color-primary;
-    background: rgba(26, 115, 232, 0.02);
+    background: rgba($color-primary, 0.02);
   }
 }
 
@@ -107,7 +107,7 @@
 
   &:hover {
     color: $color-primary;
-    background: rgba(26, 115, 232, 0.08);
+    background: rgba($color-primary, 0.08);
   }
 
   &:focus {

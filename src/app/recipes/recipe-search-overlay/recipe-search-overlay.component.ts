@@ -50,15 +50,6 @@ export class RecipeSearchOverlayComponent implements OnInit, OnChanges {
   isLoading = true;
   loadError = false;
 
-  // Define the same category order as in recipe.service.ts
-  private readonly CATEGORY_ORDER: string[] = [
-    'Batch',
-    'Trigger',
-    'Data List',
-    'Action Button',
-    'Data Loader'
-  ];
-
   suggestions: RecipeSearchItem[] = [];
   filteredSuggestions: RecipeSearchItem[] = [];
 
@@ -91,7 +82,7 @@ export class RecipeSearchOverlayComponent implements OnInit, OnChanges {
               : [r.category],
           }));
 
-        this.categories = this.sortCategories([...new Set(this.suggestions.map((i) => i.category))]);
+        this.categories = this.recipeService.sortCategoryNames([...new Set(this.suggestions.map((i) => i.category))]);
         this.filterSubCategoryList();
         this.filterSuggestions();
         this.isLoading = false;
@@ -265,25 +256,4 @@ export class RecipeSearchOverlayComponent implements OnInit, OnChanges {
     );
   }
 
-  /**
-   * Sort categories according to predefined order
-   */
-  private sortCategories(categories: string[]): string[] {
-    return [...categories].sort((a, b) => {
-      const indexA = this.CATEGORY_ORDER.indexOf(a);
-      const indexB = this.CATEGORY_ORDER.indexOf(b);
-
-      // If both categories are in the order array, sort by their position
-      if (indexA !== -1 && indexB !== -1) {
-        return indexA - indexB;
-      }
-
-      // If only one is in the order array, prioritize it
-      if (indexA !== -1) return -1;
-      if (indexB !== -1) return 1;
-
-      // If neither is in the order array, maintain original order
-      return 0;
-    });
-  }
 }

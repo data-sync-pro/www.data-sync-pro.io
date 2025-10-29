@@ -1,4 +1,5 @@
 import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
+import { ClipboardUtil } from '../../shared/utils/clipboard.util';
 
 @Component({
   selector: 'app-recipe-step',
@@ -32,25 +33,6 @@ export class RecipeStepComponent {
 
   copyToClipboard(event: Event, text: string): void {
     event.stopPropagation();
-    if (navigator.clipboard && window.isSecureContext) {
-      navigator.clipboard.writeText(text).then(() => {
-        // Successfully copied
-      }).catch(err => {
-        console.error('Failed to copy text: ', err);
-      });
-    } else {
-      // Fallback for older browsers
-      const textArea = document.createElement('textarea');
-      textArea.value = text;
-      document.body.appendChild(textArea);
-      textArea.focus();
-      textArea.select();
-      try {
-        document.execCommand('copy');
-      } catch (err) {
-        console.error('Failed to copy text: ', err);
-      }
-      document.body.removeChild(textArea);
-    }
+    ClipboardUtil.copyToClipboard(text);
   }
 }

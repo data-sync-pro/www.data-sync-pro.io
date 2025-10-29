@@ -15,7 +15,7 @@
   min-height: calc(100vh - $header-height);
   margin-top: $header-height;
   background-color: #ffffff;
-  transition: grid-template-columns 0.3s ease;
+  transition: grid-template-columns $transition-smooth;
 
   &.sidebar-collapsed {
     
@@ -34,9 +34,9 @@
     }
   }
 
-  
-  @media (min-width: 1400px) {
-    grid-template-columns: 16% 1fr 16%; 
+
+  @include large-desktop {
+    grid-template-columns: 16% 1fr 16%;
 
     &.sidebar-collapsed {
       grid-template-columns: 4% 1fr 16%;
@@ -51,8 +51,8 @@
     }
   }
 
-  
-  @media (max-width: $breakpoint-desktop) {
+
+  @include desktop {
     grid-template-areas:
       "breadcrumb"
       "main";
@@ -67,7 +67,7 @@
   left: 1rem;
   z-index: 1000;
   background: #fff;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  box-shadow: $shadow-md;
   
   @media (min-width: $breakpoint-desktop) {
     display: none ;
@@ -84,7 +84,7 @@
   z-index: 1099; // Fixed: increased from 199 to 1099 to be below sidebar (1100) but above content
   opacity: 0;
   visibility: hidden;
-  transition: all 0.3s ease;
+  transition: $transition-smooth;
   
   &.active {
     opacity: 1;
@@ -111,11 +111,12 @@
   background: #ffffff;
 
   min-height: calc(100vh - $header-height);
-  @media (max-width: $breakpoint-tablet) {
+
+  @include tablet {
     padding: 16px 32px; // Match FAQ's tablet padding
   }
 
-  @media (max-width: $breakpoint-mobile) {
+  @include mobile {
     padding: 12px 16px; // Match FAQ's mobile padding
     // On mobile, allow scrolling to footer
     min-height: calc(100vh - $header-height);
@@ -130,8 +131,8 @@
     top: $header-height;
     height: calc(100vh - $header-height);
     z-index: 80;
-    
-    @media (max-width: $breakpoint-desktop) {
+
+    @include desktop {
       display: none;
     }
   }
@@ -155,7 +156,7 @@
   // Default: hidden by default, only show on hover (when TOC is visible)
   opacity: 0;
   visibility: hidden;
-  transition: all 0.3s ease;
+  transition: $transition-smooth;
 
   // When TOC is hidden, always show the button
   .recipe-layout-container.toc-hidden & {
@@ -172,7 +173,7 @@
   .recipe-layout-container.toc-hidden & {
     right: 0px;
     border-radius: 6px 0 0 6px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: $shadow-md;
     opacity: 1; // Always visible when TOC is hidden
     visibility: visible;
   }
@@ -180,22 +181,22 @@
     opacity: 1;
     visibility: visible;
     background: #f8f9fa;
-    border-color: #1a73e8;
+    border-color: $color-primary;
     
     // Default hover shadow (TOC visible)
-    box-shadow: -4px 0 12px rgba(26, 115, 232, 0.15);
-    
+    box-shadow: -4px 0 12px rgba($color-primary, 0.15);
+
     // When TOC is hidden, use left shadow since button is at right edge
     .faq-layout-container.toc-hidden & {
-      box-shadow: -4px 0 12px rgba(26, 115, 232, 0.15);
+      box-shadow: -4px 0 12px rgba($color-primary, 0.15);
     }
   }
 
   &:active {
     transform: translateY(-50%) scale(0.95);
   }
-  
-  @media (min-width: 1400px) {
+
+  @include large-desktop {
     right: 16%; // Adjusted TOC width for larger screens
 
     .recipe-layout-container.toc-hidden & {
@@ -203,8 +204,8 @@
     }
   }
 
-  @media (max-width: $breakpoint-desktop) {
-    display: none ;
+  @include desktop {
+    display: none;
   }
 }
 
@@ -234,9 +235,9 @@
   bottom: 20px;
   right: 20px;
   z-index: 100;
-  
+
   @media (min-width: $breakpoint-desktop) {
-    display: none ;
+    display: none;
   }
 }
 
@@ -269,10 +270,10 @@
   h1, h2 {
     font-size: 2.5rem;
     font-weight: 600;
-    color: #202124;
+    color: $color-text-primary;
     margin-bottom: 1rem;
 
-    @media (max-width: $breakpoint-tablet) {
+    @include tablet {
       font-size: 2rem;
     }
   }
@@ -283,10 +284,10 @@
   .search-title {
     font-size: 2.5rem;
     font-weight: 600;
-    color: #202124;
+    color: $color-text-primary;
     margin-bottom: 1rem;
 
-    @media (max-width: $breakpoint-tablet) {
+    @include tablet {
       font-size: 2rem;
     }
   }
@@ -294,12 +295,12 @@
   .home-description,
   .category-description {
     font-size: 1.125rem;
-    color: #5f6368;
+    color: $color-text-secondary;
     max-width: 600px;
     margin: 0 auto;
     line-height: 1.6;
 
-    @media (max-width: $breakpoint-tablet) {
+    @include tablet {
       font-size: 1rem;
     }
   }
@@ -308,12 +309,12 @@
 // Recipe count styling (separate from header nesting)
 .recipe-count {
   font-size: 1rem;
-  color: #5f6368;
+  color: $color-text-secondary;
   margin: 0;
   font-weight: 500;
   text-align: center;
 
-  @media (max-width: $breakpoint-tablet) {
+  @include tablet {
     font-size: 0.9rem;
   }
 }
@@ -325,7 +326,7 @@
   gap: 1.5rem;
   margin-bottom: 4rem;
 
-  @media (max-width: $breakpoint-mobile) {
+  @include mobile {
     grid-template-columns: 1fr;
     gap: 1rem;
   }
@@ -337,17 +338,17 @@
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 1.5rem;
 
-  @media (max-width: $breakpoint-desktop) {
+  @include desktop {
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 1.25rem;
   }
 
-  @media (max-width: $breakpoint-tablet) {
+  @include tablet {
     grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
     gap: 1.25rem;
   }
 
-  @media (max-width: $breakpoint-mobile) {
+  @include mobile {
     grid-template-columns: 1fr;
     gap: 1rem;
   }
@@ -360,11 +361,11 @@
   h2 {
     font-size: 1.75rem;
     font-weight: 600;
-    color: #202124;
+    color: $color-text-primary;
     margin-bottom: 2rem;
     text-align: center;
 
-    @media (max-width: $breakpoint-tablet) {
+    @include tablet {
       font-size: 1.5rem;
     }
   }
@@ -377,12 +378,12 @@
   h2 {
     font-size: 1.5rem;
     font-weight: 600;
-    color: #202124;
+    color: $color-text-primary;
     margin-bottom: 0.5rem;
   }
 
   .search-summary {
-    color: #5f6368;
+    color: $color-text-secondary;
     font-size: 0.875rem;
   }
 }
@@ -394,7 +395,7 @@
   align-items: center;
   justify-content: center;
   min-height: 400px;
-  color: #5f6368;
+  color: $color-text-secondary;
 
   mat-progress-bar {
     width: 200px;
@@ -411,7 +412,7 @@
 .no-results {
   text-align: center;
   padding: 4rem 2rem;
-  color: #5f6368;
+  color: $color-text-secondary;
 
   mat-icon {
     font-size: 64px;
@@ -424,7 +425,7 @@
   h3 {
     font-size: 1.5rem;
     font-weight: 500;
-    color: #202124;
+    color: $color-text-primary;
     margin-bottom: 0.5rem;
   }
 
@@ -449,11 +450,11 @@
   background: rgba(255, 255, 255, 0.95); // Semi-transparent white background
   backdrop-filter: blur(8px); // Modern blur effect for better visibility
   -webkit-backdrop-filter: blur(8px); // Safari support
-  transition: all 0.2s ease;
+  transition: $transition-normal;
 
   // Add subtle shadow when scrolled
   &.scrolled {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: $shadow-md;
   }
 
 
@@ -477,22 +478,22 @@
   gap: 4px;
   background: none;
   border: none;
-  color: #1a73e8; // FAQ blue color
+  color: $color-primary; // FAQ blue color
   font-size: 1rem; // Match FAQ font size
   font-weight: 400;
   cursor: pointer;
   padding: 2px 6px; // Match FAQ padding
   border-radius: 3px;
   text-decoration: none;
-  transition: all 0.15s ease;
+  transition: $transition-fast;
 
   &:hover:not(.active) {
-    background-color: rgba(26, 115, 232, 0.08);
+    background-color: rgba($color-primary, 0.08);
     color: #1557b0; // Match FAQ hover color
   }
 
   &.active {
-    color: #5f6368; // Match FAQ active color
+    color: $color-text-secondary; // Match FAQ active color
     cursor: default;
     font-weight: 500;
   }
@@ -539,9 +540,9 @@
     margin: 0 0 0.5rem 0;
     font-size: 2rem;
     font-weight: 600;
-    color: #202124;
+    color: $color-text-primary;
 
-    @media (max-width: $breakpoint-tablet) {
+    @include tablet {
       font-size: 1.75rem;
     }
   }
@@ -555,7 +556,7 @@
   border-bottom: 1px solid #e1e5e9;
   padding-bottom: 0;
   
-  @media (max-width: $breakpoint-mobile) {
+  @include mobile {
     flex-direction: column;
     gap: 0.25rem;
   }
@@ -568,21 +569,21 @@
   padding: 0.75rem 1.25rem;
   background: none;
   border: none;
-  color: #5f6368;
+  color: $color-text-secondary;
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
   border-radius: 8px 8px 0 0;
   position: relative;
-  transition: all 0.2s ease;
+  transition: $transition-normal;
 
   &:hover {
-    background-color: rgba(26, 115, 232, 0.08);
-    color: #202124;
+    background-color: rgba($color-primary, 0.08);
+    color: $color-text-primary;
   }
 
   &.active {
-    color: #202124;
+    color: $color-text-primary;
     background-color: #fff;
     
     &::after {
@@ -592,7 +593,7 @@
       left: 0;
       right: 0;
       height: 2px;
-      background-color: #202124;
+      background-color: $color-text-primary;
     }
   }
 
@@ -602,16 +603,16 @@
     height: 18px;
   }
 
-  @media (max-width: $breakpoint-mobile) {
+  @include mobile {
     padding: 0.75rem 1rem;
     border-radius: 6px;
-    
+
     &.active::after {
       display: none;
     }
-    
+
     &.active {
-      background-color: rgba(26, 115, 232, 0.1);
+      background-color: rgba($color-primary, 0.1);
     }
   }
 }
@@ -624,10 +625,10 @@
 // Unified scroll anchor positioning for all recipe content sections
 .recipe-section,
 .recipe-step-container {
-  scroll-margin-top: 110px;
+  scroll-margin-top: $scroll-margin-top-desktop;
 
-  @media (max-width: 768px) {
-    scroll-margin-top: 80px;
+  @include tablet {
+    scroll-margin-top: $scroll-margin-top-mobile;
   }
 }
 
@@ -643,7 +644,7 @@
   h3, h4 {
     margin-top: 0;
     margin-bottom: 1rem;
-    color: #202124;
+    color: $color-text-primary;
   }
 
   h3 {
@@ -662,13 +663,13 @@
 
     li {
       margin-bottom: 0.25rem;
-      color: #202124;
+      color: $color-text-primary;
     }
   }
 
   p {
     line-height: 1.6;
-    color: #202124;
+    color: $color-text-primary;
     margin-bottom: 1rem;
   }
 }

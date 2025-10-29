@@ -5,6 +5,7 @@ import { map, catchError, shareReplay, tap, finalize, switchMap } from 'rxjs/ope
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { AutoLinkService } from './auto-link.service';
 import { generateSlug } from '../utils/slug.utils';
+import { RECIPE_CATEGORY_ORDER } from '../constants/recipe.constants';
 
 import {
   SourceRecipeRecord,
@@ -77,14 +78,8 @@ export class RecipeService implements OnDestroy {
     'triggers': 'A modular, bulk-safe routine that reacts to DML events, applies scoping, transforms fields, validates, and performs DML actions.'
   };
 
-  // Define the display order for categories in sidebar
-  private readonly CATEGORY_ORDER: string[] = [
-    'Batch',
-    'Trigger',
-    'Data List',
-    'Action Button',
-    'Data Loader'
-  ];
+  // Use shared category order constant
+  private readonly CATEGORY_ORDER = RECIPE_CATEGORY_ORDER;
 
   constructor(
     private http: HttpClient,
@@ -439,6 +434,29 @@ export class RecipeService implements OnDestroy {
       'Data Loader': 'Data Loader'
     };
     return mapping[category] || category;
+  }
+
+  /**
+   * Sort category names according to predefined order
+   * Public method for use by components
+   */
+  sortCategoryNames(categories: string[]): string[] {
+    return [...categories].sort((a, b) => {
+      const indexA = this.CATEGORY_ORDER.indexOf(a);
+      const indexB = this.CATEGORY_ORDER.indexOf(b);
+
+      // If both categories are in the order array, sort by their position
+      if (indexA !== -1 && indexB !== -1) {
+        return indexA - indexB;
+      }
+
+      // If only one is in the order array, prioritize it
+      if (indexA !== -1) return -1;
+      if (indexB !== -1) return 1;
+
+      // If neither is in the order array, maintain original order
+      return 0;
+    });
   }
 
   /**
