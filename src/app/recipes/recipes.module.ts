@@ -28,6 +28,9 @@ import { RecipesComponent } from './recipes.component';
 import { RecipeCardComponent } from './recipe-card/recipe-card.component';
 import { RecipeStepComponent } from './recipe-step/recipe-step.component';
 import { RecipeSearchOverlayComponent } from './recipe-search-overlay/recipe-search-overlay.component';
+import { RecipeSidebarComponent } from './recipe-sidebar/recipe-sidebar.component';
+import { RecipeTocComponent } from './recipe-toc/recipe-toc.component';
+import { RecipeOverviewSectionComponent } from './recipe-overview-section/recipe-overview-section.component';
 
 // Shared Modules and Components
 import { SharedModule } from '../shared/shared.module';
@@ -37,7 +40,10 @@ import { SharedModule } from '../shared/shared.module';
     RecipesComponent,
     RecipeCardComponent,
     RecipeStepComponent,
-    RecipeSearchOverlayComponent
+    RecipeSearchOverlayComponent,
+    RecipeSidebarComponent,
+    RecipeTocComponent,
+    RecipeOverviewSectionComponent
   ],
   imports: [
     CommonModule,

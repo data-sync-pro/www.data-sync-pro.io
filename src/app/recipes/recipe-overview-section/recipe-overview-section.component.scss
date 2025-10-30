@@ -1,0 +1,7 @@
+// Recipe Overview Section Component Styles
+// Most styles are inherited from parent component's recipe styles
+// This file is for component-specific overrides only
+
+:host {
+  display: block;
+}

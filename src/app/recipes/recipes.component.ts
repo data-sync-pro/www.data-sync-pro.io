@@ -22,21 +22,12 @@ import {
   RecipeSearchResult
 } from '../shared/models/recipe.model';
 import { RecipeService } from '../shared/services/recipe.service';
-import { RecipePreviewService, RecipePreviewData } from '../shared/services/recipe-preview.service';
+import { RecipePreviewService } from '../shared/services/recipe-preview.service';
+import { RecipeTocService } from '../shared/services/recipe-toc.service';
+import { RecipeNavigationService } from '../shared/services/recipe-navigation.service';
+import { RecipeUiStateService, RecipeUIState } from '../shared/services/recipe-ui-state.service';
+import { RecipePreviewSyncService } from '../shared/services/recipe-preview-sync.service';
 import { SelectedSuggestion } from './recipe-search-overlay/recipe-search-overlay.component';
-
-interface UIState {
-  isLoading: boolean;
-  sidebarCollapsed: boolean;
-  mobileSidebarOpen: boolean;
-  isMobile: boolean;
-  currentView: 'home' | 'category' | 'recipe';
-  isPreviewMode: boolean;
-  tocHidden: boolean;
-  activeSectionId: string;
-  userHasScrolled: boolean;
-  scrollTicking: boolean;
-}
 
 interface SearchState {
   query: string;
@@ -56,23 +47,8 @@ interface SearchState {
 export class RecipesComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
-  // State management
-  ui: UIState = {
-    isLoading: false,
-    sidebarCollapsed: false,
-    mobileSidebarOpen: false,
-    isMobile: false,
-    currentView: 'home',
-    isPreviewMode: false,
-    tocHidden: false,
-    activeSectionId: 'use-case',
-    userHasScrolled: false,
-    scrollTicking: false
-  };
-
-  private optimizedScrollListener?: () => void;
-  private sectionObserver?: IntersectionObserver;
-  private visibleSections = new Set<string>();
+  // UI State - managed by RecipeUiStateService
+  ui!: RecipeUIState;
 
   search: SearchState = {
     query: '',
@@ -115,17 +91,51 @@ export class RecipesComponent implements OnInit, OnDestroy {
     private router: Router,
     private recipeService: RecipeService,
     private previewService: RecipePreviewService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private recipeTocService: RecipeTocService,
+    private recipeNavigationService: RecipeNavigationService,
+    private uiStateService: RecipeUiStateService,
+    private previewSyncService: RecipePreviewSyncService
   ) {}
 
   ngOnInit(): void {
+    // Subscribe to UI state changes FIRST - must happen before any code that accesses this.ui
+    this.uiStateService.getState()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(state => {
+        this.ui = state;
+        this.cdr.markForCheck();
+      });
+
+    // Now safe to initialize and access UI state
     this.initializeComponent();
     this.setupRouteHandling();
     this.loadInitialData();
-    this.checkMobileView();
-    this.loadSidebarState();
-    this.setupOptimizedScrollListener();
-    this.setupSectionObserver();
+
+    // Setup navigation service
+    this.recipeNavigationService.setupOptimizedScrollListener();
+    this.recipeNavigationService.setupSectionObserver();
+
+    // Subscribe to navigation events
+    this.recipeNavigationService.getNavigationEvents()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(event => {
+        if (event.type === 'section-changed' && event.sectionId) {
+          this.uiStateService.setActiveSectionId(event.sectionId);
+          this.recipeTOC.currentSectionId = event.sectionId;
+        } else if (event.type === 'user-scrolled') {
+          this.uiStateService.markUserScrolled();
+        }
+      });
+
+    // Subscribe to preview update events
+    this.previewSyncService.getUpdateEvents()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(event => {
+        if (event.type === 'content-updated') {
+          this.handlePreviewUpdate(event.recipe);
+        }
+      });
 
     // Add body class to hide footer on recipe pages
     document.body.classList.add('recipe-page');
@@ -174,15 +184,11 @@ export class RecipesComponent implements OnInit, OnDestroy {
     this.destroy$.next();
     this.destroy$.complete();
 
-    // Clean up scroll listener
-    if (this.optimizedScrollListener) {
-      window.removeEventListener('scroll', this.optimizedScrollListener);
-    }
+    // Clean up navigation service
+    this.recipeNavigationService.cleanup();
 
-    // Clean up section observer
-    if (this.sectionObserver) {
-      this.sectionObserver.disconnect();
-    }
+    // Clean up preview sync service
+    this.previewSyncService.cleanup();
 
     // Remove body class when leaving recipe pages
     document.body.classList.remove('recipe-page');
@@ -192,7 +198,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
    * Initialize component
    */
   private initializeComponent(): void {
-    this.updateUIState({ isLoading: true });
+    this.uiStateService.setLoading(true);
   }
 
   /**
@@ -228,21 +234,21 @@ export class RecipesComponent implements OnInit, OnDestroy {
         const previewRecipeId = queryParams.get('recipeId');
         
         if (isPreview && previewRecipeId) {
-          this.ui.isPreviewMode = true;
-          this.ui.currentView = 'recipe';
+          this.uiStateService.setPreviewMode(true);
+          this.uiStateService.setCurrentView('recipe');
           this.loadPreviewRecipe(previewRecipeId);
           this.setupPreviewSync(previewRecipeId);
         } else {
-          this.ui.isPreviewMode = false;
+          this.uiStateService.setPreviewMode(false);
           // Determine current view for normal mode
           if (recipeName) {
-            this.ui.currentView = 'recipe';
+            this.uiStateService.setCurrentView('recipe');
             this.loadRecipeDetails(category, recipeName);
           } else if (category) {
-            this.ui.currentView = 'category';
+            this.uiStateService.setCurrentView('category');
             this.loadCategoryRecipes(category);
           } else {
-            this.ui.currentView = 'home';
+            this.uiStateService.setCurrentView('home');
             this.loadAllRecipes();
           }
         }
@@ -258,8 +264,8 @@ export class RecipesComponent implements OnInit, OnDestroy {
    * Load initial data
    */
   private loadInitialData(): void {
-    this.updateUIState({ isLoading: true });
-    
+    this.uiStateService.setLoading(true);
+
     // Load categories
     this.recipeService.getCategories().pipe(
       takeUntil(this.destroy$)
@@ -272,7 +278,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
         console.error('Failed to load categories:', error);
       }
     });
-    
+
     // Load all recipes
     this.recipeService.getRecipes().pipe(
       takeUntil(this.destroy$)
@@ -280,15 +286,15 @@ export class RecipesComponent implements OnInit, OnDestroy {
       next: (recipes) => {
         this.recipes = recipes;
         // Only set filteredRecipes when in home view to avoid overwriting category filters
-        if (this.ui.currentView === 'home') {
+        if (this.uiStateService.getCurrentView() === 'home') {
           this.filteredRecipes = this.sortRecipesByCategoryAndTitle(recipes);
         }
-        this.updateUIState({ isLoading: false });
+        this.uiStateService.setLoading(false);
         this.cdr.markForCheck();
       },
       error: (error) => {
         console.error('Failed to load recipes:', error);
-        this.updateUIState({ isLoading: false });
+        this.uiStateService.setLoading(false);
       }
     });
   }
@@ -303,12 +309,12 @@ export class RecipesComponent implements OnInit, OnDestroy {
       next: (recipes) => {
         this.recipes = recipes;
         this.filteredRecipes = this.sortRecipesByCategoryAndTitle(recipes);
-        this.updateUIState({ isLoading: false });
+        this.uiStateService.setLoading(false);
         this.cdr.markForCheck();
       },
       error: (error) => {
         console.error('Failed to load recipes:', error);
-        this.updateUIState({ isLoading: false });
+        this.uiStateService.setLoading(false);
       }
     });
   }
@@ -323,12 +329,12 @@ export class RecipesComponent implements OnInit, OnDestroy {
       next: (recipes) => {
         this.recipes = recipes;
         this.filteredRecipes = this.sortRecipesByCategoryAndTitle(recipes);
-        this.updateUIState({ isLoading: false });
+        this.uiStateService.setLoading(false);
         this.cdr.markForCheck();
       },
       error: (error) => {
         console.error('Failed to load category recipes:', error);
-        this.updateUIState({ isLoading: false });
+        this.uiStateService.setLoading(false);
       }
     });
   }
@@ -342,24 +348,25 @@ export class RecipesComponent implements OnInit, OnDestroy {
     ).subscribe({
       next: (recipe) => {
         this.currentRecipe = recipe;
-        this.updateUIState({ isLoading: false });
+        this.uiStateService.setLoading(false);
 
         if (recipe) {
           // Generate TOC structure for the loaded recipe
-          this.generateRecipeTOCStructure();
+          this.recipeTocService.setCurrentRecipe(recipe);
+          this.recipeTOC = this.recipeTocService.generateRecipeTOCStructure();
           // Reset scroll state
-          this.ui.userHasScrolled = false;
+          this.uiStateService.resetScrollState();
           // Re-observe all sections after recipe loads
           this.observeAllSections();
           // Handle initial URL hash if present
-          this.handleInitialHash();
+          this.recipeNavigationService.handleInitialHash();
         }
 
         this.cdr.markForCheck();
       },
       error: (error) => {
         console.error('Failed to load recipe details:', error);
-        this.updateUIState({ isLoading: false });
+        this.uiStateService.setLoading(false);
       }
     });
   }
@@ -369,141 +376,57 @@ export class RecipesComponent implements OnInit, OnDestroy {
    */
   private loadPreviewRecipe(recipeId: string): void {
     const previewData = this.previewService.getPreviewData(recipeId);
-    
+
     if (previewData) {
-      // Convert preview data to RecipeItem format
-      this.currentRecipe = this.convertPreviewToRecipeItem(previewData);
-      this.updateUIState({ isLoading: false });
-      
+      // Convert preview data to RecipeItem format using service
+      this.currentRecipe = this.previewSyncService.convertPreviewToRecipeItem(previewData);
+      this.uiStateService.setLoading(false);
+
       if (this.currentRecipe) {
-        this.generateRecipeTOCStructure();
-        this.ui.userHasScrolled = false;
+        this.recipeTocService.setCurrentRecipe(this.currentRecipe);
+        this.recipeTOC = this.recipeTocService.generateRecipeTOCStructure();
+        this.uiStateService.resetScrollState();
         // Re-observe all sections after preview recipe loads
         this.observeAllSections();
         // Handle initial URL hash if present
-        this.handleInitialHash();
+        this.recipeNavigationService.handleInitialHash();
 
-        // Set initial timestamp for comparison
-        this.setPreviewTimestamp(previewData.timestamp);
+        // Set initial timestamp in preview sync service
+        this.previewSyncService.setCurrentTimestamp(previewData.timestamp);
       }
-    
+
       this.cdr.markForCheck();
     } else {
-      this.updateUIState({ isLoading: false });
+      this.uiStateService.setLoading(false);
     }
+  }
+
+  /**
+   * Handle preview update from preview sync service
+   */
+  private handlePreviewUpdate(recipe: RecipeItem): void {
+    if (!this.currentRecipe) return;
+
+    // Update current recipe
+    this.currentRecipe = recipe;
+
+    // Regenerate TOC structure for updated content
+    this.recipeTocService.setCurrentRecipe(this.currentRecipe);
+    this.recipeTOC = this.recipeTocService.generateRecipeTOCStructure();
+
+    // Re-observe all sections after content update
+    this.observeAllSections();
+
+    // Trigger change detection
+    this.cdr.markForCheck();
   }
 
   /**
    * Setup preview synchronization for cross-tab updates
    */
   private setupPreviewSync(recipeId: string): void {
-    // Enhanced storage event listener
-    const handleStorageChange = (event: StorageEvent) => {
-      const sessionKey = `recipe-preview-${recipeId}`;
-      const backupKey = `backup-recipe-preview-${recipeId}`;
-
-      // Check both sessionStorage and localStorage keys
-      if ((event.key === sessionKey || event.key === backupKey) && event.newValue) {
-        try {
-          const previewData = JSON.parse(event.newValue) as RecipePreviewData;
-          this.updatePreviewContent(previewData);
-        } catch (error) {
-          console.error('❌ Error parsing recipe preview update data:', error);
-        }
-      }
-    };
-
-    // Listen for storage changes (cross-tab communication)
-    window.addEventListener('storage', handleStorageChange);
-
-    // Enhanced periodic check for updates (fallback mechanism)
-    const updateInterval = setInterval(() => {
-      this.checkForPreviewUpdates(recipeId);
-    }, 1000);
-    
-    // Cleanup on destroy
-    this.destroy$.subscribe(() => {
-      clearInterval(updateInterval);
-      window.removeEventListener('storage', handleStorageChange);
-    });
-  }
-
-  /**
-   * Update preview content with new data
-   */
-  private updatePreviewContent(previewData: RecipePreviewData): void {
-    if (!this.currentRecipe) return;
-
-    // Convert and update the current recipe item
-    this.currentRecipe = this.convertPreviewToRecipeItem(previewData);
-    
-    // Update page title if needed
-    document.title = `[Preview] ${previewData.title} - Data Sync Pro Recipes`;
-    
-    // Regenerate TOC structure for updated content
-    this.generateRecipeTOCStructure();
-    // Re-observe all sections after content update
-    this.observeAllSections();
-
-    // Update timestamp for comparison
-    this.setPreviewTimestamp(previewData.timestamp);
-    
-    // Trigger change detection
-    this.cdr.markForCheck();
-  }
-
-  /**
-   * Check for preview updates via periodic polling (fallback mechanism)
-   */
-  private checkForPreviewUpdates(recipeId: string): void {
-    const currentData = this.previewService.getPreviewData(recipeId);
-    if (!currentData || !this.currentRecipe) return;
-
-    const currentTimestamp = this.getPreviewTimestamp();
-
-    if (currentData.timestamp > currentTimestamp) {
-      this.updatePreviewContent(currentData);
-    }
-  }
-
-  /**
-   * Get preview timestamp for comparison
-   */
-  private getPreviewTimestamp(): number {
-    return (this.currentRecipe as any)?._previewTimestamp || 0;
-  }
-
-  /**
-   * Set preview timestamp
-   */
-  private setPreviewTimestamp(timestamp: number): void {
-    if (this.currentRecipe) {
-      (this.currentRecipe as any)._previewTimestamp = timestamp;
-    }
-  }
-
-  /**
-   * Convert preview data to RecipeItem format
-   */
-  private convertPreviewToRecipeItem(previewData: RecipePreviewData): RecipeItem {
-    const sourceRecipe = previewData.recipeData;
-    
-    return {
-      id: sourceRecipe.id,
-      title: sourceRecipe.title,
-      category: sourceRecipe.category,
-      DSPVersions: sourceRecipe.DSPVersions,
-      overview: sourceRecipe.overview,
-      whenToUse: sourceRecipe.whenToUse,
-      generalImages: sourceRecipe.generalImages,
-      prerequisites: sourceRecipe.prerequisites,
-      direction: sourceRecipe.direction,
-      connection: sourceRecipe.connection,
-      walkthrough: sourceRecipe.walkthrough,
-      downloadableExecutables: sourceRecipe.downloadableExecutables,
-      relatedRecipes: sourceRecipe.relatedRecipes,
-      keywords: sourceRecipe.keywords
-    };
+    // Delegate to preview sync service
+    this.previewSyncService.setupPreviewSync(recipeId);
   }
 
   /**
@@ -525,8 +448,8 @@ export class RecipesComponent implements OnInit, OnDestroy {
    */
   goToCategory(categoryName: string): void {
     this.router.navigate(['/recipes', categoryName]);
-    
-    if (this.ui.isMobile) {
+
+    if (this.uiStateService.isMobile()) {
       this.closeMobileSidebar();
     }
   }
@@ -544,7 +467,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
 
     // Reset to top section when navigating to a different recipe
     if (!isSameRecipe) {
-      this.ui.activeSectionId = 'use-case';
+      this.uiStateService.setActiveSectionId('use-case');
     }
 
   }
@@ -590,51 +513,24 @@ export class RecipesComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Check if mobile view
-   */
-  private checkMobileView(): void {
-    this.updateUIState({ isMobile: window.innerWidth <= 768 });
-  }
-
-  /**
    * Toggle sidebar
    */
   toggleSidebar(): void {
-    const collapsed = !this.ui.sidebarCollapsed;
-    this.updateUIState({ sidebarCollapsed: collapsed });
-    localStorage.setItem('recipe-sidebar-collapsed', collapsed.toString());
+    this.uiStateService.toggleSidebar();
   }
 
   /**
    * Toggle mobile sidebar
    */
   toggleMobileSidebar(): void {
-    this.updateUIState({ mobileSidebarOpen: !this.ui.mobileSidebarOpen });
+    this.uiStateService.toggleMobileSidebar();
   }
 
   /**
    * Close mobile sidebar
    */
   closeMobileSidebar(): void {
-    this.updateUIState({ mobileSidebarOpen: false });
-  }
-
-  /**
-   * Load sidebar state from localStorage
-   */
-  private loadSidebarState(): void {
-    const savedState = localStorage.getItem('recipe-sidebar-collapsed');
-    if (savedState !== null) {
-      this.updateUIState({ sidebarCollapsed: savedState === 'true' });
-    }
-  }
-
-  /**
-   * State update helper for OnPush optimization
-   */
-  private updateUIState(updates: Partial<UIState>): void {
-    this.ui = { ...this.ui, ...updates };
-    this.cdr.markForCheck();
+    this.uiStateService.closeMobileSidebar();
   }
 
   /**
@@ -733,371 +629,56 @@ export class RecipesComponent implements OnInit, OnDestroy {
 
 
   /**
-   * Generate recipe TOC structure based on current recipe - Dynamic generation
-   */
-  generateRecipeTOCStructure(): void {
-    if (!this.currentRecipe) {
-      this.recipeTOC.tabs = [];
-      return;
-    }
-
-    const tabs: RecipeTab[] = [];
-
-    // Generate Overview Tab dynamically based on available content
-    const overviewSections = this.generateOverviewSections();
-    tabs.push({
-      id: 'overview',
-      title: 'Overview',
-      sections: overviewSections
-    });
-
-    // Generate Walkthrough Tab dynamically
-    const walkthroughSections = this.generateWalkthroughSections();
-    if (walkthroughSections.length > 0) {
-      tabs.push({
-        id: 'walkthrough',
-        title: 'Walkthrough',
-        sections: walkthroughSections
-      });
-    }
-
-    this.recipeTOC.tabs = tabs;
-    this.recipeTOC.currentSectionId = this.ui.activeSectionId;
-  }
-
-  /**
-   * Configuration for overview sections
-   */
-  private readonly overviewSectionConfigs = [
-    {
-      id: 'overview',
-      title: 'Overview',
-      elementId: 'recipe-overview',
-      contentType: 'html',
-      isVisible: () => this.hasValidOverview(),
-      getData: () => this.currentRecipe?.overview,
-      alwaysShow: true,
-      isHighlight: true
-    },
-    {
-      id: 'when-to-use',
-      title: 'General Use Case',
-      elementId: 'recipe-when-to-use',
-      contentType: 'html',
-      isVisible: () => this.hasValidWhenToUse(),
-      getData: () => this.currentRecipe?.whenToUse
-    },
-    {
-      id: 'dsp-versions',
-      title: 'Supported DSP Versions',
-      elementId: 'recipe-dsp-versions',
-      contentType: 'tag-list',
-      isVisible: () => !!(this.currentRecipe?.DSPVersions?.length && this.currentRecipe.DSPVersions.length > 0),
-      getData: () => this.currentRecipe?.DSPVersions,
-      tagClass: 'version-tag'
-    },
-    {
-      id: 'prerequisites',
-      title: 'Prerequisites',
-      elementId: 'recipe-prerequisites',
-      contentType: 'prerequisites',
-      isVisible: () => this.hasArrayPrerequisites(),
-      getData: () => this.getValidPrerequisites()
-    },
-    {
-      id: 'building-permissions',
-      title: 'Permission Sets for Building',
-      elementId: 'recipe-building-permissions',
-      contentType: 'list',
-      isVisible: () => this.getPermissionSetsForBuilding().length > 0,
-      getData: () => this.getPermissionSetsForBuilding()
-    },
-    {
-      id: 'using-permissions',
-      title: 'Permission Sets for Using',
-      elementId: 'recipe-using-permissions',
-      contentType: 'list',
-      isVisible: () => this.getPermissionSetsForUsing().length > 0,
-      getData: () => this.getPermissionSetsForUsing()
-    },
-    {
-      id: 'download-executables',
-      title: 'Download Executable Files',
-      elementId: 'recipe-download-executables',
-      contentType: 'download-list',
-      isVisible: () => this.hasValidDownloadableExecutables(),
-      getData: () => this.getValidDownloadableExecutables()
-    },
-    {
-      id: 'related-recipes',
-      title: 'Related Recipes',
-      elementId: 'recipe-related',
-      contentType: 'link-list',
-      isVisible: () => this.hasValidRelatedRecipes(),
-      getData: () => this.getValidRelatedRecipes()
-    },
-  ];
-
-  /**
-   * Generate Overview sections dynamically based on available content
-   */
-  private generateOverviewSections(): RecipeSection[] {
-    const sections: RecipeSection[] = [];
-
-    // Iterate through configuration and add visible sections
-    for (const config of this.overviewSectionConfigs) {
-      // Check if section should be visible
-      if (config.alwaysShow || (config.isVisible && config.isVisible())) {
-        sections.push({
-          id: config.id,
-          title: config.title,
-          elementId: config.elementId
-        });
-      }
-    }
-
-    return sections;
-  }
-
-  /**
    * Get visible overview sections with their data for template rendering
    */
   getVisibleOverviewSections() {
-    return this.overviewSectionConfigs.filter(config => 
-      config.alwaysShow || (config.isVisible && config.isVisible())
-    ).map(config => ({
-      ...config,
-      data: config.getData ? config.getData() : null
-    }));
-  }
-
-  /**
-   * Generate Walkthrough sections dynamically based on available content
-   */
-  private generateWalkthroughSections(): RecipeSection[] {
-    const sections: RecipeSection[] = [];
-    const walkthrough = this.currentRecipe?.walkthrough;
-
-    // Handle new array format
-    if (Array.isArray(walkthrough)) {
-      walkthrough.forEach((step, index) => {
-        sections.push({
-          id: `step-${index}`,
-          title: step.step || `Step ${index + 1}`,
-          elementId: `recipe-step-${index}`
-        });
-      });
-    }
-    return sections;
+    return this.recipeTocService.getVisibleOverviewSections();
   }
 
 
-
-  // ==================== Scroll Tracking Methods ====================
-
-  /**
-   * Setup optimized scroll listener for section highlighting
-   */
-  private setupOptimizedScrollListener(): void {
-    if (typeof window === 'undefined') return;
-    
-    this.optimizedScrollListener = () => {
-      // Mark that user has scrolled - this enables TOC highlighting
-      if (!this.ui.userHasScrolled) {
-        this.ui.userHasScrolled = true;
-      }
-      
-      if (!this.ui.scrollTicking) {
-        requestAnimationFrame(() => {
-          this.handleOptimizedScroll();
-          this.ui.scrollTicking = false;
-        });
-        this.ui.scrollTicking = true;
-      }
-    };
-    
-    window.addEventListener('scroll', this.optimizedScrollListener, { passive: true });
-  }
-
-  /**
-   * Handle scroll events
-   * Note: Section highlighting is handled by Intersection Observer
-   */
-  private handleOptimizedScroll(): void {
-    // Reserved for future scroll-based features if needed
-  }
-
-  /**
-   * Setup Intersection Observer for automatic TOC highlighting
-   */
-  private setupSectionObserver(): void {
-    if (typeof window === 'undefined' || !('IntersectionObserver' in window)) {
-      return;
-    }
-
-    const options: IntersectionObserverInit = {
-      root: null,
-      rootMargin: '-80px 0px -60% 0px', // Account for header and focus on top sections
-      threshold: 0
-    };
-
-    this.sectionObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        const sectionId = entry.target.id;
-        if (entry.isIntersecting) {
-          this.visibleSections.add(sectionId);
-        } else {
-          this.visibleSections.delete(sectionId);
-        }
-      });
-
-      // Update active section to the first visible one
-      if (this.visibleSections.size > 0) {
-        const firstVisible = Array.from(this.visibleSections)[0];
-        this.updateActiveSection(firstVisible);
-      }
-    }, options);
-
-    // Start observing sections
-    this.observeAllSections();
-  }
 
   /**
    * Observe all sections for TOC highlighting
    */
   private observeAllSections(): void {
-    // Delay to ensure DOM is rendered
-    setTimeout(() => {
-      // Observe Overview sections
-      this.getOverviewSectionsForTOC().forEach(section => {
-        const element = document.getElementById(section.elementId || '');
-        if (element) {
-          this.sectionObserver?.observe(element);
-        }
-      });
+    // Get overview section element IDs
+    const overviewElementIds = this.getOverviewSectionsForTOC()
+      .map(section => section.elementId || '')
+      .filter(id => id.length > 0);
 
-      // Observe Walkthrough steps
-      this.walkthroughStepsData.forEach((_, index) => {
-        const element = document.getElementById(`step-${index}`);
-        if (element) {
-          this.sectionObserver?.observe(element);
-        }
-      });
-    }, 100);
+    // Get walkthrough step count
+    const walkthroughStepCount = this.walkthroughStepsData.length;
+
+    // Delegate to navigation service
+    this.recipeNavigationService.observeAllSections(overviewElementIds, walkthroughStepCount);
   }
-
-  /**
-   * Update active section for TOC highlighting
-   */
-  private updateActiveSection(sectionId: string): void {
-    if (this.ui.activeSectionId !== sectionId) {
-      this.ui.activeSectionId = sectionId;
-      this.recipeTOC.currentSectionId = sectionId;
-      this.cdr.markForCheck();
-    }
-  }
-
 
   /**
    * Get Overview sections for TOC display
    */
   getOverviewSectionsForTOC(): RecipeSection[] {
-    const overviewTab = this.recipeTOC.tabs.find(tab => tab.id === 'overview');
-    return overviewTab ? overviewTab.sections : [];
+    return this.recipeTocService.getOverviewSectionsForTOC();
   }
 
   /**
    * Get Walkthrough sections for TOC display
    */
   getWalkthroughSectionsForTOC(): RecipeSection[] {
-    const walkthroughTab = this.recipeTOC.tabs.find(tab => tab.id === 'walkthrough');
-    return walkthroughTab ? walkthroughTab.sections : [];
+    return this.recipeTocService.getWalkthroughSectionsForTOC();
   }
 
   /**
    * Navigate to Overview section - Scroll to section anchor
    */
   navigateToOverviewSection(sectionId: string): void {
-    const sectionElement = document.getElementById(sectionId);
-    if (sectionElement) {
-      sectionElement.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start'
-      });
-
-      // Update URL hash for anchor support
-      this.updateUrlHash(sectionId);
-
-      // Update active section for TOC highlighting
-      this.ui.activeSectionId = sectionId;
-      this.recipeTOC.currentSectionId = sectionId;
-      this.cdr.markForCheck();
-    }
+    this.recipeNavigationService.navigateToOverviewSection(sectionId);
   }
 
   /**
    * Navigate to Walkthrough section - Scroll to step anchor
    */
   navigateToWalkthroughSection(stepIndex: number): void {
-    // Scroll to the step immediately (no tab switching needed)
-    this.scrollToStep(stepIndex);
-    // Update URL hash for anchor support
-    this.updateUrlHash(`step-${stepIndex}`);
-  }
-
-  /**
-   * Scroll to a specific step by index
-   */
-  private scrollToStep(stepIndex: number): void {
-    const stepElement = document.getElementById(`step-${stepIndex}`);
-    if (stepElement) {
-      stepElement.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start'
-      });
-
-      // Update active section for TOC highlighting
-      this.ui.activeSectionId = `step-${stepIndex}`;
-      this.recipeTOC.currentSectionId = `step-${stepIndex}`;
-      this.cdr.markForCheck();
-    }
-  }
-
-  /**
-   * Update URL hash without triggering page reload
-   */
-  private updateUrlHash(sectionId: string): void {
-    if (typeof window !== 'undefined' && window.history) {
-      const currentUrl = window.location.pathname + window.location.search;
-      const newUrl = `${currentUrl}#${sectionId}`;
-      window.history.replaceState(null, '', newUrl);
-    }
-  }
-
-  /**
-   * Handle initial URL hash on page load
-   */
-  private handleInitialHash(): void {
-    if (typeof window === 'undefined') return;
-
-    const hash = window.location.hash.slice(1); // Remove '#' prefix
-    if (hash) {
-      // Delay to ensure DOM is rendered
-      setTimeout(() => {
-        const element = document.getElementById(hash);
-        if (element) {
-          element.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start'
-          });
-
-          // Update active section
-          this.ui.activeSectionId = hash;
-          this.recipeTOC.currentSectionId = hash;
-          this.cdr.markForCheck();
-        }
-      }, 300);
-    }
+    this.recipeNavigationService.navigateToWalkthroughSection(stepIndex);
   }
 
   /**
@@ -1105,21 +686,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
    */
   @HostListener('window:hashchange', ['$event'])
   onHashChange(): void {
-    const hash = window.location.hash.slice(1);
-    if (hash) {
-      const element = document.getElementById(hash);
-      if (element) {
-        element.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start'
-        });
-
-        // Update active section
-        this.ui.activeSectionId = hash;
-        this.recipeTOC.currentSectionId = hash;
-        this.cdr.markForCheck();
-      }
-    }
+    this.recipeNavigationService.handleInitialHash();
   }
 
 
@@ -1165,147 +732,6 @@ export class RecipesComponent implements OnInit, OnDestroy {
 
 
 
-  /**
-   * Check if current recipe has array prerequisites with valid items
-   */
-  hasArrayPrerequisites(): boolean {
-    if (!this.currentRecipe?.prerequisites || !Array.isArray(this.currentRecipe.prerequisites)) {
-      return false;
-    }
-    
-    // Check if there's at least one prerequisite with actual content
-    return this.currentRecipe.prerequisites.some(prereq => 
-      (prereq.description && prereq.description.trim().length > 0) ||
-      (prereq.quickLinks && prereq.quickLinks.length > 0 && 
-       prereq.quickLinks.some(link => link.title && link.title.trim().length > 0))
-    );
-  }
-
-  /**
-   * Get permission sets for building
-   */
-  getPermissionSetsForBuilding(): string[] {
-    if (!this.currentRecipe) return [];
-    
-    // New format - extract from prerequisites array
-    const buildingPermissions: string[] = [];
-    if (Array.isArray(this.currentRecipe.prerequisites)) {
-      this.currentRecipe.prerequisites.forEach(prereq => {
-        if (prereq.description.toLowerCase().includes('permission') && 
-            prereq.description.toLowerCase().includes('building')) {
-          // This is a simplified extraction - you might want to improve this logic
-          buildingPermissions.push(prereq.description);
-        }
-      });
-    }
-    
-    return buildingPermissions;
-  }
-
-  /**
-   * Get permission sets for using
-   */
-  getPermissionSetsForUsing(): string[] {
-    if (!this.currentRecipe) return [];
-
-    // New format - extract from prerequisites array
-    const usingPermissions: string[] = [];
-    if (Array.isArray(this.currentRecipe.prerequisites)) {
-      this.currentRecipe.prerequisites.forEach(prereq => {
-        if (prereq.description.toLowerCase().includes('permission') && 
-            prereq.description.toLowerCase().includes('using')) {
-          // This is a simplified extraction - you might want to improve this logic
-          usingPermissions.push(prereq.description);
-        }
-      });
-    }
-    
-    return usingPermissions;
-  }
-
-  /**
-   * Check if current recipe has valid overview
-   */
-  hasValidOverview(): boolean {
-    const overview = this.currentRecipe?.overview;
-    return !!(overview && overview.trim().length > 0);
-  }
-
-  /**
-   * Check if current recipe has valid when to use
-   */
-  hasValidWhenToUse(): boolean {
-    const whenToUse = this.currentRecipe?.whenToUse;
-    return !!(whenToUse && whenToUse.trim().length > 0);
-  }
-
-  /**
-   * Check if current recipe has valid downloadable executables
-   */
-  hasValidDownloadableExecutables(): boolean {
-    const executables = this.currentRecipe?.downloadableExecutables;
-    return !!(executables && executables.length > 0 && 
-              executables.some(exe => 
-                (exe.filePath && exe.filePath.trim().length > 0) 
-              ));
-  }
-
-  /**
-   * Get valid downloadable executables (with non-empty title and url or filePath)
-   */
-  getValidDownloadableExecutables() {
-    const executables = this.currentRecipe?.downloadableExecutables || [];
-    return executables.filter(exe => 
-      // Support new format with filePath
-      (exe.filePath && exe.filePath.trim().length > 0)
-    ).map(exe => {
-      // Transform new format to legacy format for template compatibility
-      if (exe.filePath && !exe.title && !exe.url) {
-        const fileName = exe.filePath.split('/').pop() || exe.filePath;
-        // Remove extension and keep the original filename (including special characters)
-        const titleFromFileName = fileName.replace(/\.[^/.]+$/, '');
-        
-        // Build correct assets path for download
-        const correctUrl = this.buildAssetPath(exe.filePath);
-        
-        return {
-          ...exe,
-          title: titleFromFileName,
-          url: correctUrl,
-          // Keep original filename for download attribute
-          originalFileName: fileName
-        };
-      }
-      return exe;
-    });
-  }
-
-  /**
-   * Build correct asset path for recipe files
-   */
-  private buildAssetPath(filePath: string): string {
-    if (!this.currentRecipe || !filePath) return filePath;
-    
-    // If filePath already starts with '/assets/', return as is
-    if (filePath.startsWith('/assets/')) {
-      return filePath;
-    }
-    
-    // If filePath already starts with 'assets/', make it absolute
-    if (filePath.startsWith('assets/')) {
-      return `/${filePath}`;
-    }
-    
-    // If filePath is absolute URL, return as is
-    if (filePath.startsWith('http://') || filePath.startsWith('https://')) {
-      return filePath;
-    }
-    
-    // Build the correct absolute assets path: /assets/recipes/{recipeId}/{filePath}
-    // Replace em dash and other dash characters with underscore to match actual folder names
-    const normalizedRecipeId = this.currentRecipe.id.replace(/[\u2010-\u2015]/g, '_');
-    return `/assets/recipes/${normalizedRecipeId}/${filePath}`;
-  }
 
   /**
    * Handle download link click to bypass Angular routing
@@ -1343,38 +769,6 @@ export class RecipesComponent implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * Check if current recipe has valid related recipes
-   */
-  hasValidRelatedRecipes(): boolean {
-    const related = this.currentRecipe?.relatedRecipes;
-    return !!(related && related.length > 0 && 
-              related.some(recipe => recipe.title && recipe.title.trim().length > 0 && 
-                                    recipe.url && recipe.url.trim().length > 0));
-  }
-
-  /**
-   * Get valid related recipes (with non-empty title and url)
-   */
-  getValidRelatedRecipes() {
-    const related = this.currentRecipe?.relatedRecipes || [];
-    return related.filter(recipe => recipe.title && recipe.title.trim().length > 0 && 
-                                   recipe.url && recipe.url.trim().length > 0);
-  }
-
-  /**
-   * Get valid prerequisites (with non-empty content)
-   */
-  getValidPrerequisites() {
-    const prerequisites = this.currentRecipe?.prerequisites || [];
-    if (!Array.isArray(prerequisites)) return [];
-
-    return prerequisites.filter(prereq =>
-      (prereq.description && prereq.description.trim().length > 0) ||
-      (prereq.quickLinks && prereq.quickLinks.length > 0 &&
-       prereq.quickLinks.some(link => link.title && link.title.trim().length > 0))
-    );
-  }
 
   // ==================== TrackBy Functions for Performance ====================
 

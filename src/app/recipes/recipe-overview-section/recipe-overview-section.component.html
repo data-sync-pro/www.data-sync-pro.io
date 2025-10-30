@@ -1,0 +1,77 @@
+<section [id]="section.elementId"
+         class="recipe-section"
+         [class.use-case-highlight]="section.isHighlight">
+  <h4>{{ section.title }}</h4>
+
+  <!-- Switch based on content type -->
+  <ng-container [ngSwitch]="section.contentType">
+
+    <!-- Use Case Highlight (special treatment) -->
+    <div *ngSwitchCase="'use-case-highlight'" class="use-case-content">
+      <div [innerHTML]="section.data"></div>
+    </div>
+
+    <!-- HTML content -->
+    <div *ngSwitchCase="'html'" [innerHTML]="section.data"></div>
+
+    <!-- Simple text content -->
+    <p *ngSwitchCase="'text'">{{ section.data }}</p>
+
+    <!-- Tag list (versions, keywords) -->
+    <div *ngSwitchCase="'tag-list'" [class]="section.tagClass === 'version-tag' ? 'version-tags' : 'keyword-tags'">
+      <span *ngFor="let item of asAny(section.data)"
+            [class]="section.tagClass || 'tag'">{{ item }}</span>
+    </div>
+
+    <!-- Simple list -->
+    <ul *ngSwitchCase="'list'">
+      <li *ngFor="let item of asAny(section.data)">{{ item }}</li>
+    </ul>
+
+    <!-- Download list -->
+    <div *ngSwitchCase="'download-list'" class="download-list">
+      <div *ngFor="let executable of asAny(section.data)" class="download-item">
+        <button type="button"
+                class="download-link"
+                (click)="onDownloadClick(executable.url, executable.title, executable.originalFileName)">
+          {{ executable.title }}
+          <lightning-icon iconName="utility:download" size="xx-small" alternativeText="Download"></lightning-icon>
+        </button>
+      </div>
+    </div>
+
+    <!-- Link list (related recipes) -->
+    <div *ngSwitchCase="'link-list'" class="related-recipes">
+      <a *ngFor="let related of asAny(section.data)"
+         [href]="related.url"
+         class="related-recipe-link">
+        {{ related.title }}
+      </a>
+    </div>
+
+    <!-- Prerequisites (bullet points format) -->
+    <div *ngSwitchCase="'prerequisites'" class="prerequisites-list">
+      <ul>
+        <li *ngFor="let prereq of asAny(section.data)">
+          <div class="prerequisite-description">
+            {{ prereq.description && prereq.description.trim() ? prereq.description : 'N/A' }}
+            <ng-container *ngIf="prereq.quickLinks?.length">
+              <ng-container *ngFor="let link of prereq.quickLinks">
+                <a [href]="link.url" target="_blank" *ngIf="link.title && link.title.trim()" class="inline-download-icon">
+                  <lightning-icon iconName="utility:download" size="xx-small" alternativeText="Download"></lightning-icon>
+                </a>
+              </ng-container>
+            </ng-container>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Version info -->
+    <div *ngSwitchCase="'version-info'">
+      <p>Version: {{ asAny(section.data)?.version }}</p>
+      <p>{{ asAny(section.data)?.description }}</p>
+    </div>
+
+  </ng-container>
+</section>
