@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { SourceRecipeRecord } from '../models/recipe.model';
+import { SourceRecipeRecord } from '../../shared/models/recipe.model';
 
 interface RecipeTab {
   id: string;

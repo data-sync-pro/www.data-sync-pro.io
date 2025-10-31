@@ -11,7 +11,7 @@ import {
   HostListener,
   ChangeDetectorRef,
 } from '@angular/core';
-import { RecipeService } from '../../shared/services/recipe.service';
+import { RecipeService } from '../services/recipe.service';
 
 // Search-specific item structure for the overlay
 interface RecipeSearchItem {

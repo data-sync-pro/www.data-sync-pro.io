@@ -1,12 +1,12 @@
 import { Component, OnInit, OnDestroy, ViewChild, ElementRef, HostListener, ChangeDetectorRef, NgZone, Renderer2 } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Subject, takeUntil, debounceTime } from 'rxjs';
-import { RecipeStorageService } from '../shared/services/recipe-storage.service';
-import { RecipeExportService } from '../shared/services/recipe-export.service';
-import { RecipeFileStorageService } from '../shared/services/recipe-file-storage.service';
-import { RecipeService } from '../shared/services/recipe.service';
+import { RecipeStorageService } from '../recipes/services/recipe-storage.service';
+import { RecipeExportService } from '../recipes/services/recipe-export.service';
+import { RecipeFileStorageService } from '../recipes/services/recipe-file-storage.service';
+import { RecipeService } from '../recipes/services/recipe.service';
 import { NotificationService } from '../shared/services/notification.service';
-import { RecipePreviewService, RecipePreviewData } from '../shared/services/recipe-preview.service';
+import { RecipePreviewService, RecipePreviewData } from '../recipes/services/recipe-preview.service';
 import { ClipboardUtil } from '../shared/utils/clipboard.util';
 import { 
   RecipeItem, 
@@ -20,7 +20,7 @@ import {
   RecipeRelatedItem,
   RecipeGeneralImage
 } from '../shared/models/recipe.model';
-import { ExportProgress } from '../shared/services/recipe-export.service';
+import { ExportProgress } from '../recipes/services/recipe-export.service';
 
 interface RecipeTab {
   id: string;

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Subject, Observable } from 'rxjs';
 import { RecipePreviewService, RecipePreviewData } from './recipe-preview.service';
-import { RecipeItem } from '../models/recipe.model';
+import { RecipeItem } from '../../shared/models/recipe.model';
 
 /**
  * Preview update event

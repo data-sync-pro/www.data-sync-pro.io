@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { RecipeExportService } from './recipe-export.service';
-import { SourceRecipeRecord } from '../models/recipe.model';
+import { SourceRecipeRecord } from '../../shared/models/recipe.model';
 
 export interface RecipePreviewData {
   recipeId: string;

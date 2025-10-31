@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { RecipeItem, RecipeTOCStructure, RecipeSection, RecipeTab } from '../models/recipe.model';
+import { RecipeItem, RecipeTOCStructure, RecipeSection, RecipeTab } from '../../shared/models/recipe.model';
 
 /**
  * Section configuration for dynamic TOC generation
@@ -35,12 +35,25 @@ export class RecipeTocService {
    */
   private currentRecipe: RecipeItem | null = null;
 
+  /**
+   * Cache for getVisibleOverviewSections to avoid redundant calculations
+   * Cleared when recipe changes
+   */
+  private cachedOverviewSections?: any[];
+  private cachedRecipeId?: string;
+
   constructor() { }
 
   /**
    * Set the current recipe for TOC generation
+   * Clears cache when recipe changes
    */
   setCurrentRecipe(recipe: RecipeItem | null): void {
+    // Clear cache if recipe has changed
+    if (this.currentRecipe?.id !== recipe?.id) {
+      this.cachedOverviewSections = undefined;
+      this.cachedRecipeId = undefined;
+    }
     this.currentRecipe = recipe;
   }
 
@@ -49,8 +62,7 @@ export class RecipeTocService {
    */
   generateRecipeTOCStructure(): RecipeTOCStructure {
     const recipeTOC: RecipeTOCStructure = {
-      tabs: [],
-      currentSectionId: 'overview'
+      tabs: []
     };
 
     if (!this.currentRecipe) {
@@ -182,15 +194,28 @@ export class RecipeTocService {
 
   /**
    * Get visible overview sections with their data for template rendering
+   * Uses caching to avoid redundant calculations on every call
    */
   getVisibleOverviewSections() {
+    // Return cached result if recipe hasn't changed
+    if (this.cachedRecipeId === this.currentRecipe?.id && this.cachedOverviewSections) {
+      return this.cachedOverviewSections;
+    }
+
+    // Calculate visible sections
     const configs = this.getOverviewSectionConfigs();
-    return configs.filter(config =>
+    const result = configs.filter(config =>
       config.alwaysShow || (config.isVisible && config.isVisible())
     ).map(config => ({
       ...config,
       data: config.getData ? config.getData() : null
     }));
+
+    // Cache the result
+    this.cachedRecipeId = this.currentRecipe?.id;
+    this.cachedOverviewSections = result;
+
+    return result;
   }
 
   /**
@@ -206,7 +231,7 @@ export class RecipeTocService {
         sections.push({
           id: `step-${index}`,
           title: step.step || `Step ${index + 1}`,
-          elementId: `recipe-step-${index}`
+          elementId: `step-${index}`
         });
       });
     }
@@ -248,28 +273,35 @@ export class RecipeTocService {
       return filePath;
     }
 
-    // Build the correct absolute assets path: /assets/recipes/{recipeId}/{filePath}
+    // Build the correct absolute assets path: /assets/recipes/{recipeSlug}/{filePath}
     // Replace em dash and other dash characters with underscore to match actual folder names
-    const normalizedRecipeId = this.currentRecipe.id.replace(/[\u2010-\u2015]/g, '_');
-    return `/assets/recipes/${normalizedRecipeId}/${filePath}`;
+    // Use slug (folder name) instead of id (UUID) to match actual asset directory structure
+    const normalizedSlug = (this.currentRecipe.slug || this.currentRecipe.id)
+      .replace(/[\u2010-\u2015]/g, '_');
+    return `/assets/recipes/${normalizedSlug}/${filePath}`;
   }
 
   // ==================== Validation Methods ====================
 
   /**
+   * Private helper to validate if a string has content
+   */
+  private hasValidString(value: string | undefined): boolean {
+    return !!(value && value.trim().length > 0);
+  }
+
+  /**
    * Check if current recipe has valid overview
    */
   hasValidOverview(): boolean {
-    const overview = this.currentRecipe?.overview;
-    return !!(overview && overview.trim().length > 0);
+    return this.hasValidString(this.currentRecipe?.overview);
   }
 
   /**
    * Check if current recipe has valid when to use
    */
   hasValidWhenToUse(): boolean {
-    const whenToUse = this.currentRecipe?.whenToUse;
-    return !!(whenToUse && whenToUse.trim().length > 0);
+    return this.hasValidString(this.currentRecipe?.whenToUse);
   }
 
   /**
@@ -402,5 +434,37 @@ export class RecipeTocService {
       (prereq.quickLinks && prereq.quickLinks.length > 0 &&
        prereq.quickLinks.some(link => link.title && link.title.trim().length > 0))
     );
+  }
+
+  /**
+   * Get all sections (overview + walkthrough) for unified rendering
+   * Returns sections with data and metadata for RecipeSectionComponent
+   * This method supports the unified component architecture
+   */
+  getAllSectionsForRendering(): any[] {
+    const sections: any[] = [];
+
+    // Add all visible overview sections
+    const overviewSections = this.getVisibleOverviewSections();
+    sections.push(...overviewSections);
+
+    // Add all walkthrough steps as sections
+    const walkthrough = this.currentRecipe?.walkthrough;
+    if (Array.isArray(walkthrough)) {
+      walkthrough.forEach((step, index) => {
+        sections.push({
+          id: `step-${index}`,
+          title: step.step || `Step ${index + 1}`,
+          elementId: `step-${index}`,
+          contentType: 'walkthrough-step',
+          isVisible: () => true,
+          getData: () => step,
+          data: step,
+          stepIndex: index
+        });
+      });
+    }
+
+    return sections;
   }
 }

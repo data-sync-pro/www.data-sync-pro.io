@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { TIMING } from '../../shared/constants/timing.constants';
 
 /**
  * UI State interface for Recipe pages
@@ -34,12 +35,15 @@ export class RecipeUiStateService {
     currentView: 'home',
     isPreviewMode: false,
     tocHidden: false,
-    activeSectionId: 'use-case',
+    activeSectionId: 'recipe-overview',
     userHasScrolled: false
   };
 
   // State subject - holds current state
   private state$ = new BehaviorSubject<RecipeUIState>(this.initialState);
+
+  // Resize debounce timer
+  private resizeTimer: any;
 
   constructor() {
     this.loadSidebarStateFromStorage();
@@ -238,12 +242,21 @@ export class RecipeUiStateService {
 
   /**
    * Setup window resize listener for mobile detection
+   * Uses debounce to prevent excessive calls during resize
    */
   private setupResizeListener(): void {
     if (typeof window === 'undefined') return;
 
     window.addEventListener('resize', () => {
-      this.checkMobileView();
+      // Clear existing timer
+      if (this.resizeTimer) {
+        clearTimeout(this.resizeTimer);
+      }
+
+      // Set new timer with debounce delay
+      this.resizeTimer = setTimeout(() => {
+        this.checkMobileView();
+      }, TIMING.SCROLL_DEBOUNCE);
     });
   }
 
@@ -336,7 +349,7 @@ export class RecipeUiStateService {
       isLoading: false,
       currentView: 'home',
       isPreviewMode: false,
-      activeSectionId: 'use-case',
+      activeSectionId: 'recipe-overview',
       userHasScrolled: false,
       mobileSidebarOpen: false
     });

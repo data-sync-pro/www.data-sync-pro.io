@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { SourceRecipeRecord } from '../models/recipe.model';
+import { SourceRecipeRecord } from '../../shared/models/recipe.model';
 import { RecipeFileStorageService } from './recipe-file-storage.service';
 import { RecipeStorageService } from './recipe-storage.service';
-import { NotificationService } from './notification.service';
+import { NotificationService } from '../../shared/services/notification.service';
 import { firstValueFrom } from 'rxjs';
 
 declare const JSZip: any;

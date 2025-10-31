@@ -3,9 +3,9 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject, of, throwError, combineLatest } from 'rxjs';
 import { map, catchError, shareReplay, tap, finalize, switchMap } from 'rxjs/operators';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { AutoLinkService } from './auto-link.service';
-import { generateSlug } from '../utils/slug.utils';
-import { RECIPE_CATEGORY_ORDER } from '../constants/recipe.constants';
+import { AutoLinkService } from '../../shared/services/auto-link.service';
+import { generateSlug } from '../../shared/utils/slug.utils';
+import { RECIPE_CATEGORY_ORDER } from '../../shared/constants/recipe.constants';
 
 import {
   SourceRecipeRecord,
@@ -18,7 +18,7 @@ import {
   RecipeEvent,
   RecipeCategoryType,
   LegacyRecipeWalkthrough
-} from '../models/recipe.model';
+} from '../../shared/models/recipe.model';
 
 /**
  * Recipe index configuration

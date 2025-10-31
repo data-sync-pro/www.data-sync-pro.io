@@ -2,13 +2,14 @@ import {
   Component,
   OnInit,
   OnDestroy,
+  AfterViewInit,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   ViewEncapsulation,
   HostListener
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Subject } from 'rxjs';
+import { Subject, combineLatest } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 import {
@@ -17,25 +18,17 @@ import {
   RecipeFilter,
   RecipeNavigationState,
   RecipeSection,
-  RecipeTab,
   RecipeTOCStructure,
-  RecipeSearchResult
+  RecipeSearchState
 } from '../shared/models/recipe.model';
-import { RecipeService } from '../shared/services/recipe.service';
-import { RecipePreviewService } from '../shared/services/recipe-preview.service';
-import { RecipeTocService } from '../shared/services/recipe-toc.service';
-import { RecipeNavigationService } from '../shared/services/recipe-navigation.service';
-import { RecipeUiStateService, RecipeUIState } from '../shared/services/recipe-ui-state.service';
-import { RecipePreviewSyncService } from '../shared/services/recipe-preview-sync.service';
+import { RecipeService } from './services/recipe.service';
+import { RecipePreviewService } from './services/recipe-preview.service';
+import { RecipeTocService } from './services/recipe-toc.service';
+import { RecipeNavigationService } from './services/recipe-navigation.service';
+import { RecipeUiStateService, RecipeUIState } from './services/recipe-ui-state.service';
+import { RecipePreviewSyncService } from './services/recipe-preview-sync.service';
+import { RECIPE_CLASSES, RECIPE_MESSAGES} from '../shared/constants/recipe.constants';
 import { SelectedSuggestion } from './recipe-search-overlay/recipe-search-overlay.component';
-
-interface SearchState {
-  query: string;
-  isActive: boolean;
-  results: RecipeSearchResult[];
-  hasResults: boolean;
-  isOverlayOpen: boolean;
-}
 
 @Component({
   selector: 'app-recipes',
@@ -44,13 +37,14 @@ interface SearchState {
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class RecipesComponent implements OnInit, OnDestroy {
+export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
   private destroy$ = new Subject<void>();
+  private needsObserverSetup: boolean = false;
 
   // UI State - managed by RecipeUiStateService
   ui!: RecipeUIState;
 
-  search: SearchState = {
+  search: RecipeSearchState = {
     query: '',
     isActive: false,
     results: [],
@@ -74,8 +68,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
   
   // Recipe TOC structure
   recipeTOC: RecipeTOCStructure = {
-    tabs: [],
-    currentSectionId: 'use-case'
+    tabs: []
   };
   
   // Filters
@@ -92,8 +85,8 @@ export class RecipesComponent implements OnInit, OnDestroy {
     private recipeService: RecipeService,
     private previewService: RecipePreviewService,
     private cdr: ChangeDetectorRef,
-    private recipeTocService: RecipeTocService,
-    private recipeNavigationService: RecipeNavigationService,
+    public recipeTocService: RecipeTocService,
+    public recipeNavigationService: RecipeNavigationService,
     private uiStateService: RecipeUiStateService,
     private previewSyncService: RecipePreviewSyncService
   ) {}
@@ -117,15 +110,12 @@ export class RecipesComponent implements OnInit, OnDestroy {
     this.recipeNavigationService.setupSectionObserver();
 
     // Subscribe to navigation events
+    // Note: Navigation service now updates UI state directly
     this.recipeNavigationService.getNavigationEvents()
       .pipe(takeUntil(this.destroy$))
       .subscribe(event => {
-        if (event.type === 'section-changed' && event.sectionId) {
-          this.uiStateService.setActiveSectionId(event.sectionId);
-          this.recipeTOC.currentSectionId = event.sectionId;
-        } else if (event.type === 'user-scrolled') {
-          this.uiStateService.markUserScrolled();
-        }
+        // Just trigger change detection for OnPush strategy
+        this.cdr.markForCheck();
       });
 
     // Subscribe to preview update events
@@ -138,7 +128,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
       });
 
     // Add body class to hide footer on recipe pages
-    document.body.classList.add('recipe-page');
+    document.body.classList.add(RECIPE_CLASSES.BODY_PAGE);
   }
 
   /**
@@ -174,10 +164,27 @@ export class RecipesComponent implements OnInit, OnDestroy {
 
   private isInputFocused(): boolean {
     const activeElement = document.activeElement;
-    return !!(activeElement instanceof HTMLInputElement || 
+    return !!(activeElement instanceof HTMLInputElement ||
            activeElement instanceof HTMLTextAreaElement ||
            (activeElement && activeElement.tagName === 'INPUT') ||
            (activeElement && activeElement.tagName === 'TEXTAREA'));
+  }
+
+  /**
+   * Lifecycle: After view initialization
+   * Sets up observers after DOM is ready
+   * Uses requestAnimationFrame for optimal timing
+   */
+  ngAfterViewInit(): void {
+    if (this.needsObserverSetup && this.showRecipeDetails) {
+      this.needsObserverSetup = false;
+      // Use requestAnimationFrame for better timing than setTimeout
+      // This ensures execution after next repaint, typically faster than 200ms
+      requestAnimationFrame(() => {
+        this.observeAllSections();
+        this.recipeNavigationService.handleInitialHash();
+      });
+    }
   }
 
   ngOnDestroy(): void {
@@ -191,7 +198,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
     this.previewSyncService.cleanup();
 
     // Remove body class when leaving recipe pages
-    document.body.classList.remove('recipe-page');
+    document.body.classList.remove(RECIPE_CLASSES.BODY_PAGE);
   }
 
   /**
@@ -216,44 +223,48 @@ export class RecipesComponent implements OnInit, OnDestroy {
 
   /**
    * Setup route parameter handling
+   * Uses combineLatest to avoid nested subscriptions and memory leaks
    */
   private setupRouteHandling(): void {
-    this.route.paramMap.pipe(
+    // Combine paramMap and queryParamMap into a single stream
+    combineLatest([
+      this.route.paramMap,
+      this.route.queryParamMap
+    ]).pipe(
       takeUntil(this.destroy$)
-    ).subscribe(params => {
+    ).subscribe(([params, queryParams]) => {
+      // Extract route parameters
       const category = params.get('category') || '';
       const recipeName = params.get('recipeName') || '';
-      
+
       this.navigation = { category, recipeName };
-      
-      // Check for preview mode
-      this.route.queryParamMap.pipe(
-        takeUntil(this.destroy$)
-      ).subscribe(queryParams => {
-        const isPreview = queryParams.get('preview') === 'true';
-        const previewRecipeId = queryParams.get('recipeId');
-        
-        if (isPreview && previewRecipeId) {
-          this.uiStateService.setPreviewMode(true);
+
+      // Check for preview mode from query params
+      const isPreview = queryParams.get('preview') === 'true';
+      const previewRecipeId = queryParams.get('recipeId');
+
+      if (isPreview && previewRecipeId) {
+        // Preview mode
+        this.uiStateService.setPreviewMode(true);
+        this.uiStateService.setCurrentView('recipe');
+        this.loadPreviewRecipe(previewRecipeId);
+        this.setupPreviewSync(previewRecipeId);
+      } else {
+        // Normal mode - determine view based on route parameters
+        this.uiStateService.setPreviewMode(false);
+
+        if (recipeName) {
           this.uiStateService.setCurrentView('recipe');
-          this.loadPreviewRecipe(previewRecipeId);
-          this.setupPreviewSync(previewRecipeId);
+          this.loadRecipeDetails(category, recipeName);
+        } else if (category) {
+          this.uiStateService.setCurrentView('category');
+          this.loadCategoryRecipes(category);
         } else {
-          this.uiStateService.setPreviewMode(false);
-          // Determine current view for normal mode
-          if (recipeName) {
-            this.uiStateService.setCurrentView('recipe');
-            this.loadRecipeDetails(category, recipeName);
-          } else if (category) {
-            this.uiStateService.setCurrentView('category');
-            this.loadCategoryRecipes(category);
-          } else {
-            this.uiStateService.setCurrentView('home');
-            this.loadAllRecipes();
-          }
+          this.uiStateService.setCurrentView('home');
+          this.loadAllRecipes();
         }
-      });
-      
+      }
+
       this.cdr.markForCheck();
     });
   }
@@ -275,7 +286,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
         this.cdr.markForCheck();
       },
       error: (error) => {
-        console.error('Failed to load categories:', error);
+        console.error(RECIPE_MESSAGES.ERROR_LOAD_CATEGORIES, error);
       }
     });
 
@@ -293,7 +304,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
         this.cdr.markForCheck();
       },
       error: (error) => {
-        console.error('Failed to load recipes:', error);
+        console.error(RECIPE_MESSAGES.ERROR_LOAD_RECIPES, error);
         this.uiStateService.setLoading(false);
       }
     });
@@ -313,7 +324,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
         this.cdr.markForCheck();
       },
       error: (error) => {
-        console.error('Failed to load recipes:', error);
+        console.error(RECIPE_MESSAGES.ERROR_LOAD_RECIPES, error);
         this.uiStateService.setLoading(false);
       }
     });
@@ -333,7 +344,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
         this.cdr.markForCheck();
       },
       error: (error) => {
-        console.error('Failed to load category recipes:', error);
+        console.error(RECIPE_MESSAGES.ERROR_LOAD_RECIPES, error);
         this.uiStateService.setLoading(false);
       }
     });
@@ -356,16 +367,14 @@ export class RecipesComponent implements OnInit, OnDestroy {
           this.recipeTOC = this.recipeTocService.generateRecipeTOCStructure();
           // Reset scroll state
           this.uiStateService.resetScrollState();
-          // Re-observe all sections after recipe loads
-          this.observeAllSections();
-          // Handle initial URL hash if present
-          this.recipeNavigationService.handleInitialHash();
+          // Mark that observers need setup (will be done in ngAfterViewInit)
+          this.needsObserverSetup = true;
         }
 
         this.cdr.markForCheck();
       },
       error: (error) => {
-        console.error('Failed to load recipe details:', error);
+        console.error(RECIPE_MESSAGES.ERROR_LOAD_RECIPE, error);
         this.uiStateService.setLoading(false);
       }
     });
@@ -386,10 +395,8 @@ export class RecipesComponent implements OnInit, OnDestroy {
         this.recipeTocService.setCurrentRecipe(this.currentRecipe);
         this.recipeTOC = this.recipeTocService.generateRecipeTOCStructure();
         this.uiStateService.resetScrollState();
-        // Re-observe all sections after preview recipe loads
-        this.observeAllSections();
-        // Handle initial URL hash if present
-        this.recipeNavigationService.handleInitialHash();
+        // Mark that observers need setup (will be done in ngAfterViewInit)
+        this.needsObserverSetup = true;
 
         // Set initial timestamp in preview sync service
         this.previewSyncService.setCurrentTimestamp(previewData.timestamp);
@@ -414,8 +421,8 @@ export class RecipesComponent implements OnInit, OnDestroy {
     this.recipeTocService.setCurrentRecipe(this.currentRecipe);
     this.recipeTOC = this.recipeTocService.generateRecipeTOCStructure();
 
-    // Re-observe all sections after content update
-    this.observeAllSections();
+    // Mark that observers need setup (will be done in ngAfterViewInit)
+    this.needsObserverSetup = true;
 
     // Trigger change detection
     this.cdr.markForCheck();
@@ -467,7 +474,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
 
     // Reset to top section when navigating to a different recipe
     if (!isSameRecipe) {
-      this.uiStateService.setActiveSectionId('use-case');
+      this.uiStateService.setActiveSectionId('recipe-overview');
     }
 
   }
@@ -635,6 +642,14 @@ export class RecipesComponent implements OnInit, OnDestroy {
     return this.recipeTocService.getVisibleOverviewSections();
   }
 
+  /**
+   * Get all sections (overview + walkthrough) for unified rendering
+   * Used by the unified RecipeSectionComponent
+   */
+  getAllSectionsForRendering(): any[] {
+    return this.recipeTocService.getAllSectionsForRendering();
+  }
+
 
 
   /**
@@ -642,9 +657,9 @@ export class RecipesComponent implements OnInit, OnDestroy {
    */
   private observeAllSections(): void {
     // Get overview section element IDs
-    const overviewElementIds = this.getOverviewSectionsForTOC()
-      .map(section => section.elementId || '')
-      .filter(id => id.length > 0);
+    const overviewElementIds = this.recipeTocService.getOverviewSectionsForTOC()
+      .map((section: RecipeSection) => section.elementId || '')
+      .filter((id: string) => id.length > 0);
 
     // Get walkthrough step count
     const walkthroughStepCount = this.walkthroughStepsData.length;
@@ -653,33 +668,6 @@ export class RecipesComponent implements OnInit, OnDestroy {
     this.recipeNavigationService.observeAllSections(overviewElementIds, walkthroughStepCount);
   }
 
-  /**
-   * Get Overview sections for TOC display
-   */
-  getOverviewSectionsForTOC(): RecipeSection[] {
-    return this.recipeTocService.getOverviewSectionsForTOC();
-  }
-
-  /**
-   * Get Walkthrough sections for TOC display
-   */
-  getWalkthroughSectionsForTOC(): RecipeSection[] {
-    return this.recipeTocService.getWalkthroughSectionsForTOC();
-  }
-
-  /**
-   * Navigate to Overview section - Scroll to section anchor
-   */
-  navigateToOverviewSection(sectionId: string): void {
-    this.recipeNavigationService.navigateToOverviewSection(sectionId);
-  }
-
-  /**
-   * Navigate to Walkthrough section - Scroll to step anchor
-   */
-  navigateToWalkthroughSection(stepIndex: number): void {
-    this.recipeNavigationService.navigateToWalkthroughSection(stepIndex);
-  }
 
   /**
    * Listen for hash changes (back/forward navigation)

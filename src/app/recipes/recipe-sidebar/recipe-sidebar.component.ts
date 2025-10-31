@@ -1,6 +1,6 @@
 import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { RecipeCategory, RecipeNavigationState } from '../../shared/models/recipe.model';
-import { RecipeUIState } from '../../shared/services/recipe-ui-state.service';
+import { RecipeUIState } from '../services/recipe-ui-state.service';
 
 /**
  * Recipe Sidebar Component
