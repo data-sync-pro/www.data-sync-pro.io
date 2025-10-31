@@ -6,6 +6,7 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { AutoLinkService } from '../../../shared/services/auto-link.service';
 import { generateSlug } from '../../../shared/utils/slug.utils';
 import { RECIPE_CATEGORY_ORDER } from '../constants/recipe.constants';
+import { RecipeLoggerService } from './logger.service';
 
 import {
   SourceRecipeRecord,
@@ -96,7 +97,8 @@ export class RecipeService implements OnDestroy {
   constructor(
     private http: HttpClient,
     private sanitizer: DomSanitizer,
-    private autoLinkService: AutoLinkService
+    private autoLinkService: AutoLinkService,
+    private logger: RecipeLoggerService
   ) {
     this.initializeService();
     this.initializeIntersectionObserver();
@@ -141,7 +143,7 @@ export class RecipeService implements OnDestroy {
         this.saveToLocalStorage(recipes);
       },
       error: (error) => {
-        console.error('Failed to load recipes:', error);
+        this.logger.error('Failed to load recipes', error);
         this.recipesCache$.next([]);
       }
     });
@@ -185,7 +187,7 @@ export class RecipeService implements OnDestroy {
               return recipe;
             }),
             catchError(error => {
-              console.warn(`Failed to load recipe from folder ${recipeIndex.folderId}:`, error);
+              this.logger.warn(`Failed to load recipe from folder ${recipeIndex.folderId}`, error);
               return of(null);
             })
           )
@@ -196,7 +198,7 @@ export class RecipeService implements OnDestroy {
         );
       }),
       catchError(error => {
-        console.error('Failed to load recipe index:', error);
+        this.logger.error('Failed to load recipe index', error);
         return of([]);
       })
     );
@@ -716,7 +718,7 @@ export class RecipeService implements OnDestroy {
       };
       localStorage.setItem(this.STORAGE_KEY_RECIPE_CONTENT, JSON.stringify(cacheData));
     } catch (error) {
-      console.warn('Failed to save recipes to local storage:', error);
+      this.logger.warn('Failed to save recipes to local storage', error);
     }
   }
 
@@ -736,7 +738,7 @@ export class RecipeService implements OnDestroy {
         }
       }
     } catch (error) {
-      console.warn('Failed to load recipes from local storage:', error);
+      this.logger.warn('Failed to load recipes from local storage', error);
     }
   }
 

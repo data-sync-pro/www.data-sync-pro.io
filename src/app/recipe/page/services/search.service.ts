@@ -4,6 +4,7 @@ import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { RecipeItem, RecipeFilter, RecipeSearchState } from '../../core/models/recipe.model';
 import { RecipeService } from '../../core/services/recipe.service';
+import { RecipeLoggerService } from '../../core/services/logger.service';
 import { SelectedSuggestion } from '../search-overlay/search-overlay.component';
 
 /**
@@ -48,7 +49,8 @@ export class RecipeSearchService implements OnDestroy {
 
   constructor(
     private recipeService: RecipeService,
-    private router: Router
+    private router: Router,
+    private logger: RecipeLoggerService
   ) {}
 
   ngOnDestroy(): void {
@@ -121,7 +123,7 @@ export class RecipeSearchService implements OnDestroy {
           });
         },
         error: (error) => {
-          console.error('Search failed:', error);
+          this.logger.error('Search failed', error);
 
           // Update state with error
           this.updateSearchState({

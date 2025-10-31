@@ -22,6 +22,7 @@ import {
   RecipeSearchState
 } from '../core/models/recipe.model';
 import { RecipeService } from '../core/services/recipe.service';
+import { RecipeLoggerService } from '../core/services/logger.service';
 import { RecipeTocService } from './services/toc.service';
 import { RecipeNavigationService } from './services/navigation.service';
 import { RecipeUiStateService, RecipeUIState } from './services/ui-state.service';
@@ -107,7 +108,8 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
     private uiStateService: RecipeUiStateService,
     private previewSyncService: RecipePreviewSyncService,
     private routeHandlerService: RecipeRouteHandlerService,
-    private searchService: RecipeSearchService
+    private searchService: RecipeSearchService,
+    private logger: RecipeLoggerService
   ) {}
 
   ngOnInit(): void {
@@ -296,7 +298,7 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
         this.cdr.markForCheck();
       },
       error: (error) => {
-        console.error(RECIPE_MESSAGES.ERROR_LOAD_CATEGORIES, error);
+        this.logger.error(RECIPE_MESSAGES.ERROR_LOAD_CATEGORIES, error);
       }
     });
 
@@ -445,7 +447,7 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
    */
   downloadExecutable(url: string, title: string, originalFileName?: string): void {
     if (!url) {
-      console.error('Download URL is empty');
+      this.logger.error('Download URL is empty');
       return;
     }
 

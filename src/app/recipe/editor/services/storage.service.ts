@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { SourceRecipeRecord } from '../../core/models/recipe.model';
+import { RecipeLoggerService } from '../../core/services/logger.service';
 
 interface RecipeTab {
   id: string;
@@ -18,7 +19,7 @@ export class RecipeStorageService {
   private readonly TABS_KEY = this.STORAGE_KEY_PREFIX + 'tabs';
   private readonly EDITED_IDS_KEY = this.STORAGE_KEY_PREFIX + 'edited_ids';
   
-  constructor() {}
+  constructor(private logger: RecipeLoggerService) {}
   
   /**
    * Clean recipe object for storage/export by removing runtime properties
@@ -88,7 +89,7 @@ export class RecipeStorageService {
   saveRecipe(recipe: SourceRecipeRecord): boolean {
     try {
       if (!recipe.id) {
-        console.error('Recipe must have an ID to be saved');
+        this.logger.error('Recipe must have an ID to be saved');
         return false;
       }
       
@@ -114,7 +115,7 @@ export class RecipeStorageService {
       
       return true;
     } catch (error) {
-      console.error('Error saving recipe:', error);
+      this.logger.error('Error saving recipe:', error);
       return false;
     }
   }
@@ -127,7 +128,7 @@ export class RecipeStorageService {
       const editedRecipes = this.getAllEditedRecipes();
       return editedRecipes.find(r => r.id === recipeId) || null;
     } catch (error) {
-      console.error('Error getting edited recipe:', error);
+      this.logger.error('Error getting edited recipe:', error);
       return null;
     }
   }
@@ -143,7 +144,7 @@ export class RecipeStorageService {
       }
       return JSON.parse(data);
     } catch (error) {
-      console.error('Error getting all edited recipes:', error);
+      this.logger.error('Error getting all edited recipes:', error);
       return [];
     }
   }
@@ -159,7 +160,7 @@ export class RecipeStorageService {
       }
       return JSON.parse(data);
     } catch (error) {
-      console.error('Error getting edited recipe IDs:', error);
+      this.logger.error('Error getting edited recipe IDs:', error);
       return [];
     }
   }
@@ -189,7 +190,7 @@ export class RecipeStorageService {
       
       return true;
     } catch (error) {
-      console.error('Error deleting edited recipe:', error);
+      this.logger.error('Error deleting edited recipe:', error);
       return false;
     }
   }
@@ -211,7 +212,7 @@ export class RecipeStorageService {
       localStorage.setItem(this.TABS_KEY, JSON.stringify(tabsToSave));
       return true;
     } catch (error) {
-      console.error('Error saving tabs:', error);
+      this.logger.error('Error saving tabs:', error);
       return false;
     }
   }
@@ -227,7 +228,7 @@ export class RecipeStorageService {
       }
       return JSON.parse(data);
     } catch (error) {
-      console.error('Error getting saved tabs:', error);
+      this.logger.error('Error getting saved tabs:', error);
       return null;
     }
   }
@@ -258,7 +259,7 @@ export class RecipeStorageService {
       
       return true;
     } catch (error) {
-      console.error('Error clearing all data:', error);
+      this.logger.error('Error clearing all data:', error);
       return false;
     }
   }
@@ -290,7 +291,7 @@ export class RecipeStorageService {
         percentage: (totalSize / estimatedLimit) * 100
       };
     } catch (error) {
-      console.error('Error getting storage info:', error);
+      this.logger.error('Error getting storage info:', error);
       return { used: 0, available: 0, percentage: 0 };
     }
   }
@@ -328,7 +329,7 @@ export class RecipeStorageService {
       
       return true;
     } catch (error) {
-      console.error('Error importing recipes:', error);
+      this.logger.error('Error importing recipes:', error);
       return false;
     }
   }

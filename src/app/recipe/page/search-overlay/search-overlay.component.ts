@@ -12,6 +12,7 @@ import {
   ChangeDetectorRef,
 } from '@angular/core';
 import { RecipeService } from '../../core/services/recipe.service';
+import { RecipeLoggerService } from '../../core/services/logger.service';
 
 // Search-specific item structure for the overlay
 interface RecipeSearchItem {
@@ -55,7 +56,8 @@ export class RecipeSearchOverlayComponent implements OnInit, OnChanges {
 
   constructor(
     private cdr: ChangeDetectorRef,
-    private recipeService: RecipeService
+    private recipeService: RecipeService,
+    private logger: RecipeLoggerService
   ) {}
 
   ngOnInit() {
@@ -90,7 +92,7 @@ export class RecipeSearchOverlayComponent implements OnInit, OnChanges {
         this.cdr.detectChanges();
       },
       error: (error) => {
-        console.error('Error loading recipes:', error);
+        this.logger.error('Error loading recipes', error);
         this.loadError = true;
         this.isLoading = false;
         this.cdr.detectChanges();

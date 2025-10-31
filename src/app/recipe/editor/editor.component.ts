@@ -5,6 +5,7 @@ import { RecipeStorageService } from './services/storage.service';
 import { RecipeExportService } from '../core/services/export.service';
 import { RecipeFileStorageService } from './services/file-storage.service';
 import { RecipeService } from '../core/services/recipe.service';
+import { RecipeLoggerService } from '../core/services/logger.service';
 import { NotificationService } from '../../shared/services/notification.service';
 import { RecipePreviewService, RecipePreviewData } from '../core/services/preview.service';
 import { ClipboardUtil } from '../../shared/utils/clipboard.util';
@@ -320,7 +321,8 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
     private cdr: ChangeDetectorRef,
     private ngZone: NgZone,
     private renderer: Renderer2,
-    private previewService: RecipePreviewService
+    private previewService: RecipePreviewService,
+    private logger: RecipeLoggerService
   ) {}
   
   ngOnInit(): void {
@@ -463,7 +465,7 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
           });
         },
         error: (error) => {
-          console.error('Failed to load recipe active states:', error);
+          this.logger.error('Failed to load recipe active states', error);
         }
       });
   }
@@ -643,7 +645,7 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
           this.loadAllImagesForRecipe(sourceRecipe);
         },
         error: (error) => {
-          console.error('Error loading recipe:', error);
+          this.logger.error('Error loading recipe:', error);
           this.notificationService.error('Failed to load recipe');
           this.state.isLoading = false;
         }
@@ -691,7 +693,7 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
           const newId = this.generateUUID();
           this.currentRecipe.id = newId;
 
-          console.log(`Recipe ID updated from "${oldId}" to "${newId}" due to title change`);
+          this.logger.debug(`Recipe ID updated from "${oldId}" to "${newId}" due to title change`);
         }
 
         // Update previous title for next comparison
@@ -879,17 +881,17 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
       
       // Generate displayUrl immediately for instant preview
       try {
-        console.log(`Attempting to generate displayUrl for baseName: ${baseName}`);
+        this.logger.debug(`Attempting to generate displayUrl for baseName: ${baseName}`);
         const imageFile = await this.fileStorageService.getImage(baseName);
         if (imageFile) {
           const displayUrl = URL.createObjectURL(imageFile);
           (media as any).displayUrl = displayUrl;
-          console.log(`Successfully generated displayUrl: ${displayUrl} for baseName: ${baseName}`);
+          this.logger.debug(`Successfully generated displayUrl: ${displayUrl} for baseName: ${baseName}`);
         } else {
-          console.warn(`No image file found for baseName: ${baseName}`);
+          this.logger.warn(`No image file found for baseName: ${baseName}`);
         }
       } catch (error) {
-        console.error('Failed to generate immediate displayUrl:', error);
+        this.logger.error('Failed to generate immediate displayUrl:', error);
       }
       
       this.currentRecipe.walkthrough[stepIndex].media.push(media);
@@ -900,7 +902,7 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
       // Trigger change detection to update UI
       this.cdr.detectChanges();
     } catch (error) {
-      console.error('Error uploading image:', error);
+      this.logger.error('Error uploading image:', error);
       this.notificationService.error('Failed to upload image');
     }
   }
@@ -1272,7 +1274,7 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
       
       this.notificationService.success(`JSON file uploaded: ${fileName}`);
     } catch (error) {
-      console.error('Error uploading JSON file:', error);
+      this.logger.error('Error uploading JSON file:', error);
       this.notificationService.error('Failed to upload JSON file');
     }
   }
@@ -1504,12 +1506,12 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
       
       // Report missing images
       if (missingImages.length > 0) {
-        console.warn(`Missing ${missingImages.length} images after import:`, missingImages);
+        this.logger.warn(`Missing ${missingImages.length} images after import:`, missingImages);
       } else {
-        console.log('All images are available after import');
+        this.logger.debug('All images are available after import');
       }
     } catch (error) {
-      console.error('Error checking missing images:', error);
+      this.logger.error('Error checking missing images:', error);
     }
   }
 
@@ -1590,7 +1592,7 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
       target.value = '';
       
     } catch (error) {
-      console.error('Error replacing missing image:', error);
+      this.logger.error('Error replacing missing image:', error);
       this.notificationService.error('Failed to replace image');
     }
   }
@@ -1635,7 +1637,7 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
       target.value = '';
       
     } catch (error) {
-      console.error('Error replacing missing general image:', error);
+      this.logger.error('Error replacing missing general image:', error);
       this.notificationService.error('Failed to replace image');
     }
   }
@@ -1688,17 +1690,17 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
       
       // Generate displayUrl immediately for instant preview
       try {
-        console.log(`Attempting to generate displayUrl for general image baseName: ${baseName}`);
+        this.logger.debug(`Attempting to generate displayUrl for general image baseName: ${baseName}`);
         const imageFile = await this.fileStorageService.getImage(baseName);
         if (imageFile) {
           const displayUrl = URL.createObjectURL(imageFile);
           (generalImage as any).displayUrl = displayUrl;
-          console.log(`Successfully generated displayUrl for general image: ${displayUrl}`);
+          this.logger.debug(`Successfully generated displayUrl for general image: ${displayUrl}`);
         } else {
-          console.warn(`No image file found for general image baseName: ${baseName}`);
+          this.logger.warn(`No image file found for general image baseName: ${baseName}`);
         }
       } catch (error) {
-        console.error('Failed to generate immediate displayUrl for general image:', error);
+        this.logger.error('Failed to generate immediate displayUrl for general image:', error);
       }
       
       if (!this.currentRecipe.generalImages) {
@@ -1713,7 +1715,7 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
       // Trigger change detection to update UI
       this.cdr.detectChanges();
     } catch (error) {
-      console.error('Error uploading general image:', error);
+      this.logger.error('Error uploading general image:', error);
       this.notificationService.error('Failed to upload general image');
     }
   }
@@ -1931,7 +1933,7 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
           );
         }
       } catch (error) {
-        console.error('Error importing ZIP:', error);
+        this.logger.error('Error importing ZIP:', error);
         this.notificationService.error('Failed to import ZIP file');
       } finally {
         this.state.isImporting = false;
@@ -2248,7 +2250,7 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
       
       return cleanRecipe;
     } catch (error) {
-      console.error('Error cleaning recipe for export:', error);
+      this.logger.error('Error cleaning recipe for export:', error);
       return recipe; // Return original if cleaning fails
     }
   }
@@ -2273,7 +2275,7 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
       // Ensure unique name within current recipe
       return this.ensureUniqueImageName(baseName, extension);
     } catch (error) {
-      console.error('Error generating image name:', error);
+      this.logger.error('Error generating image name:', error);
       return this.fallbackImageName();
     }
   }
@@ -2345,7 +2347,7 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
       // Ensure unique name within current recipe
       return this.ensureUniqueGeneralImageName(baseName, '');
     } catch (error) {
-      console.error('Error generating general image name:', error);
+      this.logger.error('Error generating general image name:', error);
       return 'general-image';
     }
   }
@@ -2398,11 +2400,11 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
       // Check if it's an assets path (static image)
       if (media.url.startsWith('assets/') || this.isAssetsImagePath(media.url)) {
         const assetsUrl = this.normalizeAssetsImageUrl(media.url);
-        console.log(`Loading assets image: ${assetsUrl}`);
+        this.logger.debug(`Loading assets image: ${assetsUrl}`);
         
         // For assets images, use the URL directly
         media.displayUrl = assetsUrl;
-        console.log(`Successfully loaded assets media image: ${assetsUrl}`);
+        this.logger.debug(`Successfully loaded assets media image: ${assetsUrl}`);
         this.cdr.detectChanges();
         return;
       }
@@ -2412,21 +2414,21 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
         const fileName = media.url.replace('images/', '');
         const imageKey = fileName.replace(/\.[^/.]+$/, ''); // Remove extension
         
-        console.log(`Loading image for media with key: ${imageKey}`);
+        this.logger.debug(`Loading image for media with key: ${imageKey}`);
         
         const imageFile = await this.fileStorageService.getImage(imageKey);
         
         if (imageFile) {
           const displayUrl = URL.createObjectURL(imageFile);
           media.displayUrl = displayUrl;
-          console.log(`Successfully loaded media image: ${displayUrl}`);
+          this.logger.debug(`Successfully loaded media image: ${displayUrl}`);
           this.cdr.detectChanges(); // Trigger change detection
         } else {
-          console.warn(`No image file found for media key: ${imageKey}`);
+          this.logger.warn(`No image file found for media key: ${imageKey}`);
         }
       }
     } catch (error) {
-      console.error('Error loading image for media:', error);
+      this.logger.error('Error loading image for media:', error);
     }
   }
   
@@ -2438,11 +2440,11 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
       // Check if it's an assets path (static image)
       if (image.url.startsWith('assets/') || this.isAssetsImagePath(image.url)) {
         const assetsUrl = this.normalizeAssetsImageUrl(image.url);
-        console.log(`Loading assets general image: ${assetsUrl}`);
+        this.logger.debug(`Loading assets general image: ${assetsUrl}`);
         
         // For assets images, use the URL directly
         image.displayUrl = assetsUrl;
-        console.log(`Successfully loaded assets general image: ${assetsUrl}`);
+        this.logger.debug(`Successfully loaded assets general image: ${assetsUrl}`);
         this.cdr.detectChanges();
         return;
       }
@@ -2452,21 +2454,21 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
         const fileName = image.url.replace('images/', '');
         const imageKey = fileName.replace(/\.[^/.]+$/, ''); // Remove extension
         
-        console.log(`Loading general image with key: ${imageKey}`);
+        this.logger.debug(`Loading general image with key: ${imageKey}`);
         
         const imageFile = await this.fileStorageService.getImage(imageKey);
         
         if (imageFile) {
           const displayUrl = URL.createObjectURL(imageFile);
           image.displayUrl = displayUrl;
-          console.log(`Successfully loaded general image: ${displayUrl}`);
+          this.logger.debug(`Successfully loaded general image: ${displayUrl}`);
           this.cdr.detectChanges(); // Trigger change detection
         } else {
-          console.warn(`No image file found for general image key: ${imageKey}`);
+          this.logger.warn(`No image file found for general image key: ${imageKey}`);
         }
       }
     } catch (error) {
-      console.error('Error loading image for general image:', error);
+      this.logger.error('Error loading image for general image:', error);
     }
   }
   
@@ -2474,7 +2476,7 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
   onImageError(event: Event): void {
     const img = event.target as HTMLImageElement;
     img.style.display = 'none';
-    console.warn('Failed to load image:', img.src);
+    this.logger.warn('Failed to load image:', img.src);
   }
 
   /**
@@ -2508,7 +2510,7 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
     const targetRecipe = recipe || this.currentRecipe;
     if (!targetRecipe) return;
 
-    console.log('Loading all images for recipe:', targetRecipe.title);
+    this.logger.debug('Loading all images for recipe:', targetRecipe.title);
 
     try {
       // Load walkthrough step media images
@@ -2533,12 +2535,12 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
         }
       }
 
-      console.log('All images loaded for recipe:', targetRecipe.title);
+      this.logger.debug('All images loaded for recipe:', targetRecipe.title);
       
       // Trigger change detection to update UI
       this.cdr.detectChanges();
     } catch (error) {
-      console.error('Error loading all images for recipe:', error);
+      this.logger.error('Error loading all images for recipe:', error);
     }
   }
   
@@ -2585,9 +2587,9 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
                 
                 hasUpdates = true;
                 
-                console.log(`Updated image name: ${currentFileName} -> ${newFileName}`);
+                this.logger.debug(`Updated image name: ${currentFileName} -> ${newFileName}`);
               } catch (error) {
-                console.error('Error updating image name:', error);
+                this.logger.error('Error updating image name:', error);
               }
             }
           }
@@ -2599,7 +2601,7 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
         this.notificationService.success('Image names updated based on recipe content');
       }
     } catch (error) {
-      console.error('Error updating image names:', error);
+      this.logger.error('Error updating image names:', error);
     }
   }
   

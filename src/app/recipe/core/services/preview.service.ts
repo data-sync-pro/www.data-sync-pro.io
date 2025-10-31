@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { RecipeExportService } from './export.service';
 import { SourceRecipeRecord } from '../models/recipe.model';
+import { RecipeLoggerService } from './logger.service';
 
 export interface RecipePreviewData {
   recipeId: string;
@@ -17,7 +18,8 @@ export class RecipePreviewService {
   private readonly PREVIEW_KEY_PREFIX = 'recipe-preview-';
   
   constructor(
-    private exportService: RecipeExportService
+    private exportService: RecipeExportService,
+    private logger: RecipeLoggerService
   ) {}
 
   /**
@@ -50,7 +52,7 @@ export class RecipePreviewService {
     try {
       return JSON.parse(storedData) as RecipePreviewData;
     } catch (error) {
-      console.error('Error parsing recipe preview data:', error);
+      this.logger.error('Error parsing recipe preview data', error);
       return null;
     }
   }
@@ -103,7 +105,7 @@ export class RecipePreviewService {
         return { success: false, url };
       }
     } catch (error) {
-      console.error('Error opening recipe preview window:', error);
+      this.logger.error('Error opening recipe preview window', error);
       return { success: false, url };
     }
   }
@@ -120,21 +122,21 @@ export class RecipePreviewService {
       timestamp: Date.now()
     };
     const dataString = JSON.stringify(updatedData);
-    
-    console.log('📤 Updating recipe preview data for:', data.recipeId, 'at', new Date().toLocaleTimeString());
-    
+
+    this.logger.debug(`Updating recipe preview data for: ${data.recipeId}`, { timestamp: new Date().toLocaleTimeString() });
+
     // Method 1: Direct sessionStorage update (triggers real storage events)
     // First remove the key, then set it to ensure the storage event fires
     sessionStorage.removeItem(storageKey);
     sessionStorage.setItem(storageKey, dataString);
-    
-    console.log('✅ Recipe preview data saved to sessionStorage');
-    
+
+    this.logger.debug('Recipe preview data saved to sessionStorage');
+
     // Method 2: Also try localStorage as backup (some browsers handle this better for cross-tab)
     const backupKey = `backup-${storageKey}`;
     localStorage.removeItem(backupKey);
     localStorage.setItem(backupKey, dataString);
-    
-    console.log('💾 Recipe preview backup saved to localStorage');
+
+    this.logger.debug('Recipe preview backup saved to localStorage');
   }
 }

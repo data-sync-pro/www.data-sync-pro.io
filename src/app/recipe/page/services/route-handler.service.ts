@@ -8,6 +8,7 @@ import { RecipeUiStateService } from './ui-state.service';
 import { RecipePreviewSyncService } from './preview-sync.service';
 import { RecipeTocService } from './toc.service';
 import { RecipePreviewService } from '../../core/services/preview.service';
+import { RecipeLoggerService } from '../../core/services/logger.service';
 import { RECIPE_MESSAGES } from '../../core/constants/recipe.constants';
 
 /**
@@ -58,7 +59,8 @@ export class RecipeRouteHandlerService implements OnDestroy {
     private uiStateService: RecipeUiStateService,
     private previewSyncService: RecipePreviewSyncService,
     private recipeTocService: RecipeTocService,
-    private previewService: RecipePreviewService
+    private previewService: RecipePreviewService,
+    private logger: RecipeLoggerService
   ) {
     // Initialize total count cache
     this.initializeTotalCount();
@@ -276,7 +278,7 @@ export class RecipeRouteHandlerService implements OnDestroy {
         this.cachedTotalCount = recipes.length;
       },
       error: (error) => {
-        console.error('Error initializing total recipe count:', error);
+        this.logger.error('Error initializing total recipe count', error);
         this.cachedTotalCount = 0;
       }
     });
@@ -307,7 +309,7 @@ export class RecipeRouteHandlerService implements OnDestroy {
   }
 
   private handleLoadError(error: any, message: string): void {
-    console.error(message, error);
+    this.logger.error(message, error);
     this.uiStateService.setLoading(false);
   }
 

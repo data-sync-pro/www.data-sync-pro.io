@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { RecipeLoggerService } from '../../core/services/logger.service';
 
 interface StoredImage {
   id: string;
@@ -33,7 +34,7 @@ export class RecipeFileStorageService {
   private readonly TIME_MINUTES_PER_HOUR = 60;
   private readonly TIME_HOURS_PER_DAY = 24;
 
-  constructor() {}
+  constructor(private logger: RecipeLoggerService) {}
 
   /**
    * Generic database operation wrapper
@@ -73,7 +74,7 @@ export class RecipeFileStorageService {
       const request = indexedDB.open(this.dbName, 2);
       
       request.onerror = () => {
-        console.error('Failed to open IndexedDB:', request.error);
+        this.logger.error('Failed to open IndexedDB:', request.error);
         reject(request.error);
       };
       
@@ -87,14 +88,14 @@ export class RecipeFileStorageService {
         const oldVersion = event.oldVersion;
         const newVersion = event.newVersion;
         
-        console.log(`Upgrading IndexedDB from version ${oldVersion} to ${newVersion}`);
+        this.logger.debug(`Upgrading IndexedDB from version ${oldVersion} to ${newVersion}`);
         
         // Version 1: Create images store (for new installations or upgrades from version 0)
         if (oldVersion < 1) {
           if (!db.objectStoreNames.contains(this.imageStoreName)) {
             const store = db.createObjectStore(this.imageStoreName, { keyPath: 'id' });
             store.createIndex('timestamp', 'timestamp', { unique: false });
-            console.log('Created images object store');
+            this.logger.debug('Created images object store');
           }
         }
         
@@ -103,7 +104,7 @@ export class RecipeFileStorageService {
           if (!db.objectStoreNames.contains(this.jsonStoreName)) {
             const store = db.createObjectStore(this.jsonStoreName, { keyPath: 'id' });
             store.createIndex('timestamp', 'timestamp', { unique: false });
-            console.log('Created JSON files object store');
+            this.logger.debug('Created JSON files object store');
           }
         }
       };
@@ -128,7 +129,7 @@ export class RecipeFileStorageService {
       (store) => store.put(imageData)
     );
 
-    console.log(`Image stored successfully: ${id}`);
+    this.logger.debug(`Image stored successfully: ${id}`);
     return id;
   }
   
@@ -156,10 +157,10 @@ export class RecipeFileStorageService {
         (store) => store.delete(id)
       );
 
-      console.log(`Image deleted successfully: ${id}`);
+      this.logger.debug(`Image deleted successfully: ${id}`);
       return true;
     } catch (error) {
-      console.error(`Failed to delete image ${id}:`, error);
+      this.logger.error(`Failed to delete image ${id}:`, error);
       return false;
     }
   }
@@ -197,10 +198,10 @@ export class RecipeFileStorageService {
         (store) => store.clear()
       );
 
-      console.log('All images cleared successfully');
+      this.logger.debug('All images cleared successfully');
       return true;
     } catch (error) {
-      console.error('Failed to clear all images:', error);
+      this.logger.error('Failed to clear all images:', error);
       return false;
     }
   }
@@ -222,7 +223,7 @@ export class RecipeFileStorageService {
         count: images.length
       };
     } catch (error) {
-      console.error('Error getting storage info:', error);
+      this.logger.error('Error getting storage info:', error);
       return { used: 0, count: 0 };
     }
   }
@@ -259,7 +260,7 @@ export class RecipeFileStorageService {
       }
       return null;
     } catch (error) {
-      console.error('Error getting image preview URL:', error);
+      this.logger.error('Error getting image preview URL:', error);
       return null;
     }
   }
@@ -298,13 +299,13 @@ export class RecipeFileStorageService {
           deletedCount++;
           cursor.continue();
         } else {
-          console.log(`Cleaned up ${deletedCount} old images`);
+          this.logger.debug(`Cleaned up ${deletedCount} old images`);
           resolve(deletedCount);
         }
       };
       
       request.onerror = () => {
-        console.error('Failed to cleanup old images:', request.error);
+        this.logger.error('Failed to cleanup old images:', request.error);
         reject(request.error);
       };
     });
@@ -374,7 +375,7 @@ export class RecipeFileStorageService {
       (store) => store.put(jsonData)
     );
 
-    console.log(`JSON file stored successfully: ${id}`);
+    this.logger.debug(`JSON file stored successfully: ${id}`);
     return id;
   }
   
@@ -402,10 +403,10 @@ export class RecipeFileStorageService {
         (store) => store.delete(id)
       );
 
-      console.log(`JSON file deleted successfully: ${id}`);
+      this.logger.debug(`JSON file deleted successfully: ${id}`);
       return true;
     } catch (error) {
-      console.error(`Failed to delete JSON file ${id}:`, error);
+      this.logger.error(`Failed to delete JSON file ${id}:`, error);
       return false;
     }
   }
@@ -458,10 +459,10 @@ export class RecipeFileStorageService {
         (store) => store.clear()
       );
 
-      console.log('All JSON files cleared successfully');
+      this.logger.debug('All JSON files cleared successfully');
       return true;
     } catch (error) {
-      console.error('Failed to clear all JSON files:', error);
+      this.logger.error('Failed to clear all JSON files:', error);
       return false;
     }
   }

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Subject, Observable } from 'rxjs';
 import { RecipePreviewService, RecipePreviewData } from '../../core/services/preview.service';
+import { RecipeLoggerService } from '../../core/services/logger.service';
 import { RecipeItem } from '../../core/models/recipe.model';
 
 /**
@@ -28,7 +29,8 @@ export class RecipePreviewSyncService {
   private currentTimestamp: number = 0;
 
   constructor(
-    private previewService: RecipePreviewService
+    private previewService: RecipePreviewService,
+    private logger: RecipeLoggerService
   ) {}
 
   // ==================== Event Observables ====================
@@ -74,7 +76,7 @@ export class RecipePreviewSyncService {
           const previewData = JSON.parse(event.newValue) as RecipePreviewData;
           this.handlePreviewUpdate(previewData);
         } catch (error) {
-          console.error('❌ Error parsing recipe preview update data:', error);
+          this.logger.error('Error parsing recipe preview update data', error);
         }
       }
     };

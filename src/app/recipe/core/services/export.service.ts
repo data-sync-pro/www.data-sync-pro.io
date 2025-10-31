@@ -4,8 +4,35 @@ import { SourceRecipeRecord } from '../models/recipe.model';
 import { RecipeFileStorageService } from '../../editor/services/file-storage.service';
 import { RecipeStorageService } from '../../editor/services/storage.service';
 import { NotificationService } from '../../../shared/services/notification.service';
+import { RecipeLoggerService } from './logger.service';
 import { firstValueFrom } from 'rxjs';
 import JSZip from 'jszip';
+
+/**
+ * Extended SourceRecipeRecord with runtime metadata
+ * Used during export to track the actual folder ID (which may differ from recipe.id)
+ */
+export interface SourceRecipeRecordWithMetadata extends SourceRecipeRecord {
+  __folderId?: string;
+}
+
+/**
+ * Recipe index file structure (for bulk imports/exports)
+ * Contains metadata about multiple recipes
+ */
+export interface RecipeIndexFile {
+  recipes: RecipeIndexEntry[];
+}
+
+/**
+ * Individual recipe entry in index file
+ */
+export interface RecipeIndexEntry {
+  folderId: string;
+  active: boolean;
+  title?: string;
+  category?: string;
+}
 
 export interface ExportProgress {
   step: string;
@@ -22,7 +49,8 @@ export class RecipeExportService {
   constructor(
     private http: HttpClient,
     private notificationService: NotificationService,
-    private storageService: RecipeStorageService
+    private storageService: RecipeStorageService,
+    private logger: RecipeLoggerService
   ) {}
   
   /**
@@ -42,7 +70,7 @@ export class RecipeExportService {
       
       return file;
     } catch (error) {
-      console.warn(`Failed to fetch original file ${filePath}:`, error);
+      this.logger.warn(`Failed to fetch original file ${filePath}`, error);
       return null;
     }
   }
@@ -50,10 +78,10 @@ export class RecipeExportService {
   /**
    * Get the actual folder ID for a recipe (handling ID vs folder name mismatch)
    */
-  private getFolderIdForRecipe(recipe: SourceRecipeRecord): string {
+  private getFolderIdForRecipe(recipe: SourceRecipeRecordWithMetadata): string {
     // Check if recipe has the stored folder ID
-    if ((recipe as any).__folderId) {
-      return (recipe as any).__folderId;
+    if (recipe.__folderId) {
+      return recipe.__folderId;
     }
     
     // Map known problematic recipe IDs to correct folder names
@@ -68,9 +96,9 @@ export class RecipeExportService {
    * Get file with fallback: try IndexedDB first, then original file path
    */
   private async getFileWithFallback(
-    fileStorage: RecipeFileStorageService, 
-    imageId: string, 
-    recipe: SourceRecipeRecord,
+    fileStorage: RecipeFileStorageService,
+    imageId: string,
+    recipe: SourceRecipeRecordWithMetadata,
     relativePath: string,
     isImage: boolean = true
   ): Promise<File | null> {
@@ -91,7 +119,7 @@ export class RecipeExportService {
       // Fallback to original file from assets
       return await this.fetchOriginalFile(originalPath);
     } catch (error) {
-      console.warn(`Failed to get file ${imageId} / ${relativePath}:`, error);
+      this.logger.warn(`Failed to get file ${imageId} / ${relativePath}`, error);
       return null;
     }
   }
@@ -111,7 +139,7 @@ export class RecipeExportService {
       this.downloadBlob(blob, filename);
       this.notificationService.success(`Recipe exported: ${filename}`);
     } catch (error) {
-      console.error('Error exporting single recipe:', error);
+      this.logger.error('Error exporting single recipe', error);
       this.notificationService.error('Failed to export recipe');
     }
   }
@@ -206,7 +234,7 @@ export class RecipeExportService {
                       imagesFolder.file(imageName, imageFile);
                     }
                   } catch (error) {
-                    console.warn(`Failed to add image ${media.url}:`, error);
+                    this.logger.warn(`Failed to add image ${media.url}`, error);
                   }
                 }
               }
@@ -237,7 +265,7 @@ export class RecipeExportService {
                   imagesFolder.file(imageName, imageFile);
                 }
               } catch (error) {
-                console.warn(`Failed to add general image ${image.url}:`, error);
+                this.logger.warn(`Failed to add general image ${image.url}`, error);
               }
             }
           }
@@ -266,7 +294,7 @@ export class RecipeExportService {
                   executablesFolder.file(fileName, jsonFile);
                 }
               } catch (error) {
-                console.warn(`Failed to add JSON file ${executable.filePath}:`, error);
+                this.logger.warn(`Failed to add JSON file ${executable.filePath}`, error);
               }
             }
           }
@@ -301,9 +329,9 @@ export class RecipeExportService {
       this.downloadBlob(zipBlob, filename);
       const totalRecipesInIndex = allRecipesForIndex ? allRecipesForIndex.length : recipes.length;
       this.notificationService.success(`${recipes.length} edited recipes exported as ZIP with index.json containing ${totalRecipesInIndex} total recipes`);
-      
+
     } catch (error) {
-      console.error('Error exporting recipes as ZIP:', error);
+      this.logger.error('Error exporting recipes as ZIP', error);
       this.notificationService.error('Failed to export recipes as ZIP');
     }
   }
@@ -336,7 +364,7 @@ export class RecipeExportService {
       this.downloadBlob(blob, filename);
       this.notificationService.success(`${recipes.length} recipes exported as JSON with index`);
     } catch (error) {
-      console.error('Error exporting recipes as JSON:', error);
+      this.logger.error('Error exporting recipes as JSON', error);
       this.notificationService.error('Failed to export recipes as JSON');
     }
   }
@@ -361,7 +389,7 @@ export class RecipeExportService {
             resolve(null);
           }
         } catch (error) {
-          console.error('Error parsing recipe JSON:', error);
+          this.logger.error('Error parsing recipe JSON', error);
           this.notificationService.error('Failed to parse recipe file');
           resolve(null);
         }
@@ -392,12 +420,12 @@ export class RecipeExportService {
           
           // Handle structured export data with index
           if (data.metadata && data.recipes && data.index) {
-            console.log('Importing structured recipe export with index');
+            this.logger.debug('Importing structured recipe export with index');
             recipes = data.recipes;
-            
+
             // Optionally validate index consistency
             if (data.index.recipes) {
-              console.log(`Index contains ${data.index.recipes.length} recipes`);
+              this.logger.debug(`Index contains ${data.index.recipes.length} recipes`);
             }
           } 
           // Handle simple array of recipes (legacy)
@@ -421,11 +449,11 @@ export class RecipeExportService {
             if (validRecipes.length < recipes.length) {
               this.notificationService.warning(`${recipes.length - validRecipes.length} invalid recipes skipped`);
             }
-            console.log(`Successfully imported ${validRecipes.length} recipes`);
+            this.logger.debug(`Successfully imported ${validRecipes.length} recipes`);
             resolve(validRecipes);
           }
         } catch (error) {
-          console.error('Error parsing recipes JSON:', error);
+          this.logger.error('Error parsing recipes JSON', error);
           this.notificationService.error('Failed to parse recipes file');
           resolve(null);
         }
@@ -452,15 +480,15 @@ export class RecipeExportService {
     const requiredFields = ['title', 'category'];
     for (const field of requiredFields) {
       if (!recipe.hasOwnProperty(field) || !recipe[field]) {
-        console.warn(`Recipe missing required field: ${field}`);
+        this.logger.warn(`Recipe missing required field: ${field}`);
         return false;
       }
     }
-    
+
     // Check category is valid
     const validCategories = ['Batch', 'Triggers', 'Data List', 'Action Button', 'Data Loader'];
     if (!validCategories.includes(recipe.category)) {
-      console.warn(`Invalid category: ${recipe.category}`);
+      this.logger.warn(`Invalid category: ${recipe.category}`);
       return false;
     }
     
@@ -470,16 +498,16 @@ export class RecipeExportService {
       if (!recipe.hasOwnProperty(field)) {
         recipe[field] = [];
       } else if (!Array.isArray(recipe[field])) {
-        console.warn(`Field ${field} should be an array`);
+        this.logger.warn(`Field ${field} should be an array`);
         return false;
       }
     }
-    
+
     // Validate walkthrough structure
     if (recipe.walkthrough) {
       for (const step of recipe.walkthrough) {
         if (!step.step || !Array.isArray(step.config) || !Array.isArray(step.media)) {
-          console.warn('Invalid walkthrough step structure');
+          this.logger.warn('Invalid walkthrough step structure');
           return false;
         }
       }
@@ -502,22 +530,22 @@ export class RecipeExportService {
         throw new Error('JSZip library not available');
       }
       
-      console.log('Starting ZIP import for file:', file.name);
-      
+      this.logger.debug('Starting ZIP import for file', { fileName: file.name });
+
       // Read and extract ZIP file
       const zip = new JSZip();
       const zipContent = await zip.loadAsync(file);
-      
+
       // Check for index.json first
-      let recipeIndex: any = null;
+      let recipeIndex: RecipeIndexFile | null = null;
       const indexFile = zipContent.file('index.json');
       if (indexFile) {
         try {
           const indexContent = await indexFile.async('string');
-          recipeIndex = JSON.parse(indexContent);
-          console.log('Found index.json with recipe metadata:', recipeIndex);
+          recipeIndex = JSON.parse(indexContent) as RecipeIndexFile;
+          this.logger.debug('Found index.json with recipe metadata', recipeIndex);
         } catch (error) {
-          console.warn('Failed to parse index.json:', error);
+          this.logger.warn('Failed to parse index.json', error);
         }
       }
       
@@ -551,25 +579,25 @@ export class RecipeExportService {
           // Get recipe.json file
           const recipeJsonFile = zipContent.file(`${folder}/recipe.json`);
           if (!recipeJsonFile) {
-            console.warn(`No recipe.json found in folder: ${folder}`);
+            this.logger.warn(`No recipe.json found in folder: ${folder}`);
             continue;
           }
-          
+
           // Parse recipe JSON
           const recipeJsonContent = await recipeJsonFile.async('string');
           const recipe = JSON.parse(recipeJsonContent) as SourceRecipeRecord;
-          
+
           // Validate recipe
           if (!this.validateRecipe(recipe)) {
-            console.warn(`Invalid recipe in folder: ${folder}`);
+            this.logger.warn(`Invalid recipe in folder: ${folder}`);
             continue;
           }
 
           // If we have index metadata, use it to validate/enhance the recipe
           if (recipeIndex && recipeIndex.recipes) {
-            const indexEntry = recipeIndex.recipes.find((entry: any) => entry.folderId === folder);
+            const indexEntry = recipeIndex.recipes.find((entry: RecipeIndexEntry) => entry.folderId === folder);
             if (indexEntry && !indexEntry.active) {
-              console.log(`Skipping inactive recipe: ${folder}`);
+              this.logger.debug(`Skipping inactive recipe: ${folder}`);
               continue;
             }
           }
@@ -595,9 +623,9 @@ export class RecipeExportService {
                   
                   // Store image in IndexedDB
                   await fileStorage.storeImage(imageId, imageFileObj);
-                  console.log(`Stored image: ${imageName}`);
+                  this.logger.debug(`Stored image: ${imageName}`);
                 } catch (error) {
-                  console.warn(`Failed to import image: ${imagePath}`, error);
+                  this.logger.warn(`Failed to import image: ${imagePath}`, error);
                 }
               }
             }
@@ -621,9 +649,9 @@ export class RecipeExportService {
                   
                   // Store JSON file in IndexedDB
                   await fileStorage.storeJsonFile(fileName, jsonFileObj);
-                  console.log(`Stored JSON file: ${fileName}`);
+                  this.logger.debug(`Stored JSON file: ${fileName}`);
                 } catch (error) {
-                  console.warn(`Failed to import JSON file: ${jsonPath}`, error);
+                  this.logger.warn(`Failed to import JSON file: ${jsonPath}`, error);
                 }
               }
             }
@@ -631,10 +659,10 @@ export class RecipeExportService {
           
           // Add to imported recipes
           importedRecipes.push(recipe);
-          console.log(`Successfully imported recipe: ${recipe.title}`);
-          
+          this.logger.debug(`Successfully imported recipe: ${recipe.title}`);
+
         } catch (error) {
-          console.error(`Error processing folder ${folder}:`, error);
+          this.logger.error(`Error processing folder ${folder}`, error);
         }
       }
       
@@ -655,9 +683,9 @@ export class RecipeExportService {
       }
       
       return importedRecipes;
-      
+
     } catch (error) {
-      console.error('Error importing from ZIP:', error);
+      this.logger.error('Error importing from ZIP', error);
       this.notificationService.error('Failed to import from ZIP file');
       return [];
     }
@@ -755,7 +783,7 @@ export class RecipeExportService {
   /**
    * Generate recipe index for ZIP export - based on actual recipes being exported
    */
-  private async generateRecipeIndex(recipes: SourceRecipeRecord[]): Promise<any> {
+  private async generateRecipeIndex(recipes: SourceRecipeRecord[]): Promise<RecipeIndexFile> {
     const validRecipes = recipes.filter(recipe => recipe.id && recipe.title);
     const existingFolders = new Set<string>();
 
