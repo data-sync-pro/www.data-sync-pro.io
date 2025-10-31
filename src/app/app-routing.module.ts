@@ -9,12 +9,12 @@ import { FaqEditorComponent } from './faq-editor/faq-editor.component';
 
 const routes: Routes = [
   {
-    path: 'recipes',loadChildren: () => import('./recipes/recipes.module').then(m => m.RecipesModule)
+    path: 'recipes',loadChildren: () => import('./recipe/page/page.module').then(m => m.RecipePageModule)
   },
   { path: 'faq-editor', component: FaqEditorComponent },
-  { 
-    path: 'recipe-editor', 
-    loadChildren: () => import('./recipe-editor/recipe-editor.module').then(m => m.RecipeEditorModule)
+  {
+    path: 'recipe-editor',
+    loadChildren: () => import('./recipe/editor/editor.module').then(m => m.RecipeEditorModule)
   },
   //{ path: 'pricing', component: PricingComponent },
   //{ path: 'home', component: HomeComponent },
