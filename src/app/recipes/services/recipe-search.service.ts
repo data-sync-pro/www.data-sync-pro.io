@@ -57,6 +57,18 @@ export class RecipeSearchService implements OnDestroy {
   }
 
   /**
+   * Update search state with partial updates
+   * Helper method to avoid repeating isOverlayOpen preservation logic
+   */
+  private updateSearchState(updates: Partial<RecipeSearchState>): void {
+    const currentState = this.searchState$.value;
+    this.searchState$.next({
+      ...currentState,
+      ...updates
+    });
+  }
+
+  /**
    * Get search state as observable
    */
   getSearchState(): Observable<RecipeSearchState> {
@@ -88,21 +100,17 @@ export class RecipeSearchService implements OnDestroy {
    * Search recipes
    */
   searchRecipes(query: string, currentFilter: RecipeFilter, allRecipes: RecipeItem[]): void {
-    const trimmedQuery = query.trim();
-    const isActive = trimmedQuery.length > 0;
-
-    if (isActive) {
+    if (query.trim().length > 0) {
       this.recipeService.searchRecipes(query, currentFilter).pipe(
         takeUntil(this.destroy$)
       ).subscribe({
         next: (results) => {
           // Update search state
-          this.searchState$.next({
+          this.updateSearchState({
             query: query,
             isActive: true,
             results: results,
-            hasResults: results.length > 0,
-            isOverlayOpen: this.searchState$.value.isOverlayOpen
+            hasResults: results.length > 0
           });
 
           // Emit search result event
@@ -116,23 +124,21 @@ export class RecipeSearchService implements OnDestroy {
           console.error('Search failed:', error);
 
           // Update state with error
-          this.searchState$.next({
+          this.updateSearchState({
             query: query,
             isActive: true,
             results: [],
-            hasResults: false,
-            isOverlayOpen: this.searchState$.value.isOverlayOpen
+            hasResults: false
           });
         }
       });
     } else {
       // Clear search
-      this.searchState$.next({
+      this.updateSearchState({
         query: '',
         isActive: false,
         results: [],
-        hasResults: true,
-        isOverlayOpen: this.searchState$.value.isOverlayOpen
+        hasResults: true
       });
 
       // Emit search result event with all recipes
@@ -148,12 +154,11 @@ export class RecipeSearchService implements OnDestroy {
    * Clear search
    */
   clearSearch(allRecipes: RecipeItem[]): void {
-    this.searchState$.next({
+    this.updateSearchState({
       query: '',
       isActive: false,
       results: [],
-      hasResults: true,
-      isOverlayOpen: this.searchState$.value.isOverlayOpen
+      hasResults: true
     });
 
     // Emit search result event with all recipes

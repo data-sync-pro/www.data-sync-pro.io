@@ -5,8 +5,7 @@ import { RecipeFileStorageService } from './recipe-file-storage.service';
 import { RecipeStorageService } from './recipe-storage.service';
 import { NotificationService } from '../../shared/services/notification.service';
 import { firstValueFrom } from 'rxjs';
-
-declare const JSZip: any;
+import JSZip from 'jszip';
 
 export interface ExportProgress {
   step: string;

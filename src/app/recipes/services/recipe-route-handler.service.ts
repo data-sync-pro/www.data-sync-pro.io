@@ -131,12 +131,9 @@ export class RecipeRouteHandlerService implements OnDestroy {
    * Load all recipes for home view
    */
   private loadAllRecipes(): void {
-    this.uiStateService.setLoading(true);
-
-    this.recipeService.getRecipes().pipe(
-      takeUntil(this.destroy$)
-    ).subscribe({
-      next: (recipes) => {
+    this.loadWithErrorHandling(
+      this.recipeService.getRecipes(),
+      (recipes) => {
         // Cache total count for use in other views
         this.cachedTotalCount = recipes.length;
 
@@ -150,23 +147,18 @@ export class RecipeRouteHandlerService implements OnDestroy {
           needsObserverSetup: false,
           totalRecipeCount: recipes.length
         });
-
-        this.uiStateService.setLoading(false);
       },
-      error: (error) => this.handleLoadError(error, RECIPE_MESSAGES.ERROR_LOAD_RECIPES)
-    });
+      RECIPE_MESSAGES.ERROR_LOAD_RECIPES
+    );
   }
 
   /**
    * Load recipes for specific category
    */
   private loadCategoryRecipes(category: string): void {
-    this.uiStateService.setLoading(true);
-
-    this.recipeService.getRecipesByCategory(category).pipe(
-      takeUntil(this.destroy$)
-    ).subscribe({
-      next: (recipes) => {
+    this.loadWithErrorHandling(
+      this.recipeService.getRecipesByCategory(category),
+      (recipes) => {
         const sortedRecipes = this.recipeService.sortRecipesByCategoryAndTitle(recipes);
 
         this.dataLoaded$.next({
@@ -177,25 +169,18 @@ export class RecipeRouteHandlerService implements OnDestroy {
           needsObserverSetup: false,
           totalRecipeCount: this.cachedTotalCount  // Use cached total count
         });
-
-        this.uiStateService.setLoading(false);
       },
-      error: (error) => this.handleLoadError(error, RECIPE_MESSAGES.ERROR_LOAD_RECIPES)
-    });
+      RECIPE_MESSAGES.ERROR_LOAD_RECIPES
+    );
   }
 
   /**
    * Load specific recipe details by slug
    */
   private loadRecipeDetails(category: string, recipeSlug: string): void {
-    this.uiStateService.setLoading(true);
-
-    this.recipeService.getRecipe(category, recipeSlug).pipe(
-      takeUntil(this.destroy$)
-    ).subscribe({
-      next: (recipe) => {
-        this.uiStateService.setLoading(false);
-
+    this.loadWithErrorHandling(
+      this.recipeService.getRecipe(category, recipeSlug),
+      (recipe) => {
         if (recipe) {
           // Generate TOC structure for the loaded recipe
           this.recipeTocService.setCurrentRecipe(recipe);
@@ -223,8 +208,8 @@ export class RecipeRouteHandlerService implements OnDestroy {
           });
         }
       },
-      error: (error) => this.handleLoadError(error, RECIPE_MESSAGES.ERROR_LOAD_RECIPE)
-    });
+      RECIPE_MESSAGES.ERROR_LOAD_RECIPE
+    );
   }
 
   /**
@@ -300,33 +285,30 @@ export class RecipeRouteHandlerService implements OnDestroy {
   // ==================== Helper Methods ====================
 
   /**
-   * Handle data loading errors
-   * Centralized error handling for all data loading operations
+   * Generic loading wrapper to reduce code duplication
+   * Handles loading state and error handling consistently
    */
+  private loadWithErrorHandling<T>(
+    observable$: Observable<T>,
+    processFn: (data: T) => void,
+    errorMessage: string
+  ): void {
+    this.uiStateService.setLoading(true);
+
+    observable$.pipe(
+      takeUntil(this.destroy$)
+    ).subscribe({
+      next: (data) => {
+        processFn(data);
+        this.uiStateService.setLoading(false);
+      },
+      error: (error) => this.handleLoadError(error, errorMessage)
+    });
+  }
+
   private handleLoadError(error: any, message: string): void {
     console.error(message, error);
     this.uiStateService.setLoading(false);
-  }
-
-  /**
-   * Create RecipeLoadResult object
-   * Factory method to ensure consistent creation with cached total count
-   */
-  private createLoadResult(
-    currentRecipe: RecipeItem | null,
-    recipeTOC: RecipeTOCStructure,
-    recipes: RecipeItem[] = [],
-    filteredRecipes: RecipeItem[] = [],
-    needsObserverSetup: boolean = false
-  ): RecipeLoadResult {
-    return {
-      currentRecipe,
-      recipeTOC,
-      recipes,
-      filteredRecipes,
-      needsObserverSetup,
-      totalRecipeCount: this.cachedTotalCount
-    };
   }
 
   // ==================== Navigation Methods ====================

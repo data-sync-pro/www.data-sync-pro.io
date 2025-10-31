@@ -28,6 +28,11 @@ export interface NavigationEvent {
 })
 export class RecipeNavigationService {
 
+  // Section ID constants
+  private readonly SECTION_ID_PREFIX = 'recipe-';
+  private readonly STEP_ID_PREFIX = 'step-';
+  private readonly SECTION_SELECTOR = '[id^="recipe-"], [id^="step-"]';
+
   // Observable for navigation events
   private navigationEvent$ = new Subject<NavigationEvent>();
   private navigationEvents$?: Observable<NavigationEvent>;
@@ -143,7 +148,7 @@ export class RecipeNavigationService {
     // Collect all element IDs
     const allElementIds: string[] = [...overviewElementIds];
     for (let i = 0; i < walkthroughStepCount; i++) {
-      allElementIds.push(`step-${i}`);
+      allElementIds.push(`${this.STEP_ID_PREFIX}${i}`);
     }
 
     // Use requestAnimationFrame for optimal timing after DOM render
@@ -159,14 +164,14 @@ export class RecipeNavigationService {
 
       // Observe Walkthrough steps
       for (let i = 0; i < walkthroughStepCount; i++) {
-        const element = document.getElementById(`step-${i}`);
+        const element = document.getElementById(`${this.STEP_ID_PREFIX}${i}`);
         if (element) {
           this.sectionObserver?.observe(element);
         }
       }
 
       // Cache all sections for DOM order queries (performance optimization)
-      this.cachedSections = Array.from(document.querySelectorAll('[id^="recipe-"], [id^="step-"]'));
+      this.cachedSections = Array.from(document.querySelectorAll(this.SECTION_SELECTOR));
 
       // Manual initial section detection
       this.detectInitialVisibleSection(allElementIds);
@@ -176,6 +181,21 @@ export class RecipeNavigationService {
   // ============================================================================
   // STATE MANAGEMENT - Track Active Section and Visibility
   // ============================================================================
+
+  /**
+   * Calculate observation area boundaries
+   * Returns the top and bottom Y coordinates of the viewport observation area
+   */
+  private calculateObservationBoundaries(): { observeTop: number; observeBottom: number } {
+    const headerOffset = INTERSECTION_CONFIG.HEADER_OFFSET;
+    const bottomMargin = INTERSECTION_CONFIG.BOTTOM_MARGIN;
+    const viewportHeight = window.innerHeight;
+
+    return {
+      observeTop: window.scrollY + headerOffset,
+      observeBottom: window.scrollY + viewportHeight - bottomMargin
+    };
+  }
 
   /**
    * Update active section for TOC highlighting
@@ -198,13 +218,8 @@ export class RecipeNavigationService {
    * Uses visibility-based detection (same logic as IntersectionObserver) instead of distance
    */
   private detectInitialVisibleSection(elementIds: string[]): void {
-    const headerOffset = INTERSECTION_CONFIG.HEADER_OFFSET;
-    const bottomMargin = INTERSECTION_CONFIG.BOTTOM_MARGIN;
-    const viewportHeight = window.innerHeight;
-
     // Calculate the observation area (same as IntersectionObserver rootMargin)
-    const observeTop = window.scrollY + headerOffset;
-    const observeBottom = window.scrollY + viewportHeight - bottomMargin;
+    const { observeTop, observeBottom } = this.calculateObservationBoundaries();
 
     let bestSection: { id: string; visibleRatio: number } | null = null;
 
@@ -252,15 +267,14 @@ export class RecipeNavigationService {
     }
 
     // Use cached sections instead of querying DOM every time
-    const allSections = this.cachedSections.length > 0
-      ? this.cachedSections
-      : Array.from(document.querySelectorAll('[id^="recipe-"], [id^="step-"]'));
+    // If cache is empty, query DOM and update cache
+    if (this.cachedSections.length === 0) {
+      this.cachedSections = Array.from(document.querySelectorAll(this.SECTION_SELECTOR));
+    }
+    const allSections = this.cachedSections;
 
-    const headerOffset = INTERSECTION_CONFIG.HEADER_OFFSET;
-    const bottomMargin = INTERSECTION_CONFIG.BOTTOM_MARGIN;
-    const viewportHeight = window.innerHeight;
-    const observeTop = window.scrollY + headerOffset;
-    const observeBottom = window.scrollY + viewportHeight - bottomMargin;
+    // Calculate observation boundaries
+    const { observeTop, observeBottom } = this.calculateObservationBoundaries();
 
     let bestSection: { id: string; visibleRatio: number; index: number } | null = null;
 
@@ -311,7 +325,7 @@ export class RecipeNavigationService {
    * Navigate to Walkthrough section - Scroll to step anchor
    */
   navigateToWalkthroughSection(stepIndex: number): void {
-    this.scrollToSection(`step-${stepIndex}`);
+    this.scrollToSection(`${this.STEP_ID_PREFIX}${stepIndex}`);
   }
 
   /**

@@ -17,7 +17,9 @@ import {
   RecipeProgress,
   RecipeEvent,
   RecipeCategoryType,
-  LegacyRecipeWalkthrough
+  LegacyRecipeWalkthrough,
+  RecipeWalkthroughStep,
+  RecipeExecutable
 } from '../../shared/models/recipe.model';
 
 /**
@@ -32,6 +34,16 @@ interface RecipeIndexItem {
   name: string;
   category: string;
   active: boolean;
+}
+
+/**
+ * Extended SourceRecipeRecord with runtime metadata
+ * Includes properties added during data loading and proper typing for legacy format
+ */
+interface SourceRecipeRecordWithMetadata extends Omit<SourceRecipeRecord, 'walkthrough'> {
+  __folderId?: string;
+  walkthrough: RecipeWalkthroughStep[] | LegacyRecipeWalkthrough;
+  downloadableExecutable?: RecipeExecutable;
 }
 
 @Injectable({
@@ -154,7 +166,7 @@ export class RecipeService implements OnDestroy {
   /**
    * Load recipes from individual folders using dynamic discovery
    */
-  private loadFolderRecipes(): Observable<SourceRecipeRecord[]> {
+  private loadFolderRecipes(): Observable<SourceRecipeRecordWithMetadata[]> {
     // First, load the recipe index to get available recipe folders
     return this.http.get<RecipeIndexConfig>(this.RECIPE_INDEX_URL).pipe(
       map(indexConfig => indexConfig.recipes.filter(item => item.active)),
@@ -163,12 +175,12 @@ export class RecipeService implements OnDestroy {
           return of([]);
         }
 
-        const recipeRequests = activeRecipes.map(recipeIndex => 
-          this.http.get<SourceRecipeRecord>(`${this.RECIPE_FOLDERS_BASE}${recipeIndex.folderId}/recipe.json`).pipe(
+        const recipeRequests = activeRecipes.map(recipeIndex =>
+          this.http.get<SourceRecipeRecordWithMetadata>(`${this.RECIPE_FOLDERS_BASE}${recipeIndex.folderId}/recipe.json`).pipe(
             map(recipe => {
               // Add the actual folder ID to the recipe object for correct path resolution
               if (recipe) {
-                (recipe as any).__folderId = recipeIndex.folderId;
+                recipe.__folderId = recipeIndex.folderId;
               }
               return recipe;
             }),
@@ -180,7 +192,7 @@ export class RecipeService implements OnDestroy {
         );
 
         return combineLatest(recipeRequests).pipe(
-          map(recipes => recipes.filter(recipe => recipe !== null) as SourceRecipeRecord[])
+          map(recipes => recipes.filter(recipe => recipe !== null) as SourceRecipeRecordWithMetadata[])
         );
       }),
       catchError(error => {
@@ -193,7 +205,7 @@ export class RecipeService implements OnDestroy {
   /**
    * Transform source recipe records to application format
    */
-  private transformRecipeRecords(records: SourceRecipeRecord[]): RecipeItem[] {
+  private transformRecipeRecords(records: SourceRecipeRecordWithMetadata[]): RecipeItem[] {
     return records.map(record => this.transformSingleRecord(record));
   }
 
@@ -237,124 +249,144 @@ export class RecipeService implements OnDestroy {
   }
 
   /**
+   * Check if record is in new format
+   */
+  private isNewFormat(record: SourceRecipeRecordWithMetadata): boolean {
+    return Array.isArray(record.walkthrough) &&
+           !!(record.overview || record.usecase) &&
+           Array.isArray(record.prerequisites);
+  }
+
+  /**
    * Transform a single record to handle both new and legacy formats
    */
-  private transformSingleRecord(record: SourceRecipeRecord): RecipeItem {
-    // Check if this is a new format record (based on walkthrough being an array)
-    if (Array.isArray(record.walkthrough) && (record.overview || record.usecase) && Array.isArray(record.prerequisites)) {
-      // Use the actual folder ID for image paths, fallback to record.id if not available
-      const folderId = (record as any).__folderId || record.id;
-      
-      return {
-        // New format fields
-        id: record.id,
-        title: record.title,
-        slug: generateSlug(record.title),
-        category: record.category,
-        DSPVersions: record.DSPVersions || [],
-        overview: record.overview || record.usecase || '',
-        safeOverview: this.sanitizer.bypassSecurityTrustHtml(
-          this.autoLinkService.applyAutoLinkTerms(record.overview || record.usecase || '')
-        ),
-        whenToUse: record.whenToUse || '',
-        safeWhenToUse: record.whenToUse ? this.sanitizer.bypassSecurityTrustHtml(
-          this.autoLinkService.applyAutoLinkTerms(record.whenToUse)
-        ) : undefined,
-        generalImages: record.generalImages || [],
-        prerequisites: record.prerequisites || [],
-        direction: record.direction || '',
-        safeDirection: record.direction ? this.sanitizer.bypassSecurityTrustHtml(
-          this.autoLinkService.applyAutoLinkTerms(record.direction)
-        ) : this.sanitizer.bypassSecurityTrustHtml(''),
-        connection: record.connection || '',
-        walkthrough: this.processWalkthroughImagePaths(record.walkthrough || [], folderId),
-        downloadableExecutables: this.processDownloadableExecutables(record.downloadableExecutables || [], folderId),
-        relatedRecipes: record.relatedRecipes || [],
-        keywords: record.keywords || [],
-        
-        // Legacy compatibility fields
-        usecase: record.usecase || record.overview || '',
-        safeUsecase: this.sanitizer.bypassSecurityTrustHtml(
-          this.autoLinkService.applyAutoLinkTerms(record.usecase || record.overview || '')
-        ),
-        
-        // Legacy compatibility fields
-        name: record.name,
-        description: record.description,
-        useCase: record.useCase,
-        safeUseCase: record.useCase ? this.sanitizer.bypassSecurityTrustHtml(
-          this.autoLinkService.applyAutoLinkTerms(record.useCase)
-        ) : undefined,
-        tags: record.tags,
-        lastUpdated: record.lastUpdated ? new Date(record.lastUpdated) : undefined,
-        author: record.author,
-        seqNo: record.seqNo,
-        
-        // Runtime properties
-        isExpanded: false,
-        isLoading: false,
-        viewCount: 0,
-        currentStep: 0,
-        completedSteps: [],
-        showSocialShare: false
-      };
-    } else {
-      // Legacy format - maintain backward compatibility
-      return {
-        // Required new format fields (with defaults)
-        id: record.id,
-        title: record.title,
-        slug: generateSlug(record.title),
-        category: record.category,
-        DSPVersions: [],
-        overview: record.useCase || record.description || '',
-        safeOverview: this.sanitizer.bypassSecurityTrustHtml(
-          this.autoLinkService.applyAutoLinkTerms(record.useCase || record.description || '')
-        ),
-        whenToUse: '',
-        safeWhenToUse: undefined,
-        generalImages: [],
-        prerequisites: record.prerequisites as any || [],
-        direction: '',
-        safeDirection: this.sanitizer.bypassSecurityTrustHtml(''),
-        connection: '',
-        walkthrough: [],
-        downloadableExecutables: (record as any).downloadableExecutable ? [{
-          title: (record as any).downloadableExecutable.description || (record as any).downloadableExecutable.fileName,
-          url: (record as any).downloadableExecutable.filePath
-        }] : [],
-        relatedRecipes: [],
-        keywords: record.tags || [],
-        
-        // Legacy compatibility fields
-        usecase: record.useCase || record.description || '',
-        safeUsecase: this.sanitizer.bypassSecurityTrustHtml(
-          this.autoLinkService.applyAutoLinkTerms(record.useCase || record.description || '')
-        ),
-        
-        // Legacy fields
-        name: record.name,
-        description: record.description,
-        useCase: record.useCase,
-        safeUseCase: record.useCase ? this.sanitizer.bypassSecurityTrustHtml(
-          this.autoLinkService.applyAutoLinkTerms(record.useCase)
-        ) : undefined,
-        legacyWalkthrough: record.walkthrough as any as LegacyRecipeWalkthrough,
-        downloadableExecutable: (record as any).downloadableExecutable,
-        tags: record.tags,
-        lastUpdated: new Date(record.lastUpdated || Date.now()),
-        author: record.author,
-        seqNo: record.seqNo,
-        
-        // Runtime properties
-        isExpanded: false,
-        isLoading: false,
-        viewCount: 0,
-        currentStep: 0,
-        completedSteps: [],
-        showSocialShare: false
-      };
-    }
+  private transformSingleRecord(record: SourceRecipeRecordWithMetadata): RecipeItem {
+    return this.isNewFormat(record)
+      ? this.transformNewFormatRecord(record)
+      : this.transformLegacyRecord(record);
+  }
+
+  /**
+   * Transform new format record
+   */
+  private transformNewFormatRecord(record: SourceRecipeRecordWithMetadata): RecipeItem {
+    // Use the actual folder ID for image paths, fallback to record.id if not available
+    const folderId = record.__folderId || record.id;
+
+    return {
+      // New format fields
+      id: record.id,
+      title: record.title,
+      slug: generateSlug(record.title),
+      category: record.category,
+      DSPVersions: record.DSPVersions || [],
+      overview: record.overview || record.usecase || '',
+      safeOverview: this.sanitizer.bypassSecurityTrustHtml(
+        this.autoLinkService.applyAutoLinkTerms(record.overview || record.usecase || '')
+      ),
+      whenToUse: record.whenToUse || '',
+      safeWhenToUse: record.whenToUse ? this.sanitizer.bypassSecurityTrustHtml(
+        this.autoLinkService.applyAutoLinkTerms(record.whenToUse)
+      ) : undefined,
+      generalImages: record.generalImages || [],
+      prerequisites: record.prerequisites || [],
+      direction: record.direction || '',
+      safeDirection: record.direction ? this.sanitizer.bypassSecurityTrustHtml(
+        this.autoLinkService.applyAutoLinkTerms(record.direction)
+      ) : this.sanitizer.bypassSecurityTrustHtml(''),
+      connection: record.connection || '',
+      walkthrough: this.processWalkthroughImagePaths((record.walkthrough as RecipeWalkthroughStep[]) || [], folderId),
+      downloadableExecutables: this.processDownloadableExecutables(record.downloadableExecutables || [], folderId),
+      relatedRecipes: record.relatedRecipes || [],
+      keywords: record.keywords || [],
+
+      // Legacy compatibility fields
+      usecase: record.usecase || record.overview || '',
+      safeUsecase: this.sanitizer.bypassSecurityTrustHtml(
+        this.autoLinkService.applyAutoLinkTerms(record.usecase || record.overview || '')
+      ),
+
+      // Legacy compatibility fields
+      name: record.name,
+      description: record.description,
+      useCase: record.useCase,
+      safeUseCase: record.useCase ? this.sanitizer.bypassSecurityTrustHtml(
+        this.autoLinkService.applyAutoLinkTerms(record.useCase)
+      ) : undefined,
+      tags: record.tags,
+      lastUpdated: record.lastUpdated ? new Date(record.lastUpdated) : undefined,
+      author: record.author,
+      seqNo: record.seqNo,
+
+      // Runtime properties
+      isExpanded: false,
+      isLoading: false,
+      viewCount: 0,
+      currentStep: 0,
+      completedSteps: [],
+      showSocialShare: false
+    };
+  }
+
+  /**
+   * Transform legacy format record
+   */
+  private transformLegacyRecord(record: SourceRecipeRecordWithMetadata): RecipeItem {
+    // Legacy format - maintain backward compatibility
+    return {
+      // Required new format fields (with defaults)
+      id: record.id,
+      title: record.title,
+      slug: generateSlug(record.title),
+      category: record.category,
+      DSPVersions: [],
+      overview: record.useCase || record.description || '',
+      safeOverview: this.sanitizer.bypassSecurityTrustHtml(
+        this.autoLinkService.applyAutoLinkTerms(record.useCase || record.description || '')
+      ),
+      whenToUse: '',
+      safeWhenToUse: undefined,
+      generalImages: [],
+      prerequisites: Array.isArray(record.prerequisites) ? record.prerequisites : [],
+      direction: '',
+      safeDirection: this.sanitizer.bypassSecurityTrustHtml(''),
+      connection: '',
+      walkthrough: [],
+      downloadableExecutables: record.downloadableExecutable ? [{
+        title: record.downloadableExecutable.description || record.downloadableExecutable.fileName,
+        url: record.downloadableExecutable.filePath
+      }] : [],
+      relatedRecipes: [],
+      keywords: record.tags || [],
+
+      // Legacy compatibility fields
+      usecase: record.useCase || record.description || '',
+      safeUsecase: this.sanitizer.bypassSecurityTrustHtml(
+        this.autoLinkService.applyAutoLinkTerms(record.useCase || record.description || '')
+      ),
+
+      // Legacy fields
+      name: record.name,
+      description: record.description,
+      useCase: record.useCase,
+      safeUseCase: record.useCase ? this.sanitizer.bypassSecurityTrustHtml(
+        this.autoLinkService.applyAutoLinkTerms(record.useCase)
+      ) : undefined,
+      legacyWalkthrough: record.walkthrough as LegacyRecipeWalkthrough,
+      downloadableExecutable: record.downloadableExecutable,
+      tags: record.tags,
+      lastUpdated: new Date(record.lastUpdated || Date.now()),
+      author: record.author,
+      seqNo: record.seqNo,
+
+      // Runtime properties
+      isExpanded: false,
+      isLoading: false,
+      viewCount: 0,
+      currentStep: 0,
+      completedSteps: [],
+      showSocialShare: false
+    };
   }
 
   /**
@@ -637,8 +669,8 @@ export class RecipeService implements OnDestroy {
    * Track recipe events
    */
   trackRecipeEvent(event: RecipeEvent): void {
-    // Implementation for analytics tracking
-    console.log('Recipe event tracked:', event);
+    // TODO: Implement analytics tracking
+    // Reserved for future analytics integration
   }
 
   /**

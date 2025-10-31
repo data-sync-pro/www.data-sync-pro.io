@@ -3,10 +3,55 @@ import { SectionConfig } from '../services/recipe-toc.service';
 import { ClipboardUtil } from '../../shared/utils/clipboard.util';
 
 /**
- * Section configuration with data loaded for rendering
- * Data is any type as it varies by content type
+ * Media item (image, video, etc.)
  */
-export type SectionWithData = SectionConfig & { data: any };
+export interface MediaItem {
+  url: string;
+  type: string;
+  alt?: string;
+}
+
+/**
+ * Configuration field
+ */
+export interface ConfigField {
+  field: string;
+  value: unknown;
+}
+
+/**
+ * Quick link
+ */
+export interface QuickLink {
+  url: string;
+  title: string;
+}
+
+/**
+ * Prerequisite item
+ */
+export interface PrerequisiteItem {
+  description: string;
+  quickLinks?: QuickLink[];
+}
+
+/**
+ * Section data structure
+ */
+export interface SectionData {
+  media?: MediaItem[];
+  config?: ConfigField[];
+  tags?: string[];
+  downloads?: { url: string; title: string; fileName: string }[];
+  relatedLinks?: QuickLink[];
+  quickLinks?: QuickLink[];
+  prerequisites?: PrerequisiteItem[];
+}
+
+/**
+ * Section configuration with data loaded for rendering
+ */
+export type SectionWithData = SectionConfig & { data: SectionData };
 
 /**
  * Unified Recipe Section Component
@@ -70,8 +115,9 @@ export class RecipeSectionComponent {
 
   /**
    * Cast helper for template type assertions
+   * Returns any to allow template iterations on dynamic data
    */
-  asAny(value: any): any {
+  asAny(value: unknown): any {
     return value;
   }
 
@@ -87,7 +133,7 @@ export class RecipeSectionComponent {
    * Check if a value represents true (case-insensitive)
    * Used for walkthrough config boolean fields
    */
-  isTrueValue(value: any): boolean {
+  isTrueValue(value: unknown): boolean {
     if (typeof value === 'boolean') {
       return value;
     }
@@ -111,7 +157,7 @@ export class RecipeSectionComponent {
    * TrackBy function for objects with URL property
    * Used for downloads, related links, and quick links
    */
-  trackByUrl(index: number, item: any): string | number {
+  trackByUrl(index: number, item: QuickLink | { url: string }): string | number {
     return item?.url || index;
   }
 
@@ -119,7 +165,7 @@ export class RecipeSectionComponent {
    * TrackBy function for prerequisites
    * Uses description as unique identifier
    */
-  trackByDescription(index: number, item: any): string | number {
+  trackByDescription(index: number, item: PrerequisiteItem): string | number {
     return item?.description || index;
   }
 
@@ -127,7 +173,7 @@ export class RecipeSectionComponent {
    * TrackBy function for media items (walkthrough steps)
    * Uses URL as unique identifier
    */
-  trackByMediaUrl(index: number, media: any): string | number {
+  trackByMediaUrl(index: number, media: MediaItem): string | number {
     return media?.url || index;
   }
 
@@ -135,7 +181,7 @@ export class RecipeSectionComponent {
    * TrackBy function for config fields (walkthrough steps)
    * Uses field name as unique identifier
    */
-  trackByConfigField(index: number, config: any): string | number {
+  trackByConfigField(index: number, config: ConfigField): string | number {
     return config?.field || index;
   }
 }

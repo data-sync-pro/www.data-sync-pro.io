@@ -21,9 +21,46 @@ export class RecipeFileStorageService {
   private jsonStoreName = 'jsonFiles';
   private db: IDBDatabase | null = null;
   private initPromise: Promise<IDBDatabase> | null = null;
-  
+
+  // Constants
+  private readonly RANDOM_STRING_LENGTH = 9;
+  private readonly RANDOM_STRING_RADIX = 36;
+  private readonly MAX_FILE_SIZE_MB = 5;
+  private readonly MAX_FILE_SIZE_BYTES = this.MAX_FILE_SIZE_MB * 1024 * 1024;
+  private readonly DEFAULT_CLEANUP_DAYS = 30;
+  private readonly TIME_MS_PER_SECOND = 1000;
+  private readonly TIME_SECONDS_PER_MINUTE = 60;
+  private readonly TIME_MINUTES_PER_HOUR = 60;
+  private readonly TIME_HOURS_PER_DAY = 24;
+
   constructor() {}
-  
+
+  /**
+   * Generic database operation wrapper
+   * Reduces code duplication by handling common DB transaction patterns
+   */
+  private async performDbOperation<T>(
+    storeName: string,
+    mode: IDBTransactionMode,
+    operation: (store: IDBObjectStore) => IDBRequest<T>
+  ): Promise<T> {
+    await this.init();
+
+    return new Promise((resolve, reject) => {
+      if (!this.db) {
+        reject(new Error('Database not initialized'));
+        return;
+      }
+
+      const transaction = this.db.transaction([storeName], mode);
+      const store = transaction.objectStore(storeName);
+      const request = operation(store);
+
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+  }
+
   /**
    * Initialize IndexedDB
    */
@@ -79,173 +116,93 @@ export class RecipeFileStorageService {
    * Store an image file
    */
   async storeImage(id: string, file: File): Promise<string> {
-    await this.init();
-    
-    return new Promise((resolve, reject) => {
-      if (!this.db) {
-        reject(new Error('Database not initialized'));
-        return;
-      }
-      
-      const transaction = this.db.transaction([this.imageStoreName], 'readwrite');
-      const store = transaction.objectStore(this.imageStoreName);
-      
-      const imageData: StoredImage = {
-        id,
-        file,
-        timestamp: Date.now()
-      };
-      
-      const request = store.put(imageData);
-      
-      request.onsuccess = () => {
-        console.log(`Image stored successfully: ${id}`);
-        resolve(id);
-      };
-      
-      request.onerror = () => {
-        console.error(`Failed to store image ${id}:`, request.error);
-        reject(request.error);
-      };
-    });
+    const imageData: StoredImage = {
+      id,
+      file,
+      timestamp: Date.now()
+    };
+
+    await this.performDbOperation(
+      this.imageStoreName,
+      'readwrite',
+      (store) => store.put(imageData)
+    );
+
+    console.log(`Image stored successfully: ${id}`);
+    return id;
   }
   
   /**
    * Get an image file
    */
   async getImage(id: string): Promise<File | null> {
-    await this.init();
-    
-    return new Promise((resolve, reject) => {
-      if (!this.db) {
-        reject(new Error('Database not initialized'));
-        return;
-      }
-      
-      const transaction = this.db.transaction([this.imageStoreName], 'readonly');
-      const store = transaction.objectStore(this.imageStoreName);
-      const request = store.get(id);
-      
-      request.onsuccess = () => {
-        const result = request.result as StoredImage;
-        resolve(result ? result.file : null);
-      };
-      
-      request.onerror = () => {
-        console.error(`Failed to get image ${id}:`, request.error);
-        reject(request.error);
-      };
-    });
+    const result = await this.performDbOperation<StoredImage>(
+      this.imageStoreName,
+      'readonly',
+      (store) => store.get(id)
+    );
+
+    return result ? result.file : null;
   }
   
   /**
    * Delete an image
    */
   async deleteImage(id: string): Promise<boolean> {
-    await this.init();
-    
-    return new Promise((resolve, reject) => {
-      if (!this.db) {
-        reject(new Error('Database not initialized'));
-        return;
-      }
-      
-      const transaction = this.db.transaction([this.imageStoreName], 'readwrite');
-      const store = transaction.objectStore(this.imageStoreName);
-      const request = store.delete(id);
-      
-      request.onsuccess = () => {
-        console.log(`Image deleted successfully: ${id}`);
-        resolve(true);
-      };
-      
-      request.onerror = () => {
-        console.error(`Failed to delete image ${id}:`, request.error);
-        resolve(false);
-      };
-    });
+    try {
+      await this.performDbOperation(
+        this.imageStoreName,
+        'readwrite',
+        (store) => store.delete(id)
+      );
+
+      console.log(`Image deleted successfully: ${id}`);
+      return true;
+    } catch (error) {
+      console.error(`Failed to delete image ${id}:`, error);
+      return false;
+    }
   }
   
   /**
    * Get all stored image IDs
    */
   async getAllImageIds(): Promise<string[]> {
-    await this.init();
-    
-    return new Promise((resolve, reject) => {
-      if (!this.db) {
-        reject(new Error('Database not initialized'));
-        return;
-      }
-      
-      const transaction = this.db.transaction([this.imageStoreName], 'readonly');
-      const store = transaction.objectStore(this.imageStoreName);
-      const request = store.getAllKeys();
-      
-      request.onsuccess = () => {
-        resolve(request.result as string[]);
-      };
-      
-      request.onerror = () => {
-        console.error('Failed to get all image IDs:', request.error);
-        reject(request.error);
-      };
-    });
+    return this.performDbOperation<string[]>(
+      this.imageStoreName,
+      'readonly',
+      (store) => store.getAllKeys() as IDBRequest<string[]>
+    );
   }
-  
+
   /**
    * Get all stored images
    */
   async getAllImages(): Promise<StoredImage[]> {
-    await this.init();
-    
-    return new Promise((resolve, reject) => {
-      if (!this.db) {
-        reject(new Error('Database not initialized'));
-        return;
-      }
-      
-      const transaction = this.db.transaction([this.imageStoreName], 'readonly');
-      const store = transaction.objectStore(this.imageStoreName);
-      const request = store.getAll();
-      
-      request.onsuccess = () => {
-        resolve(request.result as StoredImage[]);
-      };
-      
-      request.onerror = () => {
-        console.error('Failed to get all images:', request.error);
-        reject(request.error);
-      };
-    });
+    return this.performDbOperation<StoredImage[]>(
+      this.imageStoreName,
+      'readonly',
+      (store) => store.getAll()
+    );
   }
   
   /**
    * Clear all stored images
    */
   async clearAll(): Promise<boolean> {
-    await this.init();
-    
-    return new Promise((resolve, reject) => {
-      if (!this.db) {
-        reject(new Error('Database not initialized'));
-        return;
-      }
-      
-      const transaction = this.db.transaction([this.imageStoreName], 'readwrite');
-      const store = transaction.objectStore(this.imageStoreName);
-      const request = store.clear();
-      
-      request.onsuccess = () => {
-        console.log('All images cleared successfully');
-        resolve(true);
-      };
-      
-      request.onerror = () => {
-        console.error('Failed to clear all images:', request.error);
-        resolve(false);
-      };
-    });
+    try {
+      await this.performDbOperation(
+        this.imageStoreName,
+        'readwrite',
+        (store) => store.clear()
+      );
+
+      console.log('All images cleared successfully');
+      return true;
+    } catch (error) {
+      console.error('Failed to clear all images:', error);
+      return false;
+    }
   }
   
   /**
@@ -275,7 +232,7 @@ export class RecipeFileStorageService {
    */
   generateImageId(): string {
     const timestamp = Date.now();
-    const random = Math.random().toString(36).substr(2, 9);
+    const random = Math.random().toString(this.RANDOM_STRING_RADIX).substring(2, 2 + this.RANDOM_STRING_LENGTH);
     return `img_${timestamp}_${random}`;
   }
   
@@ -310,16 +267,22 @@ export class RecipeFileStorageService {
   /**
    * Cleanup old images (older than specified days)
    */
-  async cleanupOldImages(daysOld = 30): Promise<number> {
+  async cleanupOldImages(daysOld = this.DEFAULT_CLEANUP_DAYS): Promise<number> {
     await this.init();
-    
+
     return new Promise((resolve, reject) => {
       if (!this.db) {
         reject(new Error('Database not initialized'));
         return;
       }
-      
-      const cutoffTime = Date.now() - (daysOld * 24 * 60 * 60 * 1000);
+
+      const cutoffTime = Date.now() - (
+        daysOld *
+        this.TIME_HOURS_PER_DAY *
+        this.TIME_MINUTES_PER_HOUR *
+        this.TIME_SECONDS_PER_MINUTE *
+        this.TIME_MS_PER_SECOND
+      );
       const transaction = this.db.transaction([this.imageStoreName], 'readwrite');
       const store = transaction.objectStore(this.imageStoreName);
       const index = store.index('timestamp');
@@ -359,7 +322,7 @@ export class RecipeFileStorageService {
    * Get file size limit (in bytes)
    */
   getMaxFileSize(): number {
-    return 5 * 1024 * 1024; // 5MB
+    return this.MAX_FILE_SIZE_BYTES;
   }
   
   /**
@@ -399,145 +362,74 @@ export class RecipeFileStorageService {
    * Store a JSON file
    */
   async storeJsonFile(id: string, file: File): Promise<string> {
-    await this.init();
-    
-    return new Promise((resolve, reject) => {
-      if (!this.db) {
-        reject(new Error('Database not initialized'));
-        return;
-      }
-      
-      const transaction = this.db.transaction([this.jsonStoreName], 'readwrite');
-      const store = transaction.objectStore(this.jsonStoreName);
-      
-      const jsonData: StoredJsonFile = {
-        id,
-        file,
-        timestamp: Date.now()
-      };
-      
-      const request = store.put(jsonData);
-      
-      request.onsuccess = () => {
-        console.log(`JSON file stored successfully: ${id}`);
-        resolve(id);
-      };
-      
-      request.onerror = () => {
-        console.error(`Failed to store JSON file ${id}:`, request.error);
-        reject(request.error);
-      };
-    });
+    const jsonData: StoredJsonFile = {
+      id,
+      file,
+      timestamp: Date.now()
+    };
+
+    await this.performDbOperation(
+      this.jsonStoreName,
+      'readwrite',
+      (store) => store.put(jsonData)
+    );
+
+    console.log(`JSON file stored successfully: ${id}`);
+    return id;
   }
   
   /**
    * Get a JSON file
    */
   async getJsonFile(id: string): Promise<File | null> {
-    await this.init();
-    
-    return new Promise((resolve, reject) => {
-      if (!this.db) {
-        reject(new Error('Database not initialized'));
-        return;
-      }
-      
-      const transaction = this.db.transaction([this.jsonStoreName], 'readonly');
-      const store = transaction.objectStore(this.jsonStoreName);
-      const request = store.get(id);
-      
-      request.onsuccess = () => {
-        const result = request.result as StoredJsonFile;
-        resolve(result ? result.file : null);
-      };
-      
-      request.onerror = () => {
-        console.error(`Failed to get JSON file ${id}:`, request.error);
-        reject(request.error);
-      };
-    });
+    const result = await this.performDbOperation<StoredJsonFile>(
+      this.jsonStoreName,
+      'readonly',
+      (store) => store.get(id)
+    );
+
+    return result ? result.file : null;
   }
-  
+
   /**
    * Delete a JSON file
    */
   async deleteJsonFile(id: string): Promise<boolean> {
-    await this.init();
-    
-    return new Promise((resolve, reject) => {
-      if (!this.db) {
-        reject(new Error('Database not initialized'));
-        return;
-      }
-      
-      const transaction = this.db.transaction([this.jsonStoreName], 'readwrite');
-      const store = transaction.objectStore(this.jsonStoreName);
-      const request = store.delete(id);
-      
-      request.onsuccess = () => {
-        console.log(`JSON file deleted successfully: ${id}`);
-        resolve(true);
-      };
-      
-      request.onerror = () => {
-        console.error(`Failed to delete JSON file ${id}:`, request.error);
-        resolve(false);
-      };
-    });
+    try {
+      await this.performDbOperation(
+        this.jsonStoreName,
+        'readwrite',
+        (store) => store.delete(id)
+      );
+
+      console.log(`JSON file deleted successfully: ${id}`);
+      return true;
+    } catch (error) {
+      console.error(`Failed to delete JSON file ${id}:`, error);
+      return false;
+    }
   }
-  
+
   /**
    * Get all stored JSON file IDs
    */
   async getAllJsonFileIds(): Promise<string[]> {
-    await this.init();
-    
-    return new Promise((resolve, reject) => {
-      if (!this.db) {
-        reject(new Error('Database not initialized'));
-        return;
-      }
-      
-      const transaction = this.db.transaction([this.jsonStoreName], 'readonly');
-      const store = transaction.objectStore(this.jsonStoreName);
-      const request = store.getAllKeys();
-      
-      request.onsuccess = () => {
-        resolve(request.result as string[]);
-      };
-      
-      request.onerror = () => {
-        console.error('Failed to get all JSON file IDs:', request.error);
-        reject(request.error);
-      };
-    });
+    return this.performDbOperation<string[]>(
+      this.jsonStoreName,
+      'readonly',
+      (store) => store.getAllKeys() as IDBRequest<string[]>
+    );
   }
-  
+
   /**
    * Get all stored JSON files
    */
   async getAllJsonFiles(): Promise<StoredJsonFile[]> {
-    await this.init();
-    
-    return new Promise((resolve, reject) => {
-      if (!this.db) {
-        reject(new Error('Database not initialized'));
-        return;
-      }
-      
-      const transaction = this.db.transaction([this.jsonStoreName], 'readonly');
-      const store = transaction.objectStore(this.jsonStoreName);
-      const request = store.getAll();
-      
-      request.onsuccess = () => {
-        resolve(request.result as StoredJsonFile[]);
-      };
-      
-      request.onerror = () => {
-        console.error('Failed to get all JSON files:', request.error);
-        reject(request.error);
-      };
-    });
+    return this.performDbOperation<StoredJsonFile[]>(
+      this.jsonStoreName,
+      'readonly',
+      (store) => store.getAll()
+    );
   }
   
   /**
@@ -547,12 +439,11 @@ export class RecipeFileStorageService {
     if (!file.type.includes('json') && !file.name.toLowerCase().endsWith('.json')) {
       return { valid: false, error: 'Invalid file type. Only JSON files are allowed.' };
     }
-    
-    const maxSize = 5 * 1024 * 1024; // 5MB for JSON files
-    if (file.size > maxSize) {
-      return { valid: false, error: `File too large. Maximum size is ${this.formatFileSize(maxSize)}.` };
+
+    if (file.size > this.MAX_FILE_SIZE_BYTES) {
+      return { valid: false, error: `File too large. Maximum size is ${this.formatFileSize(this.MAX_FILE_SIZE_BYTES)}.` };
     }
-    
+
     return { valid: true };
   }
   
@@ -560,28 +451,19 @@ export class RecipeFileStorageService {
    * Clear all JSON files
    */
   async clearAllJsonFiles(): Promise<boolean> {
-    await this.init();
-    
-    return new Promise((resolve, reject) => {
-      if (!this.db) {
-        reject(new Error('Database not initialized'));
-        return;
-      }
-      
-      const transaction = this.db.transaction([this.jsonStoreName], 'readwrite');
-      const store = transaction.objectStore(this.jsonStoreName);
-      const request = store.clear();
-      
-      request.onsuccess = () => {
-        console.log('All JSON files cleared successfully');
-        resolve(true);
-      };
-      
-      request.onerror = () => {
-        console.error('Failed to clear all JSON files:', request.error);
-        resolve(false);
-      };
-    });
+    try {
+      await this.performDbOperation(
+        this.jsonStoreName,
+        'readwrite',
+        (store) => store.clear()
+      );
+
+      console.log('All JSON files cleared successfully');
+      return true;
+    } catch (error) {
+      console.error('Failed to clear all JSON files:', error);
+      return false;
+    }
   }
   
   /**

@@ -26,6 +26,9 @@ export interface RecipeUIState {
 })
 export class RecipeUiStateService {
 
+  // Storage keys
+  private readonly STORAGE_KEY_SIDEBAR_COLLAPSED = 'recipe-sidebar-collapsed';
+
   // Initial state
   private readonly initialState: RecipeUIState = {
     isLoading: false,
@@ -186,7 +189,7 @@ export class RecipeUiStateService {
   private loadSidebarStateFromStorage(): void {
     if (typeof localStorage === 'undefined') return;
 
-    const savedState = localStorage.getItem('recipe-sidebar-collapsed');
+    const savedState = localStorage.getItem(this.STORAGE_KEY_SIDEBAR_COLLAPSED);
     if (savedState !== null) {
       this.updateState({ sidebarCollapsed: savedState === 'true' });
     }
@@ -197,7 +200,7 @@ export class RecipeUiStateService {
    */
   private saveSidebarStateToStorage(collapsed: boolean): void {
     if (typeof localStorage === 'undefined') return;
-    localStorage.setItem('recipe-sidebar-collapsed', collapsed.toString());
+    localStorage.setItem(this.STORAGE_KEY_SIDEBAR_COLLAPSED, collapsed.toString());
   }
 
   // ==================== Mobile Sidebar Management ====================
