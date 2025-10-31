@@ -177,24 +177,6 @@
   min-width: 0;
 }
 
-.suggestion-title {
-  font-weight: 600;
-  font-size: 1rem;
-  line-height: 1.3;
-  color: $color-text-primary;
-}
-
-.suggestion-overview {
-  font-size: 0.9rem;
-  color: $color-text-muted;
-  line-height: 1.4;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
 .suggestion-categories {
   display: flex;
   flex-wrap: wrap;
@@ -223,14 +205,6 @@
 }
 
 // Loading, error, and placeholder states
-.loading-state,
-.error-state,
-.no-results-state,
-.default-state {
-  padding: 2rem 1rem;
-  text-align: center;
-}
-
 .loading-placeholder,
 .error-placeholder,
 .empty-placeholder {
@@ -243,19 +217,4 @@
 
 .error-placeholder {
   color: $color-error-text;
-}
-
-.no-results-text,
-.default-text {
-  font-size: 1.1rem;
-  color: $color-text-muted;
-  margin-bottom: 0.5rem;
-  font-weight: 500;
-}
-
-.no-results-subtitle,
-.default-subtitle {
-  font-size: 0.9rem;
-  color: $color-text-muted;
-  line-height: 1.4;
 }

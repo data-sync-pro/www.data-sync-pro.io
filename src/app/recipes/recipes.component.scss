@@ -9,191 +9,308 @@
 
 // Note: Layout variables ($sidebar-width, $toc-width, breakpoints, etc.) are imported from ./styles/layout
 
-// Microsoft Learn TOC color variables (for list-toc)
-$ms-toc-text: #242424;
-$ms-toc-text-secondary: #616161;
-$ms-toc-link: #666666;
-$ms-toc-link-hover: #333333;
-$ms-toc-active-bg: #f0f0f0;
-$ms-toc-active-border: #666666;
-$ms-toc-border: #d2d2d2;
-$ms-toc-bg: $color-bg-primary;
-$ms-toc-group-title: #171717;
+// ==================== Main Content Area Styles (from _layout.scss) ====================
 
-// ==================== Recipe Detail Content Styles ====================
+// Content section wrappers
+.recipe-home,
+.recipe-category-view,
+.recipe-detail-view,
+.search-results {
+  margin: 0 auto;
+}
 
-// Use Case content - direct display without nested card
-.use-case-content {
-  @include content-text;
+// Header sections - FAQ-inspired spacing
+.home-header,
+.category-header,
+.search-header {
+  text-align: center;
+  margin-bottom: 60px;
+
+  h1, h2 {
+    font-size: 2.5rem;
+    font-weight: 600;
+    color: $color-text-primary;
+    margin-bottom: 1rem;
+
+    @include tablet {
+      font-size: 2rem;
+    }
+  }
+
+  // Specific title classes for consistent styling
+  .section-title,
+  .category-title,
+  .search-title {
+    font-size: 2.5rem;
+    font-weight: 600;
+    color: $color-text-primary;
+    margin-bottom: 1rem;
+
+    @include tablet {
+      font-size: 2rem;
+    }
+  }
+
+  .category-description {
+    font-size: 1.125rem;
+    color: $color-text-secondary;
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+
+    @include tablet {
+      font-size: 1rem;
+    }
+  }
+}
+
+// Recipe grid
+.recipe-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5rem;
+
+  @include desktop {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.25rem;
+  }
+
+  @include tablet {
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1.25rem;
+  }
+
+  @include mobile {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}
+
+// Search results header
+.search-header {
+  margin-bottom: 2rem;
+
+  h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: $color-text-primary;
+    margin-bottom: 0.5rem;
+  }
+
+  .search-summary {
+    color: $color-text-secondary;
+    font-size: 0.875rem;
+  }
+}
+
+// Loading container
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
   color: $color-text-secondary;
 
-  // Clean text styling
+  mat-progress-bar {
+    width: 200px;
+    margin-bottom: 1rem;
+  }
+
   p {
-    @include content-text;
-    margin: 0 0 $spacing-md 0;
-
-    &:last-child {
-      margin-bottom: 0;
-    }
-  }
-}
-
-.recipe-section h4 .section-icon {
-  font-size: 1.2rem;
-  margin-right: $spacing-sm;
-  color: $text-color-muted;
-  transition: $transition-normal;
-}
-
-
-// Version and keyword tags
-.version-tags, .keyword-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: $spacing-sm;
-  margin-top: $spacing-md;
-}
-
-.version-tag, .keyword-tag {
-  background: $color-primary-light;
-  color: $color-primary;
-  font-size: $font-size-caption;
-  font-weight: $font-weight-medium;
-  padding: $spacing-xs $spacing-md;
-  border-radius: $radius-xxl;
-  border: 1px solid #bbdefb;
-  transition: $transition-normal;
-}
-
-.version-tag:hover, .keyword-tag:hover {
-  background: #bbdefb;
-  transform: translateY(-1px);
-}
-
-// Prerequisites styling - bullet points design
-.prerequisites-list {
-  margin-top: $spacing-lg;
-
-  ul {
-    list-style-type: disc;
-    padding-left: $spacing-xl;
     margin: 0;
-
-    li {
-      margin-bottom: $spacing-md;
-      line-height: 1.5;
-
-      .prerequisite-description {
-        margin-bottom: $spacing-xs;
-        font-weight: 500;
-        display: flex;
-        gap: $spacing-sm;
-
-        .inline-download-icon {
-          display: inline-flex;
-          color: $color-primary;
-          &:hover {
-            color: $color-primary-hover;
-          }
-
-          lightning-icon {
-            font-size: 18px;
-            width: 18px;
-            height: 18px;
-            flex-shrink: 0;
-
-          }
-        }
-      }
-    }
+    font-size: 0.875rem;
   }
 }
 
-// Download section styling
-.download-list {
-  display: flex;
-  flex-direction: column;
-  gap: $spacing-md;
-  margin-top: $spacing-lg;
+// No results state
+.no-results {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: $color-text-secondary;
+
+  mat-icon {
+    font-size: 64px;
+    width: 64px;
+    height: 64px;
+    margin-bottom: 1.5rem;
+    opacity: 0.3;
+  }
+
+  h3 {
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: $color-text-primary;
+    margin-bottom: 0.5rem;
+  }
+
+  p {
+    font-size: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  button {
+    margin-top: 1rem;
+  }
 }
 
-.download-item {
-  background: $color-bg-light;
-  border: 1px solid $color-border;
-  border-radius: $radius-lg;
-  padding: $spacing-md;
+// Breadcrumb navigation - sticky positioning like FAQ
+.breadcrumb-nav {
+  grid-area: breadcrumb; // Assign to breadcrumb grid area
+  position: sticky;
+  top: $header-height; // Stick below the main header
+  z-index: 90; // Higher than TOC but below main header
+  padding: 8px 1.5vw; // Match FAQ horizontal padding
+  margin-bottom: 12px; // Match FAQ margin
+  background: rgba(255, 255, 255, 0.95); // Semi-transparent white background
+  backdrop-filter: blur(8px); // Modern blur effect for better visibility
+  -webkit-backdrop-filter: blur(8px); // Safari support
   transition: $transition-normal;
+
+  // Ensure proper stacking context
+  isolation: isolate;
 }
 
-.download-item:hover {
-  background: $color-border;
-  border-color: $color-primary;
-}
-
-.download-link {
+.breadcrumb {
   display: flex;
-  gap: $spacing-sm;
-  color: $color-primary;
-  text-decoration: none;
-  font-weight: 500;
-  transition: $transition-normal;
+  align-items: center;
+  gap: 2px;
+  margin: 0;
+  padding: 0 0 8px 0; // Add bottom padding for the border
+  list-style: none;
+  border-bottom: 1px solid #f1f3f4; // Move border to content level
+}
+
+.breadcrumb-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
   background: none;
   border: none;
+  color: $color-primary; // FAQ blue color
+  font-size: 1rem; // Match FAQ font size
+  font-weight: 400;
   cursor: pointer;
-  padding: 0;
-  font-size: inherit;
-  font-family: inherit;
+  padding: 2px 6px; // Match FAQ padding
+  border-radius: 3px;
+  text-decoration: none;
+  transition: $transition-fast;
+
+  &:hover:not(.active) {
+    background-color: rgba($color-primary, 0.08);
+    color: #1557b0; // Match FAQ hover color
+  }
+
+  &.active {
+    color: $color-text-secondary; // Match FAQ active color
+    cursor: default;
+    font-weight: 500;
+  }
+
+  &:disabled {
+    cursor: default;
+  }
+
+  span {
+    white-space: nowrap;
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 }
 
-.download-link:hover {
-  color: $color-primary-hover;
+.breadcrumb-separator {
+  display: flex;
+  align-items: center;
+  color: #bdc1c6;
+  margin: 0 1px;
 }
 
-.download-link lightning-icon {
-  display: inline-flex;
+// ==================== Recipe Detail Styles ====================
+
+// Recipe detail container
+.recipe-detail {
+  padding-top: 20px; // Match FAQ's top padding
+  margin: 0 auto;
 }
 
-// Related recipes styling
-.related-recipes {
+// Recipe header
+.recipe-header {
   display: flex;
   flex-direction: column;
-  gap: $spacing-sm;
-  margin-top: $spacing-lg;
+  align-items: left;
+  text-align: left;
+  gap: 1rem;
+  margin-bottom: 4rem;
+
+  .header-content h1 {
+    margin: 0 0 0.5rem 0;
+    font-size: 2rem;
+    font-weight: 600;
+    color: $color-text-primary;
+
+    @include tablet {
+      font-size: 1.75rem;
+    }
+  }
 }
 
-.related-recipe-link {
-  color: $color-primary;
-  text-decoration: none;
-  font-weight: 500;
-  padding: $spacing-sm $spacing-md;
-  border-radius: $radius-md;
-  transition: $transition-normal;
-  border: 1px solid transparent;
-}
+// Unified scroll anchor positioning for all recipe content sections
+.recipe-section {
+  scroll-margin-top: $scroll-margin-top-desktop;
 
-.related-recipe-link:hover {
-  background: $color-primary-light;
-  border-color: #bbdefb;
-  text-decoration: none;
-}
+  @include tablet {
+    scroll-margin-top: $scroll-margin-top-mobile;
+  }
 
+  // Recipe sections styling
+  padding: 1.5rem 0;
+  border-bottom: 1px solid #f0f0f0;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  h3, h4 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    color: $color-text-primary;
+  }
+
+  h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+  }
+
+  h4 {
+    font-size: 1.25rem;
+    font-weight: 500;
+  }
+
+  ul {
+    margin: 0.5rem 0;
+    padding-left: 1.5rem;
+
+    li {
+      margin-bottom: 0.25rem;
+      color: $color-text-primary;
+    }
+  }
+
+  p {
+    line-height: 1.6;
+    color: $color-text-primary;
+    margin-bottom: 1rem;
+  }
+}
 
 // ==================== Unified Content Styles ====================
+// Note: Section-specific content styles moved to recipe-section.component.scss
+// Note: MS TOC variables moved to _recipe-variables.scss
 .recipe-unified-content {
   width: 100%;
   max-width: $content-max-width;
   margin: 0 auto;
-}
-
-// Simplified step display - no animations needed for long-form
-app-recipe-step {
-  display: block;
-}
-
-// Walkthrough sections with separation from Overview
-.walkthrough-sections {
-  margin-top: 64px;
-  // Removed gradient divider line - unified border provides visual separation
 }
 
 .no-steps {
@@ -221,132 +338,7 @@ app-recipe-step {
   }
 }
 
-
-// Animations
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(40px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-
 // Recipe page styling
 :host-context(body.recipe-page) {
   display: block;
-}
-
-// ==================== Recipe List TOC Styles ====================
-// TOC for home/category pages (moved from _toc.scss)
-
-.recipe-list-toc {
-  position: sticky;
-  top: 80px;
-  height: calc(100vh - 100px);
-  overflow-y: auto;
-  padding: 0 1rem;
-  background: $ms-toc-bg;
-
-  &.hidden {
-    display: none;
-  }
-
-  // Thin scrollbar
-  @include custom-scrollbar(6px, transparent, #c8c8c8);
-
-  .toc-container {
-    padding: 1.5rem 0;
-  }
-
-  .toc-heading {
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    color: $ms-toc-text-secondary;
-    margin: 0 0 1rem 0;
-    letter-spacing: 0.05em;
-  }
-
-  .toc-nav {
-    .toc-items {
-      list-style: none;
-      margin: 0;
-      padding: 0;
-
-      .toc-item {
-        margin: 0;
-
-        a {
-          display: flex;
-          align-items: center;
-          padding: 0.5rem 0.75rem;
-          color: $ms-toc-text;
-          text-decoration: none;
-          border-left: 2px solid transparent;
-          margin-left: -2px;
-          transition: $transition-normal;
-          cursor: pointer;
-          font-size: 0.875rem;
-          position: relative;
-          padding-left: 1.25rem;
-
-          // Add decorative dot before each recipe item
-          &::before {
-            content: '';
-            position: absolute;
-            left: 0.5rem;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 4px;
-            height: 4px;
-            background: #c1c7cd;
-            border-radius: 50%;
-            transition: $transition-normal;
-          }
-
-          .recipe-icon {
-            font-size: 16px;
-            width: 16px;
-            height: 16px;
-            margin-right: 0.5rem;
-            opacity: 0.7;
-          }
-
-          &:hover {
-            color: $ms-toc-link-hover;
-            background: rgba(0, 96, 199, 0.05);
-
-            &::before {
-              background: #c3c2c2;
-              transform: translateY(-50%) scale(1.2);
-            }
-
-            .recipe-icon {
-              opacity: 1;
-            }
-          }
-        }
-
-        &.active a {
-          color: $ms-toc-text;
-          background: $ms-toc-active-bg;
-          border-left-color: transparent;
-
-          &::before {
-            background: #0060c7;
-            transform: translateY(-50%) scale(1.3);
-          }
-
-          .recipe-icon {
-            opacity: 1;
-            color: $ms-toc-text;
-          }
-        }
-      }
-    }
-  }
 }

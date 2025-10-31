@@ -10,9 +10,9 @@
         <ul class="toc-items">
           <li *ngFor="let section of overviewSections; trackBy: trackBySectionId"
               class="toc-item"
-              [class.active]="activeSectionId === section.id">
+              [class.active]="activeSectionId === section.elementId">
             <a (click)="onOverviewSectionClick(section.elementId)"
-               [attr.aria-current]="activeSectionId === section.id ? 'location' : null">
+               [attr.aria-current]="activeSectionId === section.elementId ? 'location' : null">
               {{ section.title }}
             </a>
           </li>
@@ -25,9 +25,9 @@
         <ul class="toc-items">
           <li *ngFor="let section of walkthroughSections; let i = index; trackBy: trackBySectionId"
               class="toc-item"
-              [class.active]="activeSectionId === section.id">
+              [class.active]="activeSectionId === section.elementId">
             <a (click)="onWalkthroughSectionClick(i)"
-               [attr.aria-current]="activeSectionId === section.id ? 'location' : null">
+               [attr.aria-current]="activeSectionId === section.elementId ? 'location' : null">
               {{ i + 1 }}. {{ section.title }}
             </a>
           </li>

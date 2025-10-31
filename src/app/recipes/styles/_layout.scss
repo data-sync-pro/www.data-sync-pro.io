@@ -1,8 +1,11 @@
 // ==================== Recipe Layout Styles ====================
+// Core grid layout system only - content styles have been moved to recipes.component.scss
 
 // Import centralized variables
 @import './recipe-variables';
 
+// ==================== Grid Layout System ====================
+// Three-column layout: sidebar + main + toc
 
 .recipe-layout-container {
   display: grid;
@@ -10,7 +13,7 @@
     "sidebar breadcrumb toc"
     "sidebar main toc";
   grid-template-rows: auto 1fr;
-  
+
   grid-template-columns: $sidebar-width-percent 1fr $toc-width-percent;
   min-height: calc(100vh - $header-height);
   margin-top: $header-height;
@@ -18,7 +21,6 @@
   transition: grid-template-columns $transition-smooth;
 
   &.sidebar-collapsed {
-    
     grid-template-columns: $sidebar-collapsed-width-percent 1fr $toc-width-percent;
   }
 
@@ -26,14 +28,13 @@
     grid-template-areas:
       "sidebar breadcrumb"
       "sidebar main";
-    
+
     grid-template-columns: $sidebar-width-percent 1fr;
 
     &.sidebar-collapsed {
       grid-template-columns: $sidebar-collapsed-width-percent 1fr;
     }
   }
-
 
   @include large-desktop {
     grid-template-columns: 16% 1fr 16%;
@@ -51,7 +52,6 @@
     }
   }
 
-
   @include desktop {
     grid-template-areas:
       "breadcrumb"
@@ -60,48 +60,7 @@
   }
 }
 
-// Mobile sidebar toggle and overlay
-.mobile-sidebar-toggle {
-  position: fixed;
-  top: calc($header-height + 1rem);
-  left: 1rem;
-  z-index: 1000;
-  background: #fff;
-  box-shadow: $shadow-md;
-  
-  @media (min-width: $breakpoint-desktop) {
-    display: none ;
-  }
-}
-
-.sidebar-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 1099; // Fixed: increased from 199 to 1099 to be below sidebar (1100) but above content
-  opacity: 0;
-  visibility: hidden;
-  transition: $transition-smooth;
-  
-  &.active {
-    opacity: 1;
-    visibility: visible;
-  }
-  
-  @media (min-width: $breakpoint-desktop) {
-    display: none;
-  }
-}
-
-// Grid areas for components
-.recipe-sidebar {
-  grid-area: sidebar;
-}
-
-// Breadcrumb navigation will be positioned within main area
+// ==================== Main Content Area ====================
 
 .recipe-main {
   grid-area: main;
@@ -109,7 +68,6 @@
   overflow-x: hidden;
   overflow-y: auto;
   background: #ffffff;
-
   min-height: calc(100vh - $header-height);
 
   @include tablet {
@@ -118,136 +76,12 @@
 
   @include mobile {
     padding: 12px 16px; // Match FAQ's mobile padding
-    // On mobile, allow scrolling to footer
     min-height: calc(100vh - $header-height);
   }
 }
 
-.recipe-toc {
-  grid-area: toc;
-  
-  &.desktop-toc {
-    position: sticky;
-    top: $header-height;
-    height: calc(100vh - $header-height);
-    z-index: 80;
-
-    @include desktop {
-      display: none;
-    }
-  }
-}
-
-// TOC Toggle Button - positioned to the left of TOC or right edge when hidden
-.toc-toggle-btn {
-  position: fixed;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 32px;
-  height: 32px;
-  background: #ffffff;
-  border: 1px solid #e1e5e9;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 85; // Higher than TOC but lower than modals
-
-  // Default: hidden by default, only show on hover (when TOC is visible)
-  opacity: 0;
-  visibility: hidden;
-  transition: $transition-smooth;
-
-  // When TOC is hidden, always show the button
-  .recipe-layout-container.toc-hidden & {
-    opacity: 1;
-    visibility: visible;
-  }
-
-  // Default: when TOC is visible, button is at the left edge of TOC
-  right: $toc-width-percent; // TOC width
-  border-radius: 6px 0 0 6px; // Rounded only on the left side
-  box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
-
-  // When TOC is hidden, move button to the right edge of screen and keep it visible
-  .recipe-layout-container.toc-hidden & {
-    right: 0px;
-    border-radius: 6px 0 0 6px;
-    box-shadow: $shadow-md;
-    opacity: 1; // Always visible when TOC is hidden
-    visibility: visible;
-  }
-  &:hover {
-    opacity: 1;
-    visibility: visible;
-    background: #f8f9fa;
-    border-color: $color-primary;
-    
-    // Default hover shadow (TOC visible)
-    box-shadow: -4px 0 12px rgba($color-primary, 0.15);
-
-    // When TOC is hidden, use left shadow since button is at right edge
-    .faq-layout-container.toc-hidden & {
-      box-shadow: -4px 0 12px rgba($color-primary, 0.15);
-    }
-  }
-
-  &:active {
-    transform: translateY(-50%) scale(0.95);
-  }
-
-  @include large-desktop {
-    right: 16%; // Adjusted TOC width for larger screens
-
-    .recipe-layout-container.toc-hidden & {
-      right: 10px;
-    }
-  }
-
-  @include desktop {
-    display: none;
-  }
-}
-
-// Show TOC toggle button when hovering TOC area
-.recipe-toc:hover + .toc-toggle-btn {
-  opacity: 1;
-  visibility: visible;
-}
-
-// When TOC is hidden, expand the button's hover area slightly
-.recipe-layout-container.toc-hidden .toc-toggle-btn {
-  // Expand hover area when TOC is hidden
-  &::before {
-    content: '';
-    position: absolute;
-    top: -10px;
-    bottom: -10px;
-    left: -15px;
-    right: -5px;
-    z-index: -1;
-  }
-}
-
-// Mobile TOC Toggle
-.mobile-toc-toggle {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  z-index: 100;
-
-  @media (min-width: $breakpoint-desktop) {
-    display: none;
-  }
-}
-
-// Content sections
-.recipe-home,
-.recipe-category-view,
-.recipe-detail-view,
-.search-results {
-  margin: 0 auto;
-}
+// ==================== Global Animations ====================
+// fadeInUp animation - used across multiple components
 
 @keyframes fadeInUp {
   from {
@@ -257,430 +91,5 @@
   to {
     opacity: 1;
     transform: translateY(0);
-  }
-}
-
-// Header sections - FAQ-inspired spacing
-.home-header,
-.category-header,
-.search-header {
-  text-align: center;
-  margin-bottom: 60px;
-
-  h1, h2 {
-    font-size: 2.5rem;
-    font-weight: 600;
-    color: $color-text-primary;
-    margin-bottom: 1rem;
-
-    @include tablet {
-      font-size: 2rem;
-    }
-  }
-
-  // Specific title classes for consistent styling
-  .section-title,
-  .category-title,
-  .search-title {
-    font-size: 2.5rem;
-    font-weight: 600;
-    color: $color-text-primary;
-    margin-bottom: 1rem;
-
-    @include tablet {
-      font-size: 2rem;
-    }
-  }
-  
-  .home-description,
-  .category-description {
-    font-size: 1.125rem;
-    color: $color-text-secondary;
-    max-width: 600px;
-    margin: 0 auto;
-    line-height: 1.6;
-
-    @include tablet {
-      font-size: 1rem;
-    }
-  }
-}
-
-// Recipe count styling (separate from header nesting)
-.recipe-count {
-  font-size: 1rem;
-  color: $color-text-secondary;
-  margin: 0;
-  font-weight: 500;
-  text-align: center;
-
-  @include tablet {
-    font-size: 0.9rem;
-  }
-}
-
-// Category grid
-.category-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 4rem;
-
-  @include mobile {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
-}
-
-// Recipe grid
-.recipe-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 1.5rem;
-
-  @include desktop {
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 1.25rem;
-  }
-
-  @include tablet {
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 1.25rem;
-  }
-
-  @include mobile {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
-}
-
-// Popular recipes section
-.popular-recipes {
-  margin-top: 4rem;
-
-  h2 {
-    font-size: 1.75rem;
-    font-weight: 600;
-    color: $color-text-primary;
-    margin-bottom: 2rem;
-    text-align: center;
-
-    @include tablet {
-      font-size: 1.5rem;
-    }
-  }
-}
-
-// Search results header
-.search-header {
-  margin-bottom: 2rem;
-
-  h2 {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: $color-text-primary;
-    margin-bottom: 0.5rem;
-  }
-
-  .search-summary {
-    color: $color-text-secondary;
-    font-size: 0.875rem;
-  }
-}
-
-// Loading container
-.loading-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 400px;
-  color: $color-text-secondary;
-
-  mat-progress-bar {
-    width: 200px;
-    margin-bottom: 1rem;
-  }
-
-  p {
-    margin: 0;
-    font-size: 0.875rem;
-  }
-}
-
-// No results state
-.no-results {
-  text-align: center;
-  padding: 4rem 2rem;
-  color: $color-text-secondary;
-
-  mat-icon {
-    font-size: 64px;
-    width: 64px;
-    height: 64px;
-    margin-bottom: 1.5rem;
-    opacity: 0.3;
-  }
-
-  h3 {
-    font-size: 1.5rem;
-    font-weight: 500;
-    color: $color-text-primary;
-    margin-bottom: 0.5rem;
-  }
-
-  p {
-    font-size: 1rem;
-    margin-bottom: 2rem;
-  }
-
-  button {
-    margin-top: 1rem;
-  }
-}
-
-// Breadcrumb navigation - sticky positioning like FAQ
-.breadcrumb-nav {
-  grid-area: breadcrumb; // Assign to breadcrumb grid area
-  position: sticky;
-  top: $header-height; // Stick below the main header
-  z-index: 90; // Higher than TOC but below main header
-  padding: 8px 1.5vw; // Match FAQ horizontal padding
-  margin-bottom: 12px; // Match FAQ margin
-  background: rgba(255, 255, 255, 0.95); // Semi-transparent white background
-  backdrop-filter: blur(8px); // Modern blur effect for better visibility
-  -webkit-backdrop-filter: blur(8px); // Safari support
-  transition: $transition-normal;
-
-  // Add subtle shadow when scrolled
-  &.scrolled {
-    box-shadow: $shadow-md;
-  }
-
-
-  // Ensure proper stacking context
-  isolation: isolate;
-}
-
-.breadcrumb {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-  margin: 0;
-  padding: 0 0 8px 0; // Add bottom padding for the border
-  list-style: none;
-  border-bottom: 1px solid #f1f3f4; // Move border to content level
-}
-
-.breadcrumb-item {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  background: none;
-  border: none;
-  color: $color-primary; // FAQ blue color
-  font-size: 1rem; // Match FAQ font size
-  font-weight: 400;
-  cursor: pointer;
-  padding: 2px 6px; // Match FAQ padding
-  border-radius: 3px;
-  text-decoration: none;
-  transition: $transition-fast;
-
-  &:hover:not(.active) {
-    background-color: rgba($color-primary, 0.08);
-    color: #1557b0; // Match FAQ hover color
-  }
-
-  &.active {
-    color: $color-text-secondary; // Match FAQ active color
-    cursor: default;
-    font-weight: 500;
-  }
-
-  &:disabled {
-    cursor: default;
-  }
-
-  span {
-    white-space: nowrap;
-    max-width: 120px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-
-  }
-}
-
-.breadcrumb-separator {
-  display: flex;
-  align-items: center;
-  color: #bdc1c6;
-  margin: 0 1px;
-}
-
-// ==================== Recipe Detail Styles ====================
-
-// Recipe detail container
-.recipe-detail {
-  padding-top: 20px; // Match FAQ's top padding
-  margin: 0 auto;
-}
-
-// Recipe header
-.recipe-header {
-  display: flex;
-  flex-direction: column;
-  align-items: left;
-  text-align: left;
-  gap: 1rem;
-  margin-bottom: 4rem;
-  
-
-  .header-content h1 {
-    margin: 0 0 0.5rem 0;
-    font-size: 2rem;
-    font-weight: 600;
-    color: $color-text-primary;
-
-    @include tablet {
-      font-size: 1.75rem;
-    }
-  }
-}
-
-// Recipe tab navigation
-.recipe-tabs {
-  display: flex;
-  gap: 0.5rem;
-  margin-bottom: 2rem;
-  border-bottom: 1px solid #e1e5e9;
-  padding-bottom: 0;
-  
-  @include mobile {
-    flex-direction: column;
-    gap: 0.25rem;
-  }
-}
-
-.recipe-tab {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1.25rem;
-  background: none;
-  border: none;
-  color: $color-text-secondary;
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  border-radius: 8px 8px 0 0;
-  position: relative;
-  transition: $transition-normal;
-
-  &:hover {
-    background-color: rgba($color-primary, 0.08);
-    color: $color-text-primary;
-  }
-
-  &.active {
-    color: $color-text-primary;
-    background-color: #fff;
-    
-    &::after {
-      content: '';
-      position: absolute;
-      bottom: -1px;
-      left: 0;
-      right: 0;
-      height: 2px;
-      background-color: $color-text-primary;
-    }
-  }
-
-  mat-icon {
-    font-size: 18px;
-    width: 18px;
-    height: 18px;
-  }
-
-  @include mobile {
-    padding: 0.75rem 1rem;
-    border-radius: 6px;
-
-    &.active::after {
-      display: none;
-    }
-
-    &.active {
-      background-color: rgba($color-primary, 0.1);
-    }
-  }
-}
-
-
-.tab-content {
-  animation: fadeInUp 0.15s ease;
-}
-
-// Unified scroll anchor positioning for all recipe content sections
-.recipe-section,
-.recipe-step-container {
-  scroll-margin-top: $scroll-margin-top-desktop;
-
-  @include tablet {
-    scroll-margin-top: $scroll-margin-top-mobile;
-  }
-}
-
-// Recipe sections
-.recipe-section {
-  padding: 1.5rem 0;
-  border-bottom: 1px solid #f0f0f0;
-
-  &:last-child {
-    border-bottom: none;
-  }
-
-  h3, h4 {
-    margin-top: 0;
-    margin-bottom: 1rem;
-    color: $color-text-primary;
-  }
-
-  h3 {
-    font-size: 1.5rem;
-    font-weight: 600;
-  }
-
-  h4 {
-    font-size: 1.25rem;
-    font-weight: 500;
-  }
-
-  ul {
-    margin: 0.5rem 0;
-    padding-left: 1.5rem;
-
-    li {
-      margin-bottom: 0.25rem;
-      color: $color-text-primary;
-    }
-  }
-
-  p {
-    line-height: 1.6;
-    color: $color-text-primary;
-    margin-bottom: 1rem;
-  }
-}
-
-// ==================== Walkthrough Container Styles ====================
-.walkthrough-sections {
-  border: 1px solid $color-border;
-  border-radius: $radius-md;
-  background: #ffffff;
-
-  @include tablet {
-    border-radius: $radius-sm;
   }
 }

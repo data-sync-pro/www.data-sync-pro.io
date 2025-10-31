@@ -112,31 +112,19 @@
             <!-- Unified Recipe Content - Overview + Walkthrough -->
             <div class="recipe-unified-content">
 
-              <!-- Overview Sections -->
-              <div class="overview-sections">
-                <app-recipe-overview-section
-                  *ngFor="let sectionConfig of getVisibleOverviewSections(); trackBy: trackBySectionId"
-                  [section]="sectionConfig"
-                  (downloadClick)="downloadExecutable($event.url, $event.title, $event.fileName)">
-                </app-recipe-overview-section>
-              </div>
+              <!-- All Sections (Overview + Walkthrough) using unified component -->
+              <app-recipe-section
+                *ngFor="let sectionConfig of getAllSectionsForRendering(); trackBy: trackBySectionId"
+                [section]="sectionConfig"
+                [stepIndex]="sectionConfig.stepIndex"
+                (downloadClick)="downloadExecutable($event.url, $event.title, $event.fileName)">
+              </app-recipe-section>
 
-              <!-- Walkthrough Sections -->
-              <div class="walkthrough-sections" *ngIf="walkthroughSteps.length > 0">
-                <app-recipe-step
-                  *ngFor="let step of walkthroughStepsData; let i = index; trackBy: trackByStepIndex"
-                  [stepData]="step"
-                  [stepId]="'step-' + i"
-                  [stepIndex]="i"
-                  [attr.data-step-index]="i">
-                </app-recipe-step>
-              </div>
-
-              <!-- No Steps Available -->
-              <div class="no-steps" *ngIf="walkthroughSteps.length === 0">
+              <!-- No Content Available -->
+              <div class="no-steps" *ngIf="getAllSectionsForRendering().length === 0">
                 <mat-icon>info</mat-icon>
-                <h3>No walkthrough steps available</h3>
-                <p>This recipe doesn't have detailed walkthrough steps configured.</p>
+                <h3>No content available</h3>
+                <p>This recipe doesn't have any content configured.</p>
               </div>
 
             </div>
@@ -175,12 +163,12 @@
 
   <!-- Right TOC (Table of Contents) - Microsoft Learn Style -->
   <app-recipe-toc
-    [overviewSections]="getOverviewSectionsForTOC()"
-    [walkthroughSections]="getWalkthroughSectionsForTOC()"
+    [overviewSections]="recipeTocService.getOverviewSectionsForTOC()"
+    [walkthroughSections]="recipeTocService.getWalkthroughSectionsForTOC()"
     [activeSectionId]="ui.activeSectionId"
     [visible]="showRecipeDetails"
-    (overviewSectionClick)="navigateToOverviewSection($event)"
-    (walkthroughSectionClick)="navigateToWalkthroughSection($event)">
+    (overviewSectionClick)="recipeNavigationService.navigateToOverviewSection($event)"
+    (walkthroughSectionClick)="recipeNavigationService.navigateToWalkthroughSection($event)">
   </app-recipe-toc>
 
 

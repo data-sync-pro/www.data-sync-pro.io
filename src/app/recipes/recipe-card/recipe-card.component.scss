@@ -24,12 +24,6 @@
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
     border-color: #d0d7de;
   }
-
-  // Active/selected state
-  &.active {
-    border-color: $color-primary;
-    background: rgba($color-primary, 0.02);
-  }
 }
 
 // Card header with category and download button
@@ -122,31 +116,4 @@
     line-height: 1;
     flex-shrink: 0;
   }
-}
-
-
-
-// Loading state (for future use)
-.recipe-card.loading {
-  opacity: 0.6;
-  pointer-events: none;
-
-  &::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: $spacing-xl;
-    height: $spacing-xl;
-    margin: -10px 0 0 -10px;
-    border: 2px solid #f3f3f3;
-    border-top: 2px solid $color-primary;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-  }
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
 }

@@ -715,7 +715,7 @@ export class RecipeService implements OnDestroy {
     return this.recipesCache$.pipe(
       map(recipes => {
         const categoryStats = new Map<string, number>();
-        
+
         recipes.forEach(recipe => {
           const count = categoryStats.get(recipe.category) || 0;
           categoryStats.set(recipe.category, count + 1);
@@ -738,5 +738,20 @@ export class RecipeService implements OnDestroy {
         };
       })
     );
+  }
+
+  /**
+   * Sort recipes by category first, then by title A-Z
+   * @param recipes - Array of recipes to sort
+   * @returns Sorted array of recipes
+   */
+  sortRecipesByCategoryAndTitle(recipes: RecipeItem[]): RecipeItem[] {
+    return [...recipes].sort((a, b) => {
+      const categoryCompare = a.category.localeCompare(b.category);
+      if (categoryCompare !== 0) {
+        return categoryCompare;
+      }
+      return a.title.localeCompare(b.title);
+    });
   }
 }

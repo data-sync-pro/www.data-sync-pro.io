@@ -37,16 +37,6 @@ $ms-toc-group-title: #171717;
   padding: 1.5rem 0;
 }
 
-// TOC heading
-.toc-heading {
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  color: $ms-toc-text-secondary;
-  margin: 0 0 1rem 0;
-  letter-spacing: 0.05em;
-}
-
 // TOC navigation
 .toc-nav {
   font-size: 0.875rem;
@@ -127,5 +117,112 @@ $ms-toc-group-title: #171717;
         }
       }
     }
+  }
+}
+
+// ==================== TOC Toggle Controls ====================
+// These controls are rendered in the parent layout but styled here
+
+// Desktop TOC Toggle Button - positioned to the left of TOC or right edge when hidden
+.toc-toggle-btn {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
+  background: #ffffff;
+  border: 1px solid #e1e5e9;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 85; // Higher than TOC but lower than modals
+
+  // Default: hidden by default, only show on hover (when TOC is visible)
+  opacity: 0;
+  visibility: hidden;
+  transition: $transition-smooth;
+
+  // When TOC is hidden, always show the button
+  .recipe-layout-container.toc-hidden & {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  // Default: when TOC is visible, button is at the left edge of TOC
+  right: $toc-width-percent; // TOC width
+  border-radius: 6px 0 0 6px; // Rounded only on the left side
+  box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
+
+  // When TOC is hidden, move button to the right edge of screen and keep it visible
+  .recipe-layout-container.toc-hidden & {
+    right: 0px;
+    border-radius: 6px 0 0 6px;
+    box-shadow: $shadow-md;
+    opacity: 1; // Always visible when TOC is hidden
+    visibility: visible;
+  }
+
+  &:hover {
+    opacity: 1;
+    visibility: visible;
+    background: #f8f9fa;
+    border-color: $color-primary;
+
+    // Default hover shadow (TOC visible)
+    box-shadow: -4px 0 12px rgba($color-primary, 0.15);
+
+    // When TOC is hidden, use left shadow since button is at right edge
+    .recipe-layout-container.toc-hidden & {
+      box-shadow: -4px 0 12px rgba($color-primary, 0.15);
+    }
+  }
+
+  &:active {
+    transform: translateY(-50%) scale(0.95);
+  }
+
+  @include large-desktop {
+    right: 16%; // Adjusted TOC width for larger screens
+
+    .recipe-layout-container.toc-hidden & {
+      right: 10px;
+    }
+  }
+
+  @include desktop {
+    display: none;
+  }
+}
+
+// Show TOC toggle button when hovering TOC area
+:host:hover + .toc-toggle-btn {
+  opacity: 1;
+  visibility: visible;
+}
+
+// When TOC is hidden, expand the button's hover area slightly
+.recipe-layout-container.toc-hidden .toc-toggle-btn {
+  // Expand hover area when TOC is hidden
+  &::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    bottom: -10px;
+    left: -15px;
+    right: -5px;
+    z-index: -1;
+  }
+}
+
+// Mobile TOC Toggle
+.mobile-toc-toggle {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 100;
+
+  @media (min-width: $breakpoint-desktop) {
+    display: none;
   }
 }

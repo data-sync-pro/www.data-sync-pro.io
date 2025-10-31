@@ -326,7 +326,6 @@ export interface RecipeSection {
   id: string;
   title: string;
   elementId?: string; // DOM element ID for scrolling
-  isVisible?: boolean; // Whether this section exists in current recipe
 }
 
 /**
@@ -344,7 +343,6 @@ export interface RecipeTab {
  */
 export interface RecipeTOCStructure {
   tabs: RecipeTab[];
-  currentSectionId?: string;
 }
 
 /**
@@ -382,3 +380,15 @@ export type RecipeCategoryType = 'action-button' | 'batch' | 'data-list' | 'data
  * Combined recipe walkthrough type (supports both legacy and new formats)
  */
 export type RecipeWalkthrough = LegacyRecipeWalkthrough | RecipeWalkthroughStep[];
+
+/**
+ * Recipe search state interface
+ * Used for managing search functionality in recipe components
+ */
+export interface RecipeSearchState {
+  query: string;
+  isActive: boolean;
+  results: RecipeSearchResult[];
+  hasResults: boolean;
+  isOverlayOpen: boolean;
+}

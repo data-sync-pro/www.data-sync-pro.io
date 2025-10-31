@@ -8,9 +8,9 @@ import {
   ViewEncapsulation,
   HostListener
 } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
 import { Subject, combineLatest } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { ActivatedRoute } from '@angular/router';
 
 import {
   RecipeItem,
@@ -22,14 +22,30 @@ import {
   RecipeSearchState
 } from '../shared/models/recipe.model';
 import { RecipeService } from './services/recipe.service';
-import { RecipePreviewService } from './services/recipe-preview.service';
 import { RecipeTocService } from './services/recipe-toc.service';
 import { RecipeNavigationService } from './services/recipe-navigation.service';
 import { RecipeUiStateService, RecipeUIState } from './services/recipe-ui-state.service';
 import { RecipePreviewSyncService } from './services/recipe-preview-sync.service';
+import { RecipeRouteHandlerService } from './services/recipe-route-handler.service';
+import { RecipeSearchService } from './services/recipe-search.service';
 import { RECIPE_CLASSES, RECIPE_MESSAGES} from '../shared/constants/recipe.constants';
 import { SelectedSuggestion } from './recipe-search-overlay/recipe-search-overlay.component';
 
+/**
+ * Recipes Component (Refactored)
+ *
+ * This component acts as a coordinator/orchestrator that delegates business logic to services.
+ * It manages the template bindings and Change Detection, but does not contain business logic implementation.
+ *
+ * Service responsibilities:
+ * - RecipeRouteHandlerService: Route handling, data loading coordination, navigation
+ * - RecipeSearchService: Search state, search execution, overlay management
+ * - RecipeService: Recipe data, caching, sorting
+ * - RecipeUiStateService: UI state management
+ * - RecipeNavigationService: Section navigation, scroll tracking
+ * - RecipeTocService: TOC generation
+ * - RecipePreviewSyncService: Preview mode synchronization
+ */
 @Component({
   selector: 'app-recipes',
   templateUrl: './recipes.component.html',
@@ -44,6 +60,7 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
   // UI State - managed by RecipeUiStateService
   ui!: RecipeUIState;
 
+  // Search state - managed by RecipeSearchService
   search: RecipeSearchState = {
     query: '',
     isActive: false,
@@ -52,9 +69,10 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
     isOverlayOpen: false
   };
 
-  // Search overlay state
+  // Search overlay initial query
   searchOverlayInitialQuery = '';
 
+  // Navigation state
   navigation: RecipeNavigationState = {
     category: '',
     recipeName: ''
@@ -65,12 +83,13 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
   categories: RecipeCategory[] = [];
   currentRecipe: RecipeItem | null = null;
   filteredRecipes: RecipeItem[] = [];
-  
+  totalRecipeCount: number = 0;  // Total count of all recipes
+
   // Recipe TOC structure
   recipeTOC: RecipeTOCStructure = {
     tabs: []
   };
-  
+
   // Filters
   currentFilter: RecipeFilter = {
     categories: [],
@@ -81,18 +100,18 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
 
   constructor(
     private route: ActivatedRoute,
-    private router: Router,
     private recipeService: RecipeService,
-    private previewService: RecipePreviewService,
     private cdr: ChangeDetectorRef,
     public recipeTocService: RecipeTocService,
     public recipeNavigationService: RecipeNavigationService,
     private uiStateService: RecipeUiStateService,
-    private previewSyncService: RecipePreviewSyncService
+    private previewSyncService: RecipePreviewSyncService,
+    private routeHandlerService: RecipeRouteHandlerService,
+    private searchService: RecipeSearchService
   ) {}
 
   ngOnInit(): void {
-    // Subscribe to UI state changes FIRST - must happen before any code that accesses this.ui
+    // Subscribe to UI state changes FIRST
     this.uiStateService.getState()
       .pipe(takeUntil(this.destroy$))
       .subscribe(state => {
@@ -100,9 +119,47 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
         this.cdr.markForCheck();
       });
 
-    // Now safe to initialize and access UI state
+    // Initialize component
     this.initializeComponent();
-    this.setupRouteHandling();
+
+    // Setup route handling - monitor route parameters and delegate to service
+    combineLatest([
+      this.route.paramMap,
+      this.route.queryParamMap
+    ]).pipe(
+      takeUntil(this.destroy$)
+    ).subscribe(([params, queryParams]) => {
+      // Extract route parameters for navigation state
+      const category = params.get('category') || '';
+      const recipeName = params.get('recipeName') || '';
+
+      this.navigation = {
+        category,
+        recipeName
+      };
+
+      // Delegate route handling to service
+      this.routeHandlerService.handleRouteParams(params, queryParams);
+
+      this.cdr.markForCheck();
+    });
+
+    // Subscribe to data loaded events from route handler
+    this.routeHandlerService.getDataLoadedEvents()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(result => {
+        this.currentRecipe = result.currentRecipe;
+        this.recipeTOC = result.recipeTOC;
+        // Directly assign data without condition checks
+        // This allows proper clearing/updating of data for all views
+        this.recipes = result.recipes;
+        this.filteredRecipes = result.filteredRecipes;
+        this.needsObserverSetup = result.needsObserverSetup;
+        this.totalRecipeCount = result.totalRecipeCount;  // Update total count
+        this.cdr.markForCheck();
+      });
+
+    // Load initial data (categories and all recipes)
     this.loadInitialData();
 
     // Setup navigation service
@@ -110,11 +167,34 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
     this.recipeNavigationService.setupSectionObserver();
 
     // Subscribe to navigation events
-    // Note: Navigation service now updates UI state directly
     this.recipeNavigationService.getNavigationEvents()
       .pipe(takeUntil(this.destroy$))
       .subscribe(event => {
-        // Just trigger change detection for OnPush strategy
+        this.cdr.markForCheck();
+      });
+
+    // Subscribe to search state changes
+    this.searchService.getSearchState()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(state => {
+        this.search = state;
+        this.cdr.markForCheck();
+      });
+
+    // Subscribe to search result events
+    this.searchService.getSearchResultEvents()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(event => {
+        const sortedResults = this.recipeService.sortRecipesByCategoryAndTitle(event.results);
+        this.filteredRecipes = sortedResults;
+        this.cdr.markForCheck();
+      });
+
+    // Subscribe to search overlay initial query
+    this.searchService.getSearchOverlayInitialQuery()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(query => {
+        this.searchOverlayInitialQuery = query;
         this.cdr.markForCheck();
       });
 
@@ -131,17 +211,22 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
     document.body.classList.add(RECIPE_CLASSES.BODY_PAGE);
   }
 
+  // ==================== Keyboard Shortcuts ====================
+
   /**
-   * Keyboard shortcuts for search overlay
+   * Keyboard shortcut: / to open search
    */
   @HostListener('document:keydown./', ['$event'])
   onSlashKey(event: KeyboardEvent) {
-    if (!this.search.isOverlayOpen && !this.isInputFocused()) {
+    if (!this.search.isOverlayOpen && !this.searchService.isInputFocused()) {
       event.preventDefault();
       this.openSearchOverlay();
     }
   }
 
+  /**
+   * Keyboard shortcut: Ctrl+K or Cmd+K to open search
+   */
   @HostListener('document:keydown.control.k', ['$event'])
   @HostListener('document:keydown.meta.k', ['$event'])
   onCtrlK(event: KeyboardEvent) {
@@ -151,6 +236,9 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
+  /**
+   * Keyboard shortcut: Escape to close search
+   */
   @HostListener('document:keydown.escape')
   onEscape() {
     if (this.search.isOverlayOpen) {
@@ -158,28 +246,22 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
-
-
-
-
-  private isInputFocused(): boolean {
-    const activeElement = document.activeElement;
-    return !!(activeElement instanceof HTMLInputElement ||
-           activeElement instanceof HTMLTextAreaElement ||
-           (activeElement && activeElement.tagName === 'INPUT') ||
-           (activeElement && activeElement.tagName === 'TEXTAREA'));
+  /**
+   * Listen for hash changes (back/forward navigation)
+   */
+  @HostListener('window:hashchange', ['$event'])
+  onHashChange(): void {
+    this.recipeNavigationService.handleInitialHash();
   }
 
+  // ==================== Lifecycle Methods ====================
+
   /**
-   * Lifecycle: After view initialization
-   * Sets up observers after DOM is ready
-   * Uses requestAnimationFrame for optimal timing
+   * After view initialization - setup observers
    */
   ngAfterViewInit(): void {
     if (this.needsObserverSetup && this.showRecipeDetails) {
       this.needsObserverSetup = false;
-      // Use requestAnimationFrame for better timing than setTimeout
-      // This ensures execution after next repaint, typically faster than 200ms
       requestAnimationFrame(() => {
         this.observeAllSections();
         this.recipeNavigationService.handleInitialHash();
@@ -197,87 +279,27 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
     // Clean up preview sync service
     this.previewSyncService.cleanup();
 
-    // Remove body class when leaving recipe pages
+    // Remove body class
     document.body.classList.remove(RECIPE_CLASSES.BODY_PAGE);
   }
 
+  // ==================== Initialization ====================
+
   /**
    * Initialize component
+   * Loading state is managed by RecipeRouteHandlerService
    */
   private initializeComponent(): void {
-    this.uiStateService.setLoading(true);
+    // Component initialization
+    // Note: loading state is set by RecipeRouteHandlerService.handleRouteParams()
   }
 
   /**
-   * Sort recipes by category first, then by title A-Z
-   */
-  private sortRecipesByCategoryAndTitle(recipes: RecipeItem[]): RecipeItem[] {
-    return [...recipes].sort((a, b) => {
-      const categoryCompare = a.category.localeCompare(b.category);
-      if (categoryCompare !== 0) {
-        return categoryCompare;
-      }
-      return a.title.localeCompare(b.title);
-    });
-  }
-
-  /**
-   * Setup route parameter handling
-   * Uses combineLatest to avoid nested subscriptions and memory leaks
-   */
-  private setupRouteHandling(): void {
-    // Combine paramMap and queryParamMap into a single stream
-    combineLatest([
-      this.route.paramMap,
-      this.route.queryParamMap
-    ]).pipe(
-      takeUntil(this.destroy$)
-    ).subscribe(([params, queryParams]) => {
-      // Extract route parameters
-      const category = params.get('category') || '';
-      const recipeName = params.get('recipeName') || '';
-
-      this.navigation = { category, recipeName };
-
-      // Check for preview mode from query params
-      const isPreview = queryParams.get('preview') === 'true';
-      const previewRecipeId = queryParams.get('recipeId');
-
-      if (isPreview && previewRecipeId) {
-        // Preview mode
-        this.uiStateService.setPreviewMode(true);
-        this.uiStateService.setCurrentView('recipe');
-        this.loadPreviewRecipe(previewRecipeId);
-        this.setupPreviewSync(previewRecipeId);
-      } else {
-        // Normal mode - determine view based on route parameters
-        this.uiStateService.setPreviewMode(false);
-
-        if (recipeName) {
-          this.uiStateService.setCurrentView('recipe');
-          this.loadRecipeDetails(category, recipeName);
-        } else if (category) {
-          this.uiStateService.setCurrentView('category');
-          this.loadCategoryRecipes(category);
-        } else {
-          this.uiStateService.setCurrentView('home');
-          this.loadAllRecipes();
-        }
-      }
-
-      this.cdr.markForCheck();
-    });
-  }
-
-
-
-  /**
-   * Load initial data
+   * Load initial data (categories only)
+   * Recipe data is loaded by RecipeRouteHandlerService based on route
    */
   private loadInitialData(): void {
-    this.uiStateService.setLoading(true);
-
-    // Load categories
+    // Load categories - these are needed globally
     this.recipeService.getCategories().pipe(
       takeUntil(this.destroy$)
     ).subscribe({
@@ -290,122 +312,8 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
       }
     });
 
-    // Load all recipes
-    this.recipeService.getRecipes().pipe(
-      takeUntil(this.destroy$)
-    ).subscribe({
-      next: (recipes) => {
-        this.recipes = recipes;
-        // Only set filteredRecipes when in home view to avoid overwriting category filters
-        if (this.uiStateService.getCurrentView() === 'home') {
-          this.filteredRecipes = this.sortRecipesByCategoryAndTitle(recipes);
-        }
-        this.uiStateService.setLoading(false);
-        this.cdr.markForCheck();
-      },
-      error: (error) => {
-        console.error(RECIPE_MESSAGES.ERROR_LOAD_RECIPES, error);
-        this.uiStateService.setLoading(false);
-      }
-    });
-  }
-
-  /**
-   * Load all recipes for home view
-   */
-  private loadAllRecipes(): void {
-    this.recipeService.getRecipes().pipe(
-      takeUntil(this.destroy$)
-    ).subscribe({
-      next: (recipes) => {
-        this.recipes = recipes;
-        this.filteredRecipes = this.sortRecipesByCategoryAndTitle(recipes);
-        this.uiStateService.setLoading(false);
-        this.cdr.markForCheck();
-      },
-      error: (error) => {
-        console.error(RECIPE_MESSAGES.ERROR_LOAD_RECIPES, error);
-        this.uiStateService.setLoading(false);
-      }
-    });
-  }
-
-  /**
-   * Load recipes for specific category
-   */
-  private loadCategoryRecipes(category: string): void {
-    this.recipeService.getRecipesByCategory(category).pipe(
-      takeUntil(this.destroy$)
-    ).subscribe({
-      next: (recipes) => {
-        this.recipes = recipes;
-        this.filteredRecipes = this.sortRecipesByCategoryAndTitle(recipes);
-        this.uiStateService.setLoading(false);
-        this.cdr.markForCheck();
-      },
-      error: (error) => {
-        console.error(RECIPE_MESSAGES.ERROR_LOAD_RECIPES, error);
-        this.uiStateService.setLoading(false);
-      }
-    });
-  }
-
-  /**
-   * Load specific recipe details by slug
-   */
-  private loadRecipeDetails(category: string, recipeSlug: string): void {
-    this.recipeService.getRecipe(category, recipeSlug).pipe(
-      takeUntil(this.destroy$)
-    ).subscribe({
-      next: (recipe) => {
-        this.currentRecipe = recipe;
-        this.uiStateService.setLoading(false);
-
-        if (recipe) {
-          // Generate TOC structure for the loaded recipe
-          this.recipeTocService.setCurrentRecipe(recipe);
-          this.recipeTOC = this.recipeTocService.generateRecipeTOCStructure();
-          // Reset scroll state
-          this.uiStateService.resetScrollState();
-          // Mark that observers need setup (will be done in ngAfterViewInit)
-          this.needsObserverSetup = true;
-        }
-
-        this.cdr.markForCheck();
-      },
-      error: (error) => {
-        console.error(RECIPE_MESSAGES.ERROR_LOAD_RECIPE, error);
-        this.uiStateService.setLoading(false);
-      }
-    });
-  }
-
-  /**
-   * Load recipe from preview data
-   */
-  private loadPreviewRecipe(recipeId: string): void {
-    const previewData = this.previewService.getPreviewData(recipeId);
-
-    if (previewData) {
-      // Convert preview data to RecipeItem format using service
-      this.currentRecipe = this.previewSyncService.convertPreviewToRecipeItem(previewData);
-      this.uiStateService.setLoading(false);
-
-      if (this.currentRecipe) {
-        this.recipeTocService.setCurrentRecipe(this.currentRecipe);
-        this.recipeTOC = this.recipeTocService.generateRecipeTOCStructure();
-        this.uiStateService.resetScrollState();
-        // Mark that observers need setup (will be done in ngAfterViewInit)
-        this.needsObserverSetup = true;
-
-        // Set initial timestamp in preview sync service
-        this.previewSyncService.setCurrentTimestamp(previewData.timestamp);
-      }
-
-      this.cdr.markForCheck();
-    } else {
-      this.uiStateService.setLoading(false);
-    }
+    // Recipe loading is handled by RecipeRouteHandlerService.handleRouteParams()
+    // based on the current route (home/category/recipe detail)
   }
 
   /**
@@ -417,117 +325,90 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
     // Update current recipe
     this.currentRecipe = recipe;
 
-    // Regenerate TOC structure for updated content
+    // Regenerate TOC structure
     this.recipeTocService.setCurrentRecipe(this.currentRecipe);
     this.recipeTOC = this.recipeTocService.generateRecipeTOCStructure();
 
-    // Mark that observers need setup (will be done in ngAfterViewInit)
+    // Mark that observers need setup
     this.needsObserverSetup = true;
 
     // Trigger change detection
     this.cdr.markForCheck();
   }
 
-  /**
-   * Setup preview synchronization for cross-tab updates
-   */
-  private setupPreviewSync(recipeId: string): void {
-    // Delegate to preview sync service
-    this.previewSyncService.setupPreviewSync(recipeId);
-  }
+  // ==================== Navigation Methods (Delegate to Service) ====================
 
   /**
-   * Get recipe count
-   */
-  getRecipeCount(): number {
-    return this.recipes.length;
-  }
-
-  /**
-   * Navigate to home
+   * Navigate to home page
    */
   goHome(): void {
-    this.router.navigate(['/recipes']);
+    this.routeHandlerService.goHome();
   }
 
   /**
-   * Navigate to category
+   * Navigate to category page
    */
   goToCategory(categoryName: string): void {
-    this.router.navigate(['/recipes', categoryName]);
-
-    if (this.uiStateService.isMobile()) {
-      this.closeMobileSidebar();
-    }
+    this.routeHandlerService.goToCategory(categoryName, true);
   }
 
   /**
-   * Navigate to recipe
+   * Navigate to recipe detail page
    */
   goToRecipe(recipe: RecipeItem): void {
-    // Check if navigating to the same recipe
-    const isSameRecipe = this.currentRecipe &&
-                        this.currentRecipe.id === recipe.id &&
-                        this.currentRecipe.category === recipe.category;
-
-    this.router.navigate(['/recipes', recipe.category, recipe.slug]);
-
-    // Reset to top section when navigating to a different recipe
-    if (!isSameRecipe) {
-      this.uiStateService.setActiveSectionId('recipe-overview');
-    }
-
+    const currentId = this.currentRecipe?.id;
+    const currentCategory = this.currentRecipe?.category;
+    this.routeHandlerService.goToRecipe(recipe, currentId, currentCategory);
   }
 
+  // ==================== Search Methods (Delegate to Service) ====================
 
   /**
-   * Search recipes
+   * Search recipes by query
    */
   searchRecipes(query: string): void {
-    this.search.query = query;
-    this.search.isActive = query.trim().length > 0;
-    
-    if (this.search.isActive) {
-      this.recipeService.searchRecipes(query, this.currentFilter).pipe(
-        takeUntil(this.destroy$)
-      ).subscribe({
-        next: (results) => {
-          this.search.results = results;
-          this.search.hasResults = results.length > 0;
-          this.filteredRecipes = this.sortRecipesByCategoryAndTitle(results);
-          this.cdr.markForCheck();
-        },
-        error: (error) => {
-          console.error('Search failed:', error);
-        }
-      });
-    } else {
-      this.filteredRecipes = this.sortRecipesByCategoryAndTitle(this.recipes);
-      this.search.results = [];
-      this.cdr.markForCheck();
-    }
+    this.searchService.searchRecipes(query, this.currentFilter, this.recipes);
   }
 
   /**
-   * Clear search
+   * Clear search and reset results
    */
   clearSearch(): void {
-    this.search.query = '';
-    this.search.isActive = false;
-    this.search.results = [];
-    this.filteredRecipes = this.sortRecipesByCategoryAndTitle(this.recipes);
-    this.cdr.markForCheck();
+    this.searchService.clearSearch(this.recipes);
   }
 
   /**
-   * Toggle sidebar
+   * Open search overlay
+   */
+  openSearchOverlay(initialQuery = ''): void {
+    this.searchService.openSearchOverlay(initialQuery);
+  }
+
+  /**
+   * Close search overlay
+   */
+  closeSearchOverlay(): void {
+    this.searchService.closeSearchOverlay();
+  }
+
+  /**
+   * Handle search overlay recipe selection
+   */
+  handleSearchOverlaySelect(selectedRecipe: SelectedSuggestion): void {
+    this.searchService.handleSearchOverlaySelect(selectedRecipe);
+  }
+
+  // ==================== UI State Methods (Delegate to Service) ====================
+
+  /**
+   * Toggle sidebar collapsed/expanded
    */
   toggleSidebar(): void {
     this.uiStateService.toggleSidebar();
   }
 
   /**
-   * Toggle mobile sidebar
+   * Toggle mobile sidebar open/closed
    */
   toggleMobileSidebar(): void {
     this.uiStateService.toggleMobileSidebar();
@@ -540,26 +421,97 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
     this.uiStateService.closeMobileSidebar();
   }
 
+  // ==================== Section Methods ====================
+
+  /**
+   * Get visible overview sections for rendering
+   */
+  getVisibleOverviewSections() {
+    return this.recipeTocService.getVisibleOverviewSections();
+  }
+
+  /**
+   * Get all sections (overview + walkthrough) for unified rendering
+   */
+  getAllSectionsForRendering(): any[] {
+    return this.recipeTocService.getAllSectionsForRendering();
+  }
+
+  /**
+   * Observe all sections for TOC highlighting
+   */
+  private observeAllSections(): void {
+    const overviewElementIds = this.recipeTocService.getOverviewSectionsForTOC()
+      .map((section: RecipeSection) => section.elementId || '')
+      .filter((id: string) => id.length > 0);
+
+    const walkthroughStepCount = this.walkthroughStepsData.length;
+
+    this.recipeNavigationService.observeAllSections(overviewElementIds, walkthroughStepCount);
+  }
+
+  // ==================== Download ====================
+
+  /**
+   * Handle executable file download
+   */
+  downloadExecutable(url: string, title: string, originalFileName?: string): void {
+    if (!url) {
+      console.error('Download URL is empty');
+      return;
+    }
+
+    const normalizedUrl = url.replace(/[\u2010-\u2015]/g, '_');
+
+    const link = document.createElement('a');
+    link.href = normalizedUrl;
+    link.download = originalFileName || title || 'download';
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    // Track download event
+    if (this.currentRecipe) {
+      this.recipeService.trackRecipeEvent({
+        type: 'download',
+        recipeId: this.currentRecipe.id,
+        recipeTitle: this.currentRecipe.title,
+        recipeCategory: this.currentRecipe.category,
+        timestamp: new Date()
+      });
+    }
+  }
+
+  // ==================== Getters ====================
+
+  /**
+   * Get total recipe count (always returns all recipes count, not filtered)
+   */
+  getRecipeCount(): number {
+    return this.totalRecipeCount;
+  }
+
   /**
    * Get current breadcrumb path
    */
   get breadcrumbPath(): { name: string; url: string }[] {
     const path = [{ name: 'Recipes', url: '/recipes' }];
-    
+
     if (this.navigation.category) {
       const category = this.categories.find(cat => cat.name === this.navigation.category);
       const categoryName = category?.displayName || this.navigation.category;
-      path.push({ 
-        name: categoryName, 
-        url: `/recipes/${this.navigation.category}` 
+      path.push({
+        name: categoryName,
+        url: `/recipes/${this.navigation.category}`
       });
     }
-    
+
     return path;
   }
 
   /**
-   * Get recipes for current view
+   * Get recipes for current view (search results or filtered recipes)
    */
   get currentRecipes(): RecipeItem[] {
     return this.search.isActive ? this.search.results : this.filteredRecipes;
@@ -594,108 +546,18 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   /**
-   * Open search overlay
-   */
-  openSearchOverlay(initialQuery = ''): void {
-    this.searchOverlayInitialQuery = initialQuery;
-    this.search.isOverlayOpen = true;
-    
-    // Prevent body scrolling when overlay is open
-    document.body.style.overflow = 'hidden';
-    
-    this.cdr.markForCheck();
-  }
-
-  /**
-   * Close search overlay
-   */
-  closeSearchOverlay(): void {
-    this.search.isOverlayOpen = false;
-    
-    // Restore body scrolling
-    document.body.style.overflow = '';
-    
-    this.cdr.markForCheck();
-  }
-
-  /**
-   * Handle search overlay selection
-   */
-  handleSearchOverlaySelect(selectedRecipe: SelectedSuggestion): void {
-    // Navigate to the selected recipe using slug
-    this.router.navigate(['/recipes', selectedRecipe.category, selectedRecipe.slug]);
-
-
-    this.closeSearchOverlay();
-  }
-
-
-
-
-
-
-
-  /**
-   * Get visible overview sections with their data for template rendering
-   */
-  getVisibleOverviewSections() {
-    return this.recipeTocService.getVisibleOverviewSections();
-  }
-
-  /**
-   * Get all sections (overview + walkthrough) for unified rendering
-   * Used by the unified RecipeSectionComponent
-   */
-  getAllSectionsForRendering(): any[] {
-    return this.recipeTocService.getAllSectionsForRendering();
-  }
-
-
-
-  /**
-   * Observe all sections for TOC highlighting
-   */
-  private observeAllSections(): void {
-    // Get overview section element IDs
-    const overviewElementIds = this.recipeTocService.getOverviewSectionsForTOC()
-      .map((section: RecipeSection) => section.elementId || '')
-      .filter((id: string) => id.length > 0);
-
-    // Get walkthrough step count
-    const walkthroughStepCount = this.walkthroughStepsData.length;
-
-    // Delegate to navigation service
-    this.recipeNavigationService.observeAllSections(overviewElementIds, walkthroughStepCount);
-  }
-
-
-  /**
-   * Listen for hash changes (back/forward navigation)
-   */
-  @HostListener('window:hashchange', ['$event'])
-  onHashChange(): void {
-    this.recipeNavigationService.handleInitialHash();
-  }
-
-
-
-  // ==================== Walkthrough Step Navigation ====================
-
-  /**
-   * Get all walkthrough steps for current recipe
+   * Get all walkthrough step names
    */
   get walkthroughSteps(): string[] {
     if (!this.currentRecipe?.walkthrough) return [];
 
-    const steps: string[] = [];
     const walkthrough = this.currentRecipe.walkthrough;
 
     if (Array.isArray(walkthrough)) {
-      // New format - return step names
       return walkthrough.map((step, index) => step.step || `Step ${index + 1}`);
     }
 
-    return steps;
+    return [];
   }
 
   /**
@@ -708,57 +570,7 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
     return this.currentRecipe.walkthrough;
   }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-  /**
-   * Handle download link click to bypass Angular routing
-   */
-  downloadExecutable(url: string, title: string, originalFileName?: string): void {
-    if (!url) {
-      console.error('Download URL is empty');
-      return;
-    }
-    
-    // Replace em dash and other dash characters with underscore in the URL to match actual folder names
-    const normalizedUrl = url.replace(/[\u2010-\u2015]/g, '_');
-
-    // Create a temporary anchor element to force download
-    const link = document.createElement('a');
-    link.href = normalizedUrl;
-    // Use original filename if available, otherwise use title
-    link.download = originalFileName || title || 'download';
-    
-    // Use direct download approach without opening in new tab
-    // This avoids potential routing issues
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    
-    // Track download event if analytics service is available
-    if (this.currentRecipe) {
-      this.recipeService.trackRecipeEvent({
-        type: 'download',
-        recipeId: this.currentRecipe.id,
-        recipeTitle: this.currentRecipe.title,
-        recipeCategory: this.currentRecipe.category,
-        timestamp: new Date()
-      });
-    }
-  }
-
-
-  // ==================== TrackBy Functions for Performance ====================
+  // ==================== TrackBy Functions ====================
 
   /**
    * TrackBy function for recipe lists
