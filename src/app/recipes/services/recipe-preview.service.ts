@@ -137,21 +137,4 @@ export class RecipePreviewService {
     
     console.log('💾 Recipe preview backup saved to localStorage');
   }
-
-  /**
-   * Check if preview tab is open
-   */
-  isPreviewTabOpen(recipeId: string): boolean {
-    // Try to get reference to the preview window
-    const windowName = `recipe-preview-${recipeId}`;
-    const previewWindow = window.open('', windowName, 'noopener,noreferrer');
-    
-    if (previewWindow && !previewWindow.closed && previewWindow.location.href) {
-      // Window exists and is not closed
-      previewWindow.close(); // Close the test window
-      return true;
-    }
-    
-    return false;
-  }
 }

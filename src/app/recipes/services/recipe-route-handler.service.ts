@@ -140,7 +140,7 @@ export class RecipeRouteHandlerService implements OnDestroy {
         // Cache total count for use in other views
         this.cachedTotalCount = recipes.length;
 
-        const sortedRecipes = this.sortRecipesByCategoryAndTitle(recipes);
+        const sortedRecipes = this.recipeService.sortRecipesByCategoryAndTitle(recipes);
 
         this.dataLoaded$.next({
           currentRecipe: null,
@@ -153,10 +153,7 @@ export class RecipeRouteHandlerService implements OnDestroy {
 
         this.uiStateService.setLoading(false);
       },
-      error: (error) => {
-        console.error(RECIPE_MESSAGES.ERROR_LOAD_RECIPES, error);
-        this.uiStateService.setLoading(false);
-      }
+      error: (error) => this.handleLoadError(error, RECIPE_MESSAGES.ERROR_LOAD_RECIPES)
     });
   }
 
@@ -170,7 +167,7 @@ export class RecipeRouteHandlerService implements OnDestroy {
       takeUntil(this.destroy$)
     ).subscribe({
       next: (recipes) => {
-        const sortedRecipes = this.sortRecipesByCategoryAndTitle(recipes);
+        const sortedRecipes = this.recipeService.sortRecipesByCategoryAndTitle(recipes);
 
         this.dataLoaded$.next({
           currentRecipe: null,
@@ -183,10 +180,7 @@ export class RecipeRouteHandlerService implements OnDestroy {
 
         this.uiStateService.setLoading(false);
       },
-      error: (error) => {
-        console.error(RECIPE_MESSAGES.ERROR_LOAD_RECIPES, error);
-        this.uiStateService.setLoading(false);
-      }
+      error: (error) => this.handleLoadError(error, RECIPE_MESSAGES.ERROR_LOAD_RECIPES)
     });
   }
 
@@ -229,10 +223,7 @@ export class RecipeRouteHandlerService implements OnDestroy {
           });
         }
       },
-      error: (error) => {
-        console.error(RECIPE_MESSAGES.ERROR_LOAD_RECIPE, error);
-        this.uiStateService.setLoading(false);
-      }
+      error: (error) => this.handleLoadError(error, RECIPE_MESSAGES.ERROR_LOAD_RECIPE)
     });
   }
 
@@ -306,17 +297,36 @@ export class RecipeRouteHandlerService implements OnDestroy {
     });
   }
 
+  // ==================== Helper Methods ====================
+
   /**
-   * Sort recipes by category first, then by title A-Z
+   * Handle data loading errors
+   * Centralized error handling for all data loading operations
    */
-  private sortRecipesByCategoryAndTitle(recipes: RecipeItem[]): RecipeItem[] {
-    return [...recipes].sort((a, b) => {
-      const categoryCompare = a.category.localeCompare(b.category);
-      if (categoryCompare !== 0) {
-        return categoryCompare;
-      }
-      return a.title.localeCompare(b.title);
-    });
+  private handleLoadError(error: any, message: string): void {
+    console.error(message, error);
+    this.uiStateService.setLoading(false);
+  }
+
+  /**
+   * Create RecipeLoadResult object
+   * Factory method to ensure consistent creation with cached total count
+   */
+  private createLoadResult(
+    currentRecipe: RecipeItem | null,
+    recipeTOC: RecipeTOCStructure,
+    recipes: RecipeItem[] = [],
+    filteredRecipes: RecipeItem[] = [],
+    needsObserverSetup: boolean = false
+  ): RecipeLoadResult {
+    return {
+      currentRecipe,
+      recipeTOC,
+      recipes,
+      filteredRecipes,
+      needsObserverSetup,
+      totalRecipeCount: this.cachedTotalCount
+    };
   }
 
   // ==================== Navigation Methods ====================

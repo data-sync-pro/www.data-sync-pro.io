@@ -119,9 +119,6 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
         this.cdr.markForCheck();
       });
 
-    // Initialize component
-    this.initializeComponent();
-
     // Setup route handling - monitor route parameters and delegate to service
     combineLatest([
       this.route.paramMap,
@@ -284,15 +281,6 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   // ==================== Initialization ====================
-
-  /**
-   * Initialize component
-   * Loading state is managed by RecipeRouteHandlerService
-   */
-  private initializeComponent(): void {
-    // Component initialization
-    // Note: loading state is set by RecipeRouteHandlerService.handleRouteParams()
-  }
 
   /**
    * Load initial data (categories only)
