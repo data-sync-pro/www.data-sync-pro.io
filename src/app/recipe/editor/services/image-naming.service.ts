@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { SourceRecipeRecord } from '../../core/models/recipe.model';
 import { RecipeLoggerService } from '../../core/services/logger.service';
+import { createSafeString, getFileExtension, getExtensionFromFilename } from '../../core/utils';
 
 /**
  * Recipe Image Naming Service
@@ -48,14 +49,14 @@ export class RecipeImageNamingService {
         return this.fallbackImageName();
       }
 
-      const category = this.createSafeString(recipe.category || 'uncategorized');
+      const category = createSafeString(recipe.category || 'uncategorized');
 
       // Get current step name
       const step = recipe.walkthrough?.[stepIndex];
-      const stepName = this.createSafeString(step?.step || 'step');
+      const stepName = createSafeString(step?.step || 'step');
 
       // Get file extension
-      const extension = this.getFileExtension(file);
+      const extension = getFileExtension(file);
 
       // Create base name
       const baseName = `${category}-${stepName}-image`;
@@ -84,7 +85,7 @@ export class RecipeImageNamingService {
       const baseName = existingCount === 0 ? 'general-image' : `general-image-${existingCount + 1}`;
 
       // Get file extension
-      const extension = this.getFileExtension(file);
+      const extension = getFileExtension(file);
 
       // Ensure unique name within current recipe
       return this.ensureUniqueGeneralImageName(baseName, extension, recipe);
@@ -104,10 +105,10 @@ export class RecipeImageNamingService {
     stepIndex: number
   ): string {
     try {
-      const extension = this.getExtensionFromFilename(currentFileName);
-      const category = this.createSafeString(recipe.category || 'uncategorized');
+      const extension = getExtensionFromFilename(currentFileName);
+      const category = createSafeString(recipe.category || 'uncategorized');
       const step = recipe.walkthrough?.[stepIndex];
-      const stepName = this.createSafeString(step?.step || 'step');
+      const stepName = createSafeString(step?.step || 'step');
 
       const baseName = `${category}-${stepName}-image`;
       return this.ensureUniqueImageName(baseName, extension, recipe);
@@ -119,43 +120,6 @@ export class RecipeImageNamingService {
 
   // ==================== Utility Methods ====================
 
-  /**
-   * Create safe filename string
-   * Removes special characters, converts to lowercase, replaces spaces with hyphens
-   */
-  createSafeString(text: string): string {
-    if (!text || typeof text !== 'string') {
-      return 'unnamed';
-    }
-
-    const safe = text
-      .toLowerCase()
-      .trim()
-      .replace(this.INVALID_CHARS_PATTERN, '') // Remove invalid filename characters
-      .replace(this.NON_WORD_CHARS_PATTERN, '') // Keep only word characters, spaces, and hyphens
-      .replace(this.MULTIPLE_SPACES_PATTERN, '-') // Replace spaces with hyphens
-      .replace(this.MULTIPLE_HYPHENS_PATTERN, '-') // Replace multiple hyphens with single hyphen
-      .replace(this.LEADING_TRAILING_HYPHENS_PATTERN, '') // Remove leading/trailing hyphens
-      .substring(0, this.MAX_NAME_LENGTH); // Limit length
-
-    return safe || 'unnamed';
-  }
-
-  /**
-   * Get file extension from File object
-   */
-  getFileExtension(file: File): string {
-    const extension = file.name.split('.').pop()?.toLowerCase();
-    return extension || 'jpg';
-  }
-
-  /**
-   * Get file extension from filename string
-   */
-  getExtensionFromFilename(filename: string): string {
-    const extension = filename.split('.').pop()?.toLowerCase();
-    return extension || 'jpg';
-  }
 
   /**
    * Extract base name from image URL
@@ -385,5 +349,13 @@ export class RecipeImageNamingService {
     });
 
     return Array.from(duplicates);
+  }
+
+  /**
+   * Get file extension from File object (wrapper for utility function)
+   * @deprecated Use getFileExtension from core/utils instead
+   */
+  getFileExtension(file: File): string {
+    return getFileExtension(file);
   }
 }

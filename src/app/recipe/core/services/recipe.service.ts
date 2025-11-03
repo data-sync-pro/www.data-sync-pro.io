@@ -7,6 +7,7 @@ import { AutoLinkService } from '../../../shared/services/auto-link.service';
 import { generateSlug } from '../../../shared/utils/slug.utils';
 import { RECIPE_CATEGORY_ORDER } from '../constants/recipe.constants';
 import { RecipeLoggerService } from './logger.service';
+import { LocalStorageService } from './local-storage.service';
 
 import {
   SourceRecipeRecord,
@@ -98,7 +99,8 @@ export class RecipeService implements OnDestroy {
     private http: HttpClient,
     private sanitizer: DomSanitizer,
     private autoLinkService: AutoLinkService,
-    private logger: RecipeLoggerService
+    private logger: RecipeLoggerService,
+    private storage: LocalStorageService
   ) {
     this.initializeService();
     this.initializeIntersectionObserver();
@@ -648,23 +650,24 @@ export class RecipeService implements OnDestroy {
 
   /**
    * Track recipe progress
+   * Uses LocalStorageService for consistent storage
    */
   saveRecipeProgress(progress: RecipeProgress): void {
     const existingProgress = this.getRecipeProgress();
     existingProgress[progress.recipeId] = progress;
-    
-    localStorage.setItem(
-      this.STORAGE_KEY_RECIPE_PROGRESS, 
-      JSON.stringify(existingProgress)
-    );
+
+    this.storage.setItem(this.STORAGE_KEY_RECIPE_PROGRESS, existingProgress);
   }
 
   /**
    * Get recipe progress
+   * Uses LocalStorageService for consistent storage
    */
   getRecipeProgress(): { [recipeId: string]: RecipeProgress } {
-    const stored = localStorage.getItem(this.STORAGE_KEY_RECIPE_PROGRESS);
-    return stored ? JSON.parse(stored) : {};
+    return this.storage.getItem<{ [recipeId: string]: RecipeProgress }>(
+      this.STORAGE_KEY_RECIPE_PROGRESS,
+      {}
+    ) || {};
   }
 
   /**
@@ -707,38 +710,30 @@ export class RecipeService implements OnDestroy {
   }
 
   /**
-   * Save to local storage
+   * Save to local storage with TTL
+   * Uses LocalStorageService for consistent caching
    */
   private saveToLocalStorage(recipes: RecipeItem[]): void {
-    try {
-      const cacheData = {
-        recipes,
-        timestamp: Date.now(),
-        version: '1.0'
-      };
-      localStorage.setItem(this.STORAGE_KEY_RECIPE_CONTENT, JSON.stringify(cacheData));
-    } catch (error) {
-      this.logger.warn('Failed to save recipes to local storage', error);
-    }
+    this.storage.setItem(
+      this.STORAGE_KEY_RECIPE_CONTENT,
+      recipes,
+      { version: '1.0' }
+    );
   }
 
   /**
-   * Load from local storage
+   * Load from local storage with automatic TTL check
+   * Uses LocalStorageService for consistent caching
    */
   private loadFromLocalStorage(): void {
-    try {
-      const stored = localStorage.getItem(this.STORAGE_KEY_RECIPE_CONTENT);
-      if (stored) {
-        const cacheData = JSON.parse(stored);
-        const isExpired = Date.now() - cacheData.timestamp > this.CACHE_TTL;
-        
-        if (!isExpired && cacheData.recipes) {
-          this.recipesCache$.next(cacheData.recipes);
-          this.updateCategoriesCache(cacheData.recipes);
-        }
-      }
-    } catch (error) {
-      this.logger.warn('Failed to load recipes from local storage', error);
+    const recipes = this.storage.getItemWithTTL<RecipeItem[]>(
+      this.STORAGE_KEY_RECIPE_CONTENT,
+      this.CACHE_TTL
+    );
+
+    if (recipes && recipes.length > 0) {
+      this.recipesCache$.next(recipes);
+      this.updateCategoriesCache(recipes);
     }
   }
 

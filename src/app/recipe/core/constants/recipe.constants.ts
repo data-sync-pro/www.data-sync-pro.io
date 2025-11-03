@@ -188,3 +188,27 @@ export const ICON_NAMES = {
   COPY: 'utility:copy',
   CHECKMARK: 'utility:check'
 } as const;
+
+/**
+ * File size limits and constants
+ */
+export const FILE_SIZE = {
+  MAX_FILE_SIZE_MB: 5,
+  MAX_FILE_SIZE_BYTES: 5 * 1024 * 1024,
+  BYTES_PER_KB: 1024,
+  BYTES_PER_MB: 1024 * 1024,
+  BYTES_PER_GB: 1024 * 1024 * 1024
+} as const;
+
+/**
+ * Time conversion constants
+ */
+export const TIME_CONSTANTS = {
+  MS_PER_SECOND: 1000,
+  SECONDS_PER_MINUTE: 60,
+  MINUTES_PER_HOUR: 60,
+  HOURS_PER_DAY: 24,
+  MS_PER_MINUTE: 60 * 1000,
+  MS_PER_HOUR: 60 * 60 * 1000,
+  MS_PER_DAY: 24 * 60 * 60 * 1000
+} as const;

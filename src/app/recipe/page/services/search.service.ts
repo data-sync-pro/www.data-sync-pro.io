@@ -6,6 +6,7 @@ import { RecipeItem, RecipeFilter, RecipeSearchState } from '../../core/models/r
 import { RecipeService } from '../../core/services/recipe.service';
 import { RecipeLoggerService } from '../../core/services/logger.service';
 import { SelectedSuggestion } from '../search-overlay/search-overlay.component';
+import { BaseStateService } from '../../core/services/base-state.service';
 
 /**
  * Search result event emitted when search results are updated
@@ -18,6 +19,7 @@ export interface SearchResultEvent {
 
 /**
  * Service responsible for managing recipe search functionality
+ * Extends BaseStateService for common state management patterns
  *
  * This service handles:
  * - Search state management
@@ -28,30 +30,38 @@ export interface SearchResultEvent {
 @Injectable({
   providedIn: 'root'
 })
-export class RecipeSearchService implements OnDestroy {
+export class RecipeSearchService extends BaseStateService<RecipeSearchState> implements OnDestroy {
 
   private destroy$ = new Subject<void>();
 
-  // Search state
-  private searchState$ = new BehaviorSubject<RecipeSearchState>({
+  // Initial search state
+  protected initialState: RecipeSearchState = {
     query: '',
     isActive: false,
     results: [],
     hasResults: true,
     isOverlayOpen: false
-  });
+  };
+
+  // localStorage disabled for search (temporary state)
+  protected override storageOptions = {
+    enabled: false
+  };
 
   // Search overlay initial query
   private searchOverlayInitialQuery$ = new BehaviorSubject<string>('');
 
-  // Search result events
+  // Search result events (Subject for one-time events, not persistent state)
   private searchResult$ = new Subject<SearchResultEvent>();
 
   constructor(
     private recipeService: RecipeService,
     private router: Router,
     private logger: RecipeLoggerService
-  ) {}
+  ) {
+    super();
+    this.initializeState();
+  }
 
   ngOnDestroy(): void {
     this.destroy$.next();
@@ -59,29 +69,19 @@ export class RecipeSearchService implements OnDestroy {
   }
 
   /**
-   * Update search state with partial updates
-   * Helper method to avoid repeating isOverlayOpen preservation logic
-   */
-  private updateSearchState(updates: Partial<RecipeSearchState>): void {
-    const currentState = this.searchState$.value;
-    this.searchState$.next({
-      ...currentState,
-      ...updates
-    });
-  }
-
-  /**
    * Get search state as observable
+   * @deprecated Use getState() from BaseStateService instead
    */
   getSearchState(): Observable<RecipeSearchState> {
-    return this.searchState$.asObservable();
+    return this.getState();
   }
 
   /**
    * Get current search state value
+   * @deprecated Use getCurrentState() from BaseStateService instead
    */
   getCurrentSearchState(): RecipeSearchState {
-    return this.searchState$.value;
+    return this.getCurrentState();
   }
 
   /**
@@ -108,7 +108,7 @@ export class RecipeSearchService implements OnDestroy {
       ).subscribe({
         next: (results) => {
           // Update search state
-          this.updateSearchState({
+          this.updateState({
             query: query,
             isActive: true,
             results: results,
@@ -126,7 +126,7 @@ export class RecipeSearchService implements OnDestroy {
           this.logger.error('Search failed', error);
 
           // Update state with error
-          this.updateSearchState({
+          this.updateState({
             query: query,
             isActive: true,
             results: [],
@@ -136,7 +136,7 @@ export class RecipeSearchService implements OnDestroy {
       });
     } else {
       // Clear search
-      this.updateSearchState({
+      this.updateState({
         query: '',
         isActive: false,
         results: [],
@@ -156,7 +156,7 @@ export class RecipeSearchService implements OnDestroy {
    * Clear search
    */
   clearSearch(allRecipes: RecipeItem[]): void {
-    this.updateSearchState({
+    this.updateState({
       query: '',
       isActive: false,
       results: [],
@@ -176,12 +176,7 @@ export class RecipeSearchService implements OnDestroy {
    */
   openSearchOverlay(initialQuery = ''): void {
     this.searchOverlayInitialQuery$.next(initialQuery);
-
-    const currentState = this.searchState$.value;
-    this.searchState$.next({
-      ...currentState,
-      isOverlayOpen: true
-    });
+    this.updateState({ isOverlayOpen: true });
 
     // Prevent body scrolling when overlay is open
     document.body.style.overflow = 'hidden';
@@ -191,11 +186,7 @@ export class RecipeSearchService implements OnDestroy {
    * Close search overlay
    */
   closeSearchOverlay(): void {
-    const currentState = this.searchState$.value;
-    this.searchState$.next({
-      ...currentState,
-      isOverlayOpen: false
-    });
+    this.updateState({ isOverlayOpen: false });
 
     // Restore body scrolling
     document.body.style.overflow = '';
@@ -227,20 +218,20 @@ export class RecipeSearchService implements OnDestroy {
    * Get whether search overlay is open
    */
   isSearchOverlayOpen(): boolean {
-    return this.searchState$.value.isOverlayOpen;
+    return this.getCurrentState().isOverlayOpen;
   }
 
   /**
    * Get current search query
    */
   getCurrentQuery(): string {
-    return this.searchState$.value.query;
+    return this.getCurrentState().query;
   }
 
   /**
    * Check if search is active
    */
   isSearchActive(): boolean {
-    return this.searchState$.value.isActive;
+    return this.getCurrentState().isActive;
   }
 }

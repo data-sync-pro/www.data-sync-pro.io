@@ -1,14 +1,9 @@
 import { Injectable } from '@angular/core';
 import { SourceRecipeRecord } from '../../core/models/recipe.model';
 import { RecipeLoggerService } from '../../core/services/logger.service';
-
-interface RecipeTab {
-  id: string;
-  title: string;
-  recipe: SourceRecipeRecord;
-  hasChanges: boolean;
-  isActive: boolean;
-}
+import { LocalStorageService } from '../../core/services/local-storage.service';
+import { cleanRecipeForStorage } from '../../core/utils';
+import { EditorTab } from './state.service';
 
 @Injectable({
   providedIn: 'root'
@@ -18,71 +13,12 @@ export class RecipeStorageService {
   private readonly EDITED_RECIPES_KEY = this.STORAGE_KEY_PREFIX + 'edited_recipes';
   private readonly TABS_KEY = this.STORAGE_KEY_PREFIX + 'tabs';
   private readonly EDITED_IDS_KEY = this.STORAGE_KEY_PREFIX + 'edited_ids';
-  
-  constructor(private logger: RecipeLoggerService) {}
-  
-  /**
-   * Clean recipe object for storage/export by removing runtime properties
-   */
-  public cleanRecipeForStorage(recipe: SourceRecipeRecord): SourceRecipeRecord {
-    // Deep clone to avoid modifying the original
-    const cleanedRecipe = JSON.parse(JSON.stringify(recipe));
-    
-    // Clean walkthrough step media
-    if (cleanedRecipe.walkthrough && Array.isArray(cleanedRecipe.walkthrough)) {
-      cleanedRecipe.walkthrough.forEach((step: any) => {
-        if (step.media && Array.isArray(step.media)) {
-          step.media.forEach((media: any) => {
-            // Remove runtime properties
-            delete media.displayUrl;
-            delete media.imageKey;
-            
-            // Ensure URL is relative path (remove any absolute path prefix if present)
-            if (media.url && media.url.includes('assets/recipes/')) {
-              // Extract just the relative path starting from 'images/'
-              const match = media.url.match(/images\/[^/]+$/);
-              if (match) {
-                media.url = match[0];
-              }
-            }
-          });
-        }
-      });
-    }
-    
-    // Clean general images
-    if (cleanedRecipe.generalImages && Array.isArray(cleanedRecipe.generalImages)) {
-      cleanedRecipe.generalImages.forEach((image: any) => {
-        // Remove runtime properties
-        delete image.displayUrl;
-        delete image.imageKey;
-        
-        // Ensure URL is relative path
-        if (image.url && image.url.includes('assets/recipes/')) {
-          const match = image.url.match(/images\/[^/]+$/);
-          if (match) {
-            image.url = match[0];
-          }
-        }
-      });
-    }
-    
-    // Clean downloadable executables if needed
-    if (cleanedRecipe.downloadableExecutables && Array.isArray(cleanedRecipe.downloadableExecutables)) {
-      cleanedRecipe.downloadableExecutables.forEach((executable: any) => {
-        // Ensure filePath is relative
-        if (executable.filePath && executable.filePath.includes('assets/recipes/')) {
-          const match = executable.filePath.match(/downloadExecutables\/[^/]+$/);
-          if (match) {
-            executable.filePath = match[0];
-          }
-        }
-      });
-    }
-    
-    return cleanedRecipe;
-  }
-  
+
+  constructor(
+    private logger: RecipeLoggerService,
+    private storage: LocalStorageService
+  ) {}
+
   /**
    * Save a recipe to localStorage
    */
@@ -92,10 +28,10 @@ export class RecipeStorageService {
         this.logger.error('Recipe must have an ID to be saved');
         return false;
       }
-      
-      // Clean the recipe before saving
-      const cleanedRecipe = this.cleanRecipeForStorage(recipe);
-      
+
+      // Clean the recipe before saving using shared utility
+      const cleanedRecipe = cleanRecipeForStorage(recipe);
+
       // Get existing edited recipes
       const editedRecipes = this.getAllEditedRecipes();
       
@@ -108,7 +44,7 @@ export class RecipeStorageService {
       }
       
       // Save to localStorage
-      localStorage.setItem(this.EDITED_RECIPES_KEY, JSON.stringify(editedRecipes));
+      this.storage.setItem(this.EDITED_RECIPES_KEY, editedRecipes);
       
       // Update edited IDs list
       this.updateEditedIds(editedRecipes);
@@ -135,34 +71,18 @@ export class RecipeStorageService {
   
   /**
    * Get all edited recipes
+   * Uses LocalStorageService for consistent access
    */
   getAllEditedRecipes(): SourceRecipeRecord[] {
-    try {
-      const data = localStorage.getItem(this.EDITED_RECIPES_KEY);
-      if (!data) {
-        return [];
-      }
-      return JSON.parse(data);
-    } catch (error) {
-      this.logger.error('Error getting all edited recipes:', error);
-      return [];
-    }
+    return this.storage.getItem<SourceRecipeRecord[]>(this.EDITED_RECIPES_KEY, []) || [];
   }
-  
+
   /**
    * Get list of edited recipe IDs
+   * Uses LocalStorageService for consistent access
    */
   getEditedRecipeIds(): string[] {
-    try {
-      const data = localStorage.getItem(this.EDITED_IDS_KEY);
-      if (!data) {
-        return [];
-      }
-      return JSON.parse(data);
-    } catch (error) {
-      this.logger.error('Error getting edited recipe IDs:', error);
-      return [];
-    }
+    return this.storage.getItem<string[]>(this.EDITED_IDS_KEY, []) || [];
   }
   
   /**
@@ -170,7 +90,7 @@ export class RecipeStorageService {
    */
   private updateEditedIds(recipes: SourceRecipeRecord[]): void {
     const ids = recipes.map(r => r.id).filter(id => id);
-    localStorage.setItem(this.EDITED_IDS_KEY, JSON.stringify(ids));
+    this.storage.setItem(this.EDITED_IDS_KEY, ids);
   }
   
   /**
@@ -180,14 +100,14 @@ export class RecipeStorageService {
     try {
       const editedRecipes = this.getAllEditedRecipes();
       const filteredRecipes = editedRecipes.filter(r => r.id !== recipeId);
-      
+
       if (filteredRecipes.length === editedRecipes.length) {
         return false; // Recipe not found
       }
-      
-      localStorage.setItem(this.EDITED_RECIPES_KEY, JSON.stringify(filteredRecipes));
+
+      this.storage.setItem(this.EDITED_RECIPES_KEY, filteredRecipes);
       this.updateEditedIds(filteredRecipes);
-      
+
       return true;
     } catch (error) {
       this.logger.error('Error deleting edited recipe:', error);
@@ -198,7 +118,7 @@ export class RecipeStorageService {
   /**
    * Save tabs state
    */
-  saveTabs(tabs: RecipeTab[]): boolean {
+  saveTabs(tabs: EditorTab[]): boolean {
     try {
       // Filter out sensitive data before saving
       const tabsToSave = tabs.map(tab => ({
@@ -209,7 +129,7 @@ export class RecipeStorageService {
         isActive: tab.isActive
       }));
       
-      localStorage.setItem(this.TABS_KEY, JSON.stringify(tabsToSave));
+      this.storage.setItem(this.TABS_KEY, tabsToSave);
       return true;
     } catch (error) {
       this.logger.error('Error saving tabs:', error);
@@ -219,45 +139,27 @@ export class RecipeStorageService {
   
   /**
    * Get saved tabs
+   * Uses LocalStorageService for consistent access
    */
-  getSavedTabs(): RecipeTab[] | null {
-    try {
-      const data = localStorage.getItem(this.TABS_KEY);
-      if (!data) {
-        return null;
-      }
-      return JSON.parse(data);
-    } catch (error) {
-      this.logger.error('Error getting saved tabs:', error);
-      return null;
-    }
+  getSavedTabs(): EditorTab[] | null {
+    return this.storage.getItem<EditorTab[]>(this.TABS_KEY);
   }
-  
+
   /**
    * Clear specific recipe data
    */
   clearRecipe(recipeId: string): boolean {
     return this.deleteEditedRecipe(recipeId);
   }
-  
+
   /**
    * Clear all stored data
+   * Uses LocalStorageService clear with prefix
    */
   clearAll(): boolean {
     try {
-      // Get all keys that start with our prefix
-      const keysToRemove: string[] = [];
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key && key.startsWith(this.STORAGE_KEY_PREFIX)) {
-          keysToRemove.push(key);
-        }
-      }
-      
-      // Remove all our keys
-      keysToRemove.forEach(key => localStorage.removeItem(key));
-      
-      return true;
+      const count = this.storage.clear(this.STORAGE_KEY_PREFIX);
+      return count > 0 || this.storage.getKeys(this.STORAGE_KEY_PREFIX).length === 0;
     } catch (error) {
       this.logger.error('Error clearing all data:', error);
       return false;
@@ -266,21 +168,20 @@ export class RecipeStorageService {
   
   /**
    * Get storage size info
+   * Uses LocalStorageService for key enumeration
    */
   getStorageInfo(): { used: number; available: number; percentage: number } {
     try {
       let totalSize = 0;
-      
-      // Calculate size of our data
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key && key.startsWith(this.STORAGE_KEY_PREFIX)) {
-          const value = localStorage.getItem(key);
-          if (value) {
-            totalSize += key.length + value.length;
-          }
+
+      // Calculate size of our data using LocalStorageService
+      const keys = this.storage.getKeys(this.STORAGE_KEY_PREFIX);
+      keys.forEach(key => {
+        const value = this.storage.getItem<string>(key);
+        if (value) {
+          totalSize += key.length + JSON.stringify(value).length;
         }
-      }
+      });
       
       // Estimate available (localStorage typically has 5-10MB limit)
       const estimatedLimit = 5 * 1024 * 1024; // 5MB in bytes
@@ -302,31 +203,31 @@ export class RecipeStorageService {
   importRecipes(recipes: SourceRecipeRecord[]): boolean {
     try {
       const existingRecipes = this.getAllEditedRecipes();
-      
+
       // Merge with existing, replacing duplicates
       const recipeMap = new Map<string, SourceRecipeRecord>();
-      
+
       // Add existing recipes
       existingRecipes.forEach(r => {
         if (r.id) {
           recipeMap.set(r.id, r);
         }
       });
-      
+
       // Add/replace with imported recipes
       recipes.forEach(r => {
         if (r.id) {
           recipeMap.set(r.id, r);
         }
       });
-      
+
       // Convert back to array
       const mergedRecipes = Array.from(recipeMap.values());
-      
-      // Save
-      localStorage.setItem(this.EDITED_RECIPES_KEY, JSON.stringify(mergedRecipes));
+
+      // Save using LocalStorageService
+      this.storage.setItem(this.EDITED_RECIPES_KEY, mergedRecipes);
       this.updateEditedIds(mergedRecipes);
-      
+
       return true;
     } catch (error) {
       this.logger.error('Error importing recipes:', error);

@@ -7,6 +7,7 @@ import { NotificationService } from '../../../shared/services/notification.servi
 import { RecipeLoggerService } from './logger.service';
 import { firstValueFrom } from 'rxjs';
 import JSZip from 'jszip';
+import { formatFileSize, generateFolderName, cleanRecipeForStorage } from '../utils';
 
 /**
  * Extended SourceRecipeRecord with runtime metadata
@@ -129,9 +130,9 @@ export class RecipeExportService {
    */
   async exportSingleRecipe(recipe: SourceRecipeRecord): Promise<void> {
     try {
-      // Clean the recipe before export
-      const cleanedRecipe = this.storageService.cleanRecipeForStorage(recipe);
-      
+      // Clean the recipe before export using shared utility
+      const cleanedRecipe = cleanRecipeForStorage(recipe);
+
       const jsonString = JSON.stringify(cleanedRecipe, null, 2);
       const blob = new Blob([jsonString], { type: 'application/json' });
       const filename = `${cleanedRecipe.id || 'recipe'}.json`;
@@ -181,7 +182,7 @@ export class RecipeExportService {
 
       recipes.forEach(recipe => {
         if (recipe.id && recipe.title) {
-          const folderName = this.generateFolderName(recipe.title, existingFolders);
+          const folderName = generateFolderName(recipe.title, existingFolders);
           existingFolders.add(folderName);
           recipeFolderMap.set(recipe.id, folderName);
         }
@@ -192,9 +193,9 @@ export class RecipeExportService {
         if (!recipe.id) continue;
         
         updateProgress(`Processing recipe: ${recipe.title}`);
-        
-        // Clean the recipe before export
-        const cleanedRecipe = this.storageService.cleanRecipeForStorage(recipe);
+
+        // Clean the recipe before export using shared utility
+        const cleanedRecipe = cleanRecipeForStorage(recipe);
 
         // Create recipe folder using title-based name
         const folderName = recipeFolderMap.get(recipe.id) || recipe.id;
@@ -745,40 +746,6 @@ export class RecipeExportService {
     // Clean up object URL
     setTimeout(() => URL.revokeObjectURL(url), 100);
   }
-  
-  /**
-   * Generate folder name based on recipe title
-   */
-  private generateFolderName(title: string, existingFolders?: Set<string>): string {
-    if (!title) return 'unnamed-recipe';
-
-    // Generate base folder name from title
-    const baseName = title
-      .toLowerCase()
-      .trim()
-      .replace(/[/\\?<>\\:*|"]/g, '') // Remove invalid filename characters
-      .replace(/[^\w\s-]/g, '') // Keep only word characters, spaces, and hyphens
-      .replace(/\s+/g, '-') // Replace spaces with hyphens
-      .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
-      .replace(/^-|-$/g, '') // Remove leading/trailing hyphens
-      .substring(0, 50) // Limit length
-      || 'unnamed-recipe';
-
-    // Handle conflicts if existingFolders is provided
-    if (existingFolders) {
-      let finalName = baseName;
-      let counter = 2;
-
-      while (existingFolders.has(finalName)) {
-        finalName = `${baseName}-${counter}`;
-        counter++;
-      }
-
-      return finalName;
-    }
-
-    return baseName;
-  }
 
   /**
    * Generate recipe index for ZIP export - based on actual recipes being exported
@@ -789,7 +756,7 @@ export class RecipeExportService {
 
     // Generate index based only on recipes that will be exported
     const indexRecipes = validRecipes.map(recipe => {
-      const folderId = this.generateFolderName(recipe.title, existingFolders);
+      const folderId = generateFolderName(recipe.title, existingFolders);
       existingFolders.add(folderId); // Track used folder names
 
       return {
@@ -810,16 +777,6 @@ export class RecipeExportService {
     return new Blob([content]).size;
   }
   
-  /**
-   * Format file size for display
-   */
-  formatFileSize(bytes: number): string {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
-  }
 
   /**
    * Generate update instructions for exported recipes

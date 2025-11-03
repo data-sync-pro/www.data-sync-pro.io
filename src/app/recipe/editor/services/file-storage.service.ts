@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
 import { RecipeLoggerService } from '../../core/services/logger.service';
+import { formatFileSize, sanitizeFileName as sanitizeFileNameUtil } from '../../core/utils';
+import { FILE_SIZE, TIME_CONSTANTS } from '../../core/constants/recipe.constants';
 
 interface StoredImage {
   id: string;
@@ -26,13 +28,7 @@ export class RecipeFileStorageService {
   // Constants
   private readonly RANDOM_STRING_LENGTH = 9;
   private readonly RANDOM_STRING_RADIX = 36;
-  private readonly MAX_FILE_SIZE_MB = 5;
-  private readonly MAX_FILE_SIZE_BYTES = this.MAX_FILE_SIZE_MB * 1024 * 1024;
   private readonly DEFAULT_CLEANUP_DAYS = 30;
-  private readonly TIME_MS_PER_SECOND = 1000;
-  private readonly TIME_SECONDS_PER_MINUTE = 60;
-  private readonly TIME_MINUTES_PER_HOUR = 60;
-  private readonly TIME_HOURS_PER_DAY = 24;
 
   constructor(private logger: RecipeLoggerService) {}
 
@@ -277,13 +273,7 @@ export class RecipeFileStorageService {
         return;
       }
 
-      const cutoffTime = Date.now() - (
-        daysOld *
-        this.TIME_HOURS_PER_DAY *
-        this.TIME_MINUTES_PER_HOUR *
-        this.TIME_SECONDS_PER_MINUTE *
-        this.TIME_MS_PER_SECOND
-      );
+      const cutoffTime = Date.now() - (daysOld * TIME_CONSTANTS.MS_PER_DAY);
       const transaction = this.db.transaction([this.imageStoreName], 'readwrite');
       const store = transaction.objectStore(this.imageStoreName);
       const index = store.index('timestamp');
@@ -323,7 +313,7 @@ export class RecipeFileStorageService {
    * Get file size limit (in bytes)
    */
   getMaxFileSize(): number {
-    return this.MAX_FILE_SIZE_BYTES;
+    return FILE_SIZE.MAX_FILE_SIZE_BYTES;
   }
   
   /**
@@ -340,24 +330,14 @@ export class RecipeFileStorageService {
     if (!this.isValidImageFile(file)) {
       return { valid: false, error: 'Invalid file type. Only images are allowed.' };
     }
-    
+
     if (!this.isValidFileSize(file)) {
-      return { valid: false, error: `File too large. Maximum size is ${this.formatFileSize(this.getMaxFileSize())}.` };
+      return { valid: false, error: `File too large. Maximum size is ${formatFileSize(this.getMaxFileSize())}.` };
     }
-    
+
     return { valid: true };
   }
   
-  /**
-   * Format file size for display
-   */
-  formatFileSize(bytes: number): string {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
-  }
   
   /**
    * Store a JSON file
@@ -441,8 +421,8 @@ export class RecipeFileStorageService {
       return { valid: false, error: 'Invalid file type. Only JSON files are allowed.' };
     }
 
-    if (file.size > this.MAX_FILE_SIZE_BYTES) {
-      return { valid: false, error: `File too large. Maximum size is ${this.formatFileSize(this.MAX_FILE_SIZE_BYTES)}.` };
+    if (file.size > FILE_SIZE.MAX_FILE_SIZE_BYTES) {
+      return { valid: false, error: `File too large. Maximum size is ${formatFileSize(FILE_SIZE.MAX_FILE_SIZE_BYTES)}.` };
     }
 
     return { valid: true };
@@ -466,16 +446,12 @@ export class RecipeFileStorageService {
       return false;
     }
   }
-  
+
   /**
-   * Sanitize filename
+   * Sanitize filename (wrapper for utility function)
+   * @deprecated Use sanitizeFileName from core/utils instead
    */
   sanitizeFileName(fileName: string): string {
-    // Remove path separators and special characters
-    return fileName
-      .replace(/[\/\\:*?"<>|]/g, '') // Remove invalid filename characters
-      .replace(/\s+/g, '_') // Replace spaces with underscores
-      .replace(/\.+/g, '.') // Remove multiple dots
-      .replace(/^\.+|\.+$/g, ''); // Remove leading/trailing dots
+    return sanitizeFileNameUtil(fileName, { lowercase: false, spaceReplacement: '_' });
   }
 }

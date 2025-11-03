@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
 import { TIMING } from '../../../shared/constants/timing.constants';
+import { BaseStateService } from '../../core/services/base-state.service';
 
 /**
  * UI State interface for Recipe pages
@@ -19,18 +19,16 @@ export interface RecipeUIState {
 
 /**
  * Service to manage UI state for Recipe pages
- * Provides reactive state management using BehaviorSubject
+ * Extends BaseStateService for common state management patterns
+ * Provides reactive state management with localStorage persistence for sidebar state
  */
 @Injectable({
   providedIn: 'root'
 })
-export class RecipeUiStateService {
-
-  // Storage keys
-  private readonly STORAGE_KEY_SIDEBAR_COLLAPSED = 'recipe-sidebar-collapsed';
+export class RecipeUiStateService extends BaseStateService<RecipeUIState> {
 
   // Initial state
-  private readonly initialState: RecipeUIState = {
+  protected initialState: RecipeUIState = {
     isLoading: false,
     sidebarCollapsed: false,
     mobileSidebarOpen: false,
@@ -42,50 +40,21 @@ export class RecipeUiStateService {
     userHasScrolled: false
   };
 
-  // State subject - holds current state
-  private state$ = new BehaviorSubject<RecipeUIState>(this.initialState);
+  // localStorage configuration - only persist sidebar state
+  protected override storageOptions = {
+    enabled: true,
+    key: 'recipe-ui-state',
+    persistFields: ['sidebarCollapsed'] // Only persist sidebar collapse state
+  };
 
   // Resize debounce timer
   private resizeTimer: any;
 
   constructor() {
-    this.loadSidebarStateFromStorage();
+    super();
+    this.initializeState();
     this.checkMobileView();
     this.setupResizeListener();
-  }
-
-  // ==================== State Observables ====================
-
-  /**
-   * Get the complete UI state as observable
-   */
-  getState(): Observable<RecipeUIState> {
-    return this.state$.asObservable();
-  }
-
-  /**
-   * Get current state snapshot (synchronous)
-   */
-  getCurrentState(): RecipeUIState {
-    return this.state$.value;
-  }
-
-  // ==================== State Update Methods ====================
-
-  /**
-   * Update state with partial updates
-   */
-  updateState(updates: Partial<RecipeUIState>): void {
-    const currentState = this.state$.value;
-    const newState = { ...currentState, ...updates };
-    this.state$.next(newState);
-  }
-
-  /**
-   * Reset state to initial values
-   */
-  resetState(): void {
-    this.state$.next({ ...this.initialState });
   }
 
   // ==================== Loading State ====================
@@ -101,7 +70,7 @@ export class RecipeUiStateService {
    * Get current loading state (synchronous)
    */
   isLoading(): boolean {
-    return this.state$.value.isLoading;
+    return this.getCurrentState().isLoading;
   }
 
   // ==================== View Management ====================
@@ -117,28 +86,28 @@ export class RecipeUiStateService {
    * Get current view (synchronous)
    */
   getCurrentView(): 'home' | 'category' | 'recipe' {
-    return this.state$.value.currentView;
+    return this.getCurrentState().currentView;
   }
 
   /**
    * Check if showing home view
    */
   isHomeView(): boolean {
-    return this.state$.value.currentView === 'home';
+    return this.getCurrentState().currentView === 'home';
   }
 
   /**
    * Check if showing category view
    */
   isCategoryView(): boolean {
-    return this.state$.value.currentView === 'category';
+    return this.getCurrentState().currentView === 'category';
   }
 
   /**
    * Check if showing recipe details view
    */
   isRecipeView(): boolean {
-    return this.state$.value.currentView === 'recipe';
+    return this.getCurrentState().currentView === 'recipe';
   }
 
   // ==================== Preview Mode ====================
@@ -154,53 +123,33 @@ export class RecipeUiStateService {
    * Get preview mode state (synchronous)
    */
   isPreviewMode(): boolean {
-    return this.state$.value.isPreviewMode;
+    return this.getCurrentState().isPreviewMode;
   }
 
   // ==================== Sidebar Management ====================
 
   /**
    * Toggle sidebar collapsed state
+   * Automatically persisted to localStorage via BaseStateService
    */
   toggleSidebar(): void {
-    const collapsed = !this.state$.value.sidebarCollapsed;
+    const collapsed = !this.getCurrentState().sidebarCollapsed;
     this.updateState({ sidebarCollapsed: collapsed });
-    this.saveSidebarStateToStorage(collapsed);
   }
 
   /**
    * Set sidebar collapsed state
+   * Automatically persisted to localStorage via BaseStateService
    */
   setSidebarCollapsed(collapsed: boolean): void {
     this.updateState({ sidebarCollapsed: collapsed });
-    this.saveSidebarStateToStorage(collapsed);
   }
 
   /**
    * Get sidebar collapsed state (synchronous)
    */
   isSidebarCollapsed(): boolean {
-    return this.state$.value.sidebarCollapsed;
-  }
-
-  /**
-   * Load sidebar state from localStorage
-   */
-  private loadSidebarStateFromStorage(): void {
-    if (typeof localStorage === 'undefined') return;
-
-    const savedState = localStorage.getItem(this.STORAGE_KEY_SIDEBAR_COLLAPSED);
-    if (savedState !== null) {
-      this.updateState({ sidebarCollapsed: savedState === 'true' });
-    }
-  }
-
-  /**
-   * Save sidebar state to localStorage
-   */
-  private saveSidebarStateToStorage(collapsed: boolean): void {
-    if (typeof localStorage === 'undefined') return;
-    localStorage.setItem(this.STORAGE_KEY_SIDEBAR_COLLAPSED, collapsed.toString());
+    return this.getCurrentState().sidebarCollapsed;
   }
 
   // ==================== Mobile Sidebar Management ====================
@@ -209,7 +158,7 @@ export class RecipeUiStateService {
    * Toggle mobile sidebar
    */
   toggleMobileSidebar(): void {
-    this.updateState({ mobileSidebarOpen: !this.state$.value.mobileSidebarOpen });
+    this.updateState({ mobileSidebarOpen: !this.getCurrentState().mobileSidebarOpen });
   }
 
   /**
@@ -230,7 +179,7 @@ export class RecipeUiStateService {
    * Get mobile sidebar state (synchronous)
    */
   isMobileSidebarOpen(): boolean {
-    return this.state$.value.mobileSidebarOpen;
+    return this.getCurrentState().mobileSidebarOpen;
   }
 
   // ==================== Mobile Detection ====================
@@ -267,7 +216,7 @@ export class RecipeUiStateService {
    * Get mobile state (synchronous)
    */
   isMobile(): boolean {
-    return this.state$.value.isMobile;
+    return this.getCurrentState().isMobile;
   }
 
   // ==================== TOC Management ====================
@@ -283,14 +232,14 @@ export class RecipeUiStateService {
    * Toggle TOC visibility
    */
   toggleToc(): void {
-    this.updateState({ tocHidden: !this.state$.value.tocHidden });
+    this.updateState({ tocHidden: !this.getCurrentState().tocHidden });
   }
 
   /**
    * Get TOC hidden state (synchronous)
    */
   isTocHidden(): boolean {
-    return this.state$.value.tocHidden;
+    return this.getCurrentState().tocHidden;
   }
 
   // ==================== Section Management ====================
@@ -306,7 +255,7 @@ export class RecipeUiStateService {
    * Get active section ID (synchronous)
    */
   getActiveSectionId(): string {
-    return this.state$.value.activeSectionId;
+    return this.getCurrentState().activeSectionId;
   }
 
   // ==================== Scroll State Management ====================
@@ -322,7 +271,7 @@ export class RecipeUiStateService {
    * Mark that user has scrolled
    */
   markUserScrolled(): void {
-    if (!this.state$.value.userHasScrolled) {
+    if (!this.getCurrentState().userHasScrolled) {
       this.updateState({ userHasScrolled: true });
     }
   }
@@ -338,7 +287,7 @@ export class RecipeUiStateService {
    * Get user has scrolled state (synchronous)
    */
   hasUserScrolled(): boolean {
-    return this.state$.value.userHasScrolled;
+    return this.getCurrentState().userHasScrolled;
   }
 
   // ==================== Cleanup ====================

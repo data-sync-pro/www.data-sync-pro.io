@@ -9,12 +9,14 @@ import { RecipeLoggerService } from '../core/services/logger.service';
 import { NotificationService } from '../../shared/services/notification.service';
 import { RecipePreviewService, RecipePreviewData } from '../core/services/preview.service';
 import { ClipboardUtil } from '../../shared/utils/clipboard.util';
+import { cleanRecipeForExport } from '../core/utils';
 // New services for refactored architecture
-import { RecipeEditorStateService, RecipeTab, EditorState } from './services/state.service';
+import { RecipeEditorStateService, EditorTab, EditorState } from './services/state.service';
 import { RecipeValidationService } from './services/validation.service';
 import { RecipeAutocompleteService } from './services/autocomplete.service';
 import { RecipeImageNamingService } from './services/image-naming.service';
 import { RecipeImageLoaderService } from './services/image-loader.service';
+import { RecipeImageManagementService } from './services/image-management.service';
 import { EDITOR_CONSTANTS } from './editor.constants';
 import { StepManagementUtil } from './utils/step-management.util';
 import { TrackByUtil } from '../../shared/utils/trackby.util';
@@ -135,7 +137,8 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
     private validationService: RecipeValidationService,
     private autocompleteService: RecipeAutocompleteService,
     private imageNamingService: RecipeImageNamingService,
-    private imageLoaderService: RecipeImageLoaderService
+    private imageLoaderService: RecipeImageLoaderService,
+    private imageManagementService: RecipeImageManagementService
   ) {}
   
   ngOnInit(): void {
@@ -330,10 +333,10 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
   
   private triggerCrossTabPreviewUpdate(): void {
     if (!this.currentRecipe) return;
-    
-    // Use cleanRecipeForExport to handle Custom step names properly
-    const cleanedRecipe = this.cleanRecipeForExport(this.currentRecipe);
-    
+
+    // Use shared utility to handle Custom step names properly
+    const cleanedRecipe = cleanRecipeForExport(this.currentRecipe, this.customStepNames);
+
     const previewData: RecipePreviewData = {
       recipeId: cleanedRecipe.id,
       title: cleanedRecipe.title,
@@ -349,7 +352,7 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
   // Tab management
   createNewTab(): void {
     const newRecipe = this.createEmptyRecipe();
-    const tab: RecipeTab = {
+    const tab: EditorTab = {
       id: this.generateUUID(),
       title: 'New Recipe',
       recipe: newRecipe,
@@ -444,7 +447,7 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
           }
           
           // Create new tab
-          const tab: RecipeTab = {
+          const tab: EditorTab = {
             id: this.generateUUID(),
             title: sourceRecipe.title,
             recipe: sourceRecipe,
@@ -538,7 +541,7 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
   /**
    * Handle recipe title change and ID generation
    */
-  private handleRecipeTitleChange(tab: RecipeTab): void {
+  private handleRecipeTitleChange(tab: EditorTab): void {
     if (!this.currentRecipe?.title || this.currentRecipe.title === this.previousTitle) {
       return;
     }
@@ -666,154 +669,34 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
   }
   
   async onImageDrop(event: DragEvent, stepIndex: number): Promise<void> {
-    event.preventDefault();
-    const files = event.dataTransfer?.files;
-    if (!files || files.length === 0) return;
-    
-    for (let i = 0; i < files.length; i++) {
-      await this.handleImageFile(files[i], stepIndex);
-    }
+    if (!this.currentRecipe) return;
+    await this.imageManagementService.handleStepImageDrop(
+      event,
+      this.currentRecipe,
+      stepIndex,
+      () => this.onRecipeChange()
+    );
   }
-  
+
   async handleImageFile(file: File, stepIndex: number): Promise<void> {
     if (!this.currentRecipe?.walkthrough?.[stepIndex]) return;
-    await this.uploadImageFile(file, 'step-media', { stepIndex });
-  }
-
-  /**
-   * Unified image upload logic for all image upload operations
-   */
-  private async uploadImageFile(
-    file: File,
-    purpose: 'step-media' | 'general-image' | 'replace-step-media' | 'replace-general-image',
-    options: {
-      stepIndex?: number;
-      existingObject?: any;
-      targetInput?: HTMLInputElement;
-    } = {}
-  ): Promise<void> {
-    // Validate file
-    const validation = this.fileStorageService.validateImageFile(file);
-    if (!validation.valid) {
-      this.notificationService.error(validation.error || 'Invalid file');
-      return;
-    }
-
-    try {
-      const { baseName, fullFileName } = this.generateImageFileName(file, purpose, options);
-
-      // Store image in IndexedDB
-      await this.fileStorageService.storeImage(baseName, file);
-
-      // Generate displayUrl immediately
-      const displayUrl = URL.createObjectURL(file);
-
-      // Update recipe with image
-      this.updateRecipeWithImage(purpose, options, baseName, fullFileName, displayUrl, file);
-
-      // Cleanup and notify
-      this.finalizeImageUpload(options.targetInput);
-    } catch (error) {
-      this.logger.error('Error uploading image:', error);
-      this.notificationService.error('Failed to upload image');
-    }
-  }
-
-  /**
-   * Generate image file name based on purpose
-   */
-  private generateImageFileName(
-    file: File,
-    purpose: string,
-    options: { stepIndex?: number }
-  ): { baseName: string; fullFileName: string } {
-    let baseName: string;
-    let fullFileName: string;
-
-    if (purpose === 'step-media') {
-      baseName = this.imageNamingService.generateImageName(file, this.currentRecipe!, options.stepIndex!);
-      const extension = file.name.split('.').pop()?.toLowerCase() || 'jpg';
-      fullFileName = `${baseName}.${extension}`;
-    } else if (purpose === 'general-image') {
-      baseName = this.imageNamingService.generateGeneralImageName(file, this.currentRecipe!);
-      const extension = file.name.split('.').pop()?.toLowerCase() || 'png';
-      fullFileName = `${baseName}.${extension}`;
-    } else {
-      // For replace operations, use random ID
-      const imageId = this.fileStorageService.generateImageId();
-      const originalName = this.fileStorageService.sanitizeFileName(file.name);
-      baseName = imageId;
-      fullFileName = `${imageId}_${originalName}`;
-    }
-
-    return { baseName, fullFileName };
-  }
-
-  /**
-   * Update recipe with uploaded image
-   */
-  private updateRecipeWithImage(
-    purpose: string,
-    options: { stepIndex?: number; existingObject?: any },
-    baseName: string,
-    fullFileName: string,
-    displayUrl: string,
-    file: File
-  ): void {
-    if (purpose === 'step-media') {
-      const media: RecipeStepMedia = {
-        type: 'image',
-        url: `images/${fullFileName}`,
-        alt: file.name.replace(/\.[^/.]+$/, '')
-      };
-      (media as any).displayUrl = displayUrl;
-      this.currentRecipe!.walkthrough[options.stepIndex!].media.push(media);
-    } else if (purpose === 'general-image') {
-      const generalImage: RecipeGeneralImage = {
-        type: 'image',
-        url: `images/${fullFileName}`,
-        alt: file.name.replace(/\.[^/.]+$/, ''),
-        imageId: baseName
-      };
-      (generalImage as any).displayUrl = displayUrl;
-      if (!this.currentRecipe!.generalImages) {
-        this.currentRecipe!.generalImages = [];
-      }
-      this.currentRecipe!.generalImages.push(generalImage);
-    } else if (purpose === 'replace-step-media' || purpose === 'replace-general-image') {
-      options.existingObject!.url = `images/${fullFileName}`;
-      (options.existingObject as any).displayUrl = displayUrl;
-    }
-  }
-
-  /**
-   * Finalize image upload (cleanup and notifications)
-   */
-  private finalizeImageUpload(targetInput?: HTMLInputElement): void {
-    if (targetInput) {
-      targetInput.value = '';
-    }
-
-    this.onRecipeChange();
-    this.notificationService.success('Image uploaded successfully');
-    this.cdr.detectChanges();
+    await this.imageManagementService.uploadImage(
+      file,
+      this.currentRecipe,
+      'step-media',
+      { stepIndex },
+      () => this.onRecipeChange()
+    );
   }
 
   removeMedia(stepIndex: number, mediaIndex: number): void {
-    if (!this.currentRecipe?.walkthrough?.[stepIndex]) return;
-    
-    const media = this.currentRecipe.walkthrough[stepIndex].media[mediaIndex];
-    
-    // Delete from IndexedDB if it's a stored image
-    if (media.url.startsWith('images/')) {
-      const fileName = media.url.replace('images/', '');
-      // For step media, the storage key is the base name (without extension)
-      const baseName = fileName.replace(/\.[^/.]+$/, '');
-      this.fileStorageService.deleteImage(baseName);
-    }
-    
-    this.currentRecipe.walkthrough[stepIndex].media.splice(mediaIndex, 1);
-    this.onRecipeChange();
+    if (!this.currentRecipe) return;
+    this.imageManagementService.removeStepMedia(
+      this.currentRecipe,
+      stepIndex,
+      mediaIndex,
+      () => this.onRecipeChange()
+    );
   }
   
   trackByIndex = TrackByUtil.index;
@@ -945,67 +828,70 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
    * Replace missing step media image with new upload
    */
   public async replaceMissingImage(event: Event, media: any, stepIndex: number): Promise<void> {
+    if (!this.currentRecipe) return;
     const target = event.target as HTMLInputElement;
     if (!target.files || target.files.length === 0) return;
-    await this.uploadImageFile(target.files[0], 'replace-step-media', { existingObject: media, targetInput: target });
+    await this.imageManagementService.uploadImage(
+      target.files[0],
+      this.currentRecipe,
+      'replace-step-media',
+      { existingObject: media, targetInput: target },
+      () => this.onRecipeChange()
+    );
   }
 
   /**
    * Replace missing general image with new upload
    */
   public async replaceMissingGeneralImage(event: Event, image: any, imageIndex: number): Promise<void> {
+    if (!this.currentRecipe) return;
     const target = event.target as HTMLInputElement;
     if (!target.files || target.files.length === 0) return;
-    await this.uploadImageFile(target.files[0], 'replace-general-image', { existingObject: image, targetInput: target });
+    await this.imageManagementService.uploadImage(
+      target.files[0],
+      this.currentRecipe,
+      'replace-general-image',
+      { existingObject: image, targetInput: target },
+      () => this.onRecipeChange()
+    );
   }
 
   // General images management
   addGeneralImage(): void {
     if (!this.currentRecipe) return;
-
-    // Add empty general image entry (like step media)
-    const newGeneralImage: RecipeGeneralImage = {
-      type: 'image',
-      url: '',
-      alt: ''
-    };
-
-    if (!this.currentRecipe.generalImages) {
-      this.currentRecipe.generalImages = [];
-    }
-    this.currentRecipe.generalImages.push(newGeneralImage);
-    this.onRecipeChange();
+    this.imageManagementService.addEmptyGeneralImage(
+      this.currentRecipe,
+      () => this.onRecipeChange()
+    );
   }
 
   async handleGeneralImageFile(file: File): Promise<void> {
     if (!this.currentRecipe) return;
-    await this.uploadImageFile(file, 'general-image');
+    await this.imageManagementService.uploadImage(
+      file,
+      this.currentRecipe,
+      'general-image',
+      {},
+      () => this.onRecipeChange()
+    );
   }
 
   removeGeneralImage(index: number): void {
-    if (!this.currentRecipe?.generalImages) return;
-    
-    const image = this.currentRecipe.generalImages[index];
-    
-    // Delete from IndexedDB if it has an imageId
-    if (image.imageId) {
-      this.fileStorageService.deleteImage(image.imageId);
-    }
-    
-    this.currentRecipe.generalImages.splice(index, 1);
-    this.onRecipeChange();
-    
-    this.notificationService.success('General image removed');
+    if (!this.currentRecipe) return;
+    this.imageManagementService.removeGeneralImage(
+      this.currentRecipe,
+      index,
+      () => this.onRecipeChange()
+    );
   }
 
   async onGeneralImageDrop(event: DragEvent): Promise<void> {
-    event.preventDefault();
-    const files = event.dataTransfer?.files;
-    if (!files || files.length === 0) return;
-    
-    for (let i = 0; i < files.length; i++) {
-      await this.handleGeneralImageFile(files[i]);
-    }
+    if (!this.currentRecipe) return;
+    await this.imageManagementService.handleGeneralImageDrop(
+      event,
+      this.currentRecipe,
+      () => this.onRecipeChange()
+    );
   }
   
   /**
@@ -1057,7 +943,7 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
     }
   }
   
-  private saveTab(tab: RecipeTab): void {
+  private saveTab(tab: EditorTab): void {
     this.state.isSaving = true;
 
     // Validate recipe before saving
@@ -1074,10 +960,10 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
     if (!tab.recipe.id) {
       tab.recipe.id = this.generateRecipeId();
     }
-    
-    // Clean recipe to permanently save Custom step names
-    const cleanedRecipe = this.cleanRecipeForExport(tab.recipe);
-    
+
+    // Clean recipe to permanently save Custom step names using shared utility
+    const cleanedRecipe = cleanRecipeForExport(tab.recipe, this.customStepNames);
+
     // Save cleaned recipe to storage
     this.storageService.saveRecipe(cleanedRecipe);
     this.editedRecipeIds.add(cleanedRecipe.id);
@@ -1111,9 +997,9 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
     if (tab.hasChanges) {
       this.saveTab(tab);
     }
-    
-    // Use cleanRecipeForExport to handle Custom step names properly
-    const cleanedRecipe = this.cleanRecipeForExport(tab.recipe);
+
+    // Use shared utility to handle Custom step names properly
+    const cleanedRecipe = cleanRecipeForExport(tab.recipe, this.customStepNames);
     await this.exportService.exportSingleRecipe(cleanedRecipe);
   }
   
@@ -1182,7 +1068,7 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
           let firstTabId: string | null = null;
           
           for (const recipe of importedRecipes) {
-            const tab: RecipeTab = {
+            const tab: EditorTab = {
               id: this.generateUUID(),
               title: recipe.title,
               recipe: recipe,
@@ -1234,7 +1120,7 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
       
       if (imported) {
         // Create new tab with imported recipe
-        const tab: RecipeTab = {
+        const tab: EditorTab = {
           id: this.generateUUID(),
           title: imported.title,
           recipe: imported,
@@ -1294,7 +1180,7 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
   }
   
   // Utility functions
-  private getCurrentTab(): RecipeTab | undefined {
+  private getCurrentTab(): EditorTab | undefined {
     return this.state.tabs.find(t => t.id === this.state.activeTabId);
   }
   
@@ -1384,7 +1270,7 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
     
     if (recipe) {
       // Create new tab with the recipe
-      const tab: RecipeTab = {
+      const tab: EditorTab = {
         id: this.generateUUID(),
         title: recipe.title,
         recipe: recipe,
@@ -1416,58 +1302,11 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
     }
     
     try {
-      // Use clean recipe for preview (same as export)
-      const cleanRecipe = this.cleanRecipeForExport(this.currentRecipe);
+      // Use shared utility for recipe cleaning with custom step names
+      const cleanRecipe = cleanRecipeForExport(this.currentRecipe, this.customStepNames);
       this.jsonPreview = JSON.stringify(cleanRecipe, null, 2);
     } catch (error) {
       this.jsonPreview = 'Error generating JSON preview';
-    }
-  }
-  
-  // Clean recipe for export/preview (remove internal fields)
-  private cleanRecipeForExport(recipe: SourceRecipeRecord): any {
-    try {
-      if (!recipe) return null;
-      
-      // Create a deep copy to avoid modifying original data
-      // Use structuredClone if available, fallback to JSON method
-      const cleanRecipe = typeof structuredClone !== 'undefined' 
-        ? structuredClone(recipe)
-        : JSON.parse(JSON.stringify(recipe));
-      
-      // Remove any internal fields that shouldn't be in export
-      delete cleanRecipe.internalId;
-      delete cleanRecipe.editorState;
-      
-      // Clean general images - remove displayUrl safely
-      if (cleanRecipe.generalImages) {
-        cleanRecipe.generalImages = cleanRecipe.generalImages.map((image: any) => {
-          const { displayUrl, ...cleanImage } = image;
-          return cleanImage;
-        });
-      }
-      
-      // Clean walkthrough step media - remove displayUrl safely and handle custom step names
-      if (cleanRecipe.walkthrough) {
-        cleanRecipe.walkthrough.forEach((step: any, index: number) => {
-          if (step.media) {
-            step.media = step.media.map((media: any) => {
-              const { displayUrl, ...cleanMedia } = media;
-              return cleanMedia;
-            });
-          }
-          
-          // If this is a custom step, replace step field with actual custom name
-          if (step.step === 'Custom' && this.customStepNames[index]) {
-            step.step = this.customStepNames[index];
-          }
-        });
-      }
-      
-      return cleanRecipe;
-    } catch (error) {
-      this.logger.error('Error cleaning recipe for export:', error);
-      return recipe; // Return original if cleaning fails
     }
   }
 
@@ -1639,8 +1478,8 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
   public openPreviewInNewTab(): void {
     if (!this.currentRecipe) return;
 
-    // Use cleanRecipeForExport to handle Custom step names properly
-    const cleanedRecipe = this.cleanRecipeForExport(this.currentRecipe);
+    // Use shared utility to handle Custom step names properly
+    const cleanedRecipe = cleanRecipeForExport(this.currentRecipe, this.customStepNames);
 
     const previewData: RecipePreviewData = {
       recipeId: cleanedRecipe.id,
@@ -1665,8 +1504,8 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
   private updateExternalPreview(): void {
     if (!this.currentRecipe) return;
 
-    // Use cleanRecipeForExport to handle Custom step names properly
-    const cleanedRecipe = this.cleanRecipeForExport(this.currentRecipe);
+    // Use shared utility to handle Custom step names properly
+    const cleanedRecipe = cleanRecipeForExport(this.currentRecipe, this.customStepNames);
 
     const previewData: RecipePreviewData = {
       recipeId: cleanedRecipe.id,

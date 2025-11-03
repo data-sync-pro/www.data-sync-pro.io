@@ -3,12 +3,13 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { SourceRecipeRecord, RecipeItem } from '../../core/models/recipe.model';
 import { RecipeLoggerService } from '../../core/services/logger.service';
 import { ExportProgress } from '../../core/services/export.service';
+import { BaseStateService } from '../../core/services/base-state.service';
 
 /**
- * Recipe Tab Interface
+ * Editor Tab Interface
  * Represents a single editor tab with recipe data and state
  */
-export interface RecipeTab {
+export interface EditorTab {
   id: string;
   title: string;
   recipe: SourceRecipeRecord;
@@ -21,7 +22,7 @@ export interface RecipeTab {
  * Centralized state for the entire recipe editor
  */
 export interface EditorState {
-  tabs: RecipeTab[];
+  tabs: EditorTab[];
   activeTabId: string | null;
   isLoading: boolean;
   isSaving: boolean;
@@ -32,6 +33,7 @@ export interface EditorState {
 
 /**
  * Recipe Editor State Service
+ * Extends BaseStateService for common state management patterns
  *
  * Centralized state management for the Recipe Editor.
  * Handles:
@@ -40,13 +42,15 @@ export interface EditorState {
  * - Active recipe tracking
  * - Unsaved changes detection
  *
- * Uses RxJS BehaviorSubjects for reactive state updates.
+ * Uses multiple BehaviorSubjects for performance optimization:
+ * - Main state for complete editor state
+ * - Dedicated subjects for frequently accessed properties (tabs, activeTabId, currentRecipe)
  */
 @Injectable({
   providedIn: 'root'
 })
-export class RecipeEditorStateService {
-  private readonly initialState: EditorState = {
+export class RecipeEditorStateService extends BaseStateService<EditorState> {
+  protected initialState: EditorState = {
     tabs: [],
     activeTabId: null,
     isLoading: false,
@@ -56,35 +60,31 @@ export class RecipeEditorStateService {
     importProgress: null
   };
 
-  // State subjects
-  private stateSubject = new BehaviorSubject<EditorState>(this.initialState);
-  private tabsSubject = new BehaviorSubject<RecipeTab[]>([]);
+  // localStorage disabled - state is managed by RecipeStorageService
+  protected override storageOptions = {
+    enabled: false
+  };
+
+  // Additional subjects for performance optimization
+  private tabsSubject = new BehaviorSubject<EditorTab[]>([]);
   private activeTabIdSubject = new BehaviorSubject<string | null>(null);
   private currentRecipeSubject = new BehaviorSubject<SourceRecipeRecord | null>(null);
 
   // Observable streams
-  public state$ = this.stateSubject.asObservable();
   public tabs$ = this.tabsSubject.asObservable();
   public activeTabId$ = this.activeTabIdSubject.asObservable();
   public currentRecipe$ = this.currentRecipeSubject.asObservable();
 
   constructor(private logger: RecipeLoggerService) {
+    super();
+    this.initializeState();
     this.logger.debug('RecipeEditorStateService initialized');
-  }
-
-  // ==================== State Getters ====================
-
-  /**
-   * Get current editor state
-   */
-  getState(): EditorState {
-    return this.stateSubject.value;
   }
 
   /**
    * Get all tabs
    */
-  getTabs(): RecipeTab[] {
+  getTabs(): EditorTab[] {
     return this.tabsSubject.value;
   }
 
@@ -98,7 +98,7 @@ export class RecipeEditorStateService {
   /**
    * Get currently active tab
    */
-  getCurrentTab(): RecipeTab | undefined {
+  getCurrentTab(): EditorTab | undefined {
     const tabs = this.getTabs();
     const activeTabId = this.getActiveTabId();
     return tabs.find(t => t.id === activeTabId);
@@ -114,7 +114,7 @@ export class RecipeEditorStateService {
   /**
    * Find tab by ID
    */
-  getTabById(tabId: string): RecipeTab | undefined {
+  getTabById(tabId: string): EditorTab | undefined {
     return this.getTabs().find(t => t.id === tabId);
   }
 
@@ -123,13 +123,13 @@ export class RecipeEditorStateService {
 
   /**
    * Update entire state
+   * Overrides base class method to sync additional subjects
    */
-  setState(newState: Partial<EditorState>): void {
-    const currentState = this.getState();
-    const updatedState = { ...currentState, ...newState };
-    this.stateSubject.next(updatedState);
+  override updateState(newState: Partial<EditorState>): void {
+    // Call base class implementation
+    super.updateState(newState);
 
-    // Update individual subjects if changed
+    // Sync individual subjects if changed
     if (newState.tabs !== undefined) {
       this.tabsSubject.next(newState.tabs);
     }
@@ -139,23 +139,25 @@ export class RecipeEditorStateService {
   }
 
   /**
+   * Update entire state (alias for updateState)
+   * @deprecated Use updateState() instead
+   */
+  setState(newState: Partial<EditorState>): void {
+    this.updateState(newState);
+  }
+
+  /**
    * Set tabs array
    */
-  setTabs(tabs: RecipeTab[]): void {
-    const state = this.getState();
-    state.tabs = tabs;
-    this.stateSubject.next(state);
-    this.tabsSubject.next(tabs);
+  setTabs(tabs: EditorTab[]): void {
+    this.updateState({ tabs });
   }
 
   /**
    * Set active tab ID
    */
   setActiveTabId(tabId: string | null): void {
-    const state = this.getState();
-    state.activeTabId = tabId;
-    this.stateSubject.next(state);
-    this.activeTabIdSubject.next(tabId);
+    this.updateState({ activeTabId: tabId });
   }
 
   /**
@@ -198,7 +200,7 @@ export class RecipeEditorStateService {
   /**
    * Add a new tab
    */
-  addTab(tab: RecipeTab): void {
+  addTab(tab: EditorTab): void {
     const tabs = this.getTabs();
 
     // Deactivate all other tabs
@@ -238,7 +240,7 @@ export class RecipeEditorStateService {
   /**
    * Update a tab
    */
-  updateTab(tabId: string, updates: Partial<RecipeTab>): void {
+  updateTab(tabId: string, updates: Partial<EditorTab>): void {
     const tabs = this.getTabs();
     const tab = tabs.find(t => t.id === tabId);
 
