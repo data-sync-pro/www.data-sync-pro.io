@@ -6,6 +6,17 @@ import { RouterModule, Routes } from '@angular/router';
 import { RecipeEditorComponent } from './editor.component';
 import { SharedModule } from '../../shared/shared.module';
 
+// Editor components
+import { BasicInfoComponent } from './components/basic-info/basic-info.component';
+import { PrerequisitesEditorComponent } from './components/prerequisites-editor/prerequisites-editor.component';
+import { FileUploadComponent } from './components/file-upload/file-upload.component';
+import { PreviewPanelComponent } from './components/preview-panel/preview-panel.component';
+import { WalkthroughEditorComponent } from './components/walkthrough-editor/walkthrough-editor.component';
+import { ImageManagerComponent } from './components/image-manager/image-manager.component';
+
+// Directives
+import { AutocompleteDirective } from './directives/autocomplete.directive';
+
 const routes: Routes = [
   {
     path: '',
@@ -15,7 +26,14 @@ const routes: Routes = [
 
 @NgModule({
   declarations: [
-    RecipeEditorComponent
+    RecipeEditorComponent,
+    BasicInfoComponent,
+    PrerequisitesEditorComponent,
+    FileUploadComponent,
+    PreviewPanelComponent,
+    WalkthroughEditorComponent,
+    ImageManagerComponent,
+    AutocompleteDirective
   ],
   imports: [
     CommonModule,

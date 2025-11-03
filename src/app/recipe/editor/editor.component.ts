@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef, HostListener, ChangeDetectorRef, NgZone, Renderer2 } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef, HostListener, ChangeDetectorRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Subject, takeUntil, debounceTime } from 'rxjs';
 import { RecipeStorageService } from './services/storage.service';
@@ -9,6 +9,15 @@ import { RecipeLoggerService } from '../core/services/logger.service';
 import { NotificationService } from '../../shared/services/notification.service';
 import { RecipePreviewService, RecipePreviewData } from '../core/services/preview.service';
 import { ClipboardUtil } from '../../shared/utils/clipboard.util';
+// New services for refactored architecture
+import { RecipeEditorStateService, RecipeTab, EditorState } from './services/state.service';
+import { RecipeValidationService } from './services/validation.service';
+import { RecipeAutocompleteService } from './services/autocomplete.service';
+import { RecipeImageNamingService } from './services/image-naming.service';
+import { RecipeImageLoaderService } from './services/image-loader.service';
+import { EDITOR_CONSTANTS } from './editor.constants';
+import { StepManagementUtil } from './utils/step-management.util';
+import { TrackByUtil } from '../../shared/utils/trackby.util';
 import {
   RecipeItem,
   SourceRecipeRecord,
@@ -23,28 +32,10 @@ import {
 } from '../core/models/recipe.model';
 import { ExportProgress } from '../core/services/export.service';
 
-interface RecipeTab {
-  id: string;
-  title: string;
-  recipe: SourceRecipeRecord;
-  hasChanges: boolean;
-  isActive: boolean;
-}
-
 interface RecipeTitleItem {
   id: string;
   recipeId: string;
   title: string;
-}
-
-interface EditorState {
-  tabs: RecipeTab[];
-  activeTabId: string | null;
-  isLoading: boolean;
-  isSaving: boolean;
-  lastSaved: Date | null;
-  isImporting: boolean;
-  importProgress: ExportProgress | null;
 }
 
 @Component({
@@ -59,8 +50,6 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
   private autoSaveSubject = new Subject<void>();
   private previewUpdateSubject = new Subject<void>();
   private imageNameUpdateTimeout: any;
-  private autocompleteCloseTimeout: any;
-  private autocompleteDebounceTimeout: any;
   
   // Recipe list from assets
   recipeList: RecipeItem[] = [];
@@ -130,187 +119,7 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
     'Verify',
     'Custom'
   ];
-  
-  // Predefined fields for autocomplete by step type
-  executableFields = [
-    'Action',
-    'Add reference field mappings for subsequent Executables?',
-    'Batchable?',
-    'Create non-reference field mappings?',
-    'Create reference field mappings based on prior Executables?',
-    'Description',
-    'Executable API Name',
-    'Executable Name',
-    'Log to File?',
-    'Source Matching Field',
-    'Source Object API Name',
-    'Target Matching Field',
-    'Target Object API Name',
-    'Seq NO.'
-  ];
 
-  triggerFields = [
-    'After Delete Trigger?',
-    'After Insert Trigger?',
-    'After Undelete Trigger?',
-    'After Update Trigger?',
-    'All Internal Users Have Read Access?',
-    'Applicable for Self-Adaptive Triggers?',
-    'Applicable for Trigger Actions?',
-    'Batchable?',
-    'Before Delete Trigger?',
-    'Before Insert Trigger?',
-    'Before Update Trigger?',
-    'Bypass Triggers Custom Permissions',
-    'Do Not Track AGG Sources in Trigger?',
-    'Pipeline',
-    'Execute Access Permissions',
-    'Run Once on Recursive Updates?',
-    'Seq No.'
-  ];
-
-  scopingFields = [
-    'Joiner',
-    'Scope Filter',
-    'Scope Filter (After Delete Trigger)',
-    'Scope Filter (After Insert Trigger)',
-    'Scope Filter (After Undelete Trigger)',
-    'Scope Filter (After Update Trigger)',
-    'Scope Filter (Before Delete Trigger)',
-    'Scope Filter (Before Insert Trigger)',
-    'Scope Filter (Before Update Trigger)',
-    'Scope Filter (Post Join)'
-  ];
-
-  matchFields = [
-    'Additional Target Matching Criteria',
-    'Matched Records Sorting Components',
-    'Principal Matched Record Selection Rule',
-    'Target Matching Field',
-    'Target Object API Name'
-  ];
-
-  actionFields = [
-    'Action',
-    'All or Nothing?',
-    'Bypass Duplicate Rule Alerts?',
-    'Skip Fields if Target Value Exists?',
-    'Skip Null Value Fields?',
-    'Skip Record Update if No Changes?',
-    'Source Object Writeback Field',
-    'Target Connection Name',
-    'Target Object API Name',
-    'Use Salesforce Upsert API?',
-    'Action in Future Method in Triggers?'
-  ];
-
-  retrieveVerifyPreviewFields = [
-    'SOQL Query'
-  ];
-
-  batchSettingsFields = [
-    'Action to Bulk API?',
-    'Auto Retry Failed Batches?',
-    'Batch Size',
-    'Incremental Retrieval Field',
-    'Incremental Retrieval Seed Time (Date)',
-    'Incremental Retrieval Seed Time (Time)',
-    'Incremental Retrieval Since',
-    'Log to File?',
-    'Notify Email Addresses',
-    'Notify Owner?',
-    'Notify When Execution Completes',
-    'Execute Access Permissions',
-    'Retrieve Limit',
-    'Serial Mode?',
-    'Stop Execution When a Batch Fails?',
-    'Use Salesforce Upsert API?'
-  ];
-
-  actionButtonSettingsFields = [
-    'Action Button Label',
-    'Action Button Variant',
-    'Action Confirm Message',
-    'Action Icon Name',
-    'Confirm Before Action?',
-    'Edit Target Fields Before Action',
-    'Q: List Action?',
-    'Q: Row Action?',
-    'Execute Access Permissions',
-    'Success Message (UI)'
-  ];
-
-  dataListSettingsFields = [
-    'Action Button Label',
-    'Action Button Variant',
-    'Action Confirm Message',
-    'Action Icon Name',
-    'Confirm Before Action?',
-    'Edit Target Fields Before Action',
-    'Q: Column Filter Default Opt. Field Name',
-    'Q: Column Widths Mode',
-    'Q: Context Record ID',
-    'Q: Createable?',
-    'Q: Data Load Executable API Name',
-    'Q: Deletable?',
-    'Q: Download as JSON?',
-    'Q: Downloadable?',
-    'Q: Editable Fields',
-    'Q: Editable?',
-    'Q: Filterable Columns',
-    'Q: Help Text',
-    'Q: Hide Others in Query Manager?',
-    'Q: List Action?',
-    'Q: Max Column Width',
-    'Q: Max Row Selection',
-    'Q: Min Column Width',
-    'Q: New Record Executable API Name',
-    'Q: Open Links in Current Tab?',
-    'Q: Open Links in Record Page (Data List)?',
-    'Q: Open Links in Record Page?',
-    'Q: Override Columns',
-    'Q: Page Size',
-    'Q: Query Manager Toggleable?',
-    'Data List(s) Access Permissions',
-    'Q: Results Icon Name',
-    'Q: Results Title',
-    'Q: Retrieve All?',
-    'Q: Row Action?',
-    'Q: Row\'s Related Lists Pipeline API Name',
-    'Q: See Labels While Building SOQL',
-    'Q: Show Column Filter?',
-    'Q: Show Picklist Labels?',
-    'Q: Show Results in Tiles on Small Screen',
-    'Q: Show Row Action \'Clone\'?',
-    'Q: Show Row Action \'Delete\'?',
-    'Q: Show Row Action \'Edit\'?',
-    'Q: Show Row\'s Related Lists Below?',
-    'Q: Small Screen Viewport Width',
-    'Q: Sorted By',
-    'Q: Sorted Direction',
-    'Execute Access Permissions',
-    'Success Message (UI)'
-  ];
-
-  dataLoaderSettingsFields = [
-    'Action to Bulk API?',
-    'Batch Size',
-    'Error Out if Source Attributes Missing?',
-    'Log to File?',
-    'Pipeline',
-    'Relax Field Mapping\'s Type Check?',
-    'Execute Access Permissions',
-    'Seq No.',
-    'Serial Mode?',
-    'Stop Execution When a Batch Fails?'
-  ];
-
-  inputFields = [
-    'Import Data Profile',
-    'Input Data Fields',
-    'Input Data Key Field'
-  ];
-  
   constructor(
     private http: HttpClient,
     private recipeService: RecipeService,
@@ -319,10 +128,14 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
     private fileStorageService: RecipeFileStorageService,
     private notificationService: NotificationService,
     private cdr: ChangeDetectorRef,
-    private ngZone: NgZone,
-    private renderer: Renderer2,
     private previewService: RecipePreviewService,
-    private logger: RecipeLoggerService
+    private logger: RecipeLoggerService,
+    // New services for refactored architecture
+    private editorStateService: RecipeEditorStateService,
+    private validationService: RecipeValidationService,
+    private autocompleteService: RecipeAutocompleteService,
+    private imageNamingService: RecipeImageNamingService,
+    private imageLoaderService: RecipeImageLoaderService
   ) {}
   
   ngOnInit(): void {
@@ -342,27 +155,69 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
     if (this.hasUnsavedChanges()) {
       this.saveAllTabs();
     }
-    
-    // Clean up timeouts
-    if (this.autocompleteCloseTimeout) {
-      clearTimeout(this.autocompleteCloseTimeout);
-      this.autocompleteCloseTimeout = null;
-    }
-    
-    if (this.autocompleteDebounceTimeout) {
-      clearTimeout(this.autocompleteDebounceTimeout);
-      this.autocompleteDebounceTimeout = null;
-    }
-    
-    if (this.imageNameUpdateTimeout) {
-      clearTimeout(this.imageNameUpdateTimeout);
-      this.imageNameUpdateTimeout = null;
-    }
-    
-    // Close all open autocompletes
-    this.closeAllAutocomplete();
+
+    // Clean up all timeouts to prevent memory leaks
+    this.clearTimeoutSafely(this.imageNameUpdateTimeout);
+    this.clearTimeoutSafely(this.previewUpdateTimer);
+    this.clearTimeoutSafely(this.tooltipHideTimeout);
   }
-  
+
+  /**
+   * Safely clear a timeout and nullify the reference
+   */
+  private clearTimeoutSafely(timeout: any): void {
+    if (timeout) {
+      clearTimeout(timeout);
+    }
+  }
+
+  /**
+   * Truncate title to specified length with ellipsis
+   */
+  private truncateTitle(title: string, maxLength: number): string {
+    return title.length > maxLength
+      ? title.substring(0, maxLength) + '...'
+      : title;
+  }
+
+
+  /**
+   * Get filtered recipes based on criteria (created vs edited existing)
+   * @param isCreated - true for new recipes, false for edited existing recipes, undefined for all
+   */
+  private getFilteredRecipes(isCreated?: boolean): SourceRecipeRecord[] {
+    const editedRecipes = this.storageService.getAllEditedRecipes();
+
+    if (isCreated === undefined) {
+      return editedRecipes;
+    }
+
+    const originalRecipeIds = new Set(this.recipeList.map(r => r.id));
+
+    return editedRecipes.filter(recipe => {
+      if (!recipe.id) return false;
+      const isNew = !originalRecipeIds.has(recipe.id);
+      return isCreated ? isNew : !isNew;
+    });
+  }
+
+  /**
+   * Convert recipes to title items for tooltips
+   */
+  private recipesToTitleItems(recipes: SourceRecipeRecord[], maxLength: number): RecipeTitleItem[] {
+    const items: RecipeTitleItem[] = recipes
+      .filter(recipe => recipe.id && recipe.title)
+      .map(recipe => ({
+        id: recipe.id,
+        recipeId: recipe.id,
+        title: this.truncateTitle(recipe.title, maxLength)
+      }));
+
+    return items
+      .sort((a, b) => a.title.localeCompare(b.title))
+      .slice(0, EDITOR_CONSTANTS.MAX_TOOLTIP_ITEMS);
+  }
+
   // Keyboard shortcuts
   @HostListener('document:keydown', ['$event'])
   handleKeyboardEvent(event: KeyboardEvent): void {
@@ -389,9 +244,6 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
     if (target.closest('.config-field') || target.closest('.autocomplete-dropdown')) {
       return;
     }
-    
-    // Close all open autocompletes
-    this.closeAllAutocomplete();
   }
 
   /**
@@ -409,35 +261,6 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
     });
   }
 
-  private closeAllAutocomplete(): void {
-    const dropdowns = document.querySelectorAll('.autocomplete-dropdown');
-    dropdowns.forEach(dropdown => {
-      const wrapper = dropdown.parentElement;
-      if (wrapper) {
-        this.renderer.removeChild(wrapper, dropdown);
-      }
-    });
-    
-    // Clear references
-    const inputs = document.querySelectorAll('.config-field') as NodeListOf<HTMLInputElement>;
-    inputs.forEach(input => {
-      if ((input as any).autocompleteDropdown) {
-        (input as any).autocompleteDropdown = null;
-      }
-    });
-    
-    // Clear timeouts
-    if (this.autocompleteCloseTimeout) {
-      clearTimeout(this.autocompleteCloseTimeout);
-      this.autocompleteCloseTimeout = null;
-    }
-    
-    if (this.autocompleteDebounceTimeout) {
-      clearTimeout(this.autocompleteDebounceTimeout);
-      this.autocompleteDebounceTimeout = null;
-    }
-  }
-  
   private async initializeServices(): Promise<void> {
     await this.fileStorageService.init();
   }
@@ -485,7 +308,7 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
   
   private setupAutoSave(): void {
     this.autoSaveSubject.pipe(
-      debounceTime(3000),
+      debounceTime(EDITOR_CONSTANTS.AUTO_SAVE_DEBOUNCE_MS),
       takeUntil(this.destroy$)
     ).subscribe(() => {
       this.saveCurrentTab(true);
@@ -494,7 +317,7 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
   
   private setupPreviewUpdate(): void {
     this.previewUpdateSubject.pipe(
-      debounceTime(50), // 50ms debounce for responsive preview updates
+      debounceTime(EDITOR_CONSTANTS.PREVIEW_UPDATE_DEBOUNCE_MS),
       takeUntil(this.destroy$)
     ).subscribe(() => {
       this.updateJsonPreview();
@@ -533,12 +356,10 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
       hasChanges: false,
       isActive: true
     };
-    
-    // Deactivate other tabs
-    this.state.tabs.forEach(t => t.isActive = false);
-    
-    this.state.tabs.push(tab);
-    this.state.activeTabId = tab.id;
+
+    // Use StateService to add tab
+    this.editorStateService.addTab(tab);
+
     this.currentRecipe = newRecipe;
     this.previousTitle = newRecipe.title || ''; // Initialize previous title for new recipe
     this.initializeExpandedSteps();
@@ -546,53 +367,55 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
   }
   
   selectTab(tabId: string): void {
-    const tab = this.state.tabs.find(t => t.id === tabId);
-    if (!tab) return;
-    
     // Save current tab if has changes
     const currentTab = this.getCurrentTab();
     if (currentTab && currentTab.hasChanges) {
       this.saveTab(currentTab);
     }
-    
-    // Switch to selected tab
-    this.state.tabs.forEach(t => t.isActive = false);
-    tab.isActive = true;
-    this.state.activeTabId = tabId;
+
+    // Use StateService to switch tab
+    const success = this.editorStateService.selectTab(tabId);
+    if (!success) return;
+
+    const tab = this.editorStateService.getCurrentTab();
+    if (!tab) return;
+
     this.currentRecipe = tab.recipe;
     this.currentIsActive = this.isRecipeActive(tab.recipe.id);
     this.previousTitle = tab.recipe.title || ''; // Initialize previous title
     this.initializeExpandedSteps();
     this.triggerPreviewUpdate();
-    
+
     // Load all images for this recipe tab
-    this.loadAllImagesForRecipe(tab.recipe);
+    this.imageLoaderService.loadAllImagesForRecipe(tab.recipe);
   }
   
   closeTab(tabId: string): void {
-    const tabIndex = this.state.tabs.findIndex(t => t.id === tabId);
-    if (tabIndex === -1) return;
-    
-    const tab = this.state.tabs[tabIndex];
-    
+    const tab = this.editorStateService.getTabById(tabId);
+    if (!tab) return;
+
     // Confirm if has unsaved changes
     if (tab.hasChanges) {
       if (!confirm('This tab has unsaved changes. Close anyway?')) {
         return;
       }
     }
-    
-    // Remove tab
-    this.state.tabs.splice(tabIndex, 1);
-    
+
+    // Use StateService to remove tab (returns next tab index to activate)
+    const wasActive = tab.isActive;
+    const nextIndex = this.editorStateService.removeTab(tabId);
+
     // If was active tab, activate another
-    if (tab.isActive && this.state.tabs.length > 0) {
-      const newActiveIndex = Math.min(tabIndex, this.state.tabs.length - 1);
-      this.selectTab(this.state.tabs[newActiveIndex].id);
+    if (wasActive && this.editorStateService.getTabCount() > 0) {
+      const tabs = this.editorStateService.getTabs();
+      const newActiveTabId = tabs[nextIndex]?.id;
+      if (newActiveTabId) {
+        this.selectTab(newActiveTabId);
+      }
     }
-    
+
     // Create new tab if no tabs left
-    if (this.state.tabs.length === 0) {
+    if (this.editorStateService.getTabCount() === 0) {
       this.createNewTab();
     }
   }
@@ -642,7 +465,7 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
           this.state.isLoading = false;
           
           // Load all images for this recipe
-          this.loadAllImagesForRecipe(sourceRecipe);
+          this.imageLoaderService.loadAllImagesForRecipe(sourceRecipe);
         },
         error: (error) => {
           this.logger.error('Error loading recipe:', error);
@@ -674,46 +497,85 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
   isRecipeActive(recipeId: string): boolean {
     return this.recipeActiveStates.get(recipeId) ?? true; // Default to true if not found
   }
-  
+
+  /**
+   * Handle active status change from basic-info component
+   */
+  onActiveStatusChange(isActive: boolean): void {
+    this.currentIsActive = isActive;
+
+    // Update in recipeActiveStates map
+    if (this.currentRecipe?.id) {
+      this.recipeActiveStates.set(this.currentRecipe.id, isActive);
+    }
+
+    // Mark as changed
+    this.onRecipeChange();
+  }
+
   // Recipe editing
   onRecipeChange(): void {
+    this.updateCurrentTabState();
+    this.scheduleImageNameUpdate();
+    this.triggerPreviewUpdates();
+  }
+
+  /**
+   * Update current tab state with recipe changes
+   */
+  private updateCurrentTabState(): void {
     const tab = this.getCurrentTab();
-    if (tab) {
-      tab.hasChanges = true;
-      tab.recipe = this.currentRecipe!;
+    if (!tab) return;
 
-      // Check if title changed and ID needs to be updated to UUID
-      if (this.currentRecipe?.title && this.currentRecipe.title !== this.previousTitle) {
-        // Update tab title
-        tab.title = this.currentRecipe.title;
+    // Mark tab as changed and update recipe
+    this.editorStateService.markTabAsChanged(tab.id);
+    this.editorStateService.updateTab(tab.id, { recipe: this.currentRecipe! });
 
-        // If current ID is not UUID format, generate new UUID
-        if (this.currentRecipe.id && !this.isUUID(this.currentRecipe.id)) {
-          const oldId = this.currentRecipe.id;
-          const newId = this.generateUUID();
-          this.currentRecipe.id = newId;
+    // Handle title change
+    this.handleRecipeTitleChange(tab);
+  }
 
-          this.logger.debug(`Recipe ID updated from "${oldId}" to "${newId}" due to title change`);
-        }
-
-        // Update previous title for next comparison
-        this.previousTitle = this.currentRecipe.title;
-      }
+  /**
+   * Handle recipe title change and ID generation
+   */
+  private handleRecipeTitleChange(tab: RecipeTab): void {
+    if (!this.currentRecipe?.title || this.currentRecipe.title === this.previousTitle) {
+      return;
     }
-    
-    // Debounce image name updates when content changes
+
+    // Update tab title
+    this.editorStateService.updateTab(tab.id, { title: this.currentRecipe.title });
+
+    // Generate UUID if needed
+    if (this.currentRecipe.id && !this.isUUID(this.currentRecipe.id)) {
+      const oldId = this.currentRecipe.id;
+      const newId = this.generateUUID();
+      this.currentRecipe.id = newId;
+      this.logger.debug(`Recipe ID updated from "${oldId}" to "${newId}" due to title change`);
+    }
+
+    this.previousTitle = this.currentRecipe.title;
+  }
+
+  /**
+   * Schedule image name update with debounce
+   */
+  private scheduleImageNameUpdate(): void {
     if (this.imageNameUpdateTimeout) {
       clearTimeout(this.imageNameUpdateTimeout);
     }
-    
+
     this.imageNameUpdateTimeout = setTimeout(() => {
       this.updateImageNamesForContentChange();
-    }, 1000);
-    
+    }, EDITOR_CONSTANTS.IMAGE_NAME_UPDATE_DEBOUNCE_MS);
+  }
+
+  /**
+   * Trigger all preview updates
+   */
+  private triggerPreviewUpdates(): void {
     this.triggerPreviewUpdate();
     this.autoSaveSubject.next();
-    
-    // Trigger cross-tab preview sync
     this.triggerCrossTabPreviewUpdate();
   }
   
@@ -752,51 +614,17 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
   }
   
   moveStepUp(index: number): void {
-    if (!this.currentRecipe?.walkthrough || index <= 0) return;
-    
-    const steps = this.currentRecipe.walkthrough;
-    [steps[index - 1], steps[index]] = [steps[index], steps[index - 1]];
-    
-    // Swap custom step names too
-    if (this.customStepNames[index] !== undefined || this.customStepNames[index - 1] !== undefined) {
-      const temp = this.customStepNames[index];
-      this.customStepNames[index] = this.customStepNames[index - 1];
-      this.customStepNames[index - 1] = temp;
-      
-      // Clean up undefined entries
-      if (this.customStepNames[index] === undefined) {
-        delete this.customStepNames[index];
-      }
-      if (this.customStepNames[index - 1] === undefined) {
-        delete this.customStepNames[index - 1];
-      }
+    if (!this.currentRecipe?.walkthrough) return;
+    if (StepManagementUtil.moveStepUp(this.currentRecipe.walkthrough, index, this.customStepNames)) {
+      this.onRecipeChange();
     }
-    
-    this.onRecipeChange();
   }
-  
+
   moveStepDown(index: number): void {
-    if (!this.currentRecipe?.walkthrough || index >= this.currentRecipe.walkthrough.length - 1) return;
-    
-    const steps = this.currentRecipe.walkthrough;
-    [steps[index], steps[index + 1]] = [steps[index + 1], steps[index]];
-    
-    // Swap custom step names too
-    if (this.customStepNames[index] !== undefined || this.customStepNames[index + 1] !== undefined) {
-      const temp = this.customStepNames[index];
-      this.customStepNames[index] = this.customStepNames[index + 1];
-      this.customStepNames[index + 1] = temp;
-      
-      // Clean up undefined entries
-      if (this.customStepNames[index] === undefined) {
-        delete this.customStepNames[index];
-      }
-      if (this.customStepNames[index + 1] === undefined) {
-        delete this.customStepNames[index + 1];
-      }
+    if (!this.currentRecipe?.walkthrough) return;
+    if (StepManagementUtil.moveStepDown(this.currentRecipe.walkthrough, index, this.customStepNames)) {
+      this.onRecipeChange();
     }
-    
-    this.onRecipeChange();
   }
   
   // Config management
@@ -849,64 +677,128 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
   
   async handleImageFile(file: File, stepIndex: number): Promise<void> {
     if (!this.currentRecipe?.walkthrough?.[stepIndex]) return;
-    
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
-      this.notificationService.error('Please select a valid image file');
+    await this.uploadImageFile(file, 'step-media', { stepIndex });
+  }
+
+  /**
+   * Unified image upload logic for all image upload operations
+   */
+  private async uploadImageFile(
+    file: File,
+    purpose: 'step-media' | 'general-image' | 'replace-step-media' | 'replace-general-image',
+    options: {
+      stepIndex?: number;
+      existingObject?: any;
+      targetInput?: HTMLInputElement;
+    } = {}
+  ): Promise<void> {
+    // Validate file
+    const validation = this.fileStorageService.validateImageFile(file);
+    if (!validation.valid) {
+      this.notificationService.error(validation.error || 'Invalid file');
       return;
     }
-    
-    // Validate file size (10MB limit)
-    const maxSize = 10 * 1024 * 1024;
-    if (file.size > maxSize) {
-      this.notificationService.error('Image file too large. Maximum size is 10MB');
-      return;
-    }
-    
+
     try {
-      // Generate meaningful image name based on recipe content
-      const baseName = this.generateImageName(file, stepIndex);
-      const extension = file.name.split('.').pop()?.toLowerCase() || 'jpg';
-      const fullFileName = `${baseName}.${extension}`;
-      
-      // Store image in IndexedDB using the base name as key
+      const { baseName, fullFileName } = this.generateImageFileName(file, purpose, options);
+
+      // Store image in IndexedDB
       await this.fileStorageService.storeImage(baseName, file);
-      
-      // Add to step media with immediate displayUrl generation
-      const media: RecipeStepMedia = {
-        type: 'image',
-        url: `images/${fullFileName}`,
-        alt: file.name.replace(/\.[^/.]+$/, '') // Remove extension from alt text
-      };
-      
-      // Generate displayUrl immediately for instant preview
-      try {
-        this.logger.debug(`Attempting to generate displayUrl for baseName: ${baseName}`);
-        const imageFile = await this.fileStorageService.getImage(baseName);
-        if (imageFile) {
-          const displayUrl = URL.createObjectURL(imageFile);
-          (media as any).displayUrl = displayUrl;
-          this.logger.debug(`Successfully generated displayUrl: ${displayUrl} for baseName: ${baseName}`);
-        } else {
-          this.logger.warn(`No image file found for baseName: ${baseName}`);
-        }
-      } catch (error) {
-        this.logger.error('Failed to generate immediate displayUrl:', error);
-      }
-      
-      this.currentRecipe.walkthrough[stepIndex].media.push(media);
-      this.onRecipeChange();
-      
-      this.notificationService.success(`Image uploaded: ${fullFileName}`);
-      
-      // Trigger change detection to update UI
-      this.cdr.detectChanges();
+
+      // Generate displayUrl immediately
+      const displayUrl = URL.createObjectURL(file);
+
+      // Update recipe with image
+      this.updateRecipeWithImage(purpose, options, baseName, fullFileName, displayUrl, file);
+
+      // Cleanup and notify
+      this.finalizeImageUpload(options.targetInput);
     } catch (error) {
       this.logger.error('Error uploading image:', error);
       this.notificationService.error('Failed to upload image');
     }
   }
-  
+
+  /**
+   * Generate image file name based on purpose
+   */
+  private generateImageFileName(
+    file: File,
+    purpose: string,
+    options: { stepIndex?: number }
+  ): { baseName: string; fullFileName: string } {
+    let baseName: string;
+    let fullFileName: string;
+
+    if (purpose === 'step-media') {
+      baseName = this.imageNamingService.generateImageName(file, this.currentRecipe!, options.stepIndex!);
+      const extension = file.name.split('.').pop()?.toLowerCase() || 'jpg';
+      fullFileName = `${baseName}.${extension}`;
+    } else if (purpose === 'general-image') {
+      baseName = this.imageNamingService.generateGeneralImageName(file, this.currentRecipe!);
+      const extension = file.name.split('.').pop()?.toLowerCase() || 'png';
+      fullFileName = `${baseName}.${extension}`;
+    } else {
+      // For replace operations, use random ID
+      const imageId = this.fileStorageService.generateImageId();
+      const originalName = this.fileStorageService.sanitizeFileName(file.name);
+      baseName = imageId;
+      fullFileName = `${imageId}_${originalName}`;
+    }
+
+    return { baseName, fullFileName };
+  }
+
+  /**
+   * Update recipe with uploaded image
+   */
+  private updateRecipeWithImage(
+    purpose: string,
+    options: { stepIndex?: number; existingObject?: any },
+    baseName: string,
+    fullFileName: string,
+    displayUrl: string,
+    file: File
+  ): void {
+    if (purpose === 'step-media') {
+      const media: RecipeStepMedia = {
+        type: 'image',
+        url: `images/${fullFileName}`,
+        alt: file.name.replace(/\.[^/.]+$/, '')
+      };
+      (media as any).displayUrl = displayUrl;
+      this.currentRecipe!.walkthrough[options.stepIndex!].media.push(media);
+    } else if (purpose === 'general-image') {
+      const generalImage: RecipeGeneralImage = {
+        type: 'image',
+        url: `images/${fullFileName}`,
+        alt: file.name.replace(/\.[^/.]+$/, ''),
+        imageId: baseName
+      };
+      (generalImage as any).displayUrl = displayUrl;
+      if (!this.currentRecipe!.generalImages) {
+        this.currentRecipe!.generalImages = [];
+      }
+      this.currentRecipe!.generalImages.push(generalImage);
+    } else if (purpose === 'replace-step-media' || purpose === 'replace-general-image') {
+      options.existingObject!.url = `images/${fullFileName}`;
+      (options.existingObject as any).displayUrl = displayUrl;
+    }
+  }
+
+  /**
+   * Finalize image upload (cleanup and notifications)
+   */
+  private finalizeImageUpload(targetInput?: HTMLInputElement): void {
+    if (targetInput) {
+      targetInput.value = '';
+    }
+
+    this.onRecipeChange();
+    this.notificationService.success('Image uploaded successfully');
+    this.cdr.detectChanges();
+  }
+
   removeMedia(stepIndex: number, mediaIndex: number): void {
     if (!this.currentRecipe?.walkthrough?.[stepIndex]) return;
     
@@ -924,71 +816,7 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
     this.onRecipeChange();
   }
   
-  // Prerequisites management
-  addPrerequisite(): void {
-    if (!this.currentRecipe) return;
-    
-    const newPrereq: RecipePrerequisiteItem = {
-      description: '',
-      quickLinks: []
-    };
-    
-    if (!this.currentRecipe.prerequisites) {
-      this.currentRecipe.prerequisites = [];
-    }
-    
-    this.currentRecipe.prerequisites.push(newPrereq);
-    this.onRecipeChange();
-  }
-  
-  removePrerequisite(index: number): void {
-    if (!this.currentRecipe?.prerequisites) return;
-    
-    this.currentRecipe.prerequisites.splice(index, 1);
-    this.onRecipeChange();
-  }
-  
-  addQuickLink(prereqIndex: number): void {
-    if (!this.currentRecipe?.prerequisites?.[prereqIndex]) return;
-    
-    const newLink: RecipeQuickLink = {
-      title: '',
-      url: ''
-    };
-    
-    this.currentRecipe.prerequisites[prereqIndex].quickLinks.push(newLink);
-    this.onRecipeChange();
-  }
-  
-  removeQuickLink(prereqIndex: number, linkIndex: number): void {
-    if (!this.currentRecipe?.prerequisites?.[prereqIndex]) return;
-    
-    this.currentRecipe.prerequisites[prereqIndex].quickLinks.splice(linkIndex, 1);
-    this.onRecipeChange();
-  }
-  
-  // DSP Versions management
-  addDSPVersion(): void {
-    if (!this.currentRecipe) return;
-    
-    if (!this.currentRecipe.DSPVersions) {
-      this.currentRecipe.DSPVersions = [];
-    }
-    
-    this.currentRecipe.DSPVersions.push('');
-    this.onRecipeChange();
-  }
-  
-  removeDSPVersion(index: number): void {
-    if (!this.currentRecipe?.DSPVersions) return;
-    
-    this.currentRecipe.DSPVersions.splice(index, 1);
-    this.onRecipeChange();
-  }
-  
-  trackByIndex(index: number): number {
-    return index;
-  }
+  trackByIndex = TrackByUtil.index;
   
   async copyToClipboard(text: string): Promise<void> {
     const success = await ClipboardUtil.copyToClipboard(text);
@@ -999,390 +827,25 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
     }
   }
 
-  // Autocomplete functionality
-  public handleFieldAutocomplete(event: Event, stepIndex: number): void {
-    const input = event.target as HTMLInputElement;
-    if (!input || !this.currentRecipe?.walkthrough?.[stepIndex]) return;
-
-    // Clear existing debounce timeout
-    if (this.autocompleteDebounceTimeout) {
-      clearTimeout(this.autocompleteDebounceTimeout);
+  /**
+   * Handle autocomplete value selection from directive
+   */
+  public onAutocompleteSelect(value: string, stepIndex: number, configIndex: number): void {
+    if (this.currentRecipe?.walkthrough?.[stepIndex]?.config?.[configIndex]) {
+      this.currentRecipe.walkthrough[stepIndex].config[configIndex].field = value;
+      this.onRecipeChange();
+      this.cdr.markForCheck();
     }
-
-    // Clear any pending close timeout when user is actively typing
-    if (this.autocompleteCloseTimeout) {
-      clearTimeout(this.autocompleteCloseTimeout);
-      this.autocompleteCloseTimeout = null;
-    }
-
-    // Debounce the autocomplete to avoid frequent updates
-    this.autocompleteDebounceTimeout = setTimeout(() => {
-      this.ngZone.run(() => {
-        const stepName = this.currentRecipe?.walkthrough?.[stepIndex]?.step || '';
-        const query = input.value.toLowerCase();
-        const fieldsToUse = this.getFieldSuggestions(stepName);
-
-        if (fieldsToUse.length === 0) {
-          this.closeAutocompleteForInput(input);
-          return;
-        }
-
-        // Filter fields based on query
-        const matches = fieldsToUse.filter(field => 
-          field.toLowerCase().includes(query) || query.length === 0
-        );
-
-        if (matches.length > 0) {
-          this.showAutocomplete(input, matches);
-        } else {
-          this.closeAutocompleteForInput(input);
-        }
-      });
-    }, 150); // 150ms debounce
-  }
-
-  private showAutocomplete(input: HTMLInputElement, matches: string[]): void {
-    // Remove existing autocomplete
-    this.closeAutocompleteForInput(input);
-
-    const wrapper = input.closest('.autocomplete-wrapper');
-    if (!wrapper) return;
-
-    const dropdown = this.renderer.createElement('div');
-    this.renderer.addClass(dropdown, 'autocomplete-dropdown');
-
-    matches.forEach((match, index) => {
-      const item = this.renderer.createElement('div');
-      this.renderer.addClass(item, 'autocomplete-item');
-      if (index === 0) this.renderer.addClass(item, 'selected');
-      this.renderer.setProperty(item, 'textContent', match);
-      
-      // Use mousedown instead of click to fire before blur event
-      this.renderer.listen(item, 'mousedown', (event) => {
-        event.preventDefault(); // Prevent blur event
-        this.ngZone.run(() => {
-          // Update the model value properly through Angular
-          const stepItem = wrapper.closest('.step-item');
-          const configItem = wrapper.closest('.config-item');
-          const configIndex = stepItem && configItem ? 
-            Array.from(stepItem.querySelectorAll('.config-item')).indexOf(configItem) : -1;
-          const stepIndex = parseInt(wrapper.closest('.step-item')?.getAttribute('data-step-index') || '0');
-          
-          if (this.currentRecipe?.walkthrough?.[stepIndex]?.config?.[configIndex]) {
-            this.currentRecipe.walkthrough[stepIndex].config[configIndex].field = match;
-            this.onRecipeChange();
-            this.cdr.markForCheck(); // Trigger change detection
-          }
-          
-          this.closeAutocompleteForInput(input);
-        });
-      });
-      
-      this.renderer.appendChild(dropdown, item);
-    });
-
-    this.renderer.appendChild(wrapper, dropdown);
-    (input as any).autocompleteDropdown = dropdown;
-  }
-
-  public closeAutocomplete(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    if (!input) return;
-
-    // Add delay to allow user to click on autocomplete items
-    this.autocompleteCloseTimeout = setTimeout(() => {
-      this.ngZone.run(() => {
-        this.closeAutocompleteForInput(input);
-      });
-    }, 200); // 200ms delay
-  }
-
-  private closeAutocompleteForInput(input: HTMLInputElement): void {
-    const wrapper = input.closest('.autocomplete-wrapper');
-    if (wrapper) {
-      const dropdown = wrapper.querySelector('.autocomplete-dropdown');
-      if (dropdown) {
-        this.renderer.removeChild(wrapper, dropdown);
-      }
-    }
-
-    // Remove from input reference
-    if ((input as any).autocompleteDropdown) {
-      (input as any).autocompleteDropdown = null;
-    }
-
-    // Clear timeouts
-    if (this.autocompleteCloseTimeout) {
-      clearTimeout(this.autocompleteCloseTimeout);
-      this.autocompleteCloseTimeout = null;
-    }
-  }
-
-  public handleAutocompleteKeydown(event: KeyboardEvent): void {
-    const input = event.target as HTMLInputElement;
-    const dropdown = (input as any).autocompleteDropdown;
-
-    if (!dropdown) return;
-
-    this.ngZone.run(() => {
-      const items = dropdown.querySelectorAll('.autocomplete-item');
-      const selectedItem = dropdown.querySelector('.autocomplete-item.selected');
-      let selectedIndex = Array.from(items).indexOf(selectedItem);
-
-      switch (event.key) {
-        case 'ArrowDown':
-          event.preventDefault();
-          if (selectedItem) this.renderer.removeClass(selectedItem, 'selected');
-          selectedIndex = (selectedIndex + 1) % items.length;
-          this.renderer.addClass(items[selectedIndex], 'selected');
-          break;
-
-        case 'ArrowUp':
-          event.preventDefault();
-          if (selectedItem) this.renderer.removeClass(selectedItem, 'selected');
-          selectedIndex = selectedIndex <= 0 ? items.length - 1 : selectedIndex - 1;
-          this.renderer.addClass(items[selectedIndex], 'selected');
-          break;
-
-        case 'Enter':
-          event.preventDefault();
-          if (selectedItem) {
-            const selectedValue = selectedItem.textContent || '';
-            
-            // Update the model value properly through Angular
-            const wrapper = input.closest('.autocomplete-wrapper');
-            const stepItem = wrapper?.closest('.step-item');
-            const configItem = wrapper?.closest('.config-item');
-            const configIndex = stepItem && configItem ? 
-              Array.from(stepItem.querySelectorAll('.config-item')).indexOf(configItem) : -1;
-            const stepIndex = parseInt(wrapper?.closest('.step-item')?.getAttribute('data-step-index') || '0');
-            
-            if (this.currentRecipe?.walkthrough?.[stepIndex]?.config?.[configIndex]) {
-              this.currentRecipe.walkthrough[stepIndex].config[configIndex].field = selectedValue;
-              this.onRecipeChange();
-              this.cdr.markForCheck(); // Trigger change detection
-            }
-            
-            this.closeAutocompleteForInput(input);
-          }
-          break;
-
-        case 'Escape':
-          this.closeAutocompleteForInput(input);
-          break;
-      }
-    });
   }
 
   /**
    * Get field suggestions based on step type
+   * Delegates to AutocompleteService
    */
   getFieldSuggestions(stepType: string): string[] {
-    switch (stepType) {
-      case 'Create Executable':
-      case 'Create Pipeline':
-      case 'Create Scheduler':
-        return this.executableFields;
-      case 'Trigger Settings':
-        return this.triggerFields;
-      case 'Scoping':
-        return this.scopingFields;
-      case 'Match':
-        return this.matchFields;
-      case 'Action':
-        return this.actionFields;
-      case 'Retrieve':
-      case 'Verify':
-      case 'Preview':
-      case 'Preview Transformed':
-        return this.retrieveVerifyPreviewFields;
-      case 'Batch Settings':
-        return this.batchSettingsFields;
-      case 'Action Button Settings':
-        return this.actionButtonSettingsFields;
-      case 'Data List Settings':
-        return this.dataListSettingsFields;
-      case 'Data Loader Settings':
-        return this.dataLoaderSettingsFields;
-      case 'Input':
-        return this.inputFields;
-      default:
-        return []; // Default fallback
-    }
+    return this.autocompleteService.getFieldSuggestions(stepType);
   }
-  
-  // Downloadable Executables management
-  addDownloadableExecutable(): void {
-    if (!this.currentRecipe) return;
-    
-    if (!this.currentRecipe.downloadableExecutables) {
-      this.currentRecipe.downloadableExecutables = [];
-    }
-    
-    const newExecutable: RecipeDownloadableExecutable = {
-      filePath: ''
-    };
-    
-    this.currentRecipe.downloadableExecutables.push(newExecutable);
-    this.onRecipeChange();
-  }
-  
-  removeDownloadableExecutable(index: number): void {
-    if (!this.currentRecipe?.downloadableExecutables) return;
-    
-    const executable = this.currentRecipe.downloadableExecutables[index];
-    
-    // Delete from IndexedDB if it has a file
-    if (executable.filePath) {
-      const fileName = executable.filePath.replace('downloadExecutables/', '');
-      this.fileStorageService.deleteJsonFile(fileName);
-    }
-    
-    this.currentRecipe.downloadableExecutables.splice(index, 1);
-    this.onRecipeChange();
-  }
-  
-  async handleJsonFileUpload(file: File, index: number): Promise<void> {
-    if (!this.currentRecipe?.downloadableExecutables?.[index]) return;
-    
-    // Validate file
-    const validation = this.fileStorageService.validateJsonFile(file);
-    if (!validation.valid) {
-      this.notificationService.error(validation.error!);
-      return;
-    }
-    
-    try {
-      // Validate JSON content
-      const jsonContent = await this.readFileAsText(file);
-      try {
-        JSON.parse(jsonContent);
-      } catch (jsonError) {
-        this.notificationService.error('Invalid JSON file format');
-        return;
-      }
-      
-      // Sanitize filename
-      const fileName = this.fileStorageService.sanitizeFileName(file.name);
-      
-      // Store JSON file in IndexedDB
-      await this.fileStorageService.storeJsonFile(fileName, file);
-      
-      // Update executable reference
-      this.currentRecipe.downloadableExecutables[index].filePath = `downloadExecutables/${fileName}`;
-      this.onRecipeChange();
-      
-      this.notificationService.success(`JSON file uploaded: ${fileName}`);
-    } catch (error) {
-      this.logger.error('Error uploading JSON file:', error);
-      this.notificationService.error('Failed to upload JSON file');
-    }
-  }
-  
-  async onJsonFileDrop(event: DragEvent, index: number): Promise<void> {
-    event.preventDefault();
-    const files = event.dataTransfer?.files;
-    if (!files || files.length === 0) return;
-    
-    const file = files[0];
-    await this.handleJsonFileUpload(file, index);
-  }
-  
-  onJsonFileDragOver(event: DragEvent): void {
-    event.preventDefault();
-    event.stopPropagation();
-    const target = event.target as HTMLElement;
-    const uploadArea = target.closest('.json-upload-area');
-    if (uploadArea) {
-      uploadArea.classList.add('drag-over');
-    }
-  }
-  
-  onJsonFileDragLeave(event: DragEvent): void {
-    event.preventDefault();
-    event.stopPropagation();
-    const target = event.target as HTMLElement;
-    const uploadArea = target.closest('.json-upload-area');
-    if (uploadArea) {
-      uploadArea.classList.remove('drag-over');
-    }
-  }
-  
-  triggerJsonFileInput(index: number): void {
-    const fileInput = document.querySelector(`#json-upload-${index}`) as HTMLInputElement;
-    if (fileInput) {
-      fileInput.click();
-    }
-  }
-  
-  async onJsonFileSelect(event: Event, index: number): Promise<void> {
-    const input = event.target as HTMLInputElement;
-    if (!input.files || input.files.length === 0) return;
-    
-    const file = input.files[0];
-    await this.handleJsonFileUpload(file, index);
-    
-    // Reset input
-    input.value = '';
-  }
-  
-  getJsonFileName(executable: RecipeDownloadableExecutable): string {
-    if (!executable.filePath) return '';
-    return executable.filePath.replace('downloadExecutables/', '');
-  }
-  
-  private async readFileAsText(file: File): Promise<string> {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result as string);
-      reader.onerror = () => reject(reader.error);
-      reader.readAsText(file);
-    });
-  }
-  
-  // Keywords management
-  addKeyword(): void {
-    if (!this.currentRecipe) return;
-    
-    if (!this.currentRecipe.keywords) {
-      this.currentRecipe.keywords = [];
-    }
-    
-    this.currentRecipe.keywords.push('');
-    this.onRecipeChange();
-  }
-  
-  removeKeyword(index: number): void {
-    if (!this.currentRecipe?.keywords) return;
-    
-    this.currentRecipe.keywords.splice(index, 1);
-    this.onRecipeChange();
-  }
-  
-  // Related Recipes management
-  addRelatedRecipe(): void {
-    if (!this.currentRecipe) return;
-    
-    if (!this.currentRecipe.relatedRecipes) {
-      this.currentRecipe.relatedRecipes = [];
-    }
-    
-    const newRelated: RecipeRelatedItem = {
-      title: '',
-      url: ''
-    };
-    
-    this.currentRecipe.relatedRecipes.push(newRelated);
-    this.onRecipeChange();
-  }
-  
-  removeRelatedRecipe(index: number): void {
-    if (!this.currentRecipe?.relatedRecipes) return;
-    
-    this.currentRecipe.relatedRecipes.splice(index, 1);
-    this.onRecipeChange();
-  }
-  
+
   // Step expansion management
   toggleStep(index: number): void {
     if (this.expandedSteps.has(index)) {
@@ -1452,86 +915,12 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
   
   private reindexCustomStepNames(): void {
     if (!this.currentRecipe?.walkthrough) return;
-    
-    const newCustomStepNames: { [index: number]: string } = {};
-    
-    // Re-map custom step names based on current step positions
-    this.currentRecipe.walkthrough.forEach((step, index) => {
-      if (step.step === 'Custom' && this.customStepNames[index]) {
-        newCustomStepNames[index] = this.customStepNames[index];
-      }
-    });
-    
-    this.customStepNames = newCustomStepNames;
+    this.customStepNames = StepManagementUtil.reindexCustomStepNames(
+      this.currentRecipe.walkthrough,
+      this.customStepNames
+    );
   }
   
-  // Check for missing images after importing a recipe
-  private async checkMissingImagesAfterImport(recipe: SourceRecipeRecord): Promise<void> {
-    const missingImages: string[] = [];
-    
-    try {
-      // Check walkthrough step media images
-      if (recipe.walkthrough) {
-        for (const step of recipe.walkthrough) {
-          if (step.media) {
-            for (const media of step.media) {
-              if (media.type === 'image' && media.url && media.url.startsWith('images/')) {
-                const fileName = media.url.replace('images/', '');
-                const imageKey = fileName.replace(/\.[^/.]+$/, '');
-                
-                const exists = await this.fileStorageService.imageExists(imageKey);
-                if (!exists) {
-                  missingImages.push(media.url);
-                }
-              }
-            }
-          }
-        }
-      }
-      
-      // Check general images
-      if (recipe.generalImages) {
-        for (const image of recipe.generalImages) {
-          if (image.url && image.url.startsWith('images/')) {
-            const fileName = image.url.replace('images/', '');
-            const imageKey = fileName.replace(/\.[^/.]+$/, '');
-            
-            const exists = await this.fileStorageService.imageExists(imageKey);
-            if (!exists) {
-              missingImages.push(image.url);
-            }
-          }
-        }
-      }
-      
-      // Report missing images
-      if (missingImages.length > 0) {
-        this.logger.warn(`Missing ${missingImages.length} images after import:`, missingImages);
-      } else {
-        this.logger.debug('All images are available after import');
-      }
-    } catch (error) {
-      this.logger.error('Error checking missing images:', error);
-    }
-  }
-
-  /**
-   * Check if an image is missing from IndexedDB
-   */
-  public isImageMissing(media: any): boolean {
-    if (!media || !media.url || !media.url.startsWith('images/')) {
-      return false;
-    }
-    
-    // If displayUrl exists, image is loaded successfully
-    if (media.displayUrl) {
-      return false;
-    }
-    
-    // Consider it missing if no displayUrl and it's an uploaded image
-    return true;
-  }
-
   /**
    * Handle missing step media image - trigger file input
    */
@@ -1558,43 +947,7 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
   public async replaceMissingImage(event: Event, media: any, stepIndex: number): Promise<void> {
     const target = event.target as HTMLInputElement;
     if (!target.files || target.files.length === 0) return;
-    
-    const file = target.files[0];
-    
-    try {
-      // Validate file
-      const validation = this.fileStorageService.validateImageFile(file);
-      if (!validation.valid) {
-        this.notificationService.error(validation.error || 'Invalid file');
-        return;
-      }
-      
-      // Generate new image ID and store
-      const imageId = this.fileStorageService.generateImageId();
-      const originalName = this.fileStorageService.sanitizeFileName(file.name);
-      const imageName = `${imageId}_${originalName}`;
-      
-      await this.fileStorageService.storeImage(imageId, file);
-      
-      // Update media object
-      media.url = `images/${imageName}`;
-      
-      // Generate display URL immediately
-      const displayUrl = URL.createObjectURL(file);
-      (media as any).displayUrl = displayUrl;
-      
-      // Mark recipe as changed
-      this.onRecipeChange();
-      
-      this.notificationService.success('Image replaced successfully');
-      
-      // Clear file input
-      target.value = '';
-      
-    } catch (error) {
-      this.logger.error('Error replacing missing image:', error);
-      this.notificationService.error('Failed to replace image');
-    }
+    await this.uploadImageFile(target.files[0], 'replace-step-media', { existingObject: media, targetInput: target });
   }
 
   /**
@@ -1603,121 +956,30 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
   public async replaceMissingGeneralImage(event: Event, image: any, imageIndex: number): Promise<void> {
     const target = event.target as HTMLInputElement;
     if (!target.files || target.files.length === 0) return;
-    
-    const file = target.files[0];
-    
-    try {
-      // Validate file
-      const validation = this.fileStorageService.validateImageFile(file);
-      if (!validation.valid) {
-        this.notificationService.error(validation.error || 'Invalid file');
-        return;
-      }
-      
-      // Generate new image ID and store
-      const imageId = this.fileStorageService.generateImageId();
-      const originalName = this.fileStorageService.sanitizeFileName(file.name);
-      const imageName = `${imageId}_${originalName}`;
-      
-      await this.fileStorageService.storeImage(imageId, file);
-      
-      // Update image object
-      image.url = `images/${imageName}`;
-      
-      // Generate display URL immediately
-      const displayUrl = URL.createObjectURL(file);
-      (image as any).displayUrl = displayUrl;
-      
-      // Mark recipe as changed
-      this.onRecipeChange();
-      
-      this.notificationService.success('Image replaced successfully');
-      
-      // Clear file input
-      target.value = '';
-      
-    } catch (error) {
-      this.logger.error('Error replacing missing general image:', error);
-      this.notificationService.error('Failed to replace image');
-    }
+    await this.uploadImageFile(target.files[0], 'replace-general-image', { existingObject: image, targetInput: target });
   }
 
   // General images management
   addGeneralImage(): void {
     if (!this.currentRecipe) return;
-    
+
     // Add empty general image entry (like step media)
     const newGeneralImage: RecipeGeneralImage = {
       type: 'image',
       url: '',
       alt: ''
     };
-    
+
     if (!this.currentRecipe.generalImages) {
       this.currentRecipe.generalImages = [];
     }
-    
     this.currentRecipe.generalImages.push(newGeneralImage);
     this.onRecipeChange();
   }
 
   async handleGeneralImageFile(file: File): Promise<void> {
     if (!this.currentRecipe) return;
-    
-    // Validate file
-    const validation = this.fileStorageService.validateImageFile(file);
-    if (!validation.valid) {
-      this.notificationService.error(validation.error!);
-      return;
-    }
-    
-    try {
-      // Generate simple image name
-      const baseName = this.generateGeneralImageName(file);
-      const extension = file.name.split('.').pop()?.toLowerCase() || 'png';
-      const fullFileName = `${baseName}.${extension}`;
-      
-      // Store image in IndexedDB using the base name as key (like step media)
-      await this.fileStorageService.storeImage(baseName, file);
-      
-      // Add to general images with immediate displayUrl generation
-      const generalImage: RecipeGeneralImage = {
-        type: 'image',
-        url: `images/${fullFileName}`,
-        alt: file.name.replace(/\.[^/.]+$/, ''), // Remove extension from alt text
-        imageId: baseName // Use baseName as imageId for deletion compatibility
-      };
-      
-      // Generate displayUrl immediately for instant preview
-      try {
-        this.logger.debug(`Attempting to generate displayUrl for general image baseName: ${baseName}`);
-        const imageFile = await this.fileStorageService.getImage(baseName);
-        if (imageFile) {
-          const displayUrl = URL.createObjectURL(imageFile);
-          (generalImage as any).displayUrl = displayUrl;
-          this.logger.debug(`Successfully generated displayUrl for general image: ${displayUrl}`);
-        } else {
-          this.logger.warn(`No image file found for general image baseName: ${baseName}`);
-        }
-      } catch (error) {
-        this.logger.error('Failed to generate immediate displayUrl for general image:', error);
-      }
-      
-      if (!this.currentRecipe.generalImages) {
-        this.currentRecipe.generalImages = [];
-      }
-      
-      this.currentRecipe.generalImages.push(generalImage);
-      this.onRecipeChange();
-      
-      this.notificationService.success(`General image added: ${fullFileName}`);
-      
-      // Trigger change detection to update UI
-      this.cdr.detectChanges();
-    } catch (error) {
-      this.logger.error('Error uploading general image:', error);
-      this.notificationService.error('Failed to upload general image');
-    }
+    await this.uploadImageFile(file, 'general-image');
   }
 
   removeGeneralImage(index: number): void {
@@ -1797,7 +1059,17 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
   
   private saveTab(tab: RecipeTab): void {
     this.state.isSaving = true;
-    
+
+    // Validate recipe before saving
+    const validationResult = this.validationService.validateRecipe(tab.recipe);
+    if (!validationResult.valid) {
+      const errors = this.validationService.getErrorMessages(validationResult);
+      this.logger.warn('Recipe validation failed:', errors);
+      this.notificationService.error(`Validation failed:\n${errors.slice(0, EDITOR_CONSTANTS.MAX_ERROR_MESSAGES_SHOWN).join('\n')}`);
+      this.state.isSaving = false;
+      return;
+    }
+
     // Generate ID if needed
     if (!tab.recipe.id) {
       tab.recipe.id = this.generateRecipeId();
@@ -1859,6 +1131,23 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
       return;
     }
 
+    // Validate all edited recipes before export
+    const invalidRecipes: string[] = [];
+    for (const recipe of editedRecipes) {
+      const validationResult = this.validationService.validateRecipe(recipe);
+      if (!validationResult.valid) {
+        invalidRecipes.push(recipe.title || recipe.id);
+      }
+    }
+
+    if (invalidRecipes.length > 0) {
+      this.logger.warn('Some recipes have validation errors:', invalidRecipes);
+      const proceed = confirm(`${invalidRecipes.length} recipe(s) have validation errors. Export anyway?\n\n${invalidRecipes.join('\n')}`);
+      if (!proceed) {
+        return;
+      }
+    }
+
     // Export as ZIP: edited recipes as files, all recipes in index.json
     await this.exportService.exportAllAsZip(editedRecipes, this.fileStorageService, allCurrentRecipes);
   }
@@ -1909,7 +1198,7 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
             this.state.tabs.push(tab);
             
             // Load images for each recipe
-            await this.loadAllImagesForRecipe(recipe);
+            await this.imageLoaderService.loadAllImagesForRecipe(recipe);
           }
           
           // Deactivate all existing tabs and activate the first imported one
@@ -1963,8 +1252,11 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
         this.triggerPreviewUpdate();
         
         // Load all images for imported recipe and check for missing images
-        await this.loadAllImagesForRecipe(imported);
-        this.checkMissingImagesAfterImport(imported);
+        await this.imageLoaderService.loadAllImagesForRecipe(imported);
+        const report = await this.imageLoaderService.checkMissingImagesAfterImport(imported);
+        if (report.missingCount > 0) {
+          this.logger.warn(`Missing ${report.missingCount} images after import`);
+        }
         
         this.notificationService.success('Recipe imported successfully');
       } else {
@@ -2014,114 +1306,38 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
    * Get count of created recipes (new recipes not in original list)
    */
   getCreatedCount(): number {
-    const editedRecipes = this.storageService.getAllEditedRecipes();
-    const originalRecipeIds = new Set(this.recipeList.map(r => r.id));
-    
-    let createdCount = 0;
-    editedRecipes.forEach(recipe => {
-      if (recipe.id && !originalRecipeIds.has(recipe.id)) {
-        createdCount++;
-      }
-    });
-    
-    return createdCount;
+    return this.getFilteredRecipes(true).length;
   }
-  
+
   /**
    * Get count of modified existing recipes
    */
   getEditedExistingCount(): number {
-    const editedRecipes = this.storageService.getAllEditedRecipes();
-    const originalRecipeIds = new Set(this.recipeList.map(r => r.id));
-    
-    let editedCount = 0;
-    editedRecipes.forEach(recipe => {
-      if (recipe.id && originalRecipeIds.has(recipe.id)) {
-        editedCount++;
-      }
-    });
-    
-    return editedCount;
+    return this.getFilteredRecipes(false).length;
   }
   
   /**
    * Get list of created recipe titles for tooltip
    */
   getCreatedRecipeTitles(): RecipeTitleItem[] {
-    const editedRecipes = this.storageService.getAllEditedRecipes();
-    const originalRecipeIds = new Set(this.recipeList.map(r => r.id));
-    const items: RecipeTitleItem[] = [];
-    
-    editedRecipes.forEach(recipe => {
-      if (recipe.id && recipe.title && !originalRecipeIds.has(recipe.id)) {
-        // Truncate long titles to prevent tooltip overflow
-        const truncatedTitle = recipe.title.length > 50 
-          ? recipe.title.substring(0, 50) + '...' 
-          : recipe.title;
-          
-        items.push({
-          id: recipe.id,
-          recipeId: recipe.id,
-          title: truncatedTitle
-        });
-      }
-    });
-    
-    // Sort alphabetically and limit to 10 items
-    return items.sort((a, b) => a.title.localeCompare(b.title)).slice(0, 10);
+    const createdRecipes = this.getFilteredRecipes(true);
+    return this.recipesToTitleItems(createdRecipes, EDITOR_CONSTANTS.TITLE_MAX_LENGTH_TOOLTIP);
   }
-  
+
   /**
    * Get list of modified existing recipe titles for tooltip
    */
   getEditedExistingRecipeTitles(): RecipeTitleItem[] {
-    const editedRecipes = this.storageService.getAllEditedRecipes();
-    const originalRecipeIds = new Set(this.recipeList.map(r => r.id));
-    const items: RecipeTitleItem[] = [];
-    
-    editedRecipes.forEach(recipe => {
-      if (recipe.id && recipe.title && originalRecipeIds.has(recipe.id)) {
-        // Truncate long titles to prevent tooltip overflow
-        const truncatedTitle = recipe.title.length > 50 
-          ? recipe.title.substring(0, 50) + '...' 
-          : recipe.title;
-          
-        items.push({
-          id: recipe.id,
-          recipeId: recipe.id,
-          title: truncatedTitle
-        });
-      }
-    });
-    
-    // Sort alphabetically and limit to 10 items
-    return items.sort((a, b) => a.title.localeCompare(b.title)).slice(0, 10);
+    const editedRecipes = this.getFilteredRecipes(false);
+    return this.recipesToTitleItems(editedRecipes, EDITOR_CONSTANTS.TITLE_MAX_LENGTH_TOOLTIP);
   }
-  
+
   /**
    * Get list of edited recipe titles for tooltip (legacy method, kept for compatibility)
    */
   getEditedRecipeTitles(): RecipeTitleItem[] {
-    const editedRecipes = this.storageService.getAllEditedRecipes();
-    const items: RecipeTitleItem[] = [];
-    
-    editedRecipes.forEach(recipe => {
-      if (recipe.id && recipe.title) {
-        // Truncate long titles to prevent tooltip overflow
-        const truncatedTitle = recipe.title.length > 60 
-          ? recipe.title.substring(0, 60) + '...' 
-          : recipe.title;
-          
-        items.push({
-          id: recipe.id,
-          recipeId: recipe.id,
-          title: truncatedTitle
-        });
-      }
-    });
-    
-    // Sort alphabetically and limit to 10 items
-    return items.sort((a, b) => a.title.localeCompare(b.title)).slice(0, 10);
+    const allEditedRecipes = this.getFilteredRecipes();
+    return this.recipesToTitleItems(allEditedRecipes, EDITOR_CONSTANTS.TITLE_MAX_LENGTH_EXPORT);
   }
   
   /**
@@ -2144,7 +1360,7 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
     this.tooltipHideTimeout = setTimeout(() => {
       this.showTooltip = null;
       this.tooltipHideTimeout = null;
-    }, 300); // 300ms delay
+    }, EDITOR_CONSTANTS.TOOLTIP_HIDE_DELAY_MS);
   }
   
   /**
@@ -2186,7 +1402,7 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
       this.triggerPreviewUpdate();
       
       // Load images for the recipe
-      this.loadAllImagesForRecipe(recipe);
+      this.imageLoaderService.loadAllImagesForRecipe(recipe);
       
     } else {
       this.notificationService.error('Recipe not found', 'Unable to locate the selected recipe');
@@ -2254,224 +1470,7 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
       return recipe; // Return original if cleaning fails
     }
   }
-  
-  // Generate meaningful image name based on recipe content
-  private generateImageName(file: File, stepIndex: number): string {
-    try {
-      if (!this.currentRecipe) return this.fallbackImageName();
-      
-      const category = this.createSafeString(this.currentRecipe.category || 'uncategorized');
-      
-      // Get current step name
-      const step = this.currentRecipe.walkthrough?.[stepIndex];
-      const stepName = this.createSafeString(step?.step || 'step');
-      
-      // Get file extension
-      const extension = file.name.split('.').pop()?.toLowerCase() || 'jpg';
-      
-      // Create base name
-      const baseName = `${category}-${stepName}-image`;
-      
-      // Ensure unique name within current recipe
-      return this.ensureUniqueImageName(baseName, extension);
-    } catch (error) {
-      this.logger.error('Error generating image name:', error);
-      return this.fallbackImageName();
-    }
-  }
-  
-  // Create safe filename string
-  private createSafeString(text: string): string {
-    if (!text || typeof text !== 'string') return 'unnamed';
-    
-    return text
-      .toLowerCase()
-      .trim()
-      .replace(/[/\\?<>\\:*|"]/g, '') // Remove invalid filename characters
-      .replace(/[^\w\s-]/g, '') // Keep only word characters, spaces, and hyphens
-      .replace(/\s+/g, '-') // Replace spaces with hyphens
-      .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
-      .replace(/^-|-$/g, '') // Remove leading/trailing hyphens
-      .substring(0, 30) // Limit length
-      || 'unnamed';
-  }
-  
-  // Ensure unique image name within current recipe
-  private ensureUniqueImageName(baseName: string, extension: string): string {
-    if (!this.currentRecipe) return `${baseName}.${extension}`;
-    
-    const usedNames = new Set<string>();
-    
-    // Collect all existing image names in current recipe
-    if (this.currentRecipe.walkthrough) {
-      this.currentRecipe.walkthrough.forEach(step => {
-        if (step.media) {
-          step.media.forEach(media => {
-            if (media.url && media.url.startsWith('images/')) {
-              const fileName = media.url.replace('images/', '');
-              const nameWithoutExt = fileName.replace(/\.[^/.]+$/, '');
-              usedNames.add(nameWithoutExt);
-            }
-          });
-        }
-      });
-    }
-    
-    // Check if base name is unique
-    let finalName = baseName;
-    let counter = 1;
-    
-    while (usedNames.has(finalName)) {
-      finalName = `${baseName}-${++counter}`;
-    }
-    
-    return finalName;
-  }
-  
-  // Fallback image name when generation fails
-  private fallbackImageName(): string {
-    return `image-${Date.now()}`;
-  }
-  
-  // Generate simple name for general images
-  private generateGeneralImageName(file: File): string {
-    try {
-      if (!this.currentRecipe) return 'general-image';
-      
-      // Get current general images count for indexing
-      const existingCount = this.currentRecipe.generalImages?.length || 0;
-      
-      // Create simple base name
-      const baseName = existingCount === 0 ? 'general-image' : `general-image-${existingCount + 1}`;
-      
-      // Ensure unique name within current recipe
-      return this.ensureUniqueGeneralImageName(baseName, '');
-    } catch (error) {
-      this.logger.error('Error generating general image name:', error);
-      return 'general-image';
-    }
-  }
-  
-  // Ensure unique general image name within current recipe
-  private ensureUniqueGeneralImageName(baseName: string, extension: string): string {
-    if (!this.currentRecipe) return baseName;
-    
-    const usedNames = new Set<string>();
-    
-    // Collect all existing general image names in current recipe
-    if (this.currentRecipe.generalImages) {
-      this.currentRecipe.generalImages.forEach(image => {
-        if (image.url && image.url.startsWith('images/')) {
-          const fileName = image.url.replace('images/', '');
-          const nameWithoutExt = fileName.replace(/\.[^/.]+$/, '');
-          usedNames.add(nameWithoutExt);
-        }
-      });
-    }
-    
-    // Check if base name is unique
-    let finalName = baseName;
-    let counter = 2;
-    
-    while (usedNames.has(finalName)) {
-      if (baseName === 'general-image') {
-        finalName = `general-image-${counter}`;
-      } else {
-        // Extract number from baseName and increment
-        const match = baseName.match(/general-image-(\d+)/);
-        if (match) {
-          const currentNum = parseInt(match[1]);
-          finalName = `general-image-${currentNum + counter - 1}`;
-        } else {
-          finalName = `${baseName}-${counter}`;
-        }
-      }
-      counter++;
-    }
-    
-    return finalName;
-  }
-  
-  // Load image for media item asynchronously
-  async loadImageForMedia(media: any): Promise<void> {
-    try {
-      if (!media.url) return;
 
-      // Check if it's an assets path (static image)
-      if (media.url.startsWith('assets/') || this.isAssetsImagePath(media.url)) {
-        const assetsUrl = this.normalizeAssetsImageUrl(media.url);
-        this.logger.debug(`Loading assets image: ${assetsUrl}`);
-        
-        // For assets images, use the URL directly
-        media.displayUrl = assetsUrl;
-        this.logger.debug(`Successfully loaded assets media image: ${assetsUrl}`);
-        this.cdr.detectChanges();
-        return;
-      }
-
-      // Handle IndexedDB images (uploaded images)
-      if (media.url.startsWith('images/')) {
-        const fileName = media.url.replace('images/', '');
-        const imageKey = fileName.replace(/\.[^/.]+$/, ''); // Remove extension
-        
-        this.logger.debug(`Loading image for media with key: ${imageKey}`);
-        
-        const imageFile = await this.fileStorageService.getImage(imageKey);
-        
-        if (imageFile) {
-          const displayUrl = URL.createObjectURL(imageFile);
-          media.displayUrl = displayUrl;
-          this.logger.debug(`Successfully loaded media image: ${displayUrl}`);
-          this.cdr.detectChanges(); // Trigger change detection
-        } else {
-          this.logger.warn(`No image file found for media key: ${imageKey}`);
-        }
-      }
-    } catch (error) {
-      this.logger.error('Error loading image for media:', error);
-    }
-  }
-  
-  // Load image for general image item asynchronously
-  async loadImageForGeneralImage(image: any): Promise<void> {
-    try {
-      if (!image.url) return;
-
-      // Check if it's an assets path (static image)
-      if (image.url.startsWith('assets/') || this.isAssetsImagePath(image.url)) {
-        const assetsUrl = this.normalizeAssetsImageUrl(image.url);
-        this.logger.debug(`Loading assets general image: ${assetsUrl}`);
-        
-        // For assets images, use the URL directly
-        image.displayUrl = assetsUrl;
-        this.logger.debug(`Successfully loaded assets general image: ${assetsUrl}`);
-        this.cdr.detectChanges();
-        return;
-      }
-
-      // Handle IndexedDB images (uploaded images)
-      if (image.url.startsWith('images/')) {
-        const fileName = image.url.replace('images/', '');
-        const imageKey = fileName.replace(/\.[^/.]+$/, ''); // Remove extension
-        
-        this.logger.debug(`Loading general image with key: ${imageKey}`);
-        
-        const imageFile = await this.fileStorageService.getImage(imageKey);
-        
-        if (imageFile) {
-          const displayUrl = URL.createObjectURL(imageFile);
-          image.displayUrl = displayUrl;
-          this.logger.debug(`Successfully loaded general image: ${displayUrl}`);
-          this.cdr.detectChanges(); // Trigger change detection
-        } else {
-          this.logger.warn(`No image file found for general image key: ${imageKey}`);
-        }
-      }
-    } catch (error) {
-      this.logger.error('Error loading image for general image:', error);
-    }
-  }
-  
   // Handle image loading errors
   onImageError(event: Event): void {
     const img = event.target as HTMLImageElement;
@@ -2479,129 +1478,75 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
     this.logger.warn('Failed to load image:', img.src);
   }
 
-  /**
-   * Check if image URL is an assets path (relative path from recipe JSON)
-   */
-  private isAssetsImagePath(url: string): boolean {
-    // Check if it's a relative image path that should be converted to assets path
-    return url.startsWith('images/') && !url.includes('blob:') && !!this.currentRecipe?.id;
-  }
-
-  /**
-   * Convert relative image path to full assets URL
-   */
-  private normalizeAssetsImageUrl(url: string): string {
-    if (url.startsWith('assets/')) {
-      return url; // Already a full assets path
-    }
-    
-    // Convert relative images/ path to full assets path using current recipe ID
-    if (url.startsWith('images/') && this.currentRecipe?.id) {
-      return `assets/recipes/${this.currentRecipe.id}/${url}`;
-    }
-    
-    return url;
-  }
-
-  /**
-   * Load all images for the current recipe
-   */
-  async loadAllImagesForRecipe(recipe?: SourceRecipeRecord): Promise<void> {
-    const targetRecipe = recipe || this.currentRecipe;
-    if (!targetRecipe) return;
-
-    this.logger.debug('Loading all images for recipe:', targetRecipe.title);
-
-    try {
-      // Load walkthrough step media images
-      if (targetRecipe.walkthrough && targetRecipe.walkthrough.length > 0) {
-        for (const step of targetRecipe.walkthrough) {
-          if (step.media && step.media.length > 0) {
-            for (const media of step.media) {
-              if (media.type === 'image' && media.url && (media.url.startsWith('images/') || media.url.startsWith('assets/'))) {
-                await this.loadImageForMedia(media);
-              }
-            }
-          }
-        }
-      }
-
-      // Load general images
-      if (targetRecipe.generalImages && targetRecipe.generalImages.length > 0) {
-        for (const image of targetRecipe.generalImages) {
-          if (image.url && (image.url.startsWith('images/') || image.url.startsWith('assets/'))) {
-            await this.loadImageForGeneralImage(image);
-          }
-        }
-      }
-
-      this.logger.debug('All images loaded for recipe:', targetRecipe.title);
-      
-      // Trigger change detection to update UI
-      this.cdr.detectChanges();
-    } catch (error) {
-      this.logger.error('Error loading all images for recipe:', error);
-    }
-  }
-  
   // Update image names when content changes (category, step names)
   private async updateImageNamesForContentChange(): Promise<void> {
     try {
       if (!this.currentRecipe?.walkthrough) return;
-      
+
       let hasUpdates = false;
-      
+
       for (let stepIndex = 0; stepIndex < this.currentRecipe.walkthrough.length; stepIndex++) {
         const step = this.currentRecipe.walkthrough[stepIndex];
-        if (!step.media) continue;
-        
-        for (const media of step.media) {
-          if (media.url && media.url.startsWith('images/')) {
-            // Extract current filename and key
-            const currentFileName = media.url.replace('images/', '');
-            const currentKey = currentFileName.replace(/\.[^/.]+$/, '');
-            
-            // Get the stored image file
-            const imageFile = await this.fileStorageService.getImage(currentKey);
-            if (!imageFile) continue;
-            
-            // Generate new name based on current content
-            const newKey = this.generateImageName(imageFile, stepIndex);
-            const extension = currentFileName.split('.').pop() || 'jpg';
-            const newFileName = `${newKey}.${extension}`;
-            
-            if (currentKey !== newKey) {
-              try {
-                // Store with new key and delete old key
-                await this.fileStorageService.storeImage(newKey, imageFile);
-                await this.fileStorageService.deleteImage(currentKey);
-                
-                // Update media reference
-                media.url = `images/${newFileName}`;
-                
-                // Clear any cached display URL
-                if ((media as any).displayUrl) {
-                  URL.revokeObjectURL((media as any).displayUrl);
-                  delete (media as any).displayUrl;
-                }
-                
-                hasUpdates = true;
-                
-                this.logger.debug(`Updated image name: ${currentFileName} -> ${newFileName}`);
-              } catch (error) {
-                this.logger.error('Error updating image name:', error);
-              }
-            }
-          }
+        if (step.media) {
+          const updated = await this.updateStepMediaNames(step.media, stepIndex);
+          hasUpdates = hasUpdates || updated;
         }
       }
-      
+
       if (hasUpdates) {
-        this.cdr.detectChanges(); // Trigger change detection to update UI
+        this.cdr.detectChanges();
         this.notificationService.success('Image names updated based on recipe content');
       }
     } catch (error) {
       this.logger.error('Error updating image names:', error);
+    }
+  }
+
+  private async updateStepMediaNames(media: RecipeStepMedia[], stepIndex: number): Promise<boolean> {
+    let hasUpdates = false;
+
+    for (const item of media) {
+      if (!item.url || !item.url.startsWith('images/')) continue;
+
+      const updated = await this.updateSingleMediaName(item, stepIndex);
+      hasUpdates = hasUpdates || updated;
+    }
+
+    return hasUpdates;
+  }
+
+  private async updateSingleMediaName(media: RecipeStepMedia, stepIndex: number): Promise<boolean> {
+    try {
+      const currentFileName = media.url.replace('images/', '');
+      const currentKey = currentFileName.replace(/\.[^/.]+$/, '');
+
+      const imageFile = await this.fileStorageService.getImage(currentKey);
+      if (!imageFile) return false;
+
+      const newKey = this.imageNamingService.generateImageName(imageFile, this.currentRecipe!, stepIndex);
+      if (currentKey === newKey) return false;
+
+      const extension = currentFileName.split('.').pop() || 'jpg';
+      const newFileName = `${newKey}.${extension}`;
+
+      // Store with new key and delete old key
+      await this.fileStorageService.storeImage(newKey, imageFile);
+      await this.fileStorageService.deleteImage(currentKey);
+
+      // Update media reference
+      media.url = `images/${newFileName}`;
+
+      // Clear any cached display URL
+      if ((media as any).displayUrl) {
+        URL.revokeObjectURL((media as any).displayUrl);
+        delete (media as any).displayUrl;
+      }
+
+      this.logger.debug(`Updated image name: ${currentFileName} -> ${newFileName}`);
+      return true;
+    } catch (error) {
+      this.logger.error('Error updating image name:', error);
+      return false;
     }
   }
   
@@ -2711,25 +1656,6 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
       // Show fallback dialog or notification
       this.notificationService.error('Unable to open preview. Please check your popup blocker settings.');
     }
-  }
-
-  /**
-   * Update preview content
-   */
-  private updatePreview(): void {
-    if (!this.currentRecipe) {
-      return;
-    }
-
-    // Debounced preview update
-    if (this.previewUpdateTimer) {
-      clearTimeout(this.previewUpdateTimer);
-    }
-
-    this.previewUpdateTimer = setTimeout(() => {
-      // Also update external preview if open
-      this.updateExternalPreview();
-    }, 500);
   }
 
 

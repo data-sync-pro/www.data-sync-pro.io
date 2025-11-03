@@ -1,0 +1,123 @@
+<div class="image-manager">
+  <!-- Reusable Image Preview Template -->
+  <ng-template #imagePreview let-item="item">
+    <div class="media-preview"
+         *ngIf="item.type === 'image' && item.url && (item.url.startsWith('images/') || item.url.startsWith('assets/'))">
+      <div *ngIf="hasDisplayUrl(item)">
+        <img [src]="getDisplayUrl(item)"
+             [alt]="item.alt"
+             class="media-preview-image"
+             title="Click to enlarge"
+             (error)="onImageError($event)">
+      </div>
+      <div *ngIf="!hasDisplayUrl(item)" class="image-loading-placeholder">
+        <span>📸 Loading image...</span>
+      </div>
+    </div>
+  </ng-template>
+
+  <!-- Step Media Section -->
+  <div class="media-section" *ngIf="stepIndex >= 0" appSimpleZoomable>
+    <h4>Media</h4>
+    <div class="media-item"
+         *ngFor="let item of media; let j = index; trackBy: trackByIndex">
+      <div class="media-row">
+        <select class="dsp-input"
+                [(ngModel)]="item.type"
+                (change)="onChange()">
+          <option value="image">Image</option>
+          <option value="video">Video</option>
+        </select>
+        <input type="text"
+               class="dsp-input"
+               [(ngModel)]="item.url"
+               (input)="onChange()"
+               placeholder="URL or path">
+        <input type="text"
+               class="dsp-input"
+               [(ngModel)]="item.alt"
+               (input)="onChange()"
+               placeholder="Alt text">
+        <button type="button"
+                class="btn btn-sm btn-danger"
+                (click)="removeMedia(j)">−</button>
+      </div>
+
+      <!-- Image Preview -->
+      <ng-container *ngTemplateOutlet="imagePreview; context: {item: item}"></ng-container>
+    </div>
+
+    <!-- Upload Area -->
+    <div class="image-upload-area"
+         (dragover)="$event.preventDefault()"
+         (drop)="onImageDrop($event)">
+      <p>Drag and drop images here, or</p>
+      <input type="file"
+             #imageInput
+             accept="image/*,video/*"
+             style="display: none"
+             (change)="imageInput.files && handleImageFile(imageInput.files[0])">
+      <button type="button"
+              class="btn btn-sm btn-secondary"
+              (click)="imageInput.click()">Upload File</button>
+      <button type="button"
+              class="btn btn-sm btn-secondary"
+              (click)="addMedia()">+ Add Media</button>
+    </div>
+  </div>
+
+  <!-- General Images Section -->
+  <div class="general-images-section" *ngIf="stepIndex < 0" appSimpleZoomable>
+    <h4>General Images</h4>
+    <div class="general-images-container">
+      <div class="general-images-list">
+        <div class="general-image-item"
+             *ngFor="let image of generalImages; let i = index; trackBy: trackByIndex">
+          <div class="media-row">
+            <select class="dsp-input"
+                    [(ngModel)]="image.type"
+                    (change)="onChange()">
+              <option value="image">Image</option>
+              <option value="video">Video</option>
+              <option value="gif">GIF</option>
+            </select>
+            <input type="text"
+                   class="dsp-input"
+                   [(ngModel)]="image.url"
+                   (input)="onChange()"
+                   placeholder="URL or path">
+            <input type="text"
+                   class="dsp-input"
+                   [(ngModel)]="image.alt"
+                   (input)="onChange()"
+                   placeholder="Alt text">
+            <button type="button"
+                    class="btn btn-sm btn-danger"
+                    (click)="removeGeneralImage(i)">−</button>
+          </div>
+
+          <!-- Image Preview -->
+          <ng-container *ngTemplateOutlet="imagePreview; context: {item: image}"></ng-container>
+        </div>
+      </div>
+
+      <!-- Upload Area for General Images -->
+      <div class="image-upload-area"
+           (dragover)="$event.preventDefault()"
+           (drop)="onGeneralImageDrop($event)">
+        <p>Drag and drop images here, or</p>
+        <input type="file"
+               #generalImageInput
+               accept="image/*"
+               style="display: none"
+               (change)="generalImageInput.files && handleGeneralImageFile(generalImageInput.files[0])">
+        <button type="button"
+                class="btn btn-sm btn-secondary"
+                (click)="generalImageInput.click()">Upload File</button>
+        <button type="button"
+                class="btn btn-sm btn-secondary"
+                (click)="addGeneralImage()">+ Add General Image</button>
+      </div>
+    </div>
+  </div>
+</div>

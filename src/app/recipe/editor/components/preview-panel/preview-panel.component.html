@@ -1,0 +1,20 @@
+<div class="preview-panel">
+  <h2>JSON Preview</h2>
+
+  <div class="preview-actions">
+    <button class="btn btn-sm btn-secondary"
+            (click)="onCopyToClipboard()"
+            title="Copy JSON to clipboard">
+      Copy JSON
+    </button>
+    <button class="btn btn-sm btn-primary"
+            (click)="onOpenPreviewInNewTab()"
+            title="Open recipe preview in new tab">
+      Open Preview
+    </button>
+  </div>
+
+  <div class="json-preview">
+    <pre><code>{{ jsonPreview }}</code></pre>
+  </div>
+</div>

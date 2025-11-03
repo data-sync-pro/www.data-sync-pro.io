@@ -172,499 +172,61 @@
 
       <div class="recipe-form" *ngIf="!state.isLoading">
         <!-- Basic Information -->
-        <div class="form-section">
-          <h2>Basic Information</h2>
-          
-          <div class="form-row">
-            <div class="form-group active-field">
-              <label class="checkbox-label">
-                <input type="checkbox" 
-                       [(ngModel)]="currentIsActive"
-                       (change)="onRecipeChange()">
-                <span class="checkbox-text">Active</span>
-              </label>
-            </div>
-            
-            <div class="form-group">
-              <label for="title">Title *</label>
-              <input type="text" 
-                     id="title"
-                     class="dsp-input"
-                     [(ngModel)]="currentRecipe.title"
-                     (input)="onRecipeChange()"
-                     required>
-            </div>
-            
-            <div class="form-group">
-              <label for="category">Category *</label>
-              <select id="category"
-                      class="dsp-input"
-                      [(ngModel)]="currentRecipe.category"
-                      (change)="onRecipeChange()"
-                      required>
-                <option value="">Select category</option>
-                <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
-              </select>
-            </div>
-          </div>
+        <app-basic-info
+          *ngIf="currentRecipe"
+          [recipe]="currentRecipe"
+          [isActive]="currentIsActive"
+          [categories]="categories"
+          (recipeChange)="onRecipeChange()"
+          (activeChange)="onActiveStatusChange($event)">
+        </app-basic-info>
 
-          <div class="form-group">
-            <label for="overview">Overview *</label>
-            <textarea id="overview"
-                      class="dsp-input"
-                      rows="3"
-                      [(ngModel)]="currentRecipe.overview"
-                      (input)="onRecipeChange()"
-                      placeholder="Detailed overview of what this recipe does"
-                      required></textarea>
-          </div>
+        <!-- Downloadable Executables -->
+        <app-file-upload
+          *ngIf="currentRecipe"
+          [downloadableExecutables]="currentRecipe.downloadableExecutables"
+          (downloadableExecutablesChange)="onRecipeChange()">
+        </app-file-upload>
 
-          <div class="form-group">
-            <label for="whenToUse">General Use Case</label>
-            <textarea id="whenToUse"
-                      class="dsp-input"
-                      rows="3"
-                      [(ngModel)]="currentRecipe.whenToUse"
-                      (input)="onRecipeChange()"
-                      placeholder="Describe when this recipe should be used"></textarea>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label for="direction">Direction</label>
-              <input type="text"
-                     id="direction"
-                     class="dsp-input"
-                     [(ngModel)]="currentRecipe.direction"
-                     (input)="onRecipeChange()"
-                     placeholder="e.g. Current ⇒ Current">
-            </div>
-            
-            <div class="form-group">
-              <label for="connection">Connection</label>
-              <input type="text"
-                     id="connection"
-                     class="dsp-input"
-                     [(ngModel)]="currentRecipe.connection"
-                     (input)="onRecipeChange()">
-            </div>
-          </div>
-
-          <!-- DSP Versions -->
-          <div class="form-group">
-            <label>DSP Versions</label>
-            <div class="dynamic-list">
-              <div class="dynamic-item" 
-                   *ngFor="let version of currentRecipe.DSPVersions; let i = index; trackBy: trackByIndex">
-                <input type="text"
-                       class="dsp-input"
-                       [(ngModel)]="currentRecipe.DSPVersions[i]"
-                       (input)="onRecipeChange()"
-                       placeholder="Version">
-                <button type="button" 
-                        class="btn btn-sm btn-danger"
-                        (click)="removeDSPVersion(i)">−</button>
-              </div>
-              <button type="button" 
-                      class="btn btn-sm btn-secondary"
-                      (click)="addDSPVersion()">+ Add Version</button>
-            </div>
-          </div>
-
-          <!-- Keywords -->
-          <div class="form-group">
-            <label>Keywords</label>
-            <div class="dynamic-list">
-              <div class="dynamic-item" 
-                   *ngFor="let keyword of currentRecipe.keywords; let i = index; trackBy: trackByIndex">
-                <input type="text"
-                       class="dsp-input"
-                       [(ngModel)]="currentRecipe.keywords[i]"
-                       (input)="onRecipeChange()"
-                       placeholder="Keyword">
-                <button type="button" 
-                        class="btn btn-sm btn-danger"
-                        (click)="removeKeyword(i)">−</button>
-              </div>
-              <button type="button" 
-                      class="btn btn-sm btn-secondary"
-                      (click)="addKeyword()">+ Add Keyword</button>
-            </div>
-          </div>
-
-          <!-- Downloadable Executables -->
-          <div class="form-group">
-            <label>Downloadable Executables</label>
-            <div class="downloadable-executables">
-              <div class="downloadable-item" 
-                   *ngFor="let executable of currentRecipe.downloadableExecutables; let i = index; trackBy: trackByIndex">
-                <div class="json-upload-area"
-                     [class.has-json]="executable.filePath"
-                     (drop)="onJsonFileDrop($event, i)"
-                     (dragover)="onJsonFileDragOver($event)"
-                     (dragleave)="onJsonFileDragLeave($event)"
-                     (click)="triggerJsonFileInput(i)">
-                  <input type="file" 
-                         [id]="'json-upload-' + i"
-                         class="json-upload"
-                         accept=".json"
-                         style="display: none"
-                         (change)="onJsonFileSelect($event, i)">
-                  <div class="upload-placeholder" 
-                       [class.uploaded]="executable.filePath">
-                    <ng-container *ngIf="!executable.filePath">
-                      Click or drag to upload JSON file
-                    </ng-container>
-                    <ng-container *ngIf="executable.filePath">
-                      ✓ {{ getJsonFileName(executable) }}
-                    </ng-container>
-                  </div>
-                </div>
-                <button type="button" 
-                        class="btn btn-sm btn-danger"
-                        (click)="removeDownloadableExecutable(i)">−</button>
-              </div>
-              <button type="button" 
-                      class="btn btn-sm btn-secondary"
-                      (click)="addDownloadableExecutable()">+ Add File</button>
-            </div>
-          </div>
-
-          <!-- Related Recipes -->
-          <div class="form-group">
-            <label>Related Recipes</label>
-            <div class="dynamic-list">
-              <div class="related-item" 
-                   *ngFor="let related of currentRecipe.relatedRecipes; let i = index; trackBy: trackByIndex">
-                <input type="text"
-                       class="dsp-input"
-                       [(ngModel)]="related.title"
-                       (input)="onRecipeChange()"
-                       placeholder="Recipe Title">
-                <input type="text"
-                       class="dsp-input"
-                       [(ngModel)]="related.url"
-                       (input)="onRecipeChange()"
-                       placeholder="Recipe URL">
-                <button type="button" 
-                        class="btn btn-sm btn-danger"
-                        (click)="removeRelatedRecipe(i)">−</button>
-              </div>
-              <button type="button" 
-                      class="btn btn-sm btn-secondary"
-                      (click)="addRelatedRecipe()">+ Add Related Recipe</button>
-            </div>
-          </div>
-
-          <!-- General Images -->
-          <div class="form-group">
-            <label>General Images</label>
-            <div class="general-images-container" appSimpleZoomable>
-              <div class="general-images-list">
-                <div class="general-image-item" 
-                     *ngFor="let image of currentRecipe.generalImages; let i = index; trackBy: trackByIndex">
-                  <div class="media-row">
-                    <select class="dsp-input"
-                            [(ngModel)]="image.type"
-                            (change)="onRecipeChange()">
-                      <option value="image">Image</option>
-                      <option value="video">Video</option>
-                      <option value="gif">GIF</option>
-                    </select>
-                    <input type="text"
-                           class="dsp-input"
-                           [(ngModel)]="image.url"
-                           (input)="onRecipeChange()"
-                           placeholder="URL or path">
-                    <input type="text"
-                           class="dsp-input"
-                           [(ngModel)]="image.alt"
-                           (input)="onRecipeChange()"
-                           placeholder="Alt text or description">
-                    <button type="button" 
-                            class="btn btn-sm btn-danger"
-                            (click)="removeGeneralImage(i)">−</button>
-                  </div>
-                  <!-- Image Preview for uploaded images -->
-                  <div class="media-preview" 
-                       *ngIf="image.type === 'image' && image.url && (image.url.startsWith('images/') || image.url.startsWith('assets/'))">
-                    <div *ngIf="image.displayUrl; else loadingGeneralImage">
-                      <img [src]="image.displayUrl" 
-                           [alt]="image.alt"
-                           class="media-preview-image"
-                           title="Click to enlarge"
-                           (error)="onImageError($event)">
-                    </div>
-                    <ng-template #loadingGeneralImage>
-                      <div class="image-loading-placeholder" 
-                           [class.missing]="isImageMissing(image)"
-                           (click)="handleMissingGeneralImage(image, i)"
-                           [title]="isImageMissing(image) ? 'Image missing - click to upload replacement' : 'Click to load image'">
-                        <span *ngIf="!isImageMissing(image)">📸 Loading image...</span>
-                        <span *ngIf="isImageMissing(image)">⚠️ Image missing - click to upload</span>
-                        <input type="file" 
-                               [id]="'missing-general-' + i"
-                               style="display: none"
-                               accept="image/*"
-                               (change)="replaceMissingGeneralImage($event, image, i)">
-                      </div>
-                    </ng-template>
-                  </div>
-                </div>
-              </div>
-              
-              <!-- Upload Area and Add Button -->
-              <div class="image-upload-area"
-                   (dragover)="$event.preventDefault()"
-                   (drop)="onGeneralImageDrop($event)">
-                <p>Drag and drop images here, or</p>
-                <input type="file"
-                       #generalImageInput
-                       accept="image/*,video/*"
-                       style="display: none"
-                       (change)="handleGeneralImageFile($any($event.target).files[0])">
-                <button type="button" 
-                        class="btn btn-sm btn-secondary"
-                        (click)="generalImageInput.click()">Upload File</button>
-                <button type="button" 
-                        class="btn btn-sm btn-secondary"
-                        (click)="addGeneralImage()">+ Add Media</button>
-              </div>
-            </div>
-          </div>
-        </div>
+        <!-- General Images -->
+        <app-image-manager
+          *ngIf="currentRecipe"
+          [generalImages]="currentRecipe.generalImages"
+          [stepIndex]="-1"
+          [recipeId]="currentRecipe.id || ''"
+          [recipeCategory]="currentRecipe.category || ''"
+          (generalImagesChange)="onRecipeChange()">
+        </app-image-manager>
 
         <!-- Prerequisites -->
-        <div class="form-section">
-          <h2>Prerequisites</h2>
-          
-          <div class="prerequisite-item" 
-               *ngFor="let prereq of currentRecipe.prerequisites; let i = index; trackBy: trackByIndex">
-            <div class="form-group">
-              <label>Description</label>
-              <input type="text"
-                     class="dsp-input"
-                     [(ngModel)]="prereq.description"
-                     (input)="onRecipeChange()"
-                     placeholder="Prerequisite description">
-            </div>
-
-            <!-- Quick Links -->
-            <div class="quick-links">
-              <label>Quick Links</label>
-              <div class="quick-link" 
-                   *ngFor="let link of prereq.quickLinks; let j = index; trackBy: trackByIndex">
-                <input type="text"
-                       class="dsp-input"
-                       [(ngModel)]="link.title"
-                       (input)="onRecipeChange()"
-                       placeholder="Link title">
-                <input type="text"
-                       class="dsp-input"
-                       [(ngModel)]="link.url"
-                       (input)="onRecipeChange()"
-                       placeholder="URL or Recipe ID">
-                <button type="button" 
-                        class="btn btn-sm btn-danger"
-                        (click)="removeQuickLink(i, j)">−</button>
-              </div>
-              <button type="button" 
-                      class="btn btn-sm btn-secondary"
-                      (click)="addQuickLink(i)">+ Add Link</button>
-            </div>
-
-            <button type="button" 
-                    class="btn btn-sm btn-danger"
-                    (click)="removePrerequisite(i)">Remove Prerequisite</button>
-          </div>
-
-          <button type="button" 
-                  class="btn btn-secondary"
-                  (click)="addPrerequisite()">+ Add Prerequisite</button>
-        </div>
+        <app-prerequisites-editor
+          *ngIf="currentRecipe"
+          [prerequisites]="currentRecipe.prerequisites"
+          (prerequisitesChange)="onRecipeChange()">
+        </app-prerequisites-editor>
 
         <!-- Walkthrough -->
-        <div class="form-section">
-          <h2>Walkthrough</h2>
-          
-          <div class="step-item" 
-               *ngFor="let step of currentRecipe.walkthrough; let i = index; trackBy: trackByIndex"
-               [attr.data-step-index]="i">
-            <div class="step-header" (click)="toggleStep(i)">
-              <div class="step-title-section">
-                <span class="step-toggle-icon">{{ isStepExpanded(i) ? '▼' : '▶' }}</span>
-                <h3>{{ getStepTitle(step, i) }}</h3>
-              </div>
-              <div class="step-actions" (click)="$event.stopPropagation()">
-                <button type="button" 
-                        class="btn btn-sm btn-secondary"
-                        [disabled]="i === 0"
-                        (click)="moveStepUp(i)">↑</button>
-                <button type="button" 
-                        class="btn btn-sm btn-secondary"
-                        [disabled]="i === currentRecipe.walkthrough.length - 1"
-                        (click)="moveStepDown(i)">↓</button>
-                <button type="button" 
-                        class="btn btn-sm btn-danger"
-                        (click)="removeStep(i)">Remove</button>
-              </div>
-            </div>
-
-            <div class="step-content" *ngIf="isStepExpanded(i)">
-              <div class="form-group">
-                <label>Step Name</label>
-                <select class="dsp-input"
-                        [(ngModel)]="step.step"
-                        (change)="onStepSelectionChange(step, i)">
-                  <option value="">Select step</option>
-                  <option *ngFor="let option of stepOptions" [value]="option">{{ option }}</option>
-                </select>
-              </div>
-
-              <div class="form-group" *ngIf="step.step === 'Custom'">
-                <label>Custom Step Name</label>
-                <input type="text" 
-                       class="dsp-input"
-                       [(ngModel)]="customStepNames[i]"
-                       (input)="onCustomStepNameChange(i)"
-                       placeholder="Enter custom step name"
-                       #customStepInput>
-              </div>
-
-            <!-- Configuration -->
-            <div class="config-section">
-              <h4>Configuration</h4>
-              <div class="config-item" 
-                   *ngFor="let config of step.config; let j = index; trackBy: trackByIndex">
-                <div class="autocomplete-wrapper">
-                  <input type="text"
-                         class="dsp-input config-field"
-                         [(ngModel)]="config.field"
-                         (input)="onRecipeChange(); handleFieldAutocomplete($event, i)"
-                         (focus)="handleFieldAutocomplete($event, i)"
-                         (blur)="closeAutocomplete($event)"
-                         (keydown)="handleAutocompleteKeydown($event)"
-                         placeholder="Field name">
-                </div>
-                <input type="text"
-                       class="dsp-input"
-                       [(ngModel)]="config.value"
-                       (input)="onRecipeChange()"
-                       placeholder="Value">
-                <button type="button" 
-                        class="btn btn-sm btn-danger"
-                        (click)="removeConfig(i, j)">−</button>
-              </div>
-              <button type="button" 
-                      class="btn btn-sm btn-secondary"
-                      (click)="addConfig(i)">+ Add Config</button>
-            </div>
-
-            <!-- Media -->
-            <div class="media-section" appSimpleZoomable>
-              <h4>Media</h4>
-              <div class="media-item" 
-                   *ngFor="let media of step.media; let j = index; trackBy: trackByIndex">
-                <div class="media-row">
-                  <select class="dsp-input"
-                          [(ngModel)]="media.type"
-                          (change)="onRecipeChange()">
-                    <option value="image">Image</option>
-                    <option value="video">Video</option>
-                  </select>
-                  <input type="text"
-                         class="dsp-input"
-                         [(ngModel)]="media.url"
-                         (input)="onRecipeChange()"
-                         placeholder="URL or path">
-                  <input type="text"
-                         class="dsp-input"
-                         [(ngModel)]="media.alt"
-                         (input)="onRecipeChange()"
-                         placeholder="Alt text">
-                  <button type="button" 
-                          class="btn btn-sm btn-danger"
-                          (click)="removeMedia(i, j)">−</button>
-                </div>
-                <!-- Image Preview for uploaded images and assets images -->
-                <div class="media-preview" 
-                     *ngIf="media.type === 'image' && media.url && (media.url.startsWith('images/') || media.url.startsWith('assets/'))">
-                  <div *ngIf="media.displayUrl; else loadingImage">
-                    <img [src]="media.displayUrl" 
-                         [alt]="media.alt"
-                         class="media-preview-image"
-                         title="Click to enlarge"
-                         (error)="onImageError($event)">
-                  </div>
-                  <ng-template #loadingImage>
-                    <div class="image-loading-placeholder" 
-                         [class.missing]="isImageMissing(media)"
-                         (click)="handleMissingImage(media, i)"
-                         [title]="isImageMissing(media) ? 'Image missing - click to upload replacement' : 'Click to load image'">
-                      <span *ngIf="!isImageMissing(media)">📸 Loading image...</span>
-                      <span *ngIf="isImageMissing(media)">⚠️ Image missing - click to upload</span>
-                      <input type="file" 
-                             [id]="'missing-media-' + i"
-                             style="display: none"
-                             accept="image/*"
-                             (change)="replaceMissingImage($event, media, i)">
-                    </div>
-                  </ng-template>
-                </div>
-              </div>
-              
-              <!-- Upload Area and Add Button -->
-              <div class="image-upload-area"
-                   (dragover)="$event.preventDefault()"
-                   (drop)="onImageDrop($event, i)">
-                <p>Drag and drop images here, or</p>
-                <input type="file"
-                       #imageInput
-                       accept="image/*,video/*"
-                       style="display: none"
-                       (change)="handleImageFile($any($event.target).files[0], i)">
-                <button type="button" 
-                        class="btn btn-sm btn-secondary"
-                        (click)="imageInput.click()">Upload File</button>
-                <button type="button" 
-                        class="btn btn-sm btn-secondary"
-                        (click)="addMedia(i)">+ Add Media</button>
-              </div>
-            </div>
-            </div>
-          </div>
-
-          <button type="button" 
-                  class="btn btn-secondary"
-                  (click)="addStep()">+ Add Step</button>
-        </div>
+        <app-walkthrough-editor
+          *ngIf="currentRecipe"
+          [walkthrough]="currentRecipe.walkthrough"
+          [stepOptions]="stepOptions"
+          [expandedSteps]="expandedSteps"
+          [customStepNames]="customStepNames"
+          [recipeId]="currentRecipe.id || ''"
+          [recipeCategory]="currentRecipe.category || ''"
+          (walkthroughChange)="onRecipeChange()"
+          (stepExpansionToggle)="toggleStep($event)">
+        </app-walkthrough-editor>
       </div>
     </div>
 
     <!-- Right - Preview Panel -->
-    <div class="preview-panel" *ngIf="currentRecipe">
-      <div class="preview-header">
-        <h3>Preview</h3>
-        <div class="preview-actions">
-          <button class="btn btn-sm btn-primary preview-new-tab"
-                  (click)="openPreviewInNewTab()"
-                  title="Open preview in new tab">
-            <span class="btn-icon">🗗</span>
-            Open Preview
-          </button>
-        </div>
-      </div>
-      
-      <!-- JSON Preview Content -->
-      <div class="json-preview">
-        <pre><code>{{ jsonPreview }}</code></pre>
-        <button class="btn btn-sm btn-secondary copy-btn"
-                (click)="copyToClipboard(jsonPreview)"
-                title="Copy JSON to clipboard">
-          Copy JSON
-        </button>
-      </div>
-    </div>
+    <app-preview-panel
+      *ngIf="currentRecipe"
+      [jsonPreview]="jsonPreview"
+      (copyToClipboard)="copyToClipboard($event)"
+      (openPreviewInNewTab)="openPreviewInNewTab()">
+    </app-preview-panel>
   </div>
 
   <!-- No Selection Message -->

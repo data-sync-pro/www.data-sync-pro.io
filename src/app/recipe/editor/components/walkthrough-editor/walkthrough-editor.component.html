@@ -1,0 +1,94 @@
+<div class="form-section walkthrough-section">
+  <h2>Walkthrough</h2>
+
+  <div class="step-item"
+       *ngFor="let step of walkthrough; let i = index; trackBy: trackByIndex"
+       [attr.data-step-index]="i">
+    <!-- Step Header -->
+    <div class="step-header" (click)="toggleStep(i)">
+      <div class="step-title-section">
+        <span class="step-toggle-icon">{{ isStepExpanded(i) ? '▼' : '▶' }}</span>
+        <h3>{{ getStepTitle(step, i) }}</h3>
+      </div>
+      <div class="step-actions" (click)="$event.stopPropagation()">
+        <button type="button"
+                class="btn btn-sm btn-secondary"
+                [disabled]="i === 0"
+                (click)="moveStepUp(i)">↑</button>
+        <button type="button"
+                class="btn btn-sm btn-secondary"
+                [disabled]="i === walkthrough.length - 1"
+                (click)="moveStepDown(i)">↓</button>
+        <button type="button"
+                class="btn btn-sm btn-danger"
+                (click)="removeStep(i)">Remove</button>
+      </div>
+    </div>
+
+    <!-- Step Content (when expanded) -->
+    <div class="step-content" *ngIf="isStepExpanded(i)">
+      <!-- Step Name Selection -->
+      <div class="form-group">
+        <label>Step Name</label>
+        <select class="dsp-input"
+                [(ngModel)]="step.step"
+                (change)="onStepSelectionChange(step, i)">
+          <option value="">Select step</option>
+          <option *ngFor="let option of stepOptions" [value]="option">{{ option }}</option>
+        </select>
+      </div>
+
+      <!-- Custom Step Name Input -->
+      <div class="form-group" *ngIf="step.step === 'Custom'">
+        <label>Custom Step Name</label>
+        <input type="text"
+               class="dsp-input"
+               [(ngModel)]="customStepNames[i]"
+               (input)="onCustomStepNameChange(i)"
+               placeholder="Enter custom step name">
+      </div>
+
+      <!-- Configuration Section -->
+      <div class="config-section">
+        <h4>Configuration</h4>
+        <div class="config-item"
+             *ngFor="let config of step.config; let j = index; trackBy: trackByIndex">
+          <div class="autocomplete-wrapper">
+            <input type="text"
+                   class="dsp-input config-field"
+                   [(ngModel)]="config.field"
+                   (input)="onChange()"
+                   [appAutocomplete]="getFieldSuggestions(step.step)"
+                   (valueSelected)="onAutocompleteSelect($event, i, j)"
+                   placeholder="Field name">
+          </div>
+          <input type="text"
+                 class="dsp-input"
+                 [(ngModel)]="config.value"
+                 (input)="onChange()"
+                 placeholder="Value">
+          <button type="button"
+                  class="btn btn-sm btn-danger"
+                  (click)="removeConfig(i, j)">−</button>
+        </div>
+        <button type="button"
+                class="btn btn-sm btn-secondary"
+                (click)="addConfig(i)">+ Add Config</button>
+      </div>
+
+      <!-- Media Section -->
+      <app-image-manager
+        [media]="step.media"
+        [stepIndex]="i"
+        [recipeId]="recipeId"
+        [recipeCategory]="recipeCategory"
+        (mediaChange)="onChange()">
+      </app-image-manager>
+    </div>
+  </div>
+
+  <!-- Add Step Button -->
+  <button type="button"
+          class="btn btn-secondary"
+          (click)="addStep()">+ Add Step</button>
+</div>

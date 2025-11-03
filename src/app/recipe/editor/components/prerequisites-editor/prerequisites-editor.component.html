@@ -1,0 +1,47 @@
+<div class="form-section prerequisites-section">
+  <h2>Prerequisites</h2>
+
+  <div class="prerequisite-item"
+       *ngFor="let prereq of prerequisites; let i = index; trackBy: trackByIndex">
+    <div class="form-group">
+      <label>Description</label>
+      <input type="text"
+             class="dsp-input"
+             [(ngModel)]="prereq.description"
+             (input)="onChange()"
+             placeholder="Prerequisite description">
+    </div>
+
+    <!-- Quick Links -->
+    <div class="quick-links">
+      <label>Quick Links</label>
+      <div class="quick-link"
+           *ngFor="let link of prereq.quickLinks; let j = index; trackBy: trackByIndex">
+        <input type="text"
+               class="dsp-input"
+               [(ngModel)]="link.title"
+               (input)="onChange()"
+               placeholder="Link title">
+        <input type="text"
+               class="dsp-input"
+               [(ngModel)]="link.url"
+               (input)="onChange()"
+               placeholder="URL or Recipe ID">
+        <button type="button"
+                class="btn btn-sm btn-danger"
+                (click)="removeQuickLink(i, j)">−</button>
+      </div>
+      <button type="button"
+              class="btn btn-sm btn-secondary"
+              (click)="addQuickLink(i)">+ Add Link</button>
+    </div>
+
+    <button type="button"
+            class="btn btn-sm btn-danger"
+            (click)="removePrerequisite(i)">Remove Prerequisite</button>
+  </div>
+
+  <button type="button"
+          class="btn btn-secondary"
+          (click)="addPrerequisite()">+ Add Prerequisite</button>
+</div>
