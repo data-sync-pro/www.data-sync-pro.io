@@ -4,5 +4,4 @@
 
 export * from './file.utils';
 export * from './string.utils';
-export * from './image.utils';
-export * from './recipe-data.utils';
+export * from './data.utils';

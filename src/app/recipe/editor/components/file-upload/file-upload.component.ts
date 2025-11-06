@@ -1,23 +1,10 @@
 import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
-import { RecipeDownloadableExecutable } from '../../../core/models/recipe.model';
+import { DownloadableExecutable } from '../../../core/models/recipe.model';
 import { TrackByUtil } from '../../../../shared/utils/trackby.util';
-import { RecipeFileStorageService } from '../../services/file-storage.service';
+import { FileStorageAdapter } from '../../../core/storage';
 import { NotificationService } from '../../../../shared/services/notification.service';
-import { RecipeLoggerService } from '../../../core/services/logger.service';
+import { LoggerService } from '../../../core/services/logger.service';
 
-/**
- * File Upload Component
- *
- * Handles Downloadable Executables JSON file uploads:
- * - Drag and drop upload
- * - Click to upload
- * - File validation
- * - IndexedDB storage
- * - Add/Remove executables
- *
- * Files are stored in IndexedDB with path format:
- * "downloadExecutables/{filename}.json"
- */
 @Component({
   selector: 'app-file-upload',
   templateUrl: './file-upload.component.html',
@@ -25,31 +12,21 @@ import { RecipeLoggerService } from '../../../core/services/logger.service';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FileUploadComponent {
-  @Input() downloadableExecutables: RecipeDownloadableExecutable[] = [];
+  @Input() downloadableExecutables: DownloadableExecutable[] = [];
   @Output() downloadableExecutablesChange = new EventEmitter<void>();
 
   constructor(
-    private fileStorageService: RecipeFileStorageService,
+    private fileStorageService: FileStorageAdapter,
     private notificationService: NotificationService,
-    private logger: RecipeLoggerService
+    private logger: LoggerService
   ) {}
 
-  // ==================== Change Handler ====================
-
-  /**
-   * Notify parent of changes
-   */
   onChange(): void {
     this.downloadableExecutablesChange.emit();
   }
 
-  // ==================== Executables Management ====================
-
-  /**
-   * Add new downloadable executable
-   */
   addDownloadableExecutable(): void {
-    const newExecutable: RecipeDownloadableExecutable = {
+    const newExecutable: DownloadableExecutable = {
       filePath: ''
     };
 
@@ -57,15 +34,11 @@ export class FileUploadComponent {
     this.onChange();
   }
 
-  /**
-   * Remove downloadable executable at index
-   */
   async removeDownloadableExecutable(index: number): Promise<void> {
     if (!this.downloadableExecutables) return;
 
     const executable = this.downloadableExecutables[index];
 
-    // Delete from IndexedDB if it has a file
     if (executable.filePath) {
       const fileName = this.getJsonFileName(executable);
       await this.fileStorageService.deleteJsonFile(fileName);
@@ -75,11 +48,6 @@ export class FileUploadComponent {
     this.onChange();
   }
 
-  // ==================== File Upload Handlers ====================
-
-  /**
-   * Handle file drop event
-   */
   async onJsonFileDrop(event: DragEvent, index: number): Promise<void> {
     event.preventDefault();
     const files = event.dataTransfer?.files;
@@ -89,9 +57,6 @@ export class FileUploadComponent {
     await this.handleJsonFileUpload(file, index);
   }
 
-  /**
-   * Handle drag over event
-   */
   onJsonFileDragOver(event: DragEvent): void {
     event.preventDefault();
     event.stopPropagation();
@@ -102,9 +67,6 @@ export class FileUploadComponent {
     }
   }
 
-  /**
-   * Handle drag leave event
-   */
   onJsonFileDragLeave(event: DragEvent): void {
     event.preventDefault();
     event.stopPropagation();
@@ -115,9 +77,6 @@ export class FileUploadComponent {
     }
   }
 
-  /**
-   * Trigger file input click
-   */
   triggerJsonFileInput(index: number): void {
     const fileInput = document.querySelector(`#json-upload-${index}`) as HTMLInputElement;
     if (fileInput) {
@@ -125,9 +84,6 @@ export class FileUploadComponent {
     }
   }
 
-  /**
-   * Handle file select from input
-   */
   async onJsonFileSelect(event: Event, index: number): Promise<void> {
     const input = event.target as HTMLInputElement;
     if (!input.files || input.files.length === 0) return;
@@ -135,28 +91,17 @@ export class FileUploadComponent {
     const file = input.files[0];
     await this.handleJsonFileUpload(file, index);
 
-    // Reset input
     input.value = '';
   }
 
-  /**
-   * Get JSON file name from executable
-   */
-  getJsonFileName(executable: RecipeDownloadableExecutable): string {
+  getJsonFileName(executable: DownloadableExecutable): string {
     if (!executable.filePath) return '';
     return executable.filePath.replace('downloadExecutables/', '');
   }
 
-  // ==================== File Processing ====================
-
-  /**
-   * Handle JSON file upload
-   * Validates, stores in IndexedDB, and updates executable reference
-   */
   private async handleJsonFileUpload(file: File, index: number): Promise<void> {
     if (!this.downloadableExecutables?.[index]) return;
 
-    // Validate file
     const validation = this.fileStorageService.validateJsonFile(file);
     if (!validation.valid) {
       this.notificationService.error(validation.error!);
@@ -164,7 +109,6 @@ export class FileUploadComponent {
     }
 
     try {
-      // Validate JSON content
       const jsonContent = await this.readFileAsText(file);
       try {
         JSON.parse(jsonContent);
@@ -173,13 +117,10 @@ export class FileUploadComponent {
         return;
       }
 
-      // Sanitize filename
       const fileName = this.fileStorageService.sanitizeFileName(file.name);
 
-      // Store JSON file in IndexedDB
       await this.fileStorageService.storeJsonFile(fileName, file);
 
-      // Update executable reference
       this.downloadableExecutables[index].filePath = `downloadExecutables/${fileName}`;
       this.onChange();
 
@@ -190,9 +131,6 @@ export class FileUploadComponent {
     }
   }
 
-  /**
-   * Read file as text
-   */
   private async readFileAsText(file: File): Promise<string> {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -202,10 +140,5 @@ export class FileUploadComponent {
     });
   }
 
-  // ==================== Utility Methods ====================
-
-  /**
-   * Track by index for ngFor performance
-   */
   trackByIndex = TrackByUtil.index;
 }

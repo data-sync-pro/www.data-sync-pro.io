@@ -30,7 +30,7 @@ export interface QuickLink {
 /**
  * Prerequisite item
  */
-export interface PrerequisiteItem {
+export interface PrerequisiteRecipe {
   description: string;
   quickLinks?: QuickLink[];
 }
@@ -45,7 +45,7 @@ export interface SectionData {
   downloads?: { url: string; title: string; fileName: string }[];
   relatedLinks?: QuickLink[];
   quickLinks?: QuickLink[];
-  prerequisites?: PrerequisiteItem[];
+  prerequisites?: PrerequisiteRecipe[];
 }
 
 /**
@@ -165,7 +165,7 @@ export class RecipeSectionComponent {
    * TrackBy function for prerequisites
    * Uses description as unique identifier
    */
-  trackByDescription(index: number, item: PrerequisiteItem): string | number {
+  trackByDescription(index: number, item: PrerequisiteRecipe): string | number {
     return item?.description || index;
   }
 

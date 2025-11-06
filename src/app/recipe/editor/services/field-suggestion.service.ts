@@ -1,21 +1,10 @@
 import { Injectable } from '@angular/core';
-import { RecipeLoggerService } from '../../core/services/logger.service';
+import { LoggerService } from '../../core/services/logger.service';
 
-/**
- * Recipe Autocomplete Service
- *
- * Provides field suggestions for Recipe walkthrough step configurations.
- * Each step type has predefined fields specific to its functionality
- * (e.g., Batch Settings, Trigger Settings, Action Button Settings).
- *
- * These field lists come from the Recipe Producer application and
- * help users configure recipe steps with correct field names.
- */
 @Injectable({
   providedIn: 'root'
 })
-export class RecipeAutocompleteService {
-  // Predefined fields for autocomplete by step type
+export class FieldSuggestionService {
   private readonly executableFields = [
     'Action',
     'Add reference field mappings for subsequent Executables?',
@@ -191,21 +180,14 @@ export class RecipeAutocompleteService {
     'Variable API Name'
   ];
 
-  constructor(private logger: RecipeLoggerService) {
-    this.logger.debug('RecipeAutocompleteService initialized');
+  constructor(private logger: LoggerService) {
+    this.logger.debug('FieldSuggestionService initialized');
   }
 
-  // ==================== Main Methods ====================
-
-  /**
-   * Get field suggestions based on step type
-   * Returns array of predefined fields for the given step type
-   */
   getFieldSuggestions(stepType: string): string[] {
     switch (stepType) {
       case 'Create Executable':
       case 'Create Pipeline':
-      case 'Create Scheduler':
         return this.executableFields;
 
       case 'Trigger Settings':
@@ -248,191 +230,7 @@ export class RecipeAutocompleteService {
         return this.variableFields;
 
       default:
-        return []; // No suggestions for unknown step types
+        return [];
     }
-  }
-
-  /**
-   * Filter field suggestions by query string
-   * Case-insensitive partial matching
-   */
-  filterFieldSuggestions(stepType: string, query: string): string[] {
-    const fields = this.getFieldSuggestions(stepType);
-
-    if (!query || query.trim() === '') {
-      return fields;
-    }
-
-    const lowerQuery = query.toLowerCase().trim();
-    return fields.filter(field =>
-      field.toLowerCase().includes(lowerQuery)
-    );
-  }
-
-  /**
-   * Check if a step type has autocomplete suggestions
-   */
-  hasAutocomplete(stepType: string): boolean {
-    return this.getFieldSuggestions(stepType).length > 0;
-  }
-
-  /**
-   * Get all supported step types
-   */
-  getSupportedStepTypes(): string[] {
-    return [
-      'Create Executable',
-      'Create Pipeline',
-      'Create Scheduler',
-      'Trigger Settings',
-      'Scoping',
-      'Match',
-      'Action',
-      'Retrieve',
-      'Verify',
-      'Preview',
-      'Preview Transformed',
-      'Batch Settings',
-      'Action Button Settings',
-      'Data List Settings',
-      'Data Loader Settings',
-      'Input',
-      'Mapping',
-      'Variable'
-    ];
-  }
-
-  /**
-   * Get count of available fields for a step type
-   */
-  getFieldCount(stepType: string): number {
-    return this.getFieldSuggestions(stepType).length;
-  }
-
-  /**
-   * Search across all field types
-   * Returns map of step types to matching fields
-   */
-  searchAllFields(query: string): Map<string, string[]> {
-    const results = new Map<string, string[]>();
-
-    if (!query || query.trim() === '') {
-      return results;
-    }
-
-    const lowerQuery = query.toLowerCase().trim();
-    const stepTypes = this.getSupportedStepTypes();
-
-    stepTypes.forEach(stepType => {
-      const fields = this.getFieldSuggestions(stepType);
-      const matches = fields.filter(field =>
-        field.toLowerCase().includes(lowerQuery)
-      );
-
-      if (matches.length > 0) {
-        results.set(stepType, matches);
-      }
-    });
-
-    return results;
-  }
-
-  /**
-   * Get exact match for a field name
-   * Returns the step type if found, null otherwise
-   */
-  findStepTypeForField(fieldName: string): string | null {
-    const stepTypes = this.getSupportedStepTypes();
-
-    for (const stepType of stepTypes) {
-      const fields = this.getFieldSuggestions(stepType);
-      if (fields.includes(fieldName)) {
-        return stepType;
-      }
-    }
-
-    return null;
-  }
-
-  /**
-   * Validate if a field belongs to a step type
-   */
-  isValidFieldForStepType(field: string, stepType: string): boolean {
-    const fields = this.getFieldSuggestions(stepType);
-    return fields.includes(field);
-  }
-
-  /**
-   * Get similar field suggestions using fuzzy matching
-   * Uses simple Levenshtein-like distance for similarity
-   */
-  getSimilarFields(stepType: string, input: string, maxResults: number = 5): string[] {
-    const fields = this.getFieldSuggestions(stepType);
-    if (!input || input.trim() === '') {
-      return fields.slice(0, maxResults);
-    }
-
-    const lowerInput = input.toLowerCase().trim();
-
-    // Sort by similarity score
-    const scored = fields.map(field => ({
-      field,
-      score: this.calculateSimilarityScore(lowerInput, field.toLowerCase())
-    }));
-
-    scored.sort((a, b) => b.score - a.score);
-
-    return scored
-      .slice(0, maxResults)
-      .filter(item => item.score > 0)
-      .map(item => item.field);
-  }
-
-  /**
-   * Calculate similarity score between two strings
-   * Higher score = more similar
-   */
-  private calculateSimilarityScore(input: string, target: string): number {
-    let score = 0;
-
-    // Exact match bonus
-    if (input === target) {
-      return 1000;
-    }
-
-    // Starts with bonus
-    if (target.startsWith(input)) {
-      score += 500;
-    }
-
-    // Contains match
-    if (target.includes(input)) {
-      score += 100;
-    }
-
-    // Word boundary match bonus
-    const inputWords = input.split(/\s+/);
-    const targetWords = target.split(/\s+/);
-
-    inputWords.forEach(inputWord => {
-      targetWords.forEach(targetWord => {
-        if (targetWord.startsWith(inputWord)) {
-          score += 50;
-        } else if (targetWord.includes(inputWord)) {
-          score += 25;
-        }
-      });
-    });
-
-    // Character overlap
-    let overlap = 0;
-    for (const char of input) {
-      if (target.includes(char)) {
-        overlap++;
-      }
-    }
-    score += overlap;
-
-    return score;
   }
 }

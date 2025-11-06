@@ -3,6 +3,7 @@ import {
   Output,
   EventEmitter,
   OnInit,
+  OnDestroy,
   ViewChild,
   ElementRef,
   Input,
@@ -11,8 +12,11 @@ import {
   HostListener,
   ChangeDetectorRef,
 } from '@angular/core';
-import { RecipeService } from '../../core/services/recipe.service';
-import { RecipeLoggerService } from '../../core/services/logger.service';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { CacheService } from '../../core/services/cache.service';
+import { SearchService } from '../../core/services/search.service';
+import { LoggerService } from '../../core/services/logger.service';
 
 // Search-specific item structure for the overlay
 interface RecipeSearchItem {
@@ -34,9 +38,11 @@ export interface SelectedSuggestion extends RecipeSearchItem {
   templateUrl: './search-overlay.component.html',
   styleUrls: ['./search-overlay.component.scss'],
 })
-export class RecipeSearchOverlayComponent implements OnInit, OnChanges {
+export class RecipeSearchOverlayComponent implements OnInit, OnDestroy, OnChanges {
+  private destroy$ = new Subject<void>();
+
   @Input() isOpen = false;
-  @Input() initialQuery = ''; 
+  @Input() initialQuery = '';
   @Output() closed = new EventEmitter<void>();
   @Output() selectedResult = new EventEmitter<SelectedSuggestion>();
   @ViewChild('searchInput') searchInputRef!: ElementRef<HTMLInputElement>;
@@ -56,48 +62,56 @@ export class RecipeSearchOverlayComponent implements OnInit, OnChanges {
 
   constructor(
     private cdr: ChangeDetectorRef,
-    private recipeService: RecipeService,
-    private logger: RecipeLoggerService
+    private cacheService: CacheService,
+    private searchService: SearchService,
+    private logger: LoggerService
   ) {}
 
   ngOnInit() {
     this.loadRecipes();
   }
 
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
   private loadRecipes() {
     this.isLoading = true;
     this.loadError = false;
-    
-    this.recipeService.getRecipes().subscribe({
-      next: (recipes) => {
-        this.suggestions = recipes
-          .filter(r => r.id) // Only include recipes with valid IDs
-          .map((r) => ({
-            id: r.id,
-            slug: r.slug,
-            question: r.title,
-            route: `/recipes/${encodeURIComponent(r.category)}/${r.slug}`,
-            category: r.category,
-            subCategory: r.keywords && r.keywords.length > 0 ? r.keywords[0] : null,
-            tags: r.keywords && r.keywords.length > 0
-              ? [r.category, r.keywords[0]]
-              : [r.category],
-          }));
 
-        this.categories = this.recipeService.sortCategoryNames([...new Set(this.suggestions.map((i) => i.category))]);
-        this.filterSubCategoryList();
-        this.filterSuggestions();
-        this.isLoading = false;
+    this.cacheService.getRecipes$()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (recipes) => {
+          this.suggestions = recipes
+            .filter(r => r.id) // Only include recipes with valid IDs
+            .map((r) => ({
+              id: r.id,
+              slug: r.slug,
+              question: r.title,
+              route: `/recipes/${encodeURIComponent(r.category)}/${r.slug}`,
+              category: r.category,
+              subCategory: r.keywords && r.keywords.length > 0 ? r.keywords[0] : null,
+              tags: r.keywords && r.keywords.length > 0
+                ? [r.category, r.keywords[0]]
+                : [r.category],
+            }));
 
-        this.cdr.detectChanges();
-      },
-      error: (error) => {
-        this.logger.error('Error loading recipes', error);
-        this.loadError = true;
-        this.isLoading = false;
-        this.cdr.detectChanges();
-      }
-    });
+          this.categories = this.searchService.sortCategoryNames([...new Set(this.suggestions.map((i) => i.category))]);
+          this.filterSubCategoryList();
+          this.filterSuggestions();
+          this.isLoading = false;
+
+          this.cdr.detectChanges();
+        },
+        error: (error) => {
+          this.logger.error('Error loading recipes', error);
+          this.loadError = true;
+          this.isLoading = false;
+          this.cdr.detectChanges();
+        }
+      });
   }
 
   @HostListener('document:keydown.escape')

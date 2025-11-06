@@ -48,7 +48,10 @@
       "Bash(del update_faq_answers.js)",
       "Bash(python:*)",
       "WebSearch",
-      "WebFetch(domain:www.salesforceicons.com)"
+      "WebFetch(domain:www.salesforceicons.com)",
+      "Bash(cd:*)",
+      "Bash(xargs:*)",
+      "Bash(git rm:*)"
     ],
     "deny": []
   }

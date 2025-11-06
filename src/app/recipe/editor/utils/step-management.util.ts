@@ -1,24 +1,8 @@
-import { RecipeWalkthroughStep } from '../../core/models/recipe.model';
+import { WalkthroughStep } from '../../core/models/recipe.model';
 
-/**
- * Step Management Utility
- *
- * Provides reusable methods for managing recipe walkthrough steps:
- * - Swapping steps
- * - Moving steps up/down
- * - Managing custom step names during swaps
- * - Reindexing custom step names
- */
 export class StepManagementUtil {
-  /**
-   * Swap two steps in an array
-   * @param steps - Array of walkthrough steps
-   * @param index1 - First index
-   * @param index2 - Second index
-   * @param customStepNames - Optional custom step names map to update
-   */
   static swapSteps(
-    steps: RecipeWalkthroughStep[],
+    steps: WalkthroughStep[],
     index1: number,
     index2: number,
     customStepNames?: { [index: number]: string }
@@ -27,24 +11,15 @@ export class StepManagementUtil {
       return;
     }
 
-    // Swap steps
     [steps[index1], steps[index2]] = [steps[index2], steps[index1]];
 
-    // Swap custom step names if provided
     if (customStepNames) {
       this.swapCustomStepNames(customStepNames, index1, index2);
     }
   }
 
-  /**
-   * Move step up
-   * @param steps - Array of walkthrough steps
-   * @param index - Index of step to move up
-   * @param customStepNames - Optional custom step names map
-   * @returns true if moved, false if invalid
-   */
   static moveStepUp(
-    steps: RecipeWalkthroughStep[],
+    steps: WalkthroughStep[],
     index: number,
     customStepNames?: { [index: number]: string }
   ): boolean {
@@ -53,15 +28,8 @@ export class StepManagementUtil {
     return true;
   }
 
-  /**
-   * Move step down
-   * @param steps - Array of walkthrough steps
-   * @param index - Index of step to move down
-   * @param customStepNames - Optional custom step names map
-   * @returns true if moved, false if invalid
-   */
   static moveStepDown(
-    steps: RecipeWalkthroughStep[],
+    steps: WalkthroughStep[],
     index: number,
     customStepNames?: { [index: number]: string }
   ): boolean {
@@ -70,12 +38,6 @@ export class StepManagementUtil {
     return true;
   }
 
-  /**
-   * Swap custom step names between two indexes
-   * @param customStepNames - Custom step names map
-   * @param index1 - First index
-   * @param index2 - Second index
-   */
   static swapCustomStepNames(
     customStepNames: { [index: number]: string },
     index1: number,
@@ -86,7 +48,6 @@ export class StepManagementUtil {
       customStepNames[index1] = customStepNames[index2];
       customStepNames[index2] = temp;
 
-      // Clean up undefined entries
       if (customStepNames[index1] === undefined) {
         delete customStepNames[index1];
       }
@@ -96,14 +57,8 @@ export class StepManagementUtil {
     }
   }
 
-  /**
-   * Reindex custom step names after removal
-   * @param steps - Current walkthrough steps
-   * @param customStepNames - Custom step names to reindex
-   * @returns New reindexed custom step names map
-   */
   static reindexCustomStepNames(
-    steps: RecipeWalkthroughStep[],
+    steps: WalkthroughStep[],
     customStepNames: { [index: number]: string }
   ): { [index: number]: string } {
     const newCustomStepNames: { [index: number]: string } = {};

@@ -1,6 +1,6 @@
 import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
-import { RecipeWalkthroughStep, RecipeStepConfig } from '../../../core/models/recipe.model';
-import { RecipeAutocompleteService } from '../../services/autocomplete.service';
+import { WalkthroughStep, StepConfig } from '../../../core/models/recipe.model';
+import { FieldSuggestionService } from '../../services/field-suggestion.service';
 import { StepManagementUtil } from '../../utils/step-management.util';
 import { TrackByUtil } from '../../../../shared/utils/trackby.util';
 
@@ -23,7 +23,7 @@ import { TrackByUtil } from '../../../../shared/utils/trackby.util';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class WalkthroughEditorComponent {
-  @Input() walkthrough: RecipeWalkthroughStep[] = [];
+  @Input() walkthrough: WalkthroughStep[] = [];
   @Input() stepOptions: string[] = [];
   @Input() expandedSteps: Set<number> = new Set();
   @Input() customStepNames: { [index: number]: string } = {};
@@ -34,7 +34,7 @@ export class WalkthroughEditorComponent {
   @Output() stepExpansionToggle = new EventEmitter<number>();
 
   constructor(
-    private autocompleteService: RecipeAutocompleteService
+    private fieldSuggestionService: FieldSuggestionService
   ) {}
 
   // ==================== Change Handler ====================
@@ -52,7 +52,7 @@ export class WalkthroughEditorComponent {
    * Add new step
    */
   addStep(): void {
-    const newStep: RecipeWalkthroughStep = {
+    const newStep: WalkthroughStep = {
       step: '',
       config: [],
       media: []
@@ -118,7 +118,7 @@ export class WalkthroughEditorComponent {
   /**
    * Get step title for display
    */
-  getStepTitle(step: RecipeWalkthroughStep, index: number): string {
+  getStepTitle(step: WalkthroughStep, index: number): string {
     if (step.step && step.step.trim() !== '') {
       if (step.step === 'Custom') {
         return this.customStepNames[index] || 'Custom Step';
@@ -133,7 +133,7 @@ export class WalkthroughEditorComponent {
   /**
    * Handle step type selection change
    */
-  onStepSelectionChange(step: RecipeWalkthroughStep, index: number): void {
+  onStepSelectionChange(step: WalkthroughStep, index: number): void {
     if (step.step === 'Custom') {
       // Initialize custom name if not exists
       if (!this.customStepNames[index]) {
@@ -156,7 +156,7 @@ export class WalkthroughEditorComponent {
   /**
    * Check if step is custom
    */
-  isCustomStep(step: RecipeWalkthroughStep): boolean {
+  isCustomStep(step: WalkthroughStep): boolean {
     return step.step === 'Custom';
   }
 
@@ -168,7 +168,7 @@ export class WalkthroughEditorComponent {
   addConfig(stepIndex: number): void {
     if (!this.walkthrough?.[stepIndex]) return;
 
-    const newConfig: RecipeStepConfig = {
+    const newConfig: StepConfig = {
       field: '',
       value: ''
     };
@@ -203,7 +203,7 @@ export class WalkthroughEditorComponent {
    * Get field suggestions for a step
    */
   getFieldSuggestions(stepName: string): string[] {
-    return this.autocompleteService.getFieldSuggestions(stepName);
+    return this.fieldSuggestionService.getFieldSuggestions(stepName);
   }
 
   // ==================== Helper Methods ====================

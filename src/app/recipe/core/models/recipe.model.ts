@@ -1,394 +1,215 @@
-import { SafeHtml } from '@angular/platform-browser';
+// ==================== Core Recipe Data Models ====================
 
 /**
- * General image for recipe (not tied to specific step)
+ * Recipe source data structure (persisted to JSON files)
  */
-export interface RecipeGeneralImage {
+export interface RecipeData {
+  id: string;
+  title: string;
+  category: string;
+  DSPVersions: string[];
+  overview: string;
+  whenToUse?: string;
+  generalImages: GeneralImage[];
+  prerequisites: PrerequisiteRecipe[];
+  direction: string;
+  connection: string;
+  walkthrough: WalkthroughStep[];
+  downloadableExecutables: DownloadableExecutable[];
+  relatedRecipes: RelatedRecipe[];
+  keywords: string[];
+}
+
+/**
+ * Recipe runtime data structure (with computed fields)
+ */
+export interface Recipe {
+  id: string;
+  title: string;
+  slug?: string;
+  category: string;
+  DSPVersions: string[];
+  overview: string;
+  whenToUse?: string;
+  generalImages: GeneralImage[];
+  prerequisites: PrerequisiteRecipe[];
+  direction: string;
+  connection: string;
+  walkthrough: WalkthroughStep[];
+  downloadableExecutables: DownloadableExecutable[];
+  relatedRecipes: RelatedRecipe[];
+  keywords: string[];
+  isExpanded?: boolean;
+  isLoading?: boolean;
+  showSocialShare?: boolean;
+}
+
+/**
+ * Recipe preview data structure (used for preview windows)
+ */
+export interface RecipePreviewData {
+  recipeId: string;
+  title: string;
+  category: string;
+  recipeData: RecipeData;
+  timestamp: number;
+}
+
+// ==================== Recipe Component Models ====================
+
+/**
+ * General media (image/video/gif) used in recipes
+ */
+export interface GeneralImage {
   type: 'image' | 'video' | 'gif';
   url: string;
   alt: string;
   imageId?: string;
-  displayUrl?: string; // Runtime property for displaying blob URLs
+  displayUrl?: string;
 }
 
 /**
- * Raw recipe data record (from JSON file)
+ * Walkthrough step in recipe instructions
  */
-export interface SourceRecipeRecord {
-  id: string; // Auto generated
-  title: string;
-  category: string;
-  DSPVersions: string[];
-  overview: string; // Replaces usecase with more detailed description
-  whenToUse?: string; // General use case for this recipe
-  generalImages: RecipeGeneralImage[]; // Images not tied to specific steps
-  prerequisites: RecipePrerequisiteItem[];
-  direction: string;
-  connection: string;
-  walkthrough: RecipeWalkthroughStep[];
-  downloadableExecutables: RecipeDownloadableExecutable[];
-  relatedRecipes: RecipeRelatedItem[];
-  keywords: string[];
-  // Legacy fields for backward compatibility
-  name?: string;
-  description?: string;
-  usecase?: string; // Legacy field, use overview instead
-  useCase?: string;
-  tags?: string[];
-  lastUpdated?: string;
-  author?: string;
-  seqNo?: number;
-}
-
-/**
- * Recipe walkthrough step
- */
-export interface RecipeWalkthroughStep {
+export interface WalkthroughStep {
   step: string;
-  config: RecipeStepConfig[];
-  media: RecipeStepMedia[];
+  config: StepConfig[];
+  media: StepMedia[];
 }
 
 /**
- * Recipe step configuration
+ * Configuration field in a walkthrough step
  */
-export interface RecipeStepConfig {
+export interface StepConfig {
   field: string;
   value: string;
 }
 
 /**
- * Recipe step media
+ * Media item in a walkthrough step
  */
-export interface RecipeStepMedia {
+export interface StepMedia {
   type: string;
   url: string;
   alt: string;
-  displayUrl?: string; // Cached blob URL for IndexedDB images
+  displayUrl?: string;
 }
 
 /**
- * Recipe prerequisite item
+ * Prerequisite recipe requirement
  */
-export interface RecipePrerequisiteItem {
+export interface PrerequisiteRecipe {
   description: string;
-  quickLinks: RecipeQuickLink[];
+  quickLinks: QuickLink[];
 }
 
 /**
- * Recipe quick link
+ * Quick link in prerequisites
  */
-export interface RecipeQuickLink {
+export interface QuickLink {
   title: string;
   url: string;
 }
 
 /**
- * Recipe downloadable executable
+ * Downloadable executable file
  */
-export interface RecipeDownloadableExecutable {
+export interface DownloadableExecutable {
   title?: string;
   url?: string;
-  filePath?: string; // New format - path to downloadable file
+  filePath?: string;
 }
 
 /**
- * Recipe related item
+ * Related recipe reference
  */
-export interface RecipeRelatedItem {
+export interface RelatedRecipe {
   title: string;
   url: string;
 }
 
-/**
- * Legacy recipe walkthrough interface (for backward compatibility)
- */
-export interface LegacyRecipeWalkthrough {
-  createExecutable: {
-    sourceObjectApiName: string;
-    targetObjectApiName: string;
-    sourceMatchingField: string;
-    targetMatchingField: string;
-    action: string;
-    executableName: string;
-    instructions: string;
-  };
-  retrieve: {
-    soqlQueries: CodeExample[];
-    instructions: string;
-  };
-  scoping: {
-    scopeFilterSetup: string;
-    instructions: string;
-  };
-  match: {
-    matchingLogic: string;
-    rules: string;
-    instructions: string;
-  };
-  mapping: {
-    fieldMappingConfig: string;
-    instructions: string;
-  };
-  action: {
-    actionConfiguration: string;
-    options: string;
-    instructions: string;
-  };
-  verify: {
-    verificationQueries: CodeExample[];
-    instructions: string;
-  };
-  previewTransformed: {
-    previewInstructions: string;
-    expectedResults: string;
-  };
-  addSchedule: {
-    schedulingConfig: string;
-    setupGuide: string;
-  };
-}
+// ==================== Category & Search Models ====================
 
 /**
- * Code example with syntax highlighting support
+ * Recipe category with metadata
  */
-export interface CodeExample {
-  code: string;
-  language: 'soql' | 'apex' | 'sql' | 'json' | 'xml';
-  description?: string;
-  title?: string;
-}
-
-/**
- * Processed recipe item (used in application)
- */
-export interface RecipeItem {
-  id: string;
-  title: string;
-  slug?: string; // URL-friendly version of title (runtime generated)
-  category: string;
-  DSPVersions: string[];
-  overview: string; // Updated from usecase
-  safeOverview?: SafeHtml; // Safe HTML version of overview
-  whenToUse?: string; // General use case for this recipe
-  safeWhenToUse?: SafeHtml;
-  generalImages: RecipeGeneralImage[];
-  prerequisites: RecipePrerequisiteItem[];
-  direction: string;
-  safeDirection?: SafeHtml;
-  connection: string;
-  walkthrough: RecipeWalkthroughStep[];
-  downloadableExecutables: RecipeDownloadableExecutable[];
-  relatedRecipes: RecipeRelatedItem[];
-  keywords: string[];
-  
-  // Legacy fields for backward compatibility
-  usecase?: string; // Legacy field, use overview instead
-  safeUsecase?: SafeHtml;
-  
-  // Legacy fields for backward compatibility
-  name?: string;
-  description?: string;
-  useCase?: string;
-  safeUseCase?: SafeHtml;
-  legacyWalkthrough?: LegacyRecipeWalkthrough;
-  downloadableExecutable?: RecipeExecutable;
-  tags?: string[];
-  lastUpdated?: Date;
-  author?: string;
-  seqNo?: number;
-  
-  // Runtime properties
-  isExpanded?: boolean;
-  isLoading?: boolean;
-  viewCount?: number;
-  userRating?: boolean | null;
-  isPopular?: boolean;
-  currentStep?: number;
-  completedSteps?: number[];
-  showSocialShare?: boolean;
-}
-
-/**
- * Legacy recipe prerequisites (for backward compatibility)
- */
-export interface RecipePrerequisites {
-  permissionSetsForBuilding: string[];
-  permissionSetsForUsing: string[];
-  directions: string;
-  safeDirections?: SafeHtml;
-}
-
-/**
- * Recipe executable download
- */
-export interface RecipeExecutable {
-  fileName: string;
-  filePath: string;
-  version: string;
-  description: string;
-  downloadCount?: number;
-  fileSize?: string;
-}
-
-/**
- * Recipe category information
- */
-export interface RecipeCategory {
+export interface Category {
   name: string;
   displayName: string;
-  description: string;
   count: number;
-  iconClass?: string;
 }
 
 /**
- * Recipe search result
+ * Search result with relevance score
  */
-export interface RecipeSearchResult extends RecipeItem {
+export interface SearchResult extends Recipe {
   relevanceScore?: number;
-  highlightedTitle?: string;
-  highlightedDescription?: string;
-  matchedFields?: string[];
 }
 
 /**
- * Recipe navigation state
+ * Search state for search overlay
  */
-export interface RecipeNavigationState {
-  category: string;
-  recipeName: string;
-  currentStep?: number;
-}
-
-/**
- * Recipe progress tracking
- */
-export interface RecipeProgress {
-  recipeId: string;
-  currentStep: number;
-  completedSteps: number[];
-  timeSpent: number; // in minutes
-  lastAccessed: Date;
-  notes?: string;
-}
-
-/**
- * Recipe statistics
- */
-export interface RecipeStats {
-  totalRecipes: number;
-  totalCategories: number;
-  mostViewedRecipes: RecipeItem[];
-  recentlyUpdated: RecipeItem[];
-  avgCompletionTime: number;
-  popularCategories: { category: string; count: number }[];
-}
-
-/**
- * Recipe filter options
- */
-export interface RecipeFilter {
-  categories: string[];
-  searchQuery: string;
-  showPopularOnly: boolean;
-  tags: string[];
-}
-
-/**
- * Recipe sort options
- */
-export interface RecipeSortOptions {
-  field: 'title' | 'category' | 'viewCount' | 'lastUpdated';
-  direction: 'asc' | 'desc';
-}
-
-/**
- * Recipe event tracking
- */
-export interface RecipeEvent {
-  type: 'view' | 'step_complete' | 'download' | 'rate' | 'search';
-  recipeId?: string;
-  recipeTitle?: string;
-  recipeCategory?: string;
-  stepNumber?: number;
-  stepName?: string;
-  searchQuery?: string;
-  rating?: boolean;
-  timestamp: Date;
-  userId?: string;
-}
-
-/**
- * Recipe section definition for detailed TOC navigation
- */
-export interface RecipeSection {
-  id: string;
-  title: string;
-  elementId?: string; // DOM element ID for scrolling
-}
-
-/**
- * Recipe tab with sections for hierarchical TOC navigation
- */
-export interface RecipeTab {
-  id: string;
-  title: string;
-  sections: RecipeSection[];
-  isExpanded?: boolean;
-}
-
-/**
- * Complete recipe TOC structure
- */
-export interface RecipeTOCStructure {
-  tabs: RecipeTab[];
-}
-
-/**
- * Recipe content status
- */
-export enum RecipeContentStatus {
-  NOT_LOADED = 'not_loaded',
-  LOADING = 'loading',
-  LOADED = 'loaded',
-  ERROR = 'error'
-}
-
-/**
- * Recipe step types for walkthrough (legacy and new)
- */
-export type RecipeStepType = 
-  | 'createExecutable'
-  | 'retrieve'
-  | 'scoping'
-  | 'match'
-  | 'mapping'
-  | 'action'
-  | 'verify'
-  | 'previewTransformed'
-  | 'addSchedule'
-  | 'custom'; // For new flexible step structure
-
-
-/**
- * Recipe categories (from Rules Engines subcategories)
- */
-export type RecipeCategoryType = 'action-button' | 'batch' | 'data-list' | 'data-loader' | 'triggers';
-
-/**
- * Combined recipe walkthrough type (supports both legacy and new formats)
- */
-export type RecipeWalkthrough = LegacyRecipeWalkthrough | RecipeWalkthroughStep[];
-
-/**
- * Recipe search state interface
- * Used for managing search functionality in recipe components
- */
-export interface RecipeSearchState {
+export interface SearchState {
   query: string;
   isActive: boolean;
-  results: RecipeSearchResult[];
+  results: SearchResult[];
   hasResults: boolean;
   isOverlayOpen: boolean;
+}
+
+/**
+ * Filter criteria for recipes
+ */
+export interface Filter {
+  categories: string[];
+}
+
+// ==================== Navigation & UI Models ====================
+
+/**
+ * Navigation state for routing
+ */
+export interface NavigationState {
+  category: string;
+  recipeName: string;
+}
+
+/**
+ * Table of contents section
+ */
+export interface Section {
+  id: string;
+  title: string;
+  elementId?: string;
+}
+
+/**
+ * Table of contents tab
+ */
+export interface Tab {
+  id: string;
+  title: string;
+  sections: Section[];
+}
+
+// ==================== Data Loading Models ====================
+
+export interface RecipeIndexItem {
+  folderId: string;
+  name: string;
+  category: string;
+  active: boolean;
+}
+
+// ==================== Editor Models ====================
+
+/**
+ * Editor tab containing a recipe
+ */
+export interface EditorTab {
+  id: string;
+  title: string;
+  recipe: RecipeData;
+  hasChanges: boolean;
+  isActive: boolean;
 }

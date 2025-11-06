@@ -5,7 +5,7 @@ import {
   EventEmitter,
   ChangeDetectionStrategy
 } from '@angular/core';
-import { RecipeItem } from '../../core/models/recipe.model';
+import { Recipe } from '../../core/models/recipe.model';
 
 @Component({
   selector: 'app-recipe-card',
@@ -14,9 +14,9 @@ import { RecipeItem } from '../../core/models/recipe.model';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class RecipeCardComponent {
-  @Input() recipe!: RecipeItem;
+  @Input() recipe!: Recipe;
   
-  @Output() recipeSelect = new EventEmitter<RecipeItem>();
+  @Output() recipeSelect = new EventEmitter<Recipe>();
 
   /**
    * Handle recipe card click
@@ -30,7 +30,7 @@ export class RecipeCardComponent {
    */
   onDownload(event: Event): void {
     event.stopPropagation();
-    if (this.recipe.downloadableExecutable) {
+    if (this.recipe.downloadableExecutables && this.recipe.downloadableExecutables.length > 0) {
       // TODO: Implement download logic
    }
   }

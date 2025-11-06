@@ -1,149 +1,107 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
-import { RecipeItem, RecipeFilter, RecipeSearchState } from '../../core/models/recipe.model';
-import { RecipeService } from '../../core/services/recipe.service';
-import { RecipeLoggerService } from '../../core/services/logger.service';
+import { map } from 'rxjs/operators';
+import { Recipe, Filter, SearchState } from '../../core/models/recipe.model';
+import { SearchService as CoreSearchService } from '../../core/services/search.service';
+import { Store } from '../../core/store/recipe.store';
+import { LoggerService } from '../../core/services/logger.service';
 import { SelectedSuggestion } from '../search-overlay/search-overlay.component';
-import { BaseStateService } from '../../core/services/base-state.service';
 
-/**
- * Search result event emitted when search results are updated
- */
 export interface SearchResultEvent {
   query: string;
-  results: RecipeItem[];
+  results: Recipe[];
   hasResults: boolean;
 }
 
-/**
- * Service responsible for managing recipe search functionality
- * Extends BaseStateService for common state management patterns
- *
- * This service handles:
- * - Search state management
- * - Search execution (delegates to RecipeService)
- * - Search overlay visibility
- * - Search result navigation
- */
 @Injectable({
   providedIn: 'root'
 })
-export class RecipeSearchService extends BaseStateService<RecipeSearchState> implements OnDestroy {
+export class SearchStateService implements OnDestroy {
 
   private destroy$ = new Subject<void>();
 
-  // Initial search state
-  protected initialState: RecipeSearchState = {
-    query: '',
-    isActive: false,
-    results: [],
-    hasResults: true,
-    isOverlayOpen: false
-  };
-
-  // localStorage disabled for search (temporary state)
-  protected override storageOptions = {
-    enabled: false
-  };
-
-  // Search overlay initial query
   private searchOverlayInitialQuery$ = new BehaviorSubject<string>('');
 
-  // Search result events (Subject for one-time events, not persistent state)
   private searchResult$ = new Subject<SearchResultEvent>();
 
   constructor(
-    private recipeService: RecipeService,
+    private coreSearchService: CoreSearchService,
+    private store: Store,
     private router: Router,
-    private logger: RecipeLoggerService
-  ) {
-    super();
-    this.initializeState();
-  }
+    private logger: LoggerService
+  ) {}
 
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
   }
 
-  /**
-   * Get search state as observable
-   * @deprecated Use getState() from BaseStateService instead
-   */
-  getSearchState(): Observable<RecipeSearchState> {
-    return this.getState();
+  getSearchState(): Observable<SearchState> {
+    return this.store.data$.pipe(
+      map(data => ({
+        query: data.searchQuery,
+        isActive: data.searchIsActive,
+        results: data.searchResults.map(r => {
+          const { relevanceScore, ...recipeItem } = r;
+          return recipeItem as Recipe;
+        }),
+        hasResults: data.searchHasResults,
+        isOverlayOpen: data.searchOverlayOpen
+      }))
+    );
   }
 
-  /**
-   * Get current search state value
-   * @deprecated Use getCurrentState() from BaseStateService instead
-   */
-  getCurrentSearchState(): RecipeSearchState {
-    return this.getCurrentState();
-  }
-
-  /**
-   * Get search overlay initial query
-   */
   getSearchOverlayInitialQuery(): Observable<string> {
     return this.searchOverlayInitialQuery$.asObservable();
   }
 
-  /**
-   * Get search result events
-   */
   getSearchResultEvents(): Observable<SearchResultEvent> {
     return this.searchResult$.asObservable();
   }
 
-  /**
-   * Search recipes
-   */
-  searchRecipes(query: string, currentFilter: RecipeFilter, allRecipes: RecipeItem[]): void {
+  searchRecipes(query: string, currentFilter: Filter, allRecipes: Recipe[]): void {
     if (query.trim().length > 0) {
-      this.recipeService.searchRecipes(query, currentFilter).pipe(
-        takeUntil(this.destroy$)
-      ).subscribe({
-        next: (results) => {
-          // Update search state
-          this.updateState({
-            query: query,
-            isActive: true,
-            results: results,
-            hasResults: results.length > 0
-          });
-
-          // Emit search result event
-          this.searchResult$.next({
-            query: query,
-            results: results,
-            hasResults: results.length > 0
-          });
-        },
-        error: (error) => {
-          this.logger.error('Search failed', error);
-
-          // Update state with error
-          this.updateState({
-            query: query,
-            isActive: true,
-            results: [],
-            hasResults: false
-          });
+      try {
+        let filteredRecipes = allRecipes;
+        if (currentFilter.categories && currentFilter.categories.length > 0) {
+          filteredRecipes = allRecipes.filter(recipe =>
+            currentFilter.categories.includes(recipe.category)
+          );
         }
-      });
-    } else {
-      // Clear search
-      this.updateState({
-        query: '',
-        isActive: false,
-        results: [],
-        hasResults: true
-      });
 
-      // Emit search result event with all recipes
+        const searchResults = this.coreSearchService.search(filteredRecipes, query);
+
+        const results: Recipe[] = searchResults.map(result => {
+          const { relevanceScore, ...recipeItem } = result;
+          return recipeItem as Recipe;
+        });
+
+        this.store.updateDataState({
+          searchQuery: query,
+          searchIsActive: true,
+          searchResults: searchResults,
+          searchHasResults: results.length > 0
+        });
+
+        this.searchResult$.next({
+          query: query,
+          results: results,
+          hasResults: results.length > 0
+        });
+      } catch (error) {
+        this.logger.error('Search failed', error);
+
+        this.store.updateDataState({
+          searchQuery: query,
+          searchIsActive: true,
+          searchResults: [],
+          searchHasResults: false
+        });
+      }
+    } else {
+      this.store.clearSearch();
+
       this.searchResult$.next({
         query: '',
         results: allRecipes,
@@ -152,18 +110,9 @@ export class RecipeSearchService extends BaseStateService<RecipeSearchState> imp
     }
   }
 
-  /**
-   * Clear search
-   */
-  clearSearch(allRecipes: RecipeItem[]): void {
-    this.updateState({
-      query: '',
-      isActive: false,
-      results: [],
-      hasResults: true
-    });
+  clearSearch(allRecipes: Recipe[]): void {
+    this.store.clearSearch();
 
-    // Emit search result event with all recipes
     this.searchResult$.next({
       query: '',
       results: allRecipes,
@@ -171,41 +120,21 @@ export class RecipeSearchService extends BaseStateService<RecipeSearchState> imp
     });
   }
 
-  /**
-   * Open search overlay
-   */
   openSearchOverlay(initialQuery = ''): void {
     this.searchOverlayInitialQuery$.next(initialQuery);
-    this.updateState({ isOverlayOpen: true });
-
-    // Prevent body scrolling when overlay is open
-    document.body.style.overflow = 'hidden';
+    this.store.openSearchOverlay();
   }
 
-  /**
-   * Close search overlay
-   */
   closeSearchOverlay(): void {
-    this.updateState({ isOverlayOpen: false });
-
-    // Restore body scrolling
-    document.body.style.overflow = '';
+    this.store.closeSearchOverlay();
   }
 
-  /**
-   * Handle search overlay selection
-   */
   handleSearchOverlaySelect(selectedRecipe: SelectedSuggestion): void {
-    // Navigate to the selected recipe using slug
     this.router.navigate(['/recipes', selectedRecipe.category, selectedRecipe.slug]);
 
-    // Close overlay
     this.closeSearchOverlay();
   }
 
-  /**
-   * Check if an input element is currently focused
-   */
   isInputFocused(): boolean {
     const activeElement = document.activeElement;
     return !!(activeElement instanceof HTMLInputElement ||
@@ -214,24 +143,4 @@ export class RecipeSearchService extends BaseStateService<RecipeSearchState> imp
            (activeElement && activeElement.tagName === 'TEXTAREA'));
   }
 
-  /**
-   * Get whether search overlay is open
-   */
-  isSearchOverlayOpen(): boolean {
-    return this.getCurrentState().isOverlayOpen;
-  }
-
-  /**
-   * Get current search query
-   */
-  getCurrentQuery(): string {
-    return this.getCurrentState().query;
-  }
-
-  /**
-   * Check if search is active
-   */
-  isSearchActive(): boolean {
-    return this.getCurrentState().isActive;
-  }
 }

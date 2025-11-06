@@ -41,13 +41,13 @@
   <main class="recipe-main">
 
       <!-- Loading State -->
-      <div *ngIf="ui.isLoading" class="loading-container">
+      <div *ngIf="ui.showLoadingOverlay" class="loading-container">
         <mat-progress-bar mode="indeterminate"></mat-progress-bar>
         <p>Loading recipes...</p>
       </div>
 
       <!-- Home View - All Recipes -->
-      <div *ngIf="showHome && !ui.isLoading" class="recipe-home">
+      <div *ngIf="showHome && !ui.showLoadingOverlay" class="recipe-home">
         <div class="home-header">
           <h2 class="section-title">All Recipes</h2>
          </div>
@@ -71,10 +71,9 @@
       </div>
 
       <!-- Category View - Recipes in Category -->
-      <div *ngIf="showCategory && !ui.isLoading" class="recipe-category-view">
+      <div *ngIf="showCategory && !ui.showLoadingOverlay" class="recipe-category-view">
         <div class="category-header" *ngIf="currentCategory">
           <h2 class="category-title">{{ currentCategory.displayName }} Recipes</h2>
-          <p class="category-description">{{ currentCategory.description }}</p>
         </div>
 
         <!-- Recipe Grid -->
@@ -95,7 +94,7 @@
       </div>
 
       <!-- Recipe Detail View -->
-      <div *ngIf="showRecipeDetails && !ui.isLoading" class="recipe-detail-view">
+      <div *ngIf="showRecipeDetails && !ui.showLoadingOverlay" class="recipe-detail-view">
         
         <div class="recipe-detail">
           <!-- Recipe Header -->
@@ -133,7 +132,7 @@
       </div>
 
       <!-- Search Results -->
-      <div *ngIf="search.isActive && !ui.isLoading" class="search-results">
+      <div *ngIf="search.isActive && !ui.showLoadingOverlay" class="search-results">
         <div class="search-header">
           <h2 class="search-title">Search Results for "{{ search.query }}"</h2>
           <p class="search-summary">

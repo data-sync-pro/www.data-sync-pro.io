@@ -1,73 +1,45 @@
 import { Injectable } from '@angular/core';
 import {
-  SourceRecipeRecord,
-  RecipeWalkthroughStep,
-  RecipePrerequisiteItem,
-  RecipeStepMedia,
-  RecipeGeneralImage
+  RecipeData,
+  WalkthroughStep,
+  PrerequisiteRecipe,
+  StepMedia,
+  StepConfig,
+  GeneralImage
 } from '../../core/models/recipe.model';
-import { RecipeLoggerService } from '../../core/services/logger.service';
+import { LoggerService } from '../../core/services/logger.service';
 
-/**
- * Validation Result Interface
- */
 export interface ValidationResult {
   valid: boolean;
   errors: ValidationError[];
   warnings: ValidationWarning[];
 }
 
-/**
- * Validation Error Interface
- */
 export interface ValidationError {
   field: string;
   message: string;
   severity: 'error' | 'critical';
 }
 
-/**
- * Validation Warning Interface
- */
 export interface ValidationWarning {
   field: string;
   message: string;
 }
 
-/**
- * Recipe Validation Service
- *
- * Provides validation logic for Recipe data including:
- * - Required field validation
- * - Data type validation
- * - Image reference validation
- * - Walkthrough step validation
- * - Prerequisites validation
- *
- * Returns structured validation results with errors and warnings.
- */
 @Injectable({
   providedIn: 'root'
 })
-export class RecipeValidationService {
-  constructor(private logger: RecipeLoggerService) {
-    this.logger.debug('RecipeValidationService initialized');
+export class ValidationService {
+  constructor(private logger: LoggerService) {
+    this.logger.debug('ValidationService initialized');
   }
 
-  // ==================== Main Validation ====================
-
-  /**
-   * Validate entire recipe
-   * Returns comprehensive validation result
-   */
-  validateRecipe(recipe: SourceRecipeRecord): ValidationResult {
+  validateRecipe(recipe: RecipeData): ValidationResult {
     const errors: ValidationError[] = [];
     const warnings: ValidationWarning[] = [];
 
-    // Validate required fields
     errors.push(...this.validateRequiredFields(recipe));
 
-    // Validate ID format
     if (recipe.id && !this.isValidId(recipe.id)) {
       errors.push({
         field: 'id',
@@ -76,7 +48,6 @@ export class RecipeValidationService {
       });
     }
 
-    // Validate category
     if (recipe.category && !this.isValidCategory(recipe.category)) {
       errors.push({
         field: 'category',
@@ -85,7 +56,6 @@ export class RecipeValidationService {
       });
     }
 
-    // Validate walkthrough steps
     if (recipe.walkthrough && recipe.walkthrough.length > 0) {
       const stepResults = this.validateWalkthroughSteps(recipe.walkthrough);
       errors.push(...stepResults.errors);
@@ -97,21 +67,18 @@ export class RecipeValidationService {
       });
     }
 
-    // Validate prerequisites
     if (recipe.prerequisites && recipe.prerequisites.length > 0) {
       const prereqResults = this.validatePrerequisites(recipe.prerequisites);
       errors.push(...prereqResults.errors);
       warnings.push(...prereqResults.warnings);
     }
 
-    // Validate general images
     if (recipe.generalImages && recipe.generalImages.length > 0) {
       const imageResults = this.validateGeneralImages(recipe.generalImages);
       errors.push(...imageResults.errors);
       warnings.push(...imageResults.warnings);
     }
 
-    // Check for empty content
     if (!recipe.overview || recipe.overview.trim() === '') {
       warnings.push({
         field: 'overview',
@@ -136,12 +103,7 @@ export class RecipeValidationService {
     return result;
   }
 
-  // ==================== Field Validation ====================
-
-  /**
-   * Validate required fields
-   */
-  private validateRequiredFields(recipe: SourceRecipeRecord): ValidationError[] {
+  private validateRequiredFields(recipe: RecipeData): ValidationError[] {
     const errors: ValidationError[] = [];
 
     if (!recipe.id || recipe.id.trim() === '') {
@@ -171,18 +133,11 @@ export class RecipeValidationService {
     return errors;
   }
 
-  /**
-   * Validate ID format
-   * IDs should contain only alphanumeric characters, hyphens, and underscores
-   */
   private isValidId(id: string): boolean {
     const idPattern = /^[a-zA-Z0-9_-]+$/;
     return idPattern.test(id);
   }
 
-  /**
-   * Validate category value
-   */
   private isValidCategory(category: string): boolean {
     const validCategories = [
       'Batch',
@@ -195,12 +150,7 @@ export class RecipeValidationService {
     return validCategories.includes(category);
   }
 
-  // ==================== Walkthrough Validation ====================
-
-  /**
-   * Validate walkthrough steps
-   */
-  private validateWalkthroughSteps(steps: RecipeWalkthroughStep[]): {
+  private validateWalkthroughSteps(steps: WalkthroughStep[]): {
     errors: ValidationError[];
     warnings: ValidationWarning[];
   } {
@@ -210,7 +160,6 @@ export class RecipeValidationService {
     steps.forEach((step, index) => {
       const stepLabel = `walkthrough[${index}]`;
 
-      // Validate step name
       if (!step.step || step.step.trim() === '') {
         errors.push({
           field: `${stepLabel}.step`,
@@ -219,14 +168,12 @@ export class RecipeValidationService {
         });
       }
 
-      // Validate step config
       if (step.config && step.config.length > 0) {
         const configResults = this.validateStepConfig(step.config, index);
         errors.push(...configResults.errors);
         warnings.push(...configResults.warnings);
       }
 
-      // Validate step media
       if (step.media && step.media.length > 0) {
         const mediaResults = this.validateStepMedia(step.media, index);
         errors.push(...mediaResults.errors);
@@ -237,10 +184,7 @@ export class RecipeValidationService {
     return { errors, warnings };
   }
 
-  /**
-   * Validate step config
-   */
-  private validateStepConfig(config: any[], stepIndex: number): {
+  private validateStepConfig(config: StepConfig[], stepIndex: number): {
     errors: ValidationError[];
     warnings: ValidationWarning[];
   } {
@@ -269,10 +213,7 @@ export class RecipeValidationService {
     return { errors, warnings };
   }
 
-  /**
-   * Validate step media
-   */
-  private validateStepMedia(media: RecipeStepMedia[], stepIndex: number): {
+  private validateStepMedia(media: StepMedia[], stepIndex: number): {
     errors: ValidationError[];
     warnings: ValidationWarning[];
   } {
@@ -301,12 +242,7 @@ export class RecipeValidationService {
     return { errors, warnings };
   }
 
-  // ==================== Prerequisites Validation ====================
-
-  /**
-   * Validate prerequisites
-   */
-  private validatePrerequisites(prerequisites: RecipePrerequisiteItem[]): {
+  private validatePrerequisites(prerequisites: PrerequisiteRecipe[]): {
     errors: ValidationError[];
     warnings: ValidationWarning[];
   } {
@@ -324,7 +260,6 @@ export class RecipeValidationService {
         });
       }
 
-      // Validate quick links if present
       if (prereq.quickLinks && prereq.quickLinks.length > 0) {
         prereq.quickLinks.forEach((link, linkIndex) => {
           if (!link.title || link.title.trim() === '') {
@@ -346,12 +281,7 @@ export class RecipeValidationService {
     return { errors, warnings };
   }
 
-  // ==================== General Images Validation ====================
-
-  /**
-   * Validate general images
-   */
-  private validateGeneralImages(images: RecipeGeneralImage[]): {
+  private validateGeneralImages(images: GeneralImage[]): {
     errors: ValidationError[];
     warnings: ValidationWarning[];
   } {
@@ -380,57 +310,4 @@ export class RecipeValidationService {
     return { errors, warnings };
   }
 
-  // ==================== Utility Methods ====================
-
-  /**
-   * Check if recipe has critical errors that prevent saving
-   */
-  hasCriticalErrors(validationResult: ValidationResult): boolean {
-    return validationResult.errors.some(e => e.severity === 'critical');
-  }
-
-  /**
-   * Get formatted error messages
-   */
-  getErrorMessages(validationResult: ValidationResult): string[] {
-    return validationResult.errors.map(e => `${e.field}: ${e.message}`);
-  }
-
-  /**
-   * Get formatted warning messages
-   */
-  getWarningMessages(validationResult: ValidationResult): string[] {
-    return validationResult.warnings.map(w => `${w.field}: ${w.message}`);
-  }
-
-  /**
-   * Get summary string
-   */
-  getSummary(validationResult: ValidationResult): string {
-    const errorCount = validationResult.errors.length;
-    const warningCount = validationResult.warnings.length;
-
-    if (errorCount === 0 && warningCount === 0) {
-      return 'Validation passed';
-    }
-
-    const parts: string[] = [];
-    if (errorCount > 0) {
-      parts.push(`${errorCount} error${errorCount > 1 ? 's' : ''}`);
-    }
-    if (warningCount > 0) {
-      parts.push(`${warningCount} warning${warningCount > 1 ? 's' : ''}`);
-    }
-
-    return parts.join(', ');
-  }
-
-  /**
-   * Quick validation - only check critical fields
-   */
-  quickValidate(recipe: SourceRecipeRecord): boolean {
-    return !!(recipe.id && recipe.id.trim() !== '' &&
-              recipe.title && recipe.title.trim() !== '' &&
-              recipe.category && recipe.category.trim() !== '');
-  }
 }

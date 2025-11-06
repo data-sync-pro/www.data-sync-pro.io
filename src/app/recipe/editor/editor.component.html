@@ -93,13 +93,13 @@
       <h3>Importing Recipes</h3>
       <div class="progress-bar-container" *ngIf="state.importProgress">
         <div class="progress-bar">
-          <div class="progress-fill" 
-               [style.width.%]="state.importProgress.percentage"></div>
+          <div class="progress-fill"
+               [style.width.%]="Math.round((state.importProgress.current / state.importProgress.total) * 100)"></div>
         </div>
         <div class="progress-text">
           {{ state.importProgress.step }} ({{ state.importProgress.current }}/{{ state.importProgress.total }})
         </div>
-        <div class="progress-percentage">{{ state.importProgress.percentage }}%</div>
+        <div class="progress-percentage">{{ Math.round((state.importProgress.current / state.importProgress.total) * 100) }}%</div>
       </div>
       <div class="loading-spinner" *ngIf="!state.importProgress">
         <div class="spinner"></div>

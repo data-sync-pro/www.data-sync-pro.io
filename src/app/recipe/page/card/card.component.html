@@ -2,8 +2,8 @@
   <!-- Header row: category + download button -->
   <div class="card-header">
     <span class="category-tag" [class]="recipe.category">{{ recipe.category | titlecase }}</span>
-    <button mat-icon-button 
-            *ngIf="recipe.downloadableExecutable"
+    <button mat-icon-button
+            *ngIf="recipe.downloadableExecutables && recipe.downloadableExecutables.length > 0"
             class="download-button"
             matTooltip="Download Executable"
             (click)="onDownload($event)"
