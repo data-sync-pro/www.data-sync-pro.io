@@ -94,7 +94,6 @@
               <div [ngSwitch]="media.type">
                 <div *ngSwitchCase="'image'" class="media-image" appSimpleZoomable [enableHoverZoom]="false">
                   <img [src]="media.url" [alt]="media.alt" class="responsive-image zoomable-image">
-                  <p class="media-caption" *ngIf="media.alt">{{ media.alt }}</p>
                 </div>
 
                 <div *ngSwitchCase="'video'" class="media-video">
@@ -102,7 +101,6 @@
                     <source [src]="media.url" type="video/mp4">
                     Your browser does not support the video tag.
                   </video>
-                  <p class="media-caption" *ngIf="media.alt">{{ media.alt }}</p>
                 </div>
 
                 <div *ngSwitchCase="'link'" class="media-link">

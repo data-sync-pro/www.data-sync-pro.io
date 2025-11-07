@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy, ChangeDetectorRef, OnChanges, SimpleChanges, AfterViewInit } from '@angular/core';
 import { StepMedia, GeneralImage } from '../../../core/models/recipe.model';
 import { TrackByUtil } from '../../../../shared/utils/trackby.util';
 import { FileStorageAdapter } from '../../../core/storage';
@@ -13,15 +13,40 @@ import { LoggerService } from '../../../core/services/logger.service';
   styleUrls: ['./image-manager.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ImageManagerComponent {
-  @Input() media: StepMedia[] = [];
-  @Input() generalImages: GeneralImage[] = [];
+export class ImageManagerComponent implements OnChanges, AfterViewInit {
+  private _media: StepMedia[] = [];
+  private _generalImages: GeneralImage[] = [];
+
+  @Input()
+  set media(value: StepMedia[]) {
+    this._media = value;
+    if (this.isInitialized) {
+      this.loadAllMediaImages();
+    }
+  }
+  get media(): StepMedia[] {
+    return this._media;
+  }
+
+  @Input()
+  set generalImages(value: GeneralImage[]) {
+    this._generalImages = value;
+    if (this.isInitialized) {
+      this.loadAllGeneralImages();
+    }
+  }
+  get generalImages(): GeneralImage[] {
+    return this._generalImages;
+  }
+
   @Input() stepIndex: number = -1;
   @Input() recipeId: string = '';
   @Input() recipeCategory: string = '';
 
   @Output() mediaChange = new EventEmitter<void>();
   @Output() generalImagesChange = new EventEmitter<void>();
+
+  private isInitialized = false;
 
   constructor(
     private fileStorageService: FileStorageAdapter,
@@ -31,6 +56,78 @@ export class ImageManagerComponent {
     private logger: LoggerService,
     private cdr: ChangeDetectorRef
   ) {}
+
+  ngAfterViewInit(): void {
+    this.isInitialized = true;
+    // Load images after view is initialized
+    setTimeout(() => {
+      this.loadAllMediaImages();
+      this.loadAllGeneralImages();
+    }, 0);
+  }
+
+  async ngOnChanges(changes: SimpleChanges): Promise<void> {
+    // OnChanges is kept for compatibility but actual loading happens in setters
+    if (!this.isInitialized) {
+      return;
+    }
+
+    // Load media images when media input changes
+    if (changes['media'] && changes['media'].currentValue !== changes['media'].previousValue) {
+      await this.loadAllMediaImages();
+    }
+
+    // Load general images when generalImages input changes
+    if (changes['generalImages'] && changes['generalImages'].currentValue !== changes['generalImages'].previousValue) {
+      await this.loadAllGeneralImages();
+    }
+  }
+
+  private async loadAllMediaImages(): Promise<void> {
+    if (!this._media || this._media.length === 0) {
+      return;
+    }
+
+    this.logger.debug(`Loading ${this._media.length} media images for step ${this.stepIndex}`);
+
+    for (const mediaItem of this._media) {
+      if (mediaItem.url && !this.imageLoaderService.hasDisplayUrl(mediaItem)) {
+        this.logger.debug(`Loading media image: ${mediaItem.url}`);
+        const result = await this.imageLoaderService.loadImageForMedia(mediaItem);
+        if (result.success) {
+          this.logger.debug(`Successfully loaded media image: ${mediaItem.url}, displayUrl: ${result.displayUrl}`);
+        } else {
+          this.logger.warn(`Failed to load media image: ${mediaItem.url}`, result.error);
+        }
+      } else if (this.imageLoaderService.hasDisplayUrl(mediaItem)) {
+        this.logger.debug(`Media image already has displayUrl: ${mediaItem.url}`);
+      }
+    }
+    this.cdr.markForCheck();
+  }
+
+  private async loadAllGeneralImages(): Promise<void> {
+    if (!this._generalImages || this._generalImages.length === 0) {
+      return;
+    }
+
+    this.logger.debug(`Loading ${this._generalImages.length} general images`);
+
+    for (const image of this._generalImages) {
+      if (image.url && !this.imageLoaderService.hasDisplayUrl(image)) {
+        this.logger.debug(`Loading general image: ${image.url}`);
+        const result = await this.imageLoaderService.loadImageForGeneralImage(image);
+        if (result.success) {
+          this.logger.debug(`Successfully loaded general image: ${image.url}, displayUrl: ${result.displayUrl}`);
+        } else {
+          this.logger.warn(`Failed to load general image: ${image.url}`, result.error);
+        }
+      } else if (this.imageLoaderService.hasDisplayUrl(image)) {
+        this.logger.debug(`General image already has displayUrl: ${image.url}`);
+      }
+    }
+    this.cdr.markForCheck();
+  }
 
   addMedia(): void {
     const newMedia: StepMedia = {

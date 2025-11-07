@@ -11,6 +11,7 @@ export class StorageService {
   private readonly STORAGE_KEY_PREFIX = 'recipe_editor_';
   private readonly EDITED_RECIPES_KEY = this.STORAGE_KEY_PREFIX + 'edited_recipes';
   private readonly EDITED_IDS_KEY = this.STORAGE_KEY_PREFIX + 'edited_ids';
+  private readonly ACTIVE_STATES_KEY = this.STORAGE_KEY_PREFIX + 'active_states';
 
   constructor(
     private logger: LoggerService,
@@ -52,6 +53,16 @@ export class StorageService {
     return this.storage.getItem<string[]>(this.EDITED_IDS_KEY, []) || [];
   }
 
+  getEditedRecipe(recipeId: string): RecipeData | null {
+    try {
+      const editedRecipes = this.getAllEditedRecipes();
+      return editedRecipes.find(r => r.id === recipeId) || null;
+    } catch (error) {
+      this.logger.error('Error getting edited recipe:', error);
+      return null;
+    }
+  }
+
   private updateEditedIds(recipes: RecipeData[]): void {
     const ids = recipes.map(r => r.id).filter(id => id);
     this.storage.setItem(this.EDITED_IDS_KEY, ids);
@@ -78,6 +89,38 @@ export class StorageService {
 
   clearRecipe(recipeId: string): boolean {
     return this.deleteEditedRecipe(recipeId);
+  }
+
+  saveRecipeActiveState(recipeId: string, isActive: boolean): void {
+    try {
+      const activeStates = this.getAllActiveStates();
+      activeStates[recipeId] = isActive;
+      this.storage.setItem(this.ACTIVE_STATES_KEY, activeStates);
+    } catch (error) {
+      this.logger.error('Error saving recipe active state:', error);
+    }
+  }
+
+  getAllActiveStates(): { [recipeId: string]: boolean } {
+    return this.storage.getItem<{ [recipeId: string]: boolean }>(this.ACTIVE_STATES_KEY, {}) || {};
+  }
+
+  clearActiveState(recipeId: string): void {
+    try {
+      const activeStates = this.getAllActiveStates();
+      delete activeStates[recipeId];
+      this.storage.setItem(this.ACTIVE_STATES_KEY, activeStates);
+    } catch (error) {
+      this.logger.error('Error clearing recipe active state:', error);
+    }
+  }
+
+  clearAllActiveStates(): void {
+    try {
+      this.storage.setItem(this.ACTIVE_STATES_KEY, {});
+    } catch (error) {
+      this.logger.error('Error clearing all active states:', error);
+    }
   }
 
 }

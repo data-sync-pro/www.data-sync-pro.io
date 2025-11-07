@@ -38,7 +38,8 @@ export class ExportService {
     recipes: RecipeData[],
     fileStorage: FileStorageAdapter,
     allRecipesForIndex?: RecipeData[],
-    onProgress?: ProgressCallback
+    onProgress?: ProgressCallback,
+    recipeActiveStates?: Map<string, boolean>
   ): Promise<void> {
     try {
       if (typeof JSZip === 'undefined') {
@@ -174,7 +175,7 @@ export class ExportService {
       }
 
       updateProgress('Generating index.json...');
-      const indexRecipes = this.generateRecipeIndex(allRecipesForIndex || recipes);
+      const indexRecipes = this.generateRecipeIndex(allRecipesForIndex || recipes, recipeActiveStates);
       zip.file('index.json', JSON.stringify({ recipes: indexRecipes }, null, 2));
 
       updateProgress('Adding deployment instructions...');
@@ -193,12 +194,16 @@ export class ExportService {
       const filename = `recipes_export_${timestamp}.zip`;
 
       this.downloadBlob(zipBlob, filename);
+
+      updateProgress('Export completed!');
+
       const totalRecipesInIndex = allRecipesForIndex ? allRecipesForIndex.length : recipes.length;
       this.notificationService.success(`${recipes.length} edited recipes exported as ZIP with index.json containing ${totalRecipesInIndex} total recipes`);
 
     } catch (error) {
       this.logger.error('Error exporting recipes as ZIP', error);
       this.notificationService.error('Failed to export recipes as ZIP');
+      throw error; // Re-throw to allow caller to handle cleanup
     }
   }
 
@@ -230,7 +235,7 @@ export class ExportService {
     }
   }
 
-  private generateRecipeIndex(recipes: RecipeData[]): RecipeIndexEntry[] {
+  private generateRecipeIndex(recipes: RecipeData[], recipeActiveStates?: Map<string, boolean>): RecipeIndexEntry[] {
     const validRecipes = recipes.filter(recipe => recipe.id && recipe.title);
     const existingFolders = new Set<string>();
 
@@ -238,9 +243,12 @@ export class ExportService {
       const folderId = generateFolderName(recipe.title, existingFolders);
       existingFolders.add(folderId);
 
+      // Use the active state from the map if available, otherwise default to true
+      const active = recipeActiveStates?.get(recipe.id) ?? true;
+
       return {
         folderId: folderId,
-        active: true
+        active: active
       };
     }).sort((a, b) => a.folderId.localeCompare(b.folderId));
   }
