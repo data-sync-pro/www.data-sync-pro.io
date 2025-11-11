@@ -99,7 +99,7 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.subscribeToState();
     this.listManagementService.loadRecipes();
-    this.createNewTab();
+    // Don't create a new tab immediately - wait for recipes to load
   }
 
   ngOnDestroy(): void {
@@ -124,6 +124,14 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe(recipes => {
         this.recipeList = recipes;
+
+        // Auto-load first recipe on initial load
+        if (recipes.length > 0 && this.state.tabs.length === 0) {
+          const firstRecipe = recipes[0];
+          this.logger.debug('Auto-loading first recipe', { recipeId: firstRecipe.id });
+          this.loadRecipeToEditor(firstRecipe);
+        }
+
         this.cdr.markForCheck();
       });
 
@@ -260,7 +268,13 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const sourceRecipe = EditorUtils.convertToSourceRecord(recipe);
+    // Try to load edited version from storage first
+    const editedRecipe = this.ioCoordinatorService.getEditedRecipe(recipe.id);
+    const sourceRecipe = editedRecipe || EditorUtils.convertToSourceRecord(recipe);
+
+    if (editedRecipe) {
+      this.logger.debug('Loading edited version of recipe from storage', { recipeId: recipe.id });
+    }
 
     const newTab: EditorTab = {
       id: EditorUtils.generateUUID(),
@@ -589,6 +603,8 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
 
     if (result.success) {
       this.store.updateEditorTab(tab.id, { hasChanges: false });
+      // Reload edited recipes to update the editedRecipeIds
+      this.listManagementService.loadEditedRecipes();
       if (!isAutoSave) {
         this.logger.info('Recipe saved manually', { recipeId: this.currentRecipe.id });
       }
@@ -615,25 +631,44 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
         this.store.updateEditorTab(tabs[index].id, { hasChanges: false });
       }
     });
+
+    // Reload edited recipes to update the editedRecipeIds
+    this.listManagementService.loadEditedRecipes();
   }
 
-  async exportCurrentRecipe(): Promise<void> {
-    if (!this.currentRecipe) return;
+  async exportEditedAndNewRecipes(): Promise<void> {
+    try {
+      const editedRecipes = this.listManagementService.getFilteredEditedRecipes();
+      const recipeActiveStates = this.listManagementService.getAllRecipeActiveStates();
 
-    await this.ioCoordinatorService.exportSingleRecipe(
-      this.currentRecipe,
-      this.customStepNames
-    );
+      await this.ioCoordinatorService.exportEditedRecipes(
+        editedRecipes,
+        this.recipeList,
+        (progress) => this.updateImportProgress(progress),
+        recipeActiveStates
+      );
+    } finally {
+      // Always reset the importing state when done
+      this.store.setEditorImporting(false);
+    }
   }
 
   async exportAllRecipes(): Promise<void> {
-    const editedRecipes = this.listManagementService.getFilteredEditedRecipes();
+    try {
+      // Export all recipes by passing all recipes as edited recipes
+      const allRecipesAsData = this.recipeList.map(recipe => EditorUtils.convertToSourceRecord(recipe));
+      const recipeActiveStates = this.listManagementService.getAllRecipeActiveStates();
 
-    await this.ioCoordinatorService.exportAllRecipes(
-      editedRecipes,
-      this.recipeList,
-      (progress) => this.updateImportProgress(progress)
-    );
+      await this.ioCoordinatorService.exportAllRecipes(
+        allRecipesAsData,
+        this.recipeList,
+        (progress) => this.updateImportProgress(progress),
+        recipeActiveStates
+      );
+    } finally {
+      // Always reset the importing state when done
+      this.store.setEditorImporting(false);
+    }
   }
 
   triggerImport(): void {
@@ -673,6 +708,8 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
       this.createNewTab();
 
       this.listManagementService.loadRecipes();
+      // Reload edited recipes to update the editedRecipeIds (should be empty now)
+      this.listManagementService.loadEditedRecipes();
     }
   }
 

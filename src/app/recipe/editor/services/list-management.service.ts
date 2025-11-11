@@ -72,9 +72,18 @@ export class ListManagementService implements OnDestroy {
       .subscribe({
         next: (indexData) => {
           const stateMap = new Map<string, boolean>();
+
+          // First, load the original active states from index.json
           indexData.recipes.forEach(item => {
             stateMap.set(item.folderId, item.active);
           });
+
+          // Then, override with any saved states from localStorage
+          const savedStates = this.storageService.getAllActiveStates();
+          Object.keys(savedStates).forEach(recipeId => {
+            stateMap.set(recipeId, savedStates[recipeId]);
+          });
+
           this.recipeActiveStatesSubject.next(stateMap);
           this.logger.debug('Recipe active states loaded', { count: stateMap.size });
         },
@@ -119,6 +128,13 @@ export class ListManagementService implements OnDestroy {
     const currentStates = new Map(this.recipeActiveStatesSubject.value);
     currentStates.set(recipeId, isActive);
     this.recipeActiveStatesSubject.next(currentStates);
+
+    // Persist to localStorage
+    this.storageService.saveRecipeActiveState(recipeId, isActive);
+  }
+
+  getAllRecipeActiveStates(): Map<string, boolean> {
+    return new Map(this.recipeActiveStatesSubject.value);
   }
 
   getFilteredEditedRecipes(isCreated?: boolean): RecipeData[] {

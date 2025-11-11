@@ -65,13 +65,13 @@
         <span *ngIf="!state.isImporting">Import Recipe</span>
         <span *ngIf="state.isImporting">Importing...</span>
       </button>
-      <button class="btn btn-primary" (click)="exportCurrentRecipe()"
-              [disabled]="!currentRecipe || state.isImporting">
-        Export Current
+      <button class="btn btn-primary" (click)="exportEditedAndNewRecipes()"
+              [disabled]="editedRecipeIds.size === 0 || state.isImporting">
+        Export Edit & New ({{ editedRecipeIds.size }})
       </button>
       <button class="btn btn-primary" (click)="exportAllRecipes()"
-              [disabled]="editedRecipeIds.size === 0 || state.isImporting">
-        Export All ({{ editedRecipeIds.size }})
+              [disabled]="recipeList.length === 0 || state.isImporting">
+        Export All ({{ recipeList.length }})
       </button>
       <button class="btn btn-success" (click)="saveAllTabs()"
               [disabled]="!hasUnsavedChanges() || state.isImporting">
@@ -85,12 +85,12 @@
     </div>
   </div>
 
-  <!-- Import Progress Bar -->
-  <div class="import-progress-overlay" 
+  <!-- Import/Export Progress Bar -->
+  <div class="import-progress-overlay"
        *ngIf="state.isImporting"
        [ngClass]="{'show': state.isImporting}">
     <div class="import-progress-dialog">
-      <h3>Importing Recipes</h3>
+      <h3>{{ state.importProgress?.step?.includes('xport') ? 'Exporting Recipes' : 'Processing Recipes' }}</h3>
       <div class="progress-bar-container" *ngIf="state.importProgress">
         <div class="progress-bar">
           <div class="progress-fill"
@@ -103,7 +103,7 @@
       </div>
       <div class="loading-spinner" *ngIf="!state.importProgress">
         <div class="spinner"></div>
-        <div>Reading ZIP file...</div>
+        <div>Processing...</div>
       </div>
     </div>
   </div>

@@ -2,16 +2,27 @@
   <!-- Reusable Image Preview Template -->
   <ng-template #imagePreview let-item="item">
     <div class="media-preview"
-         *ngIf="item.type === 'image' && item.url && (item.url.startsWith('images/') || item.url.startsWith('assets/'))">
+         *ngIf="item.type === 'image' && item.url">
+      <!-- Show image if displayUrl is available -->
       <div *ngIf="hasDisplayUrl(item)">
         <img [src]="getDisplayUrl(item)"
-             [alt]="item.alt"
+             [alt]="item.alt || 'Media preview'"
              class="media-preview-image"
              title="Click to enlarge"
              (error)="onImageError($event)">
       </div>
-      <div *ngIf="!hasDisplayUrl(item)" class="image-loading-placeholder">
+
+      <!-- Show loading placeholder for images/ URLs without displayUrl -->
+      <div *ngIf="!hasDisplayUrl(item) && (item.url.startsWith('images/') || item.url.startsWith('assets/'))"
+           class="image-loading-placeholder">
         <span>📸 Loading image...</span>
+        <small style="display: block; margin-top: 0.25rem; font-size: 0.75rem; color: #666;">{{ item.url }}</small>
+      </div>
+
+      <!-- Show warning for other URL formats -->
+      <div *ngIf="!hasDisplayUrl(item) && !item.url.startsWith('images/') && !item.url.startsWith('assets/')"
+           class="image-external-url">
+        <span>🔗 External URL: {{ item.url }}</span>
       </div>
     </div>
   </ng-template>

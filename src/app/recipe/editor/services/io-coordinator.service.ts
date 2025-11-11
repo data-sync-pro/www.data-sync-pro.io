@@ -37,6 +37,10 @@ export class IOCoordinatorService {
     private notificationService: NotificationService
   ) {}
 
+  getEditedRecipe(recipeId: string): RecipeData | null {
+    return this.storageService.getEditedRecipe(recipeId);
+  }
+
   saveRecipe(
     recipe: RecipeData,
     customStepNames: {[index: number]: string}
@@ -131,10 +135,11 @@ export class IOCoordinatorService {
     }
   }
 
-  async exportAllRecipes(
+  async exportEditedRecipes(
     editedRecipes: RecipeData[],
     originalRecipes: Recipe[],
-    progressCallback?: (progress: IOProgress) => void
+    progressCallback?: (progress: IOProgress) => void,
+    recipeActiveStates?: Map<string, boolean>
   ): Promise<void> {
     try {
       if (editedRecipes.length === 0) {
@@ -142,7 +147,40 @@ export class IOCoordinatorService {
         return;
       }
 
-      this.logger.info('Starting bulk export', { count: editedRecipes.length });
+      this.logger.info('Starting edited recipes export', { count: editedRecipes.length });
+
+      // Export only edited recipe folders, but include all recipes in index.json
+      const allRecipesForIndex = this.mergeRecipeData(originalRecipes, editedRecipes);
+
+      await this.exportService.exportAllAsZip(
+        editedRecipes,
+        this.fileStorageService,
+        allRecipesForIndex,
+        progressCallback,
+        recipeActiveStates
+      );
+
+      this.logger.info('Edited recipes export completed successfully', {
+        editedCount: editedRecipes.length,
+        indexCount: allRecipesForIndex.length
+      });
+      this.notificationService.success(`Exported ${editedRecipes.length} edited recipe(s) with complete index!`);
+
+    } catch (error) {
+      this.logger.error('Failed to export edited recipes', error);
+      this.notificationService.error('Failed to export recipes. Please try again.');
+      throw error;
+    }
+  }
+
+  async exportAllRecipes(
+    editedRecipes: RecipeData[],
+    originalRecipes: Recipe[],
+    progressCallback?: (progress: IOProgress) => void,
+    recipeActiveStates?: Map<string, boolean>
+  ): Promise<void> {
+    try {
+      this.logger.info('Starting full export', { editedCount: editedRecipes.length, totalCount: originalRecipes.length });
 
       const recipesToExport = this.mergeRecipeData(originalRecipes, editedRecipes);
 
@@ -150,10 +188,11 @@ export class IOCoordinatorService {
         recipesToExport,
         this.fileStorageService,
         recipesToExport,
-        progressCallback
+        progressCallback,
+        recipeActiveStates
       );
 
-      this.logger.info('Bulk export completed successfully', { count: recipesToExport.length });
+      this.logger.info('Full export completed successfully', { count: recipesToExport.length });
       this.notificationService.success(`Exported ${recipesToExport.length} recipes successfully!`);
 
     } catch (error) {
@@ -266,6 +305,9 @@ export class IOCoordinatorService {
       }
 
       this.fileStorageService.clearAll();
+
+      // Clear all active states
+      this.storageService.clearAllActiveStates();
 
       this.logger.info('All edited data cleared', { count: editedCount });
       this.notificationService.success(`Cleared ${editedCount} edited recipe(s).`);
