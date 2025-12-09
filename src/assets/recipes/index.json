@@ -75,6 +75,18 @@
     {
       "folderId": "transfer-open-opportunities-on-user-deactivation",
       "active": true
+    },
+    {
+      "folderId": "test-1",
+      "active": true
+    },
+    {
+      "folderId": "test-2",
+      "active": true
+    },
+    {
+      "folderId": "test-3",
+      "active": true
     }
   ]
 }

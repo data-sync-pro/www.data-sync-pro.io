@@ -6,7 +6,8 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   ViewEncapsulation,
-  HostListener
+  HostListener,
+  ViewChild
 } from '@angular/core';
 import { Subject, combineLatest } from 'rxjs';
 import { takeUntil, distinctUntilChanged } from 'rxjs/operators';
@@ -34,6 +35,7 @@ import { RouteHandlerService } from './services/route-handler.service';
 import { SearchStateService } from './services/search.service';
 import { RECIPE_CLASSES, RECIPE_MESSAGES} from '../core/constants/recipe.constants';
 import { SelectedSuggestion } from './search-overlay/search-overlay.component';
+import { RecipeLayoutComponent } from './recipe-layout/recipe-layout.component';
 
 @Component({
   selector: 'app-recipes',
@@ -45,6 +47,8 @@ import { SelectedSuggestion } from './search-overlay/search-overlay.component';
 export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
   private destroy$ = new Subject<void>();
   private needsObserverSetup: boolean = false;
+
+  @ViewChild('recipeLayout') recipeLayout!: RecipeLayoutComponent;
 
   ui!: UIState;
 
@@ -179,16 +183,19 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   @HostListener('document:keydown./', ['$event'])
-  onSlashKey(event: KeyboardEvent) {
+  onSlashKey(event: Event) {
     if (!this.search.isOverlayOpen && !this.searchService.isInputFocused()) {
       event.preventDefault();
-      this.openSearchOverlay();
+      // Focus the filter input instead of opening overlay
+      if (this.recipeLayout) {
+        this.recipeLayout.focusFilterInput();
+      }
     }
   }
 
   @HostListener('document:keydown.control.k', ['$event'])
   @HostListener('document:keydown.meta.k', ['$event'])
-  onCtrlK(event: KeyboardEvent) {
+  onCtrlK(event: Event) {
     event.preventDefault();
     if (!this.search.isOverlayOpen) {
       this.openSearchOverlay();
@@ -202,7 +209,7 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
-  @HostListener('window:hashchange', ['$event'])
+  @HostListener('window:hashchange',)
   onHashChange(): void {
     this.recipeNavigationService.handleInitialHash();
   }
@@ -301,6 +308,45 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
 
   closeMobileSidebar(): void {
     this.store.closeMobileSidebar();
+  }
+
+  toggleCategoryFilter(categoryName: string): void {
+    const index = this.currentFilter.categories.indexOf(categoryName);
+    if (index > -1) {
+      // Remove category from filter
+      this.currentFilter.categories = this.currentFilter.categories.filter(cat => cat !== categoryName);
+    } else {
+      // Add category to filter
+      this.currentFilter.categories = [...this.currentFilter.categories, categoryName];
+    }
+
+    // If search is active, re-trigger the search with the new filter
+    if (this.search.isActive && this.search.query) {
+      this.searchRecipes(this.search.query);
+    } else {
+      // Otherwise, apply the filter normally
+      this.applyFilters();
+    }
+  }
+
+  private applyFilters(): void {
+    // Start with all recipes
+    let filtered = [...this.recipes];
+
+    // Apply category filter
+    if (this.currentFilter.categories.length > 0) {
+      filtered = filtered.filter(recipe =>
+        this.currentFilter.categories.includes(recipe.category)
+      );
+    }
+
+    // Apply search filter if active
+    if (this.search.isActive && this.search.query) {
+      filtered = this.coreSearchService.search(filtered, this.search.query);
+    }
+
+    this.filteredRecipes = filtered;
+    this.cdr.markForCheck();
   }
 
   getVisibleOverviewSections() {

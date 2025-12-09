@@ -1,0 +1,54 @@
+{
+  "id": "d9b60d4e-9c31-4c05-92e3-3f6dd9cc16072",
+  "title": "Test 2",
+  "category": "Data Loader",
+  "DSPVersions": [],
+  "overview": "sdfsdfsdfsdf\n",
+  "whenToUse": "sdfsdfsdf",
+  "generalImages": [
+    {
+      "type": "image",
+      "url": "",
+      "alt": ""
+    }
+  ],
+  "prerequisites": [
+    {
+      "description": "",
+      "quickLinks": [
+        {
+          "title": "",
+          "url": ""
+        }
+      ]
+    }
+  ],
+  "direction": "",
+  "connection": "",
+  "walkthrough": [
+    {
+      "step": "",
+      "config": [
+        {
+          "field": "",
+          "value": ""
+        }
+      ],
+      "media": [
+        {
+          "type": "image",
+          "url": "",
+          "alt": ""
+        }
+      ]
+    }
+  ],
+  "downloadableExecutables": [],
+  "relatedRecipes": [
+    {
+      "title": "",
+      "url": ""
+    }
+  ],
+  "keywords": []
+}

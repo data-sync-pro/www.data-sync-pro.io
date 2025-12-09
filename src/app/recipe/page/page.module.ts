@@ -33,6 +33,12 @@ import { RecipeSectionComponent } from './section/section.component';
 
 // Shared Modules and Components
 import { SharedModule } from '../../shared/shared.module';
+import { BannerComponent } from './banner/banner.component';
+import { BreadcrumbComponent } from './breadcrumb/breadcrumb.component';
+import { RecipeDetailComponent } from './recipe-detail.component';
+import { RecipeLayoutComponent } from './recipe-layout/recipe-layout.component';
+import { CategoryListComponent } from './category-list/category-list.component';
+import { RecipeListComponent } from './recipe-list/recipe-list.component';
 
 @NgModule({
   declarations: [
@@ -41,7 +47,13 @@ import { SharedModule } from '../../shared/shared.module';
     RecipeSearchOverlayComponent,
     RecipeSidebarComponent,
     RecipeTocComponent,
-    RecipeSectionComponent
+    RecipeSectionComponent,
+    BannerComponent,
+    BreadcrumbComponent,
+    RecipeDetailComponent,
+    RecipeLayoutComponent,
+    CategoryListComponent,
+    RecipeListComponent
   ],
   imports: [
     CommonModule,
