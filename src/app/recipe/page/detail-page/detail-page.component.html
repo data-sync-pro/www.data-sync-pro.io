@@ -1,0 +1,156 @@
+<div class="recipe-detail-page">
+  <!-- Detail Banner with Breadcrumb -->
+  <app-recipe-detail-banner
+    [title]="currentRecipe?.title || 'Recipe Details'"
+    [breadcrumbs]="breadcrumbs">
+  </app-recipe-detail-banner>
+
+  <div class="detail-main-layout">
+    <!-- Left Sidebar - Recipe List -->
+    <aside class="left-sidebar">
+      <div class="sidebar-sticky">
+        <div class="sidebar-search">
+          <img class="search-icon" src="assets/icons/recipe/search.svg" aria-hidden="true">
+          <input
+            #sidebarSearchInput
+            type="text"
+            placeholder="Find by title"
+            class="sidebar-search-input"
+            [(ngModel)]="sidebarSearchQuery"
+            (input)="onSidebarSearchInput()">
+          <span class="shortcut-hint">/</span>
+        </div>
+        <div class="category-list">
+          <div *ngFor="let group of filteredCategoryGroups" class="category-group">
+            <!-- Category Header -->
+            <div
+              class="category-header"
+              (click)="toggleCategory(group.category.name)">
+              <img
+                class="category-icon"
+                src="assets/icons/recipe/chevron-down.svg"
+                [class.collapsed]="!group.isExpanded"
+                aria-hidden="true">
+              <span class="category-name">{{ group.category.displayName }}</span>
+            </div>
+
+            <!-- Recipe List (shown when expanded) -->
+            <div class="recipe-list" *ngIf="group.isExpanded">
+              <div
+                *ngFor="let recipe of group.recipes"
+                class="recipe-list-item"
+                [class.active]="recipe.slug === currentRecipe?.slug"
+                [routerLink]="['/recipes', recipe.category, recipe.slug]">
+                {{ recipe.title }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Middle Content Area -->
+    <main class="detail-content">
+      <div class="content-sections" *ngIf="currentRecipe">
+        <!-- Overview Section -->
+        <section id="overview" class="content-section">
+          <h2 class="section-title">Overview</h2>
+          <div class="section-content" [innerHTML]="currentRecipe.overview"></div>
+        </section>
+
+        <!-- General Use Case Section -->
+        <section id="use-case" class="content-section" *ngIf="currentRecipe.whenToUse">
+          <h2 class="section-title">General Use Case</h2>
+          <div class="section-content" [innerHTML]="currentRecipe.whenToUse"></div>
+        </section>
+
+        <!-- Walkthrough Section -->
+        <section id="walkthrough" class="content-section" *ngIf="currentRecipe.walkthrough && currentRecipe.walkthrough.length > 0">
+          <h2 class="section-title">Walkthrough</h2>
+
+          <div *ngFor="let step of currentRecipe.walkthrough; let i = index" class="walkthrough-step">
+            <h3 class="step-number">{{ i + 1 }}. {{ step.step }}</h3>
+
+            <!-- Step Media -->
+            <div class="step-media" *ngIf="step.media && step.media.length > 0">
+              <div *ngFor="let media of step.media" class="media-item">
+                <img
+                  *ngIf="media.type === 'image' || media.type === 'gif'"
+                  [src]="media.displayUrl || media.url"
+                  [alt]="media.alt"
+                  class="step-image">
+                <video
+                  *ngIf="media.type === 'video'"
+                  [src]="media.displayUrl || media.url"
+                  controls
+                  class="step-video">
+                  Your browser does not support the video tag.
+                </video>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Verification GIF Section -->
+        <section id="verification-gif" class="content-section" *ngIf="currentRecipe.generalImages && currentRecipe.generalImages.length > 0">
+          <h2 class="section-title">Verification GIF</h2>
+
+          <div class="verification-media">
+            <div *ngFor="let image of currentRecipe.generalImages; let i = index" class="verification-item">
+              <img
+                *ngIf="image.type === 'image' || image.type === 'gif'"
+                [src]="image.displayUrl || image.url"
+                [alt]="image.alt"
+                class="verification-image">
+              <video
+                *ngIf="image.type === 'video'"
+                [src]="image.displayUrl || image.url"
+                controls
+                class="verification-video">
+                Your browser does not support the video tag.
+              </video>
+            </div>
+          </div>
+        </section>
+
+        <!-- Download Executable File Section -->
+        <section id="download-file" class="content-section" *ngIf="currentRecipe.downloadableExecutables && currentRecipe.downloadableExecutables.length > 0">
+          <h2 class="section-title">Downloadable Executables</h2>
+
+          <div class="download-list">
+            <a
+              *ngFor="let file of currentRecipe.downloadableExecutables"
+              [href]="file.url || file.filePath"
+              [download]="getDownloadFileName(file)"
+              class="download-item"
+              target="_blank"
+              rel="noopener noreferrer">
+              <img class="download-icon" src="assets/icons/download.svg" alt="Download">
+              <span class="download-title">{{ getDownloadFileName(file) }}</span>
+            </a>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- Loading State -->
+      <div class="loading-state" *ngIf="!currentRecipe">
+        <p>Loading recipe...</p>
+      </div>
+    </main>
+
+    <!-- Right Sidebar - TOC -->
+    <aside class="right-toc">
+      <div class="toc-sticky">
+        <h3>In this article</h3>
+        <nav class="toc-nav" *ngIf="currentRecipe">
+          <a href="#overview" class="toc-link" [class.active]="activeTocSection === 'overview'" (click)="scrollToSection($event, 'overview')">Overview</a>
+          <a href="#use-case" class="toc-link" [class.active]="activeTocSection === 'use-case'" *ngIf="currentRecipe.whenToUse" (click)="scrollToSection($event, 'use-case')">General Use Case</a>
+          <a href="#walkthrough" class="toc-link" [class.active]="activeTocSection === 'walkthrough'" *ngIf="currentRecipe.walkthrough && currentRecipe.walkthrough.length > 0" (click)="scrollToSection($event, 'walkthrough')">Walkthrough</a>
+          <a href="#verification-gif" class="toc-link" [class.active]="activeTocSection === 'verification-gif'" *ngIf="currentRecipe.generalImages && currentRecipe.generalImages.length > 0" (click)="scrollToSection($event, 'verification-gif')">Verification GIF</a>
+          <a href="#download-file" class="toc-link" [class.active]="activeTocSection === 'download-file'" *ngIf="currentRecipe.downloadableExecutables && currentRecipe.downloadableExecutables.length > 0" (click)="scrollToSection($event, 'download-file')">Downloadable Executables</a>
+        </nav>
+      </div>
+    </aside>
+  </div>
+</div>

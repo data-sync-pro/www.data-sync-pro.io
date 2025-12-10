@@ -30,12 +30,13 @@ import { RecipeSearchOverlayComponent } from './search-overlay/search-overlay.co
 import { RecipeSidebarComponent } from './sidebar/sidebar.component';
 import { RecipeTocComponent } from './toc/toc.component';
 import { RecipeSectionComponent } from './section/section.component';
+import { RecipeDetailPageComponent } from './detail-page/detail-page.component';
 
 // Shared Modules and Components
 import { SharedModule } from '../../shared/shared.module';
 import { BannerComponent } from './banner/banner.component';
+import { RecipeDetailBannerComponent } from './detail-banner/detail-banner.component';
 import { BreadcrumbComponent } from './breadcrumb/breadcrumb.component';
-import { RecipeDetailComponent } from './recipe-detail.component';
 import { RecipeLayoutComponent } from './recipe-layout/recipe-layout.component';
 import { CategoryListComponent } from './category-list/category-list.component';
 import { RecipeListComponent } from './recipe-list/recipe-list.component';
@@ -48,9 +49,10 @@ import { RecipeListComponent } from './recipe-list/recipe-list.component';
     RecipeSidebarComponent,
     RecipeTocComponent,
     RecipeSectionComponent,
+    RecipeDetailPageComponent,
     BannerComponent,
+    RecipeDetailBannerComponent,
     BreadcrumbComponent,
-    RecipeDetailComponent,
     RecipeLayoutComponent,
     CategoryListComponent,
     RecipeListComponent
