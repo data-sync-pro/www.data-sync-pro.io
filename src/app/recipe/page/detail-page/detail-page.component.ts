@@ -43,6 +43,7 @@ export class RecipeDetailPageComponent implements OnInit, OnDestroy {
 
   // Active TOC section
   activeTocSection: string = 'overview';
+  private isScrollingToSection: boolean = false;
 
   @ViewChild('sidebarSearchInput') sidebarSearchInput!: ElementRef<HTMLInputElement>;
 
@@ -160,6 +161,12 @@ export class RecipeDetailPageComponent implements OnInit, OnDestroy {
 
   scrollToSection(event: Event, sectionId: string): void {
     event.preventDefault();
+
+    // Set the active section immediately
+    this.activeTocSection = sectionId;
+    this.isScrollingToSection = true;
+    this.cdr.markForCheck();
+
     const element = document.getElementById(sectionId);
     if (element) {
       const headerOffset = 80; // Offset for fixed header
@@ -170,6 +177,11 @@ export class RecipeDetailPageComponent implements OnInit, OnDestroy {
         top: offsetPosition,
         behavior: 'smooth'
       });
+
+      // Re-enable scroll tracking after smooth scroll completes
+      setTimeout(() => {
+        this.isScrollingToSection = false;
+      }, 1000);
     }
   }
 
@@ -202,7 +214,7 @@ export class RecipeDetailPageComponent implements OnInit, OnDestroy {
   }
 
   private updateActiveTocSection(): void {
-    if (!this.currentRecipe) return;
+    if (!this.currentRecipe || this.isScrollingToSection) return;
 
     const sections = [
       'overview',
@@ -212,18 +224,25 @@ export class RecipeDetailPageComponent implements OnInit, OnDestroy {
       'download-file'
     ];
 
-    // Find which section is currently in view
-    const scrollPosition = window.scrollY + 150; // Offset for header
+    // Find which section is currently most visible in the viewport
+    const viewportMiddle = window.scrollY + window.innerHeight / 3;
     let activeSection = 'overview';
+    let closestDistance = Infinity;
 
     for (const sectionId of sections) {
       const element = document.getElementById(sectionId);
       if (element) {
         const rect = element.getBoundingClientRect();
         const elementTop = window.scrollY + rect.top;
+        const elementBottom = elementTop + rect.height;
 
-        if (scrollPosition >= elementTop) {
-          activeSection = sectionId;
+        // Check if section is in viewport
+        if (elementTop <= viewportMiddle && elementBottom >= window.scrollY) {
+          const distance = Math.abs(elementTop - window.scrollY);
+          if (distance < closestDistance) {
+            closestDistance = distance;
+            activeSection = sectionId;
+          }
         }
       }
     }

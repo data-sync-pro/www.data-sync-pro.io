@@ -69,7 +69,10 @@
           <h2 class="section-title">Walkthrough</h2>
 
           <div *ngFor="let step of currentRecipe.walkthrough; let i = index" class="walkthrough-step">
-            <h3 class="step-number">{{ i + 1 }}. {{ step.step }}</h3>
+            <div class="step-header">
+              <div class="step-number-badge">{{ i + 1 }}</div>
+              <h3 class="step-title">{{ step.step }}</h3>
+            </div>
 
             <!-- Step Media -->
             <div class="step-media" *ngIf="step.media && step.media.length > 0">
