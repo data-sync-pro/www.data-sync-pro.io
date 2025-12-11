@@ -87,6 +87,10 @@
     {
       "folderId": "test-3",
       "active": true
+    },
+    {
+      "folderId": "test-4",
+      "active": true
     }
   ]
 }
