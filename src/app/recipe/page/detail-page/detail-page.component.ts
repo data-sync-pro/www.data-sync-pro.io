@@ -45,6 +45,10 @@ export class RecipeDetailPageComponent implements OnInit, OnDestroy {
   activeTocSection: string = 'overview';
   private isScrollingToSection: boolean = false;
 
+  // Media preview modal
+  isMediaModalOpen: boolean = false;
+  previewMedia: { type: string; url: string; alt: string } | null = null;
+
   @ViewChild('sidebarSearchInput') sidebarSearchInput!: ElementRef<HTMLInputElement>;
 
   constructor(
@@ -199,6 +203,25 @@ export class RecipeDetailPageComponent implements OnInit, OnDestroy {
     return fileName.replace('.json', '').replace(/_/g, ' ');
   }
 
+  getGeneralUseCaseItems(): string[] {
+    if (!this.currentRecipe?.generalUseCase) {
+      return [];
+    }
+    // Split by \n and filter out empty strings
+    return this.currentRecipe.generalUseCase
+      .split('\n')
+      .map(item => item.trim())
+      .filter(item => item.length > 0);
+  }
+
+  shouldShowRulesEngine(): boolean {
+    if (!this.currentRecipe) {
+      return false;
+    }
+    // Show Rules Engine section if category is not 'Transformation'
+    return this.currentRecipe.category.toLowerCase() !== 'transformation';
+  }
+
   private setupScrollListener(): void {
     fromEvent(window, 'scroll')
       .pipe(
@@ -219,6 +242,9 @@ export class RecipeDetailPageComponent implements OnInit, OnDestroy {
     const sections = [
       'overview',
       'use-case',
+      'rules-engine',
+      'direction',
+      'pipeline',
       'walkthrough',
       'verification-gif',
       'download-file'
@@ -250,6 +276,29 @@ export class RecipeDetailPageComponent implements OnInit, OnDestroy {
     if (this.activeTocSection !== activeSection) {
       this.activeTocSection = activeSection;
       this.cdr.markForCheck();
+    }
+  }
+
+  openMediaPreview(media: any): void {
+    this.previewMedia = {
+      type: media.type,
+      url: media.displayUrl || media.url,
+      alt: media.alt || ''
+    };
+    this.isMediaModalOpen = true;
+    this.cdr.markForCheck();
+  }
+
+  closeMediaPreview(): void {
+    this.isMediaModalOpen = false;
+    this.previewMedia = null;
+    this.cdr.markForCheck();
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscapeKey(): void {
+    if (this.isMediaModalOpen) {
+      this.closeMediaPreview();
     }
   }
 

@@ -4,7 +4,7 @@
   "category": "Batch",
   "DSPVersions": [],
   "overview": "Automatically reassign open Opportunities whose owner is inactive (Owner.IsActive = FALSE) to that owner’s manager. A daily scheduled job finds these Opportunities and updates OwnerId, ensuring every active deal has an engaged owner.",
-  "whenToUse": "",
+  "generalUseCase": "",
   "generalImages": [],
   "prerequisites": [
     {

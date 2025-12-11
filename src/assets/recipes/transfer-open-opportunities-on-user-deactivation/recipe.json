@@ -4,7 +4,7 @@
   "category": "Trigger",
   "DSPVersions": [],
   "overview": "When Users are deactivated, automatically reassign their open Opportunities to their manager.",
-  "whenToUse": "For scenarios where trigger actions must run asynchronously, enable \"Action in Future Method in Triggers?\" to execute them in future methods.",
+  "generalUseCase": "",
   "generalImages": [
     {
       "type": "image",

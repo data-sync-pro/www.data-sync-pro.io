@@ -4,7 +4,7 @@
   "category": "Batch",
   "DSPVersions": [],
   "overview": "This recipe demonstrates how to export a Pipeline from one Salesforce org and import it into another.",
-  "whenToUse": "Export a Pipeline and import it into another Salesforce org.",
+  "generalUseCase": "",
   "generalImages": [
     {
       "type": "image",

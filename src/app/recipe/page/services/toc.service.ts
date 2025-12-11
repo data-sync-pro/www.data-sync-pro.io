@@ -75,12 +75,12 @@ export class TocService {
         isHighlight: true
       },
       {
-        id: RECIPE_SECTIONS.WHEN_TO_USE,
+        id: RECIPE_SECTIONS.GENERAL_USE_CASE,
         title: 'General Use Case',
-        elementId: 'recipe-when-to-use',
+        elementId: 'recipe-general-use-case',
         contentType: 'html',
-        isVisible: () => this.hasValidWhenToUse(),
-        getData: () => this.currentRecipe?.whenToUse
+        isVisible: () => this.hasValidGeneralUseCase(),
+        getData: () => this.currentRecipe?.generalUseCase
       },
       {
         id: 'dsp-versions',
@@ -222,8 +222,8 @@ export class TocService {
     return this.hasValidString(this.currentRecipe?.overview);
   }
 
-  hasValidWhenToUse(): boolean {
-    return this.hasValidString(this.currentRecipe?.whenToUse);
+  hasValidGeneralUseCase(): boolean {
+    return this.hasValidString(this.currentRecipe?.generalUseCase);
   }
 
   hasArrayPrerequisites(): boolean {

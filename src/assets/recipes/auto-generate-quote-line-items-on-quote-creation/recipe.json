@@ -4,7 +4,7 @@
   "category": "Trigger",
   "DSPVersions": [],
   "overview": "When a Quote is created on an Opportunity, the automation generates Quote Line Items from the Opportunity Products.\n",
-  "whenToUse": "Use $Joiner to left-join the parent (source) with its related records, then use the joined data to act on the target object. Applicable across all rule engines: #Trigger, #Data List, #Action Button, #Data Loader or #Batch.",
+  "generalUseCase": "",
   "generalImages": [
     {
       "type": "image",

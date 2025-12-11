@@ -4,7 +4,7 @@
   "category": "Batch",
   "DSPVersions": ["2.0", "2.1", "3.0"],
   "overview": "This recipe demonstrates how to deploy Data Sync Pro configurations between environments using a template downloaded from DSP.",
-  "whenToUse": "DSP enables the creation of reusable deployment templates for solutions built on record-based configurations, such as Data Sync Pro, nCino, CPQ, and Salesforce Revenue Cloud. These templates can be imported into any environment for ongoing customization and reuse in record-based configuration deployments.",
+  "generalUseCase": "",
   "generalImages": [],
   "prerequisites": [
     {
