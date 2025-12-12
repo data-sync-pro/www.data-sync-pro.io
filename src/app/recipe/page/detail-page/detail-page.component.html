@@ -14,10 +14,11 @@
           <input
             #sidebarSearchInput
             type="text"
-            placeholder="Find by title"
+            placeholder="Search..."
             class="sidebar-search-input"
-            [(ngModel)]="sidebarSearchQuery"
-            (input)="onSidebarSearchInput()">
+            (click)="openSearchOverlay()"
+            (focus)="openSearchOverlay()"
+            readonly>
           <span class="shortcut-hint">/</span>
         </div>
         <div class="category-list">
@@ -217,4 +218,12 @@
       </div>
     </div>
   </div>
+
+  <!-- Search Overlay -->
+  <app-recipe-search-overlay
+    *ngIf="isSearchOverlayOpen"
+    [isOpen]="isSearchOverlayOpen"
+    (closed)="closeSearchOverlay()"
+    (selectedResult)="handleSearchSelect($event)">
+  </app-recipe-search-overlay>
 </div>

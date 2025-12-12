@@ -46,7 +46,7 @@
 
 .overlay-search-box:focus {
   outline: none;
-  border-color: $color-primary-teal;
+  border-color: #2252b248;
   border-width: 1.75px;
 }
 
@@ -95,7 +95,7 @@
 .filter-label {
   font-weight: 600;
   font-size: 1.1rem;
-  color: $color-primary-teal;
+  color: #2253B2;
   margin-bottom: 0.5rem;
 }
 
@@ -126,8 +126,9 @@
 }
 
 .filter-chip.active {
-  background-color: $color-primary-teal;
-  border-color: $color-primary-teal;
+  background-color: #2253B2;
+  border-color: #2253B2;
+  opacity: 0.9;
   color: white;
 }
 
@@ -186,7 +187,7 @@
 }
 
 .tag {
-  background-color: $color-primary-light;
+  background-color: #E8F0FB;
   color: $color-text-primary;
   padding: 3px 8px;
   font-size: 0.8rem;
@@ -196,11 +197,12 @@
 }
 
 .suggestion-item:hover {
-  background-color: $color-primary-light;
+  background-color: #F1F6FB;
 }
 
 .suggestion-item:hover .tag {
-  background-color: $color-primary-teal;
+  background-color: #2253B2;
+  opacity: 0.9;
   color: white;
 }
 

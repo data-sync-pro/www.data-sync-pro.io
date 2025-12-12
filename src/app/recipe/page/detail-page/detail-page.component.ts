@@ -49,6 +49,9 @@ export class RecipeDetailPageComponent implements OnInit, OnDestroy {
   isMediaModalOpen: boolean = false;
   previewMedia: { type: string; url: string; alt: string } | null = null;
 
+  // Search overlay
+  isSearchOverlayOpen: boolean = false;
+
   @ViewChild('sidebarSearchInput') sidebarSearchInput!: ElementRef<HTMLInputElement>;
 
   constructor(
@@ -154,12 +157,25 @@ export class RecipeDetailPageComponent implements OnInit, OnDestroy {
 
   @HostListener('document:keydown./', ['$event'])
   onSlashKey(event: Event) {
-    // Check if the search input is not already focused
-    if (document.activeElement !== this.sidebarSearchInput?.nativeElement) {
-      event.preventDefault();
-      if (this.sidebarSearchInput) {
-        this.sidebarSearchInput.nativeElement.focus();
-      }
+    event.preventDefault();
+    this.openSearchOverlay();
+  }
+
+  openSearchOverlay(): void {
+    this.isSearchOverlayOpen = true;
+    this.cdr.markForCheck();
+  }
+
+  closeSearchOverlay(): void {
+    this.isSearchOverlayOpen = false;
+    this.cdr.markForCheck();
+  }
+
+  handleSearchSelect(selectedItem: any): void {
+    this.closeSearchOverlay();
+    // Navigate using the route provided by the search overlay
+    if (selectedItem.slug && selectedItem.category) {
+      this.router.navigate(['/recipes', selectedItem.category, selectedItem.slug]);
     }
   }
 

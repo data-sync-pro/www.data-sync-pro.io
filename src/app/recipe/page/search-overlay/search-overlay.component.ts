@@ -27,6 +27,7 @@ interface RecipeSearchItem {
   category: string;
   subCategory: string | null;
   tags: string[];
+  searchableContent: string; // Combined content for searching
 }
 
 export interface SelectedSuggestion extends RecipeSearchItem {
@@ -50,10 +51,8 @@ export class RecipeSearchOverlayComponent implements OnInit, OnDestroy, OnChange
   searchQuery = '';
 
   selectedCategory: string = '';
-  selectedSubCategories: string[] = [];
 
   categories: string[] = [];
-  subCategories: string[] = [];
   isLoading = true;
   loadError = false;
 
@@ -86,20 +85,31 @@ export class RecipeSearchOverlayComponent implements OnInit, OnDestroy, OnChange
         next: (recipes) => {
           this.suggestions = recipes
             .filter(r => r.id) // Only include recipes with valid IDs
-            .map((r) => ({
-              id: r.id,
-              slug: r.slug,
-              question: r.title,
-              route: `/recipes/${encodeURIComponent(r.category)}/${r.slug}`,
-              category: r.category,
-              subCategory: r.keywords && r.keywords.length > 0 ? r.keywords[0] : null,
-              tags: r.keywords && r.keywords.length > 0
-                ? [r.category, r.keywords[0]]
-                : [r.category],
-            }));
+            .map((r) => {
+              // Build searchable content from all relevant fields
+              const contentParts = [
+                r.overview || '',
+                r.generalUseCase || '',
+                r.pipeline || '',
+                r.direction || '',
+                r.connection || '',
+                ...(r.keywords || []),
+                ...(r.walkthrough || []).map(step => step.step)
+              ];
+
+              return {
+                id: r.id,
+                slug: r.slug,
+                question: r.title,
+                route: `/recipes/${encodeURIComponent(r.category)}/${r.slug}`,
+                category: r.category,
+                subCategory: null,
+                tags: [r.category],
+                searchableContent: contentParts.join(' ').toLowerCase()
+              };
+            });
 
           this.categories = this.searchService.sortCategoryNames([...new Set(this.suggestions.map((i) => i.category))]);
-          this.filterSubCategoryList();
           this.filterSuggestions();
           this.isLoading = false;
 
@@ -120,11 +130,9 @@ export class RecipeSearchOverlayComponent implements OnInit, OnDestroy, OnChange
   }
 
   onSelectSuggestion(item: RecipeSearchItem) {
-    const subCatFilterApplied = this.selectedSubCategories.length > 0;
-
     this.selectedResult.emit({
       ...item,
-      subCatFilterApplied,
+      subCatFilterApplied: false,
     } as SelectedSuggestion);
 
     this.close();
@@ -132,38 +140,12 @@ export class RecipeSearchOverlayComponent implements OnInit, OnDestroy, OnChange
 
   selectCategory(cat: string) {
     this.selectedCategory = this.selectedCategory === cat ? '' : cat;
-    this.filterSubCategoryList();
     this.filterSuggestions();
-  }
-
-  toggleSubCategory(sc: string) {
-    const i = this.selectedSubCategories.indexOf(sc);
-    i >= 0
-      ? this.selectedSubCategories.splice(i, 1)
-      : this.selectedSubCategories.push(sc);
-    this.filterSuggestions();
-  }
-
-  filterSubCategoryList() {
-    if (!this.selectedCategory) {
-      this.subCategories = [];
-      this.selectedSubCategories = [];
-      return;
-    }
-    const subs = this.suggestions
-      .filter((i) => i.category === this.selectedCategory && i.subCategory)
-      .map((i) => i.subCategory!);
-    this.subCategories = [...new Set(subs)];
-    this.selectedSubCategories = this.selectedSubCategories.filter((s) =>
-      this.subCategories.includes(s)
-    );
   }
 
   clearFilters() {
     this.searchQuery = '';
     this.selectedCategory = '';
-    this.selectedSubCategories = [];
-    this.subCategories = [];
     this.filterSuggestions();
   }
 
@@ -205,17 +187,15 @@ export class RecipeSearchOverlayComponent implements OnInit, OnDestroy, OnChange
     // Filter and add priority information
     const filteredWithPriority = this.suggestions
       .filter((i) => {
-        // Search in recipe title
-        const matchQuestion = kw ? i.question.toLowerCase().includes(kw) : true;
+        // Search in recipe title and content
+        const matchQuestion = kw ?
+          i.question.toLowerCase().includes(kw) || i.searchableContent.includes(kw) :
+          true;
 
         const matchCat =
           !this.selectedCategory || i.category === this.selectedCategory;
 
-        const matchSub =
-          this.selectedSubCategories.length === 0 ||
-          (i.subCategory && this.selectedSubCategories.includes(i.subCategory));
-
-        return matchQuestion && matchCat && matchSub;
+        return matchQuestion && matchCat;
       })
       .map((i) => {
         // Add priority based on match type
@@ -226,12 +206,12 @@ export class RecipeSearchOverlayComponent implements OnInit, OnDestroy, OnChange
           if (i.category.toLowerCase().includes(kw)) {
             priority = 1;
           }
-          // SubCategory match - priority 2
-          else if (i.subCategory && i.subCategory.toLowerCase().includes(kw)) {
+          // Recipe title match - priority 2
+          else if (i.question.toLowerCase().includes(kw)) {
             priority = 2;
           }
-          // Recipe title match - priority 3
-          else if (i.question.toLowerCase().includes(kw)) {
+          // Content match - priority 3
+          else if (i.searchableContent.includes(kw)) {
             priority = 3;
           }
         }
@@ -249,14 +229,7 @@ export class RecipeSearchOverlayComponent implements OnInit, OnDestroy, OnChange
           return a.item.category.localeCompare(b.item.category);
         }
 
-        // Same category, group by subCategory
-        const aSubCat = a.item.subCategory || '';
-        const bSubCat = b.item.subCategory || '';
-        if (aSubCat !== bSubCat) {
-          return aSubCat.localeCompare(bSubCat);
-        }
-
-        // Finally, sort alphabetically by recipe title within same category/subcategory
+        // Finally, sort alphabetically by recipe title within same category
         return a.item.question.localeCompare(b.item.question);
       })
       .map(result => result.item); // Return only the recipe items
@@ -267,8 +240,7 @@ export class RecipeSearchOverlayComponent implements OnInit, OnDestroy, OnChange
   get hasActiveFilters(): boolean {
     return !!(
       this.searchQuery.trim() ||
-      this.selectedCategory ||
-      this.selectedSubCategories.length > 0
+      this.selectedCategory
     );
   }
 

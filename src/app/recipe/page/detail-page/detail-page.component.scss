@@ -48,9 +48,15 @@
         outline: none;
         box-sizing: border-box;
         transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        cursor: pointer;
 
         &::placeholder {
           color: #9ca3af;
+        }
+
+        &:hover {
+          border-color: #2252b248;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
         &:focus {
@@ -135,7 +141,7 @@
             border-bottom: none;
             line-height: 1.5;
             margin-bottom: 8px;
-            margin-left: 22px;
+            margin-left: 34px;
 
             &:hover {
               color: #2253B2;
