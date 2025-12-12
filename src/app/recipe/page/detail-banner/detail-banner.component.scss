@@ -15,11 +15,11 @@
   align-items: center;
   gap: 5px;
   margin-bottom: 5px;
-  font-size: 14px;
+  font-size: 0.875rem;
 
   .breadcrumb-item {
     color: #2C2C2D;
-    font-size: 14px;
+    font-size: 0.875rem;
 
     &.clickable {
       text-decoration: none;
@@ -40,7 +40,7 @@
 
 // Recipe Title
 .recipe-title {
-  font-size: 32px;
+  font-size: 2rem;
   font-weight: 500;
   color: #2253B2;
   margin: 0;
@@ -58,18 +58,18 @@
   }
 
   .breadcrumb {
-    font-size: 13px;
+    font-size: 0.8125rem;
     margin-bottom: 12px;
   }
 
   .recipe-title {
-    font-size: 28px;
+    font-size: 1.75rem;
   }
 }
 
 @media (max-width: 480px) {
   .recipe-title {
-    font-size: 24px;
+    font-size: 1.5rem;
   }
 
   .breadcrumb {

@@ -38,7 +38,7 @@
       .sidebar-search-input {
         width: 100%;
         padding: 8px 40px;
-        font-size: 14px;
+        font-size: 0.875rem;
         border: 1px solid #E7E7E7;
         border-radius: 6px;
         outline: none;
@@ -61,7 +61,7 @@
         top: 50%;
         transform: translateY(-50%);
         background-color: #F5F5F6;
-        font-size: 14px;
+        font-size: 0.875rem;
         padding: 0px 8px;
         border-radius: 4px;
         color: #8c8c8c;
@@ -84,7 +84,7 @@
           padding: 6px 16px 6px 2px;
           cursor: pointer;
           transition: background 0.2s ease;
-          font-size: 14px;
+          font-size: 0.875rem;
           color: #2C2C2D;
           user-select: none;
 
@@ -111,7 +111,7 @@
         .recipe-list {
           .recipe-list-item {
             padding: 3px 9px 3px 9px;
-            font-size: 14px;
+            font-size: 0.875rem;
             color: #2C2C2D;
             cursor: pointer;
             border-bottom: none;
@@ -156,7 +156,7 @@
       }
 
       .section-title {
-        font-size: 20px;
+        font-size: 1.25rem;
         font-weight: 500;
         color: #2253B2;
         margin: 0 0 20px 0;
@@ -167,7 +167,7 @@
       }
 
       .section-content {
-        font-size: 16px;
+        font-size: 1rem;
         color: #2C2C2D;
         line-height: 1.7;
         margin: 12px 0 20px 14px;
@@ -190,12 +190,12 @@
           padding: 2px 6px;
           border-radius: 3px;
           font-family: 'Courier New', monospace;
-          font-size: 14px;
+          font-size: 0.875rem;
         }
       }
 
       .use-case-list {
-        font-size: 16px;
+        font-size: 1rem;
         color: #2C2C2D;
         line-height: 1.7;
         margin: 12px 0 20px 14px;
@@ -224,7 +224,7 @@
             border-radius: 50%;
             background-color: #E8F0FB;
             color: #2253B2;
-            font-size: 14px;
+            font-size: 0.875rem;
             font-weight: 600;
             display: flex;
             align-items: center;
@@ -232,7 +232,7 @@
           }
 
           .step-title {
-            font-size: 16px;
+            font-size: 1rem;
             font-weight: 500;
             color: #2253B2;
             margin: 0;
@@ -305,7 +305,7 @@
           text-decoration: none;
           color: #2253B2;
           font-weight: 400;
-          font-size: 14px;
+          font-size: 0.875rem;
           transition: all 0.2s ease;
           cursor: pointer;
 
@@ -319,7 +319,7 @@
           }
 
           .download-title {
-            font-size: 16px;
+            font-size: 1rem;
             line-height: 1.5;
             color: #2C2C2D;
 
@@ -338,7 +338,7 @@
     border-radius: 8px;
     text-align: center;
     color: #6c757d;
-    font-size: 16px;
+    font-size: 1rem;
   }
 }
 
@@ -354,7 +354,7 @@
     width: fit-content;
 
     h3 {
-      font-size: 16px;
+      font-size: 1rem;
       font-weight: 500;
       color: #2C2C2D;
       margin: 0 0 12px 0;
@@ -370,7 +370,7 @@
       width: fit-content;
 
       .toc-link {
-        font-size: 14px;
+        font-size: 0.875rem;
         color: #5c5c5c;
         text-decoration: none;
         transition: all 0.2s ease;
@@ -440,7 +440,7 @@
     }
 
     h2 {
-      font-size: 24px;
+      font-size: 1.5rem;
     }
   }
 
@@ -465,7 +465,7 @@
     padding: 20px;
 
     h2 {
-      font-size: 22px;
+      font-size: 1.375rem;
     }
   }
 }
