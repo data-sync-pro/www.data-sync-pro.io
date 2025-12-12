@@ -1,11 +1,15 @@
 .recipe-detail-page {
   min-height: 100vh;
-  margin-top: 60px;
+  max-width: 1696px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0 40px;
+  box-sizing: border-box;
 }
 
 .detail-main-layout {
   display: flex;
-  padding: 36px 40px 0px 40px;
+  padding: 36px 0 0 0;
 }
 
 // Left Sidebar - Recipe List
@@ -50,7 +54,7 @@
         }
 
         &:focus {
-          border-color: #0E6DBD;
+          border-color: #2252b248;
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
       }
@@ -74,18 +78,20 @@
       border-radius: 0;
       flex: 1;
       min-height: 0;
-      overflow-y: scroll;
+      overflow-y: auto;
       scrollbar-width: thin;
+      border-left: 1px solid #E7E7E7;
+      border-right: 1px solid #E7E7E7;
 
       .category-group {
         .category-header {
           display: flex;
           align-items: center;
-          padding: 6px 16px 6px 2px;
+          padding: 6px 16px 6px 12px;
           cursor: pointer;
           transition: background 0.2s ease;
           font-size: 0.875rem;
-          color: #2C2C2D;
+          color: #5c5c5c;
           user-select: none;
 
           .chevron-down-icon {
@@ -97,6 +103,12 @@
             &.collapsed {
               transform: rotate(-90deg);
             }
+
+            &:not(.collapsed) {
+              ~ .category-name {
+                font-weight: 500;
+              }
+            }
           }
 
           .category-name {
@@ -105,29 +117,35 @@
 
           &:hover {
             font-weight: 500;
+            background-color: #F1F6FB;
+          }
+
+          &:has(.chevron-down-icon:not(.collapsed)) {
+            background-color: #F1F6FB;
+            margin-bottom: 8px;
           }
         }
 
         .recipe-list {
           .recipe-list-item {
-            padding: 3px 9px 3px 9px;
+            padding: 3px 9px 3px 0px;
             font-size: 0.875rem;
-            color: #2C2C2D;
+            color: #5c5c5c;
             cursor: pointer;
             border-bottom: none;
             line-height: 1.5;
-            margin-bottom: 2px;
+            margin-bottom: 8px;
             margin-left: 22px;
 
             &:hover {
               color: #2253B2;
-              border-left: 3px solid #2253B2CC;
+              border-right: 3px solid #2253B2CC;
             }
 
             &.active {
               color: #2253B2;
               font-weight: 500;
-              border-left: 3px solid #2253B2CC;
+              border-right: 3px solid #2253B2CC;
             }
           }
         }
@@ -203,7 +221,7 @@
         list-style-type: disc;
 
         li {
-          margin: 12px 0;
+          margin: 6px 0;
         }
       }
 

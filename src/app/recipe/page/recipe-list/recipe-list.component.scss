@@ -54,7 +54,7 @@
 }
 
 .filter-input:focus {
-    border-color: #0E6DBD;
+    border-color: #2252b248;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
@@ -130,7 +130,7 @@
     transition: all 0.2s ease;
 
     &:hover:not(:disabled) {
-        border-color: #2253B2;
+        border-color: #2252b248;
         color: #2253B2;
         background-color: #f0f5ff;
     }

@@ -1,7 +1,17 @@
 .recipe-layout {
-    margin: 36px 40px 98px 40px;
+    margin: 36px 0 98px 0;
     display: flex;
     align-items: flex-start;
     gap: 30px;
 
+    app-category-list {
+        flex: 0 0 23%;
+        position: sticky;
+        top: 86px;
+        align-self: flex-start;
+    }
+
+    app-recipe-list {
+        flex: 1;
+    }
 }
