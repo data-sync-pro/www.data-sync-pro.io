@@ -54,7 +54,7 @@ export class EditorUtils {
   }
 
   static convertToSourceRecord(recipe: Recipe): RecipeData {
-    return {
+    const result: RecipeData = {
       id: recipe.id,
       title: recipe.title,
       category: recipe.category,
@@ -72,6 +72,13 @@ export class EditorUtils {
       relatedRecipes: recipe.relatedRecipes,
       keywords: recipe.keywords
     };
+
+    // Preserve __folderId for asset path resolution during export
+    if ((recipe as any).__folderId) {
+      (result as any).__folderId = (recipe as any).__folderId;
+    }
+
+    return result;
   }
 
   static clearTimeoutSafely(timeout: any): void {

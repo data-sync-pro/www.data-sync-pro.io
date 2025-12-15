@@ -20,7 +20,7 @@ export class TransformService {
     const metadata = record as RecipeDataWithMetadata;
     const folderId = metadata.__folderId || record.id;
 
-    return {
+    const result: Recipe = {
       id: record.id,
       title: record.title,
       slug: generateSlug(record.title),
@@ -54,6 +54,13 @@ export class TransformService {
       isLoading: false,
       showSocialShare: false
     };
+
+    // Preserve __folderId for asset path resolution during export
+    if (metadata.__folderId) {
+      (result as any).__folderId = metadata.__folderId;
+    }
+
+    return result;
   }
 
   private processWalkthroughImagePaths(walkthrough: WalkthroughStep[], folderId: string): WalkthroughStep[] {
