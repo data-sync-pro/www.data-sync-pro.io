@@ -5,10 +5,12 @@
   margin-right: auto;
   padding: 0 40px;
   box-sizing: border-box;
+  //background-color: #eaeaea1f;
 }
 
 .detail-main-layout {
   display: flex;
+  gap: 32px;
   padding: 36px 0 0 0;
 }
 
@@ -16,6 +18,10 @@
 .left-sidebar {
   flex: 0 0 23%;
   min-width: 0;
+  //border: 1px solid #E6E6E6;
+  //padding: 20px;
+  border-radius: 2px;
+  background-color: white;
 
   .sidebar-sticky {
     position: sticky;
@@ -30,7 +36,7 @@
 
       .search-icon {
         position: absolute;
-        left: 12px;
+        left: 8px;
         top: 50%;
         transform: translateY(-50%);
         width: 16px;
@@ -41,10 +47,10 @@
 
       .sidebar-search-input {
         width: 100%;
-        padding: 8px 40px;
+        padding: 8px 28px;
         font-size: 0.875rem;
         border: 1px solid #E7E7E7;
-        border-radius: 6px;
+        border-radius: 2px;
         outline: none;
         box-sizing: border-box;
         transition: border-color 0.2s ease, box-shadow 0.2s ease;
@@ -86,14 +92,12 @@
       min-height: 0;
       overflow-y: auto;
       scrollbar-width: thin;
-      border-left: 1px solid #E7E7E7;
-      border-right: 1px solid #E7E7E7;
 
       .category-group {
         .category-header {
           display: flex;
           align-items: center;
-          padding: 6px 16px 6px 12px;
+          padding: 6px 8px 6px 8px;
           cursor: pointer;
           transition: background 0.2s ease;
           font-size: 0.875rem;
@@ -133,25 +137,28 @@
         }
 
         .recipe-list {
+          margin-left: 15px;
+          border-left: 1px solid #E6E6E6;
           .recipe-list-item {
-            padding: 3px 9px 3px 0px;
+            padding: 3px 9px 3px 15px;
             font-size: 0.875rem;
             color: #5c5c5c;
             cursor: pointer;
             border-bottom: none;
             line-height: 1.5;
-            margin-bottom: 8px;
-            margin-left: 34px;
+            // margin-bottom: 8px;
+            // margin-left: 34px;
+            margin: 8px 0 8px 0px;
 
             &:hover {
               color: #2253B2;
-              border-right: 3px solid #2253B2CC;
+              border-left: 3px solid #2253B2CC;
             }
 
             &.active {
               color: #2253B2;
               font-weight: 500;
-              border-right: 3px solid #2253B2CC;
+              border-left: 3px solid #2253B2CC;
             }
           }
         }
@@ -162,13 +169,13 @@
 
 // Middle Content Area
 .detail-content {
-  flex: 1;
+  flex: 0 1 50%;
   min-width: 0;
   margin-bottom: 20%;
 
   .content-sections {
     background: #fff;
-    padding: 0px 32px;
+    //padding: 0px 32px;
 
     .content-section {
       margin-bottom: 34px;
@@ -368,14 +375,16 @@
 
 // Right Sidebar - TOC
 .right-toc {
-  min-width: 0;
-  width: fit-content;
+  flex: 0 0 23%;
+  min-width: 180px;
 
   .toc-sticky {
     position: sticky;
     top: 85px;
-    padding: 0px;
-    width: fit-content;
+    padding: 25px;
+    border: 1px solid #E6E6E6;
+    border-radius: 2px;
+    background-color: white;
 
     h3 {
       font-size: 1rem;
@@ -384,14 +393,13 @@
       margin: 0 0 12px 0;
       letter-spacing: 0.5px;
       line-height: normal;
-      width: fit-content;
     }
 
     .toc-nav {
       display: flex;
       flex-direction: column;
       gap: 8px;
-      width: fit-content;
+      margin-left: 12px;
 
       .toc-link {
         font-size: 0.875rem;
@@ -400,8 +408,7 @@
         transition: all 0.2s ease;
         border-left: 3px solid transparent;
         margin-left: 1px;
-        padding: 0px 8px 0px 8px;
-        width:fit-content;
+        padding: 0px 12px 0px 12px;
 
         &:hover {
           color: #2253B2;
