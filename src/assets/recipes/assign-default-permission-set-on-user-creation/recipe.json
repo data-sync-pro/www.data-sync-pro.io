@@ -4,7 +4,7 @@
   "category": "Trigger",
   "DSPVersions": [],
   "overview": "Automatically assign the Data Sync Pro Starter permission set to newly created internal users, granting them baseline access to Data Sync Pro.",
-  "whenToUse": "1. Automated Permission Assignment – Use automation to grant appropriate permissions to the right users as soon as they are created, ensuring consistent access control.\n\n2. Automatic Record Creation – Use automation to create an associated child record tied to a parent record based on conditions.",
+  "generalUseCase": "",
   "generalImages": [
     {
       "type": "image",

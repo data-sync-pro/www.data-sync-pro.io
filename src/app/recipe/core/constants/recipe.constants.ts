@@ -24,7 +24,7 @@ export const RECIPE_MESSAGES = {
 export const RECIPE_SECTIONS = {
   OVERVIEW: 'overview',
   RECIPE_OVERVIEW: 'recipe-overview',
-  WHEN_TO_USE: 'when-to-use',
+  GENERAL_USE_CASE: 'general-use-case',
   PREREQUISITES: 'prerequisites',
   RELATED: 'related-recipes',
   WALKTHROUGH: 'walkthrough',

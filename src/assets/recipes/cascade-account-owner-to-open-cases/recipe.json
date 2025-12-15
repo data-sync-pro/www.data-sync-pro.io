@@ -4,7 +4,7 @@
   "category": "Trigger",
   "DSPVersions": [],
   "overview": "When the Account Owner changes, the automation in this recipe reassigns related open Cases from the previous owner to the new owner.",
-  "whenToUse": "When a parent record changes, automatically update related child records to maintain consistency across relationships. This is typically achieved by using a Joiner to left-join the triggering records with their children, with the option to apply dynamic filters as needed.",
+  "generalUseCase": "",
   "generalImages": [
     {
       "type": "image",

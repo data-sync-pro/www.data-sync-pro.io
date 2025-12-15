@@ -39,12 +39,14 @@ export class EditorUtils {
       category: 'General',
       DSPVersions: [],
       overview: '',
-      whenToUse: '',
+      generalUseCase: '',
       generalImages: [],
       prerequisites: [],
+      pipeline: '',
       direction: '',
       connection: '',
       walkthrough: [],
+      verificationGIF: [],
       downloadableExecutables: [],
       relatedRecipes: [],
       keywords: []
@@ -58,12 +60,14 @@ export class EditorUtils {
       category: recipe.category,
       DSPVersions: recipe.DSPVersions,
       overview: recipe.overview,
-      whenToUse: recipe.whenToUse,
+      generalUseCase: recipe.generalUseCase,
       generalImages: recipe.generalImages,
       prerequisites: recipe.prerequisites,
+      pipeline: recipe.pipeline,
       direction: recipe.direction,
       connection: recipe.connection,
       walkthrough: recipe.walkthrough,
+      verificationGIF: recipe.verificationGIF,
       downloadableExecutables: recipe.downloadableExecutables,
       relatedRecipes: recipe.relatedRecipes,
       keywords: recipe.keywords
@@ -80,7 +84,7 @@ export class EditorUtils {
     return !!(
       recipe.title ||
       recipe.overview ||
-      recipe.whenToUse ||
+      recipe.generalUseCase ||
       (recipe.walkthrough && recipe.walkthrough.length > 0) ||
       (recipe.generalImages && recipe.generalImages.length > 0)
     );

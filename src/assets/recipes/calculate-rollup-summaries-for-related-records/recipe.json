@@ -4,7 +4,7 @@
   "category": "Trigger",
   "DSPVersions": [],
   "overview": "Automatically calculate and update rollup summary fields on a parent record whenever related child records are inserted, updated, or deleted. A trigger on the child object listens for DML events, aggregates relevant data (such as SUM, COUNT, MIN, MAX), and updates the parent record's summary fields accordingly.",
-  "whenToUse": "",
+  "generalUseCase": "",
   "generalImages": [],
   "prerequisites": [
     {

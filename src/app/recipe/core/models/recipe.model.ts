@@ -9,12 +9,14 @@ export interface RecipeData {
   category: string;
   DSPVersions: string[];
   overview: string;
-  whenToUse?: string;
+  generalUseCase?: string;
   generalImages: GeneralImage[];
   prerequisites: PrerequisiteRecipe[];
+  pipeline: string;
   direction: string;
   connection: string;
   walkthrough: WalkthroughStep[];
+  verificationGIF: VerificationGIF[];
   downloadableExecutables: DownloadableExecutable[];
   relatedRecipes: RelatedRecipe[];
   keywords: string[];
@@ -30,12 +32,14 @@ export interface Recipe {
   category: string;
   DSPVersions: string[];
   overview: string;
-  whenToUse?: string;
+  generalUseCase?: string;
   generalImages: GeneralImage[];
   prerequisites: PrerequisiteRecipe[];
+  pipeline: string,
   direction: string;
   connection: string;
   walkthrough: WalkthroughStep[];
+  verificationGIF: VerificationGIF[];
   downloadableExecutables: DownloadableExecutable[];
   relatedRecipes: RelatedRecipe[];
   keywords: string[];
@@ -65,6 +69,16 @@ export interface GeneralImage {
   url: string;
   alt: string;
   imageId?: string;
+  displayUrl?: string;
+}
+
+/**
+ * Verification GIF media (only video or gif)
+ */
+export interface VerificationGIF {
+  type: 'video' | 'gif';
+  url: string;
+  alt: string;
   displayUrl?: string;
 }
 

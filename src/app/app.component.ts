@@ -1,4 +1,4 @@
-import { Component, OnInit, HostListener } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router, NavigationEnd, Event as RouterEvent } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { AnalyticsService } from './analytics.service';
@@ -9,7 +9,8 @@ import { AnalyticsService } from './analytics.service';
 })
 export class AppComponent implements OnInit {
   showHeaderFooter = true;
-  
+  showScrollToTop = false;
+
   constructor(
     private analyticsService: AnalyticsService,
     private router: Router
@@ -21,7 +22,10 @@ export class AppComponent implements OnInit {
       .subscribe((event: NavigationEnd) => {
         // Hide header and footer on editor pages
         this.showHeaderFooter = !event.url.includes('/faq-editor') && !event.url.includes('/recipe-editor');
-        
+
+        // Show scroll-to-top button only on recipe pages
+        this.showScrollToTop = event.url.startsWith('/recipes');
+
         if (this.analyticsService.userConsented) {
           this.analyticsService.trackPageView(event.urlAfterRedirects);
         }

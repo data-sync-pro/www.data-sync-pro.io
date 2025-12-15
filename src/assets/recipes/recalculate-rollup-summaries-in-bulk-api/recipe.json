@@ -4,7 +4,7 @@
   "category": "Batch",
   "DSPVersions": [],
   "overview": "Recalculate Account roll-up summary fields that aggregate data from related Opportunities, Contacts, Cases, and Tasks using bulk blank update.",
-  "whenToUse": "Use Self-Adaptive Trigger to make field transformations during record save(before insert, before update), then use a #Batch Executable to make blank updates in bulk to trigger the recalculation. Enabling bulk api with batch size 2,000 will significantly speed up.",
+  "generalUseCase": "",
   "generalImages": [
     {
       "type": "image",

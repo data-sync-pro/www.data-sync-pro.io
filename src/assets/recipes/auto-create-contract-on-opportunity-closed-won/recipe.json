@@ -4,7 +4,7 @@
   "category": "Trigger",
   "DSPVersions": [],
   "overview": "When an Opportunity’s StageName changes to Closed Won and ContractId is blank, the automation createsa Draft Contract owned by the Opportunity’s Owner, then write the new Contract’s Id back to Opportunity.ContractId.",
-  "whenToUse": "In a before-save trigger, when conditions are met, the automation creates or update related records and write the target record’s Id to the configured Source Object Writeback Field to maintain relationships.",
+  "generalUseCase": "",
   "generalImages": [
     {
       "type": "image",

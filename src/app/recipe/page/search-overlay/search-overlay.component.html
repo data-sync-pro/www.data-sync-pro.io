@@ -5,7 +5,7 @@
         #searchInput
         type="text"
         class="overlay-search-box"
-        placeholder="Search"
+        placeholder="Search..."
         [(ngModel)]="searchQuery"
         (input)="filterSuggestions()"
       />
@@ -40,29 +40,11 @@
         </div>
       </div>
 
-      <div class="filter-group" *ngIf="subCategories.length">        
-        <div class="filter-header">                                   
-          <div class="filter-label">Sub Categories</div>              
-        </div>                                                        
-
-        <div class="filter-chips scrollable-container">               
-          <span                                                     
-            class="filter-chip"                                   
-            *ngFor="let sc of subCategories"                        
-            [class.active]="selectedSubCategories.includes(sc)"     
-            (click)="toggleSubCategory(sc)"                         
-          >
-            {{ sc === 'null' ? 'None' : sc }}                        
-          </span>                                                    
-        </div>                                                       
-      </div>
 
       <div
         class="suggestions-list"
         *ngIf="
-          (searchQuery.trim() ||
-            selectedCategory ||
-            selectedSubCategories.length) &&
+          (searchQuery.trim() || selectedCategory) &&
           filteredSuggestions.length
         "
       >
