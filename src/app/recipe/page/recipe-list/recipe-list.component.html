@@ -1,12 +1,12 @@
 <div class="recipe-list">
-    <!-- Filter Input Section -->
+    <!-- Search Input Section -->
     <div class="search-bar-wrapper">
         <div class="filter-wrapper">
-            <img class="icon" src="assets/icons/recipe/filter.svg" aria-hidden="true">
+            <img class="icon" src="assets/icons/recipe/search.svg" aria-hidden="true">
             <input
                 #filterInput
                 type="text"
-                placeholder="Filter results"
+                placeholder="Search..."
                 class="filter-input"
                 [value]="searchQuery"
                 (input)="onSearchInput($event)"
