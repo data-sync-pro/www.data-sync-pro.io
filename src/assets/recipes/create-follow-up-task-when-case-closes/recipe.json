@@ -4,7 +4,7 @@
   "category": "Trigger",
   "DSPVersions": [],
   "overview": "When a Case is closed, automatically create a follow-up task assigned to the Case Owner with a 7 days due date to verify customer satisfaction.",
-  "whenToUse": "When a parent record is saved and meets specific criteria, automatically create related child records.",
+  "generalUseCase": "",
   "generalImages": [],
   "prerequisites": [
     {

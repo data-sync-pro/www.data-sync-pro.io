@@ -4,7 +4,7 @@
   "category": "Batch",
   "DSPVersions": [],
   "overview": "Mask sensitive Contact fields (e.g., Name, Email) using RANDOMIZE, RANDOM_ITEM, or SCRAMBLE for safe sandbox use.",
-  "whenToUse": "Replace real PII and other sensitive data with realistic, fake values for Dev/QA, demos, and training in sandboxes.",
+  "generalUseCase": "",
   "generalImages": [
     {
       "type": "image",

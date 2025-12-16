@@ -4,7 +4,7 @@
   "category": "Trigger",
   "DSPVersions": [],
   "overview": "When a Case Owner changes, the automation sends a bell notification to the previous owner (User) indicating the transfer.",
-  "whenToUse": "Use automation to deliver bell notifications in Salesforce based on conditions.",
+  "generalUseCase": "",
   "generalImages": [
     {
       "type": "image",

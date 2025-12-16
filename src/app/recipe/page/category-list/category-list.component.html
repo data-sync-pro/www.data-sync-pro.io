@@ -1,0 +1,26 @@
+<div class="category-list">
+    <div class="card">
+        <div class="list-title">CATEGORIES</div>
+        <div class="list">
+            <div
+                *ngFor="let category of categories; trackBy: trackByCategoryName"
+                class="list-item"
+                (click)="onCategoryChange(category.name)">
+                <input
+                    type="checkbox"
+                    [checked]="isCategorySelected(category.name)"
+                    (click)="$event.stopPropagation()"
+                    (change)="onCategoryChange(category.name)"
+                />
+                <div class="icon-text">
+                    <img
+                        class="icon"
+                        [src]="getCategoryIcon(category.name)"
+                        [alt]="category.displayName"
+                        aria-hidden="true">
+                    <span>{{ category.displayName }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

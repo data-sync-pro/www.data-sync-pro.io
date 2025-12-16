@@ -1,11 +1,16 @@
-<mat-card class="recipe-card" (click)="onRecipeClick()">
-  <!-- Header row: category -->
-  <div class="card-header">
-    <span class="category-tag" [class]="recipe.category">{{ recipe.category | titlecase }}</span>
+<div class="recipe-card" (click)="onRecipeClick()">
+  <div class="card-content">
+    <div class="card-text">
+      <h3 class="recipe-title">{{ recipe.title }}</h3>
+      <p class="recipe-description">{{ recipe.overview }}</p>
+    </div>
+    <div class="card-icon" *ngIf="recipeIcon">
+      <img
+        class="icon"
+        [src]="recipeIcon"
+        [alt]="recipeCategoryDisplayName"
+        [title]="recipeCategoryDisplayName"
+        aria-hidden="true">
+    </div>
   </div>
-
-  <!-- Main content: title -->
-  <div class="card-body">
-    <h3 class="recipe-title" [title]="recipe.title">{{ recipe.title }}</h3>
-  </div>
-</mat-card>
+</div>

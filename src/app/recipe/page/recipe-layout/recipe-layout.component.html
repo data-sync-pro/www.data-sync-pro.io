@@ -1,0 +1,16 @@
+<div class="recipe-layout">
+    <app-category-list
+        [categories]="categories"
+        [selectedCategories]="selectedCategories"
+        (categoryToggle)="onCategoryToggle($event)">
+    </app-category-list>
+
+    <app-recipe-list
+        [recipes]="recipes"
+        [categories]="categories"
+        [searchQuery]="searchQuery"
+        (searchChange)="onSearchChange($event)"
+        (recipeSelect)="onRecipeSelect($event)"
+        (openSearchOverlay)="onOpenSearchOverlay()">
+    </app-recipe-list>
+</div>

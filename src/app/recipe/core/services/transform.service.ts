@@ -20,7 +20,7 @@ export class TransformService {
     const metadata = record as RecipeDataWithMetadata;
     const folderId = metadata.__folderId || record.id;
 
-    return {
+    const result: Recipe = {
       id: record.id,
       title: record.title,
       slug: generateSlug(record.title),
@@ -28,14 +28,19 @@ export class TransformService {
       DSPVersions: record.DSPVersions || [],
 
       overview: record.overview || '',
-      whenToUse: record.whenToUse || '',
+      generalUseCase: record.generalUseCase || '',
       direction: record.direction || '',
       connection: record.connection || '',
 
       generalImages: record.generalImages || [],
       prerequisites: record.prerequisites || [],
+      pipeline: record.pipeline || '',
       walkthrough: this.processWalkthroughImagePaths(
         record.walkthrough || [],
+        folderId
+      ),
+      verificationGIF: this.processVerificationGIF(
+        record.verificationGIF || [],
         folderId
       ),
       downloadableExecutables: this.processDownloadableExecutables(
@@ -49,6 +54,13 @@ export class TransformService {
       isLoading: false,
       showSocialShare: false
     };
+
+    // Preserve __folderId for asset path resolution during export
+    if (metadata.__folderId) {
+      (result as any).__folderId = metadata.__folderId;
+    }
+
+    return result;
   }
 
   private processWalkthroughImagePaths(walkthrough: WalkthroughStep[], folderId: string): WalkthroughStep[] {
@@ -68,6 +80,22 @@ export class TransformService {
     });
   }
 
+  private processVerificationGIF(verificationGIF: any[], folderId: string): any[] {
+    if (!verificationGIF || !Array.isArray(verificationGIF)) {
+      return [];
+    }
+
+    return verificationGIF.map(media => {
+      if (media.url && !media.url.startsWith('http') && !media.url.startsWith('/')) {
+        return {
+          ...media,
+          displayUrl: `${RECIPE_PATHS.RECIPE_FOLDERS_BASE}${folderId}/${media.url}`
+        };
+      }
+      return media;
+    });
+  }
+
   private processDownloadableExecutables(executables: any[], folderId: string): any[] {
     if (!executables || !Array.isArray(executables)) {
       return [];
@@ -77,9 +105,11 @@ export class TransformService {
       if (executable.filePath &&
           !executable.filePath.startsWith('http') &&
           !executable.filePath.startsWith('/')) {
+        const fullPath = `${RECIPE_PATHS.RECIPE_FOLDERS_BASE}${folderId}/${executable.filePath}`;
         return {
           ...executable,
-          filePath: `${RECIPE_PATHS.RECIPE_FOLDERS_BASE}${folderId}/${executable.filePath}`
+          filePath: fullPath,
+          url: fullPath
         };
       }
       return executable;

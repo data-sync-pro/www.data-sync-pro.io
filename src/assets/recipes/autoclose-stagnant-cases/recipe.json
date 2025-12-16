@@ -4,7 +4,7 @@
   "category": "Batch",
   "DSPVersions": [],
   "overview": "Automatically close any open Cases that have not been updated for 10 business days. A nightly batch job fetches Cases based on Status and LastModifiedDate, then sets Status to Closed.",
-  "whenToUse": "",
+  "generalUseCase": "",
   "generalImages": [],
   "prerequisites": [
     {

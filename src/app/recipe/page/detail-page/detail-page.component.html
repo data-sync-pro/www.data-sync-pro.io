@@ -1,0 +1,229 @@
+<!-- Detail Banner with Breadcrumb -->
+<app-recipe-detail-banner
+  [title]="currentRecipe?.title || 'Recipe Details'"
+  [breadcrumbs]="breadcrumbs">
+</app-recipe-detail-banner>
+
+<div class="recipe-detail-page">
+  <div class="detail-main-layout">
+    <!-- Left Sidebar - Recipe List -->
+    <aside class="left-sidebar">
+      <div class="sidebar-sticky">
+        <div class="sidebar-search">
+          <img class="search-icon" src="assets/icons/recipe/search.svg" aria-hidden="true">
+          <input
+            #sidebarSearchInput
+            type="text"
+            placeholder="Search..."
+            class="sidebar-search-input"
+            (click)="openSearchOverlay()"
+            (focus)="openSearchOverlay()"
+            readonly>
+          <span class="shortcut-hint">/</span>
+        </div>
+        <div class="category-list">
+          <div *ngFor="let group of filteredCategoryGroups" class="category-group">
+            <!-- Category Header -->
+            <div
+              class="category-header"
+              (click)="toggleCategory(group.category.name)">
+              <img
+                class="chevron-down-icon"
+                src="assets/icons/recipe/chevron-down.svg"
+                [class.collapsed]="!group.isExpanded"
+                aria-hidden="true">
+              <span class="category-name">{{ group.category.displayName }}</span>
+            </div>
+
+            <!-- Recipe List (shown when expanded) -->
+            <div class="recipe-list" *ngIf="group.isExpanded">
+              <div
+                *ngFor="let recipe of group.recipes"
+                class="recipe-list-item"
+                [class.active]="recipe.slug === currentRecipe?.slug"
+                [routerLink]="['/recipes', recipe.category, recipe.slug]">
+                {{ recipe.title }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Middle Content Area -->
+    <main class="detail-content">
+      <div class="content-sections" *ngIf="currentRecipe">
+        <!-- Overview Section -->
+        <section id="overview" class="content-section">
+          <h2 class="section-title">Overview</h2>
+          <div class="section-content" [innerHTML]="currentRecipe.overview"></div>
+        </section>
+
+        <!-- General Use Case Section -->
+        <section id="use-case" class="content-section" *ngIf="currentRecipe.generalUseCase && getGeneralUseCaseItems().length > 0">
+          <h2 class="section-title">General Use Case</h2>
+          <!-- Single item: display as paragraph -->
+          <div class="section-content" *ngIf="getGeneralUseCaseItems().length === 1">
+            {{ getGeneralUseCaseItems()[0] }}
+          </div>
+          <!-- Multiple items: display as list -->
+          <ul class="use-case-list" *ngIf="getGeneralUseCaseItems().length > 1">
+            <li *ngFor="let item of getGeneralUseCaseItems()">{{ item }}</li>
+          </ul>
+        </section>
+
+        <!-- Rules Engine Section -->
+        <section id="rules-engine" class="content-section" *ngIf="shouldShowRulesEngine()">
+          <h2 class="section-title">Rules Engine</h2>
+          <div class="section-content">{{ currentRecipe.category }}</div>
+        </section>
+
+        <!-- Direction Section -->
+        <section id="direction" class="content-section" *ngIf="currentRecipe.direction && currentRecipe.direction.trim().length > 0">
+          <h2 class="section-title">Direction</h2>
+          <div class="section-content">{{ currentRecipe.direction }}</div>
+        </section>
+
+        <!-- Pipeline Section -->
+        <section id="pipeline" class="content-section" *ngIf="currentRecipe.pipeline && currentRecipe.pipeline.trim().length > 0">
+          <h2 class="section-title">Pipeline</h2>
+          <div class="section-content">{{ currentRecipe.pipeline }}</div>
+        </section>
+
+        <!-- Walkthrough Section -->
+        <section id="walkthrough" class="content-section" *ngIf="currentRecipe.walkthrough && currentRecipe.walkthrough.length > 0">
+          <h2 class="section-title">Walkthrough</h2>
+
+          <div *ngFor="let step of currentRecipe.walkthrough; let i = index" class="walkthrough-step">
+            <div class="step-header">
+              <div class="step-number-badge">{{ i + 1 }}</div>
+              <h3 class="step-title">{{ step.step }}</h3>
+            </div>
+
+            <!-- Step Media -->
+            <div class="step-media" *ngIf="step.media && step.media.length > 0">
+              <div *ngFor="let media of step.media" class="media-item">
+                <img
+                  *ngIf="media.type === 'image' || media.type === 'gif'"
+                  [src]="media.displayUrl || media.url"
+                  [alt]="media.alt"
+                  class="step-image clickable"
+                  (click)="openMediaPreview(media)">
+                <video
+                  *ngIf="media.type === 'video'"
+                  [src]="media.displayUrl || media.url"
+                  controls
+                  class="step-video clickable"
+                  (click)="openMediaPreview(media)">
+                  Your browser does not support the video tag.
+                </video>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Verification GIF Section -->
+        <section id="verification-gif" class="content-section" *ngIf="currentRecipe.verificationGIF && currentRecipe.verificationGIF.length > 0">
+          <h2 class="section-title">Verification GIF</h2>
+
+          <div class="verification-media">
+            <div *ngFor="let media of currentRecipe.verificationGIF; let i = index" class="verification-item">
+              <!-- GIF uses img tag -->
+              <img
+                *ngIf="media.type === 'gif'"
+                [src]="media.displayUrl || media.url"
+                [alt]="media.alt"
+                class="verification-image clickable"
+                (click)="openMediaPreview(media)">
+              <!-- Video uses video tag -->
+              <video
+                *ngIf="media.type === 'video'"
+                [src]="media.displayUrl || media.url"
+                controls
+                class="verification-video clickable"
+                (click)="openMediaPreview(media)">
+                Your browser does not support the video tag.
+              </video>
+            </div>
+          </div>
+        </section>
+
+        <!-- Download Executable File Section -->
+        <section id="download-file" class="content-section" *ngIf="currentRecipe.downloadableExecutables && currentRecipe.downloadableExecutables.length > 0">
+          <h2 class="section-title">Downloadable Executables</h2>
+
+          <div class="download-list">
+            <a
+              *ngFor="let file of currentRecipe.downloadableExecutables"
+              [href]="file.url || file.filePath"
+              [download]="getDownloadFileName(file)"
+              class="download-item"
+              target="_blank"
+              rel="noopener noreferrer">
+              <img class="download-icon" src="assets/icons/download.svg" alt="Download">
+              <span class="download-title">{{ getDownloadFileName(file) }}</span>
+            </a>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- Loading State -->
+      <div class="loading-state" *ngIf="!currentRecipe">
+        <p>Loading recipe...</p>
+      </div>
+    </main>
+
+    <!-- Right Sidebar - TOC -->
+    <aside class="right-toc">
+      <div class="toc-sticky">
+        <h3>In this article</h3>
+        <nav class="toc-nav" *ngIf="currentRecipe">
+          <a href="#overview" class="toc-link" [class.active]="activeTocSection === 'overview'" (click)="scrollToSection($event, 'overview')">Overview</a>
+          <a href="#use-case" class="toc-link" [class.active]="activeTocSection === 'use-case'" *ngIf="currentRecipe.generalUseCase && getGeneralUseCaseItems().length > 0" (click)="scrollToSection($event, 'use-case')">General Use Case</a>
+          <a href="#rules-engine" class="toc-link" [class.active]="activeTocSection === 'rules-engine'" *ngIf="shouldShowRulesEngine()" (click)="scrollToSection($event, 'rules-engine')">Rules Engine</a>
+          <a href="#direction" class="toc-link" [class.active]="activeTocSection === 'direction'" *ngIf="currentRecipe.direction && currentRecipe.direction.trim().length > 0" (click)="scrollToSection($event, 'direction')">Direction</a>
+          <a href="#pipeline" class="toc-link" [class.active]="activeTocSection === 'pipeline'" *ngIf="currentRecipe.pipeline && currentRecipe.pipeline.trim().length > 0" (click)="scrollToSection($event, 'pipeline')">Pipeline</a>
+          <a href="#walkthrough" class="toc-link" [class.active]="activeTocSection === 'walkthrough'" *ngIf="currentRecipe.walkthrough && currentRecipe.walkthrough.length > 0" (click)="scrollToSection($event, 'walkthrough')">Walkthrough</a>
+          <a href="#verification-gif" class="toc-link" [class.active]="activeTocSection === 'verification-gif'" *ngIf="currentRecipe.verificationGIF && currentRecipe.verificationGIF.length > 0" (click)="scrollToSection($event, 'verification-gif')">Verification GIF</a>
+          <a href="#download-file" class="toc-link" [class.active]="activeTocSection === 'download-file'" *ngIf="currentRecipe.downloadableExecutables && currentRecipe.downloadableExecutables.length > 0" (click)="scrollToSection($event, 'download-file')">Downloadable Executables</a>
+        </nav>
+      </div>
+    </aside>
+  </div>
+
+  <!-- Media Preview Modal -->
+  <div class="media-modal-overlay" *ngIf="isMediaModalOpen" (click)="closeMediaPreview()">
+    <div class="media-modal-container" (click)="$event.stopPropagation()">
+      <button class="modal-close-btn" (click)="closeMediaPreview()" aria-label="Close preview">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+      <div class="media-modal-content">
+        <img
+          *ngIf="previewMedia && (previewMedia.type === 'image' || previewMedia.type === 'gif')"
+          [src]="previewMedia.url"
+          [alt]="previewMedia.alt"
+          class="modal-media">
+        <video
+          *ngIf="previewMedia && previewMedia.type === 'video'"
+          [src]="previewMedia.url"
+          controls
+          autoplay
+          class="modal-media">
+          Your browser does not support the video tag.
+        </video>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search Overlay -->
+  <app-recipe-search-overlay
+    *ngIf="isSearchOverlayOpen"
+    [isOpen]="isSearchOverlayOpen"
+    (closed)="closeSearchOverlay()"
+    (selectedResult)="handleSearchSelect($event)">
+  </app-recipe-search-overlay>
+</div>

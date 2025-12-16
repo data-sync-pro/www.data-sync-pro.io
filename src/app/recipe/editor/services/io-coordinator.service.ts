@@ -265,16 +265,24 @@ export class IOCoordinatorService {
           category: originalRecipe.category,
           DSPVersions: originalRecipe.DSPVersions,
           overview: originalRecipe.overview,
-          whenToUse: originalRecipe.whenToUse,
+          generalUseCase: originalRecipe.generalUseCase,
           generalImages: originalRecipe.generalImages,
           prerequisites: originalRecipe.prerequisites,
+          pipeline: originalRecipe.pipeline,
           direction: originalRecipe.direction,
           connection: originalRecipe.connection,
           walkthrough: originalRecipe.walkthrough,
+          verificationGIF: originalRecipe.verificationGIF || [],
           downloadableExecutables: originalRecipe.downloadableExecutables,
           relatedRecipes: originalRecipe.relatedRecipes,
           keywords: originalRecipe.keywords
         };
+
+        // Preserve __folderId for asset path resolution during export
+        if ((originalRecipe as any).__folderId) {
+          (sourceRecord as any).__folderId = (originalRecipe as any).__folderId;
+        }
+
         result.push(sourceRecord);
       }
     });

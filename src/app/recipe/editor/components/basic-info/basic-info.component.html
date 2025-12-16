@@ -46,11 +46,11 @@
   </div>
 
   <div class="form-group">
-    <label for="whenToUse">General Use Case</label>
-    <textarea id="whenToUse"
+    <label for="generalUseCase">General Use Case</label>
+    <textarea id="generalUseCase"
               class="dsp-input"
               rows="3"
-              [(ngModel)]="recipe.whenToUse"
+              [(ngModel)]="recipe.generalUseCase"
               (input)="onRecipeChange()"
               placeholder="Describe when this recipe should be used"></textarea>
   </div>
@@ -73,6 +73,16 @@
              class="dsp-input"
              [(ngModel)]="recipe.connection"
              (input)="onRecipeChange()">
+    </div>
+
+    <div class="form-group">
+      <label for="pipeline">Pipeline</label>
+      <input type="text"
+             id="pipeline"
+             class="dsp-input"
+             [(ngModel)]="recipe.pipeline"
+             (input)="onRecipeChange()"
+             placeholder="e.g. Current ⇒ Current">
     </div>
   </div>
 
