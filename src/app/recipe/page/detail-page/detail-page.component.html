@@ -177,7 +177,7 @@
     <!-- Right Sidebar - TOC -->
     <aside class="right-toc">
       <div class="toc-sticky">
-        <h3>In this article</h3>
+        <!-- <h3>In this article</h3> -->
         <nav class="toc-nav" *ngIf="currentRecipe">
           <a href="#overview" class="toc-link" [class.active]="activeTocSection === 'overview'" (click)="scrollToSection($event, 'overview')">Overview</a>
           <a href="#use-case" class="toc-link" [class.active]="activeTocSection === 'use-case'" *ngIf="currentRecipe.generalUseCase && getGeneralUseCaseItems().length > 0" (click)="scrollToSection($event, 'use-case')">General Use Case</a>

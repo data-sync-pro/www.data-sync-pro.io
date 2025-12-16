@@ -5,12 +5,11 @@
   margin-right: auto;
   padding: 0 40px;
   box-sizing: border-box;
-  //background-color: #eaeaea1f;
 }
 
 .detail-main-layout {
   display: flex;
-  gap: 32px;
+  gap: 3vw;
   padding: 36px 0 0 0;
 }
 
@@ -18,8 +17,6 @@
 .left-sidebar {
   flex: 0 0 23%;
   min-width: 0;
-  //border: 1px solid #E6E6E6;
-  //padding: 20px;
   border-radius: 2px;
   background-color: white;
 
@@ -103,6 +100,7 @@
           font-size: 0.875rem;
           color: #5c5c5c;
           user-select: none;
+          background-color: #fff;
 
           .chevron-down-icon {
             width: 14px;
@@ -131,9 +129,15 @@
           }
 
           &:has(.chevron-down-icon:not(.collapsed)) {
-            background-color: #F1F6FB;
             margin-bottom: 8px;
           }
+        }
+
+        // Make the category header sticky when it contains an active recipe
+        &:has(.recipe-list-item.active) .category-header {
+          position: sticky;
+          top: 0;
+          z-index: 10;
         }
 
         .recipe-list {
@@ -146,8 +150,6 @@
             cursor: pointer;
             border-bottom: none;
             line-height: 1.5;
-            // margin-bottom: 8px;
-            // margin-left: 34px;
             margin: 8px 0 8px 0px;
 
             &:hover {
@@ -159,6 +161,7 @@
               color: #2253B2;
               font-weight: 500;
               border-left: 3px solid #2253B2CC;
+              background-color: #F1F6FB;
             }
           }
         }
@@ -169,13 +172,12 @@
 
 // Middle Content Area
 .detail-content {
-  flex: 0 1 50%;
+  flex: 0 0 50%;
   min-width: 0;
   margin-bottom: 20%;
 
   .content-sections {
     background: #fff;
-    //padding: 0px 32px;
 
     .content-section {
       margin-bottom: 34px;
@@ -201,7 +203,7 @@
         font-size: 1rem;
         color: #2C2C2D;
         line-height: 1.7;
-        margin: 12px 0 20px 14px;
+        margin: 12px 0 20px 15px;
 
         p {
           margin: 12px 0;
@@ -229,7 +231,7 @@
         font-size: 1rem;
         color: #2C2C2D;
         line-height: 1.7;
-        margin: 12px 0 20px 14px;
+        margin: 12px 0 20px 15px;
         padding-left: 12px;
         list-style-type: disc;
 
@@ -381,9 +383,9 @@
   .toc-sticky {
     position: sticky;
     top: 85px;
-    padding: 25px;
-    border: 1px solid #E6E6E6;
-    border-radius: 2px;
+    //padding: 25px;
+    //border-left: 1px solid #E6E6E6;
+    //border-radius: 2px;
     background-color: white;
 
     h3 {
@@ -399,7 +401,6 @@
       display: flex;
       flex-direction: column;
       gap: 8px;
-      margin-left: 12px;
 
       .toc-link {
         font-size: 0.875rem;
@@ -504,11 +505,19 @@
 // Clickable media cursor
 .clickable {
   cursor: pointer;
-  transition: opacity 0.2s ease, transform 0.2s ease;
+  transition: all 0.3s ease;
 
   &:hover {
-    opacity: 0.9;
-    transform: scale(1.02);
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(1.5);
+    z-index: 1000;
+    max-width: 90vw;
+    max-height: 90vh;
+    width: auto;
+    height: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   }
 
   &:active {
