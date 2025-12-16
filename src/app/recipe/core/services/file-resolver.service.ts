@@ -75,11 +75,18 @@ export class FileResolverService {
   }
 
   extractImageId(imageName: string): string {
-    const parts = imageName.split('_');
+    // Remove file extension first
+    const nameWithoutExt = imageName.replace(/\.[^/.]+$/, '');
+
+    // Handle old format with underscores (e.g., img_timestamp_random)
+    const parts = nameWithoutExt.split('_');
     if (parts.length >= 3) {
       return parts[0] + '_' + parts[1] + '_' + parts[2];
     }
-    return imageName;
+
+    // Handle new format with dashes (e.g., step-0-image-timestamp)
+    // or general-image-timestamp - just return without extension
+    return nameWithoutExt;
   }
 
   getImageMimeType(filename: string): string {

@@ -277,6 +277,12 @@ export class IOCoordinatorService {
           relatedRecipes: originalRecipe.relatedRecipes,
           keywords: originalRecipe.keywords
         };
+
+        // Preserve __folderId for asset path resolution during export
+        if ((originalRecipe as any).__folderId) {
+          (sourceRecord as any).__folderId = (originalRecipe as any).__folderId;
+        }
+
         result.push(sourceRecord);
       }
     });

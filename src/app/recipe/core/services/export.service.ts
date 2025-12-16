@@ -19,6 +19,31 @@ export class ExportService {
     private fileResolver: FileResolverService
   ) {}
 
+  /**
+   * Extract image info from URL, handling both formats:
+   * - 'images/xxx.png' (IndexedDB images)
+   * - 'assets/recipes/folder/images/xxx.png' (transformed asset paths)
+   */
+  private extractImageInfo(url: string): { imageName: string; relativePath: string } | null {
+    if (!url) return null;
+
+    // Handle IndexedDB format: images/xxx.png
+    if (url.startsWith('images/')) {
+      const imageName = url.split('/')[1];
+      return { imageName, relativePath: url };
+    }
+
+    // Handle transformed asset format: assets/recipes/folder/images/xxx.png
+    const assetMatch = url.match(/assets\/recipes\/[^/]+\/(images\/[^/]+)$/);
+    if (assetMatch) {
+      const relativePath = assetMatch[1]; // images/xxx.png
+      const imageName = relativePath.split('/')[1];
+      return { imageName, relativePath };
+    }
+
+    return null;
+  }
+
   async exportSingleRecipe(recipe: RecipeData): Promise<void> {
     try {
       const cleanedRecipe = cleanRecipeForStorage(recipe);
@@ -93,24 +118,26 @@ export class ExportService {
           for (const step of recipe.walkthrough) {
             if (step.media) {
               for (const media of step.media) {
-                if (media.type === 'image' && media.url.startsWith('images/')) {
-                  try {
-                    const imageName = media.url.split('/')[1];
-                    const imageId = this.fileResolver.extractImageId(imageName);
+                if (media.type === 'image') {
+                  const imageInfo = this.extractImageInfo(media.url);
+                  if (imageInfo) {
+                    try {
+                      const imageId = this.fileResolver.extractImageId(imageInfo.imageName);
 
-                    const imageFile = await this.fileResolver.getFileWithFallback(
-                      fileStorage,
-                      imageId,
-                      recipe,
-                      media.url,
-                      true
-                    );
+                      const imageFile = await this.fileResolver.getFileWithFallback(
+                        fileStorage,
+                        imageId,
+                        recipe,
+                        imageInfo.relativePath,
+                        true
+                      );
 
-                    if (imageFile && imagesFolder) {
-                      imagesFolder.file(imageName, imageFile);
+                      if (imageFile && imagesFolder) {
+                        imagesFolder.file(imageInfo.imageName, imageFile);
+                      }
+                    } catch (error) {
+                      this.logger.warn(`Failed to add image ${media.url}`, error);
                     }
-                  } catch (error) {
-                    this.logger.warn(`Failed to add image ${media.url}`, error);
                   }
                 }
               }
@@ -122,21 +149,21 @@ export class ExportService {
           const imagesFolder = recipeFolder.folder('images');
 
           for (const image of recipe.generalImages) {
-            if (image.url && image.url.startsWith('images/')) {
+            const imageInfo = this.extractImageInfo(image.url);
+            if (imageInfo) {
               try {
-                const imageName = image.url.split('/')[1];
-                const imageId = this.fileResolver.extractImageId(imageName);
+                const imageId = this.fileResolver.extractImageId(imageInfo.imageName);
 
                 const imageFile = await this.fileResolver.getFileWithFallback(
                   fileStorage,
                   imageId,
                   recipe,
-                  image.url,
+                  imageInfo.relativePath,
                   true
                 );
 
                 if (imageFile && imagesFolder) {
-                  imagesFolder.file(imageName, imageFile);
+                  imagesFolder.file(imageInfo.imageName, imageFile);
                 }
               } catch (error) {
                 this.logger.warn(`Failed to add general image ${image.url}`, error);
