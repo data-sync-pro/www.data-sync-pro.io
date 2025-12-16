@@ -9,6 +9,7 @@
 
 .detail-main-layout {
   display: flex;
+  gap: 3vw;
   padding: 36px 0 0 0;
 }
 
@@ -16,6 +17,8 @@
 .left-sidebar {
   flex: 0 0 23%;
   min-width: 0;
+  border-radius: 2px;
+  background-color: white;
 
   .sidebar-sticky {
     position: sticky;
@@ -30,7 +33,7 @@
 
       .search-icon {
         position: absolute;
-        left: 12px;
+        left: 8px;
         top: 50%;
         transform: translateY(-50%);
         width: 16px;
@@ -41,10 +44,10 @@
 
       .sidebar-search-input {
         width: 100%;
-        padding: 8px 40px;
+        padding: 8px 28px;
         font-size: 0.875rem;
         border: 1px solid #E7E7E7;
-        border-radius: 6px;
+        border-radius: 2px;
         outline: none;
         box-sizing: border-box;
         transition: border-color 0.2s ease, box-shadow 0.2s ease;
@@ -86,19 +89,18 @@
       min-height: 0;
       overflow-y: auto;
       scrollbar-width: thin;
-      border-left: 1px solid #E7E7E7;
-      border-right: 1px solid #E7E7E7;
 
       .category-group {
         .category-header {
           display: flex;
           align-items: center;
-          padding: 6px 16px 6px 12px;
+          padding: 6px 8px 6px 8px;
           cursor: pointer;
           transition: background 0.2s ease;
           font-size: 0.875rem;
           color: #5c5c5c;
           user-select: none;
+          background-color: #fff;
 
           .chevron-down-icon {
             width: 14px;
@@ -127,31 +129,39 @@
           }
 
           &:has(.chevron-down-icon:not(.collapsed)) {
-            background-color: #F1F6FB;
             margin-bottom: 8px;
           }
         }
 
+        // Make the category header sticky when it contains an active recipe
+        &:has(.recipe-list-item.active) .category-header {
+          position: sticky;
+          top: 0;
+          z-index: 10;
+        }
+
         .recipe-list {
+          margin-left: 15px;
+          border-left: 1px solid #E6E6E6;
           .recipe-list-item {
-            padding: 3px 9px 3px 0px;
+            padding: 3px 9px 3px 15px;
             font-size: 0.875rem;
             color: #5c5c5c;
             cursor: pointer;
             border-bottom: none;
             line-height: 1.5;
-            margin-bottom: 8px;
-            margin-left: 34px;
+            margin: 8px 0 8px 0px;
 
             &:hover {
               color: #2253B2;
-              border-right: 3px solid #2253B2CC;
+              border-left: 3px solid #2253B2CC;
             }
 
             &.active {
               color: #2253B2;
               font-weight: 500;
-              border-right: 3px solid #2253B2CC;
+              border-left: 3px solid #2253B2CC;
+              background-color: #F1F6FB;
             }
           }
         }
@@ -162,13 +172,12 @@
 
 // Middle Content Area
 .detail-content {
-  flex: 1;
+  flex: 0 0 50%;
   min-width: 0;
   margin-bottom: 20%;
 
   .content-sections {
     background: #fff;
-    padding: 0px 32px;
 
     .content-section {
       margin-bottom: 34px;
@@ -194,7 +203,7 @@
         font-size: 1rem;
         color: #2C2C2D;
         line-height: 1.7;
-        margin: 12px 0 20px 14px;
+        margin: 12px 0 20px 15px;
 
         p {
           margin: 12px 0;
@@ -222,7 +231,7 @@
         font-size: 1rem;
         color: #2C2C2D;
         line-height: 1.7;
-        margin: 12px 0 20px 14px;
+        margin: 12px 0 20px 15px;
         padding-left: 12px;
         list-style-type: disc;
 
@@ -368,14 +377,16 @@
 
 // Right Sidebar - TOC
 .right-toc {
-  min-width: 0;
-  width: fit-content;
+  flex: 0 0 23%;
+  min-width: 180px;
 
   .toc-sticky {
     position: sticky;
     top: 85px;
-    padding: 0px;
-    width: fit-content;
+    //padding: 25px;
+    //border-left: 1px solid #E6E6E6;
+    //border-radius: 2px;
+    background-color: white;
 
     h3 {
       font-size: 1rem;
@@ -384,14 +395,12 @@
       margin: 0 0 12px 0;
       letter-spacing: 0.5px;
       line-height: normal;
-      width: fit-content;
     }
 
     .toc-nav {
       display: flex;
       flex-direction: column;
       gap: 8px;
-      width: fit-content;
 
       .toc-link {
         font-size: 0.875rem;
@@ -400,8 +409,7 @@
         transition: all 0.2s ease;
         border-left: 3px solid transparent;
         margin-left: 1px;
-        padding: 0px 8px 0px 8px;
-        width:fit-content;
+        padding: 0px 12px 0px 12px;
 
         &:hover {
           color: #2253B2;
@@ -497,15 +505,33 @@
 // Clickable media cursor
 .clickable {
   cursor: pointer;
-  transition: opacity 0.2s ease, transform 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 
   &:hover {
-    opacity: 0.9;
     transform: scale(1.02);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
   }
 
   &:active {
     transform: scale(0.98);
+  }
+}
+
+// Enhanced hover effect for images and GIFs only
+.step-image.clickable,
+.verification-image.clickable {
+  &:hover {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+    max-width: 90vw;
+    max-height: 90vh;
+    width: auto !important;
+    height: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
   }
 }
 
