@@ -505,23 +505,33 @@
 // Clickable media cursor
 .clickable {
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 
   &:hover {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) scale(1.5);
-    z-index: 1000;
-    max-width: 90vw;
-    max-height: 90vh;
-    width: auto;
-    height: auto;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    transform: scale(1.02);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
   }
 
   &:active {
     transform: scale(0.98);
+  }
+}
+
+// Enhanced hover effect for images and GIFs only
+.step-image.clickable,
+.verification-image.clickable {
+  &:hover {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+    max-width: 90vw;
+    max-height: 90vh;
+    width: auto !important;
+    height: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
   }
 }
 
