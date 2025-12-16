@@ -311,13 +311,13 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   toggleCategoryFilter(categoryName: string): void {
-    const index = this.currentFilter.categories.indexOf(categoryName);
-    if (index > -1) {
-      // Remove category from filter
-      this.currentFilter.categories = this.currentFilter.categories.filter(cat => cat !== categoryName);
+    // Single-select: clicking the same category deselects it, clicking a different one replaces
+    if (this.currentFilter.categories.includes(categoryName)) {
+      // Deselect if already selected
+      this.currentFilter.categories = [];
     } else {
-      // Add category to filter
-      this.currentFilter.categories = [...this.currentFilter.categories, categoryName];
+      // Select only this category (single-select)
+      this.currentFilter.categories = [categoryName];
     }
 
     // If search is active, re-trigger the search with the new filter
