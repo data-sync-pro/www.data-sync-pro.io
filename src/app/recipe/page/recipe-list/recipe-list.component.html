@@ -1,13 +1,13 @@
 <div class="recipe-list">
     <!-- Search Input Section -->
     <div class="search-bar-wrapper">
-        <div class="filter-wrapper">
+        <div class="search-wrapper">
             <img class="icon" src="assets/icons/recipe/search.svg" aria-hidden="true">
             <input
-                #filterInput
+                #searchInput
                 type="text"
                 placeholder="Search..."
-                class="filter-input"
+                class="search-input"
                 [value]="searchQuery"
                 (input)="onSearchInput($event)"
             >
