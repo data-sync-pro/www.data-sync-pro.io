@@ -9,8 +9,10 @@ import {
   HostListener
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Subject, combineLatest, fromEvent } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { Subject, combineLatest, fromEvent, firstValueFrom } from 'rxjs';
 import { takeUntil, throttleTime } from 'rxjs/operators';
+import JSZip from 'jszip';
 
 import { Recipe, Category } from '../../core/models/recipe.model';
 import { CacheService } from '../../core/services/cache.service';
@@ -21,6 +23,11 @@ interface CategoryGroup {
   category: Category;
   recipes: Recipe[];
   isExpanded: boolean;
+}
+
+interface TocItem {
+  id: string;
+  label: string;
 }
 
 @Component({
@@ -44,6 +51,7 @@ export class RecipeDetailPageComponent implements OnInit, OnDestroy {
   // Active TOC section
   activeTocSection: string = 'overview';
   private isScrollingToSection: boolean = false;
+  tocItems: TocItem[] = [];
 
   // Media preview modal
   isMediaModalOpen: boolean = false;
@@ -57,6 +65,7 @@ export class RecipeDetailPageComponent implements OnInit, OnDestroy {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
+    private http: HttpClient,
     private cacheService: CacheService,
     private searchService: SearchService,
     private cdr: ChangeDetectorRef
@@ -96,6 +105,9 @@ export class RecipeDetailPageComponent implements OnInit, OnDestroy {
 
           // Expand the current category
           this.expandCategory(recipe.category);
+
+          // Build TOC items dynamically
+          this.buildTocItems();
 
           this.cdr.markForCheck();
 
@@ -206,6 +218,15 @@ export class RecipeDetailPageComponent implements OnInit, OnDestroy {
   }
 
   getDownloadFileName(file: any): string {
+    // Extract filename from filePath, keeping underscores for safe file downloads
+    const filePath = file.filePath || file.url || '';
+    const fileName = filePath.split('/').pop() || 'download.json';
+
+    // Ensure .json extension is present
+    return fileName.endsWith('.json') ? fileName : fileName + '.json';
+  }
+
+  getDownloadDisplayName(file: any): string {
     // If title exists, return it
     if (file.title) {
       return file.title;
@@ -215,8 +236,42 @@ export class RecipeDetailPageComponent implements OnInit, OnDestroy {
     const filePath = file.filePath || file.url || '';
     const fileName = filePath.split('/').pop() || 'Download File';
 
-    // Remove .json extension and replace underscores with spaces
+    // Remove .json extension and replace underscores with spaces for display
     return fileName.replace('.json', '').replace(/_/g, ' ');
+  }
+
+  async downloadAllExecutables(): Promise<void> {
+    if (!this.currentRecipe?.downloadableExecutables || this.currentRecipe.downloadableExecutables.length === 0) {
+      return;
+    }
+
+    const zip = new JSZip();
+    const executables = this.currentRecipe.downloadableExecutables;
+
+    for (const file of executables) {
+      const fileUrl = file.url || file.filePath;
+      if (!fileUrl) continue;
+
+      try {
+        const response = await firstValueFrom(this.http.get(fileUrl, { responseType: 'blob' }));
+        const fileName = this.getDownloadFileName(file);
+        zip.file(fileName, response);
+      } catch (error) {
+        console.warn(`Failed to fetch file: ${fileUrl}`, error);
+      }
+    }
+
+    const zipBlob = await zip.generateAsync({ type: 'blob' });
+    const recipeTitle = this.currentRecipe.title.replace(/\s+/g, '_').replace(/-/g, '_');
+    const zipFileName = `${recipeTitle}_Executables.zip`;
+
+    // Trigger download
+    const url = URL.createObjectURL(zipBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = zipFileName;
+    link.click();
+    URL.revokeObjectURL(url);
   }
 
   getGeneralUseCaseItems(): string[] {
@@ -236,6 +291,55 @@ export class RecipeDetailPageComponent implements OnInit, OnDestroy {
     }
     // Show Rules Engine section if category is not 'Transformation'
     return this.currentRecipe.category.toLowerCase() !== 'transformation';
+  }
+
+  private buildTocItems(): void {
+    if (!this.currentRecipe) {
+      this.tocItems = [];
+      return;
+    }
+
+    const items: TocItem[] = [];
+
+    // Overview is always shown
+    items.push({ id: 'overview', label: 'Overview' });
+
+    // General Use Case
+    if (this.currentRecipe.generalUseCase && this.getGeneralUseCaseItems().length > 0) {
+      items.push({ id: 'use-case', label: 'General Use Case' });
+    }
+
+    // Rules Engine (if not Transformation category)
+    if (this.shouldShowRulesEngine()) {
+      items.push({ id: 'rules-engine', label: 'Rules Engine' });
+    }
+
+    // Direction
+    if (this.currentRecipe.direction && this.currentRecipe.direction.trim().length > 0) {
+      items.push({ id: 'direction', label: 'Direction' });
+    }
+
+    // Pipeline
+    if (this.currentRecipe.pipeline && this.currentRecipe.pipeline.trim().length > 0) {
+      items.push({ id: 'pipeline', label: 'Pipeline' });
+    }
+
+    // Walkthrough
+    if (this.currentRecipe.walkthrough && this.currentRecipe.walkthrough.length > 0) {
+      items.push({ id: 'walkthrough', label: 'Walkthrough' });
+    }
+
+    // Verification GIF
+    if (this.currentRecipe.verificationGIF && this.currentRecipe.verificationGIF.length > 0) {
+      items.push({ id: 'verification-gif', label: 'Verification GIF' });
+    }
+
+    // Downloadable Executables
+    if (this.currentRecipe.downloadableExecutables && this.currentRecipe.downloadableExecutables.length > 0) {
+      items.push({ id: 'download-file', label: 'Downloadable Executables' });
+    }
+
+    this.tocItems = items;
   }
 
   private setupScrollListener(): void {

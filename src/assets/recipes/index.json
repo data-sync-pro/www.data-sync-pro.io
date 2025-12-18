@@ -1,31 +1,7 @@
 {
   "recipes": [
     {
-      "folderId": "accept-cases-from-my-queues",
-      "active": true
-    },
-    {
       "folderId": "assign-default-permission-set-on-user-creation",
-      "active": true
-    },
-    {
-      "folderId": "auto-create-contract-on-opportunity-closed-won",
-      "active": true
-    },
-    {
-      "folderId": "auto-generate-quote-line-items-on-quote-creation",
-      "active": true
-    },
-    {
-      "folderId": "autoclose-stagnant-cases",
-      "active": true
-    },
-    {
-      "folderId": "bell-notification-to-previous-owner-upon-case-owne",
-      "active": true
-    },
-    {
-      "folderId": "calculate-rollup-summaries-for-related-records",
       "active": true
     },
     {
@@ -33,39 +9,7 @@
       "active": true
     },
     {
-      "folderId": "copy-related-records-on-parent-record-clone",
-      "active": true
-    },
-    {
       "folderId": "create-follow-up-task-when-case-closes",
-      "active": true
-    },
-    {
-      "folderId": "deploy-data-sync-pro-configurations",
-      "active": true
-    },
-    {
-      "folderId": "download-record-based-configurations-via-vs-code-e",
-      "active": true
-    },
-    {
-      "folderId": "export-and-import-a-pipeline",
-      "active": true
-    },
-    {
-      "folderId": "mask-sensitive-contact-data-in-sandboxes",
-      "active": true
-    },
-    {
-      "folderId": "reassign-opportunity-owners-for-inactive-users",
-      "active": true
-    },
-    {
-      "folderId": "recalculate-rollup-summaries-in-bulk-api",
-      "active": true
-    },
-    {
-      "folderId": "rows-related-lists-on-opportunity-data-list",
       "active": true
     },
     {
@@ -74,22 +18,6 @@
     },
     {
       "folderId": "transfer-open-opportunities-on-user-deactivation",
-      "active": true
-    },
-    {
-      "folderId": "test-1",
-      "active": true
-    },
-    {
-      "folderId": "test-2",
-      "active": true
-    },
-    {
-      "folderId": "test-3",
-      "active": true
-    },
-    {
-      "folderId": "test-4",
       "active": true
     }
   ]

@@ -107,8 +107,7 @@
                   *ngIf="media.type === 'image' || media.type === 'gif'"
                   [src]="media.displayUrl || media.url"
                   [alt]="media.alt"
-                  class="step-image clickable"
-                  (click)="openMediaPreview(media)">
+                  class="step-image">
                 <video
                   *ngIf="media.type === 'video'"
                   [src]="media.displayUrl || media.url"
@@ -133,8 +132,7 @@
                 *ngIf="media.type === 'gif'"
                 [src]="media.displayUrl || media.url"
                 [alt]="media.alt"
-                class="verification-image clickable"
-                (click)="openMediaPreview(media)">
+                class="verification-image">
               <!-- Video uses video tag -->
               <video
                 *ngIf="media.type === 'video'"
@@ -152,18 +150,13 @@
         <section id="download-file" class="content-section" *ngIf="currentRecipe.downloadableExecutables && currentRecipe.downloadableExecutables.length > 0">
           <h2 class="section-title">Downloadable Executables</h2>
 
-          <div class="download-list">
-            <a
-              *ngFor="let file of currentRecipe.downloadableExecutables"
-              [href]="file.url || file.filePath"
-              [download]="getDownloadFileName(file)"
-              class="download-item"
-              target="_blank"
-              rel="noopener noreferrer">
-              <img class="download-icon" src="assets/icons/download.svg" alt="Download">
-              <span class="download-title">{{ getDownloadFileName(file) }}</span>
-            </a>
-          </div>
+          <a
+            class="download-item"
+            href="#"
+            (click)="downloadAllExecutables(); $event.preventDefault()">
+            <img class="download-icon" src="assets/icons/download.svg" alt="Download">
+            <span class="download-title">{{ currentRecipe.title }}</span>
+          </a>
         </section>
 
       </div>
@@ -177,16 +170,14 @@
     <!-- Right Sidebar - TOC -->
     <aside class="right-toc">
       <div class="toc-sticky">
-        <!-- <h3>In this article</h3> -->
-        <nav class="toc-nav" *ngIf="currentRecipe">
-          <a href="#overview" class="toc-link" [class.active]="activeTocSection === 'overview'" (click)="scrollToSection($event, 'overview')">Overview</a>
-          <a href="#use-case" class="toc-link" [class.active]="activeTocSection === 'use-case'" *ngIf="currentRecipe.generalUseCase && getGeneralUseCaseItems().length > 0" (click)="scrollToSection($event, 'use-case')">General Use Case</a>
-          <a href="#rules-engine" class="toc-link" [class.active]="activeTocSection === 'rules-engine'" *ngIf="shouldShowRulesEngine()" (click)="scrollToSection($event, 'rules-engine')">Rules Engine</a>
-          <a href="#direction" class="toc-link" [class.active]="activeTocSection === 'direction'" *ngIf="currentRecipe.direction && currentRecipe.direction.trim().length > 0" (click)="scrollToSection($event, 'direction')">Direction</a>
-          <a href="#pipeline" class="toc-link" [class.active]="activeTocSection === 'pipeline'" *ngIf="currentRecipe.pipeline && currentRecipe.pipeline.trim().length > 0" (click)="scrollToSection($event, 'pipeline')">Pipeline</a>
-          <a href="#walkthrough" class="toc-link" [class.active]="activeTocSection === 'walkthrough'" *ngIf="currentRecipe.walkthrough && currentRecipe.walkthrough.length > 0" (click)="scrollToSection($event, 'walkthrough')">Walkthrough</a>
-          <a href="#verification-gif" class="toc-link" [class.active]="activeTocSection === 'verification-gif'" *ngIf="currentRecipe.verificationGIF && currentRecipe.verificationGIF.length > 0" (click)="scrollToSection($event, 'verification-gif')">Verification GIF</a>
-          <a href="#download-file" class="toc-link" [class.active]="activeTocSection === 'download-file'" *ngIf="currentRecipe.downloadableExecutables && currentRecipe.downloadableExecutables.length > 0" (click)="scrollToSection($event, 'download-file')">Downloadable Executables</a>
+        <nav class="toc-nav" *ngIf="tocItems.length > 0">
+          <a *ngFor="let item of tocItems"
+             [href]="'#' + item.id"
+             class="toc-link"
+             [class.active]="activeTocSection === item.id"
+             (click)="scrollToSection($event, item.id)">
+            {{ item.label }}
+          </a>
         </nav>
       </div>
     </aside>

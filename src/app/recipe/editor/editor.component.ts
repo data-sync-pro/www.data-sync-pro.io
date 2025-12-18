@@ -655,12 +655,12 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
 
   async exportAllRecipes(): Promise<void> {
     try {
-      // Export all recipes by passing all recipes as edited recipes
-      const allRecipesAsData = this.recipeList.map(recipe => EditorUtils.convertToSourceRecord(recipe));
+      // Get edited recipes from storage to include any modifications (like uploaded executables)
+      const editedRecipes = this.listManagementService.getFilteredEditedRecipes();
       const recipeActiveStates = this.listManagementService.getAllRecipeActiveStates();
 
       await this.ioCoordinatorService.exportAllRecipes(
-        allRecipesAsData,
+        editedRecipes,
         this.recipeList,
         (progress) => this.updateImportProgress(progress),
         recipeActiveStates
