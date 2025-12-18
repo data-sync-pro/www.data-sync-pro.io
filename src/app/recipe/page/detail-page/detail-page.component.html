@@ -107,8 +107,7 @@
                   *ngIf="media.type === 'image' || media.type === 'gif'"
                   [src]="media.displayUrl || media.url"
                   [alt]="media.alt"
-                  class="step-image clickable"
-                  (click)="openMediaPreview(media)">
+                  class="step-image">
                 <video
                   *ngIf="media.type === 'video'"
                   [src]="media.displayUrl || media.url"
@@ -133,8 +132,7 @@
                 *ngIf="media.type === 'gif'"
                 [src]="media.displayUrl || media.url"
                 [alt]="media.alt"
-                class="verification-image clickable"
-                (click)="openMediaPreview(media)">
+                class="verification-image">
               <!-- Video uses video tag -->
               <video
                 *ngIf="media.type === 'video'"

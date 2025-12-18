@@ -508,13 +508,14 @@
 }
 
 // Enhanced hover effect for images and GIFs only
-.step-image.clickable,
-.verification-image.clickable {
+.step-image,
+.verification-image {
   transform-origin: center center;
   position: relative;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 
   &:hover {
-    transform: scale(1.5);
+    transform: scale(2);
     z-index: 100; // Above TOC ($z-toc: 80) but below modals
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
     border-radius: 8px;
