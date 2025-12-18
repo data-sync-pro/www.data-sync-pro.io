@@ -1,116 +1,78 @@
 {
-  "id": "04978482-514e-448c-8632-b9d17938a952",
-  "title": "Cascade Account Owner to Open Cases ",
+  "id": "819352f5-69f8-4766-8438-afb0420d661e",
+  "title": "Cascade Account Owner to Open Cases",
   "category": "Trigger",
   "DSPVersions": [],
   "overview": "When the Account Owner changes, the automation in this recipe reassigns related open Cases from the previous owner to the new owner.",
-  "generalUseCase": "",
-  "generalImages": [
-    {
-      "type": "image",
-      "url": "",
-      "alt": ""
-    }
-  ],
-  "prerequisites": [
-    {
-      "description": "",
-      "quickLinks": [
-        {
-          "title": "",
-          "url": ""
-        }
-      ]
-    }
-  ],
-  "direction": "",
+  "generalUseCase": "When a parent record changes, automatically update related child records to maintain consistency across relationships. This is typically achieved by using a Joiner to left-join the triggering records with their children, with the option to apply dynamic filters as needed.",
+  "generalImages": [],
+  "prerequisites": [],
+  "pipeline": "Account.Triggers",
+  "direction": "Current => Current",
   "connection": "",
   "walkthrough": [
     {
       "step": "Create Executable",
-      "config": [
-        {
-          "field": "Source Object API Name",
-          "value": "Account"
-        },
-        {
-          "field": "Target Object API Name",
-          "value": "Case"
-        },
-        {
-          "field": "Action",
-          "value": "Update"
-        },
-        {
-          "field": "Executable Name",
-          "value": "Cascade Account Owner to Open Cases"
-        },
-        {
-          "field": "Target Matching Field",
-          "value": "Id"
-        },
-        {
-          "field": "Seq No.",
-          "value": "10"
-        }
-      ],
+      "config": [],
       "media": [
         {
           "type": "image",
-          "url": "",
-          "alt": ""
+          "url": "images/step-0-image-1766085125253.png",
+          "alt": "Screenshot 2025-12-18 at 2.11.51 PM"
         }
       ]
     },
     {
       "step": "Trigger Settings",
-      "config": [
+      "config": [],
+      "media": [
         {
-          "field": "After Update Trigger?",
-          "value": "TRUE"
+          "type": "image",
+          "url": "images/step-1-image-1766085193719.png",
+          "alt": "Screenshot 2025-12-18 at 2.13.01 PM"
         }
-      ],
-      "media": []
+      ]
+    },
+    {
+      "step": "Preview",
+      "config": [],
+      "media": [
+        {
+          "type": "image",
+          "url": "images/step-2-image-1766085225219.png",
+          "alt": "Screenshot 2025-12-18 at 2.13.30 PM"
+        }
+      ]
     },
     {
       "step": "Scoping",
-      "config": [
+      "config": [],
+      "media": [
         {
-          "field": "Scope Filter (After Update Trigger)",
-          "value": "TRIGGER_IS_CHANGED(\"OwnerId\")"
-        },
-        {
-          "field": "Joiner",
-          "value": "JOIN_OBJECT(\"$Source\", \"Case\", \"AccountId\", Id, \"isClosed = FALSE\")"
-        },
-        {
-          "field": "Scope Filter(Post Join)",
-          "value": "$Joiner.Id != NULL && TRIGGER_OLD_VALUE(\"OwnerId\") == $Joiner.OwnerId"
+          "type": "image",
+          "url": "images/step-3-image-1766085248671.png",
+          "alt": "Screenshot 2025-12-18 at 2.13.54 PM"
         }
-      ],
-      "media": []
+      ]
     },
     {
       "step": "Mapping",
-      "config": [
+      "config": [],
+      "media": [
         {
-          "field": "Id",
-          "value": "$Joiner.Id"
-        },
-        {
-          "field": "OwnerId",
-          "value": "OwnerId"
+          "type": "image",
+          "url": "images/step-4-image-1766085274857.png",
+          "alt": "Screenshot 2025-12-18 at 2.14.22 PM"
         }
-      ],
-      "media": []
+      ]
     }
   ],
-  "downloadableExecutables": [],
-  "relatedRecipes": [
+  "verificationGIF": [],
+  "downloadableExecutables": [
     {
-      "title": "",
-      "url": ""
+      "filePath": "downloadExecutables/Account.OpenCases.CascadeOwner.json"
     }
   ],
+  "relatedRecipes": [],
   "keywords": []
 }

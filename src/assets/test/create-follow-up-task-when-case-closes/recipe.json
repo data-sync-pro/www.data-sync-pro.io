@@ -81,7 +81,7 @@
   "verificationGIF": [],
   "downloadableExecutables": [
     {
-      "filePath": "downloadExecutables/Case.NewTask.json"
+      "filePath": "downloadExecutables/Create_Follow_up_Task_When_Case_Closes.json"
     }
   ],
   "relatedRecipes": [],

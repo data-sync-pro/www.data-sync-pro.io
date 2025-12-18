@@ -324,41 +324,31 @@
       }
 
       // Download File styles
-      .download-list {
+      .download-item {
         display: flex;
-        flex-direction: column;
-        gap: 16px;
+        align-items: center;
+        gap: 12px;
+        border: none;
+        text-decoration: none;
+        font-weight: 400;
+        font-size: 0.875rem;
+        transition: all 0.2s ease;
+        cursor: pointer;
         margin: 0 0 20px 14px;
 
-        .download-item {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-          border: none;
-          text-decoration: none;
-          color: #2253B2;
-          font-weight: 400;
-          font-size: 0.875rem;
-          transition: all 0.2s ease;
-          cursor: pointer;
+        .download-icon {
+          flex-shrink: 0;
+          width: 16px;
+          height: 16px;
+        }
 
-         
+        .download-title {
+          font-size: 1rem;
+          line-height: 1.5;
+          color: #2C2C2D;
 
-          .download-icon {
-            flex-shrink: 0;
+          &:hover {
             color: #2253B2;
-            width: 16px;
-            height: 16px;
-          }
-
-          .download-title {
-            font-size: 1rem;
-            line-height: 1.5;
-            color: #2C2C2D;
-
-            &:hover {
-              color: #2253B2;
-            }
           }
         }
       }
