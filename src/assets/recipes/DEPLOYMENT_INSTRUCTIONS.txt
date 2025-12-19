@@ -1,9 +1,9 @@
 
 Recipe Export Update Instructions
 ================================
-Export Date: 2025-12-18T19:58:20.697Z
-Total Recipes: 5
-Categories: Trigger, General
+Export Date: 2025-12-19T21:43:39.352Z
+Total Recipes: 1
+Categories: Batch
 
 How to Deploy the Exported Recipes:
 -----------------------------------
@@ -37,11 +37,7 @@ How to Deploy the Exported Recipes:
 
 Exported Recipe List:
 -------------------
-1. Send Email Notification on Checkbox Check (65daaf19-1538-4a9f-b618-6dc8e8401232)
-2. Cascade Account Owner to Open Cases (819352f5-69f8-4766-8438-afb0420d661e)
-3. Assign Default Permission Set on User Creation (3c581fc8-8c0d-4493-aec0-3b59d57cb696)
-4. Transfer Open Opportunities on User Deactivation (58c441e3-daec-44a0-a101-b4eab6bd1fc5)
-5. Create Follow-up Task When Case Closes (41b88a53-b7b5-4c90-acd5-2ebf412a1b87)
+1. Skip No-Op Updates in #Batch — Contact Updates (ffaaee22-657d-4694-b730-a62851a6ad23)
 
 Notes:
 ------
