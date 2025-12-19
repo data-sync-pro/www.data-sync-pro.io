@@ -43,7 +43,7 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
 
   searchQuery = '';
   selectedCategory = '';
-  categories = ['Batch', 'Trigger', 'Data List', 'Action Button', 'Data Loader', 'General'];
+  categories = ['Batch', 'Trigger', 'Data List', 'Action Button', 'Data Loader', 'General', 'Transformation', 'Query'];
 
   expandedSteps: Set<number> = new Set();
   customStepNames: { [index: number]: string } = {};

@@ -145,7 +145,9 @@ export class ValidationService {
       'Data List',
       'Action Button',
       'Data Loader',
-      'General'
+      'General',
+      'Transformation',
+      'Query'
     ];
     return validCategories.includes(category);
   }

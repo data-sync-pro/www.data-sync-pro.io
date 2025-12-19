@@ -128,7 +128,9 @@ export class SearchService {
       'Trigger': 'Trigger',
       'Data List': 'Data List',
       'Action Button': 'Action Button',
-      'Data Loader': 'Data Loader'
+      'Data Loader': 'Data Loader',
+      'Transformation': 'Transformation',
+      'Query': 'Query'
     };
 
     return mapping[category] || category;
