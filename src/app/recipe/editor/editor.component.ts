@@ -18,7 +18,8 @@ import { EDITOR_CONSTANTS } from './editor.constants';
 import {
   Recipe,
   RecipeData,
-  EditorTab
+  EditorTab,
+  normalizeCategory
 } from '../core/models/recipe.model';
 import { IOProgress } from '../core/services/io.types';
 
@@ -77,6 +78,13 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
 
   trackByIndex = TrackByUtil.index;
   trackById = TrackByUtil.id;
+
+  // Get first category for components that expect a single string
+  get currentRecipeFirstCategory(): string {
+    if (!this.currentRecipe?.category) return '';
+    const categories = normalizeCategory(this.currentRecipe.category);
+    return categories[0] || '';
+  }
 
   private previousTitle: string = '';
 
