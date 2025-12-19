@@ -1,0 +1,18 @@
+{
+  "id": "4ac95a3e-45e3-462b-88c1-e83fbd5e3f3f",
+  "title": "Upsert Leads from CSV Using Email as Match Key",
+  "category": "Data Loader",
+  "DSPVersions": [],
+  "overview": "A #Data Loader is configured to upsert records into the Lead object from a CSV file. It uses the Lead’s Email field as the match key: if a Lead with the same Email already exists, the record is updated; otherwise, a new Lead is inserted.",
+  "generalUseCase": "Use #Data Loader to create record-based, reusable rules engines for any Salesforce object to upload, match, transform, and act on records in any authorized org—with powerful deduplication and transformation capabilities running natively on the platform, so you can execute inserts, updates, upserts, deletes, or other actions without leaving Salesforce or reloading templates each time.",
+  "generalImages": [],
+  "prerequisites": [],
+  "pipeline": "",
+  "direction": "",
+  "connection": "",
+  "walkthrough": [],
+  "verificationGIF": [],
+  "downloadableExecutables": [],
+  "relatedRecipes": [],
+  "keywords": []
+}
