@@ -41,7 +41,7 @@
                 *ngFor="let recipe of group.recipes"
                 class="recipe-list-item"
                 [class.active]="recipe.slug === currentRecipe?.slug"
-                [routerLink]="['/recipes', recipe.category, recipe.slug]">
+                [routerLink]="['/recipes', group.category.name, recipe.slug]">
                 {{ recipe.title }}
               </div>
             </div>
@@ -55,44 +55,43 @@
       <div class="content-sections" *ngIf="currentRecipe">
         <!-- Overview Section -->
         <section id="overview" class="content-section">
-          <h2 class="section-title">Overview</h2>
-          <div class="section-content" [innerHTML]="currentRecipe.overview"></div>
+          <h2 class="recipe-section-title">Overview</h2>
+          <div class="section-content" [innerHTML]="currentRecipe.overview | codeBlock"></div>
         </section>
 
         <!-- General Use Case Section -->
         <section id="use-case" class="content-section" *ngIf="currentRecipe.generalUseCase && getGeneralUseCaseItems().length > 0">
-          <h2 class="section-title">General Use Case</h2>
+          <h2 class="recipe-section-title">General Use Case</h2>
           <!-- Single item: display as paragraph -->
-          <div class="section-content" *ngIf="getGeneralUseCaseItems().length === 1">
-            {{ getGeneralUseCaseItems()[0] }}
+          <div class="section-content" *ngIf="getGeneralUseCaseItems().length === 1" [innerHTML]="getGeneralUseCaseItems()[0] | codeBlock">
           </div>
           <!-- Multiple items: display as list -->
           <ul class="use-case-list" *ngIf="getGeneralUseCaseItems().length > 1">
-            <li *ngFor="let item of getGeneralUseCaseItems()">{{ item }}</li>
+            <li *ngFor="let item of getGeneralUseCaseItems()" [innerHTML]="item | codeBlock"></li>
           </ul>
         </section>
 
         <!-- Rules Engine Section -->
         <section id="rules-engine" class="content-section" *ngIf="shouldShowRulesEngine()">
-          <h2 class="section-title">Rules Engine</h2>
-          <div class="section-content">{{ currentRecipe.category }}</div>
+          <h2 class="recipe-section-title">Rules Engine</h2>
+          <div class="section-content">{{ currentRecipe.category.join(', ') }}</div>
         </section>
 
         <!-- Direction Section -->
         <section id="direction" class="content-section" *ngIf="currentRecipe.direction && currentRecipe.direction.trim().length > 0">
-          <h2 class="section-title">Direction</h2>
+          <h2 class="recipe-section-title">Direction</h2>
           <div class="section-content">{{ currentRecipe.direction }}</div>
         </section>
 
         <!-- Pipeline Section -->
         <section id="pipeline" class="content-section" *ngIf="currentRecipe.pipeline && currentRecipe.pipeline.trim().length > 0">
-          <h2 class="section-title">Pipeline</h2>
+          <h2 class="recipe-section-title">Pipeline</h2>
           <div class="section-content">{{ currentRecipe.pipeline }}</div>
         </section>
 
         <!-- Walkthrough Section -->
         <section id="walkthrough" class="content-section" *ngIf="currentRecipe.walkthrough && currentRecipe.walkthrough.length > 0">
-          <h2 class="section-title">Walkthrough</h2>
+          <h2 class="recipe-section-title">Walkthrough</h2>
 
           <div *ngFor="let step of currentRecipe.walkthrough; let i = index" class="walkthrough-step">
             <div class="step-header">
@@ -123,7 +122,7 @@
 
         <!-- Verification GIF Section -->
         <section id="verification-gif" class="content-section" *ngIf="currentRecipe.verificationGIF && currentRecipe.verificationGIF.length > 0">
-          <h2 class="section-title">Verification GIF</h2>
+          <h2 class="recipe-section-title">Verification GIF</h2>
 
           <div class="verification-media">
             <div *ngFor="let media of currentRecipe.verificationGIF; let i = index" class="verification-item">
@@ -148,7 +147,7 @@
 
         <!-- Download Executable File Section -->
         <section id="download-file" class="content-section" *ngIf="currentRecipe.downloadableExecutables && currentRecipe.downloadableExecutables.length > 0">
-          <h2 class="section-title">Downloadable Executables</h2>
+          <h2 class="recipe-section-title">Downloadable Executables</h2>
 
           <a
             class="download-item"

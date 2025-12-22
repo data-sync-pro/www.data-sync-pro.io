@@ -274,7 +274,7 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
 
   goToRecipe(recipe: Recipe): void {
     const currentId = this.currentRecipe?.id;
-    const currentCategory = this.currentRecipe?.category;
+    const currentCategory = this.currentRecipe?.category?.[0];
     this.routeHandlerService.goToRecipe(recipe, currentId, currentCategory);
   }
 
@@ -333,10 +333,10 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
     // Start with all recipes
     let filtered = [...this.recipes];
 
-    // Apply category filter
+    // Apply category filter - recipe matches if any of its categories is in the filter
     if (this.currentFilter.categories.length > 0) {
       filtered = filtered.filter(recipe =>
-        this.currentFilter.categories.includes(recipe.category)
+        recipe.category.some(cat => this.currentFilter.categories.includes(cat))
       );
     }
 

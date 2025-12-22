@@ -97,14 +97,15 @@ export class RecipeSearchOverlayComponent implements OnInit, OnDestroy, OnChange
                 ...(r.walkthrough || []).map(step => step.step)
               ];
 
+              const firstCategory = r.category[0] || '';
               return {
                 id: r.id,
                 slug: r.slug,
                 question: r.title,
-                route: `/recipes/${encodeURIComponent(r.category)}/${r.slug}`,
-                category: r.category,
+                route: `/recipes/${encodeURIComponent(firstCategory)}/${r.slug}`,
+                category: firstCategory,
                 subCategory: null,
-                tags: [r.category],
+                tags: r.category,  // Use all categories as tags
                 searchableContent: contentParts.join(' ').toLowerCase()
               };
             });

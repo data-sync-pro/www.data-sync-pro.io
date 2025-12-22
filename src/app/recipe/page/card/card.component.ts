@@ -42,17 +42,18 @@ export class RecipeCardComponent {
   }
 
   /**
-   * Get the icon for the current recipe's category
+   * Get all category icons for the current recipe
    */
-  get recipeIcon(): string {
-    return this.categoryIcons[this.recipe?.category] || '';
-  }
+  get recipeIcons(): { icon: string; displayName: string }[] {
+    if (!this.recipe?.category) return [];
 
-  /**
-   * Get the display name for the current recipe's category
-   */
-  get recipeCategoryDisplayName(): string {
-    const category = this.categories.find(cat => cat.name === this.recipe?.category);
-    return category?.displayName || this.recipe?.category || '';
+    return this.recipe.category
+      .map(categoryName => {
+        const icon = this.categoryIcons[categoryName] || '';
+        const category = this.categories.find(cat => cat.name === categoryName);
+        const displayName = category?.displayName || categoryName || '';
+        return { icon, displayName };
+      })
+      .filter(item => item.icon); // Only include categories with icons
   }
 }
