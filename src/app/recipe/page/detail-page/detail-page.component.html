@@ -56,19 +56,18 @@
         <!-- Overview Section -->
         <section id="overview" class="content-section">
           <h2 class="recipe-section-title">Overview</h2>
-          <div class="section-content" [innerHTML]="currentRecipe.overview"></div>
+          <div class="section-content" [innerHTML]="currentRecipe.overview | codeBlock"></div>
         </section>
 
         <!-- General Use Case Section -->
         <section id="use-case" class="content-section" *ngIf="currentRecipe.generalUseCase && getGeneralUseCaseItems().length > 0">
           <h2 class="recipe-section-title">General Use Case</h2>
           <!-- Single item: display as paragraph -->
-          <div class="section-content" *ngIf="getGeneralUseCaseItems().length === 1">
-            {{ getGeneralUseCaseItems()[0] }}
+          <div class="section-content" *ngIf="getGeneralUseCaseItems().length === 1" [innerHTML]="getGeneralUseCaseItems()[0] | codeBlock">
           </div>
           <!-- Multiple items: display as list -->
           <ul class="use-case-list" *ngIf="getGeneralUseCaseItems().length > 1">
-            <li *ngFor="let item of getGeneralUseCaseItems()">{{ item }}</li>
+            <li *ngFor="let item of getGeneralUseCaseItems()" [innerHTML]="item | codeBlock"></li>
           </ul>
         </section>
 
