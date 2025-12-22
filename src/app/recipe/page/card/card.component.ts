@@ -42,20 +42,18 @@ export class RecipeCardComponent {
   }
 
   /**
-   * Get the icon for the current recipe's category (uses first category)
+   * Get all category icons for the current recipe
    */
-  get recipeIcon(): string {
-    const firstCategory = this.recipe?.category?.[0];
-    return firstCategory ? (this.categoryIcons[firstCategory] || '') : '';
-  }
+  get recipeIcons(): { icon: string; displayName: string }[] {
+    if (!this.recipe?.category) return [];
 
-  /**
-   * Get the display name for the current recipe's category (uses first category)
-   */
-  get recipeCategoryDisplayName(): string {
-    const firstCategory = this.recipe?.category?.[0];
-    if (!firstCategory) return '';
-    const category = this.categories.find(cat => cat.name === firstCategory);
-    return category?.displayName || firstCategory || '';
+    return this.recipe.category
+      .map(categoryName => {
+        const icon = this.categoryIcons[categoryName] || '';
+        const category = this.categories.find(cat => cat.name === categoryName);
+        const displayName = category?.displayName || categoryName || '';
+        return { icon, displayName };
+      })
+      .filter(item => item.icon); // Only include categories with icons
   }
 }
