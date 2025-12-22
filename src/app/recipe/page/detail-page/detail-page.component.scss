@@ -188,7 +188,7 @@
         border:none;
       }
 
-      .section-title {
+      .recipe-section-title {
         font-size: 1.25rem;
         font-weight: 500;
         color: #2253B2;
@@ -204,6 +204,7 @@
         color: #2C2C2D;
         line-height: 1.7;
         margin: 12px 0 20px 15px;
+        white-space: pre-line;
 
         p {
           margin: 12px 0;
