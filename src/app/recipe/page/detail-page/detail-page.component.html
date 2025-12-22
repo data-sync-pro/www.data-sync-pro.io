@@ -74,7 +74,7 @@
         <!-- Rules Engine Section -->
         <section id="rules-engine" class="content-section" *ngIf="shouldShowRulesEngine()">
           <h2 class="recipe-section-title">Rules Engine</h2>
-          <div class="section-content">{{ currentRecipe.category }}</div>
+          <div class="section-content">{{ currentRecipe.category.join(', ') }}</div>
         </section>
 
         <!-- Direction Section -->
