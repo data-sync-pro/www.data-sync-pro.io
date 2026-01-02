@@ -4,12 +4,13 @@
       <h3 class="recipe-title">{{ recipe.title }}</h3>
       <p class="recipe-description">{{ recipe.overview }}</p>
     </div>
-    <div class="card-icon" *ngIf="recipeIcon">
+    <div class="card-icons" *ngIf="recipeIcons.length > 0">
       <img
+        *ngFor="let item of recipeIcons"
         class="icon"
-        [src]="recipeIcon"
-        [alt]="recipeCategoryDisplayName"
-        [title]="recipeCategoryDisplayName"
+        [src]="item.icon"
+        [alt]="item.displayName"
+        [title]="item.displayName"
         aria-hidden="true">
     </div>
   </div>

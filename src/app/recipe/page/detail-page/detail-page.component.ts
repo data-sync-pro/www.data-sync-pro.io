@@ -91,20 +91,21 @@ export class RecipeDetailPageComponent implements OnInit, OnDestroy {
       if (category && recipeName) {
         // Find the recipe by category and slug
         const recipe = recipes.find(r =>
-          r.category === category && r.slug === recipeName
+          r.category.includes(category) && r.slug === recipeName
         );
 
         if (recipe) {
           this.currentRecipe = recipe;
 
-          // Build breadcrumb path
+          // Build breadcrumb path (use first category or matched category)
+          const breadcrumbCategory = recipe.category.includes(category) ? category : recipe.category[0];
           this.breadcrumbs = [
             { name: 'Recipes', url: '/recipes' },
-            { name: recipe.category, url: `/recipes/${recipe.category}` }
+            { name: breadcrumbCategory, url: `/recipes/${breadcrumbCategory}` }
           ];
 
           // Expand the current category
-          this.expandCategory(recipe.category);
+          this.expandCategory(breadcrumbCategory);
 
           // Build TOC items dynamically
           this.buildTocItems();
@@ -124,7 +125,7 @@ export class RecipeDetailPageComponent implements OnInit, OnDestroy {
   private buildCategoryGroups(): void {
     this.categoryGroups = this.allCategories.map(category => ({
       category,
-      recipes: this.allRecipes.filter(r => r.category === category.name),
+      recipes: this.allRecipes.filter(r => r.category.includes(category.name)),
       isExpanded: false
     }));
     this.filteredCategoryGroups = [...this.categoryGroups];
@@ -289,8 +290,8 @@ export class RecipeDetailPageComponent implements OnInit, OnDestroy {
     if (!this.currentRecipe) {
       return false;
     }
-    // Show Rules Engine section if category is not 'Transformation'
-    return this.currentRecipe.category.toLowerCase() !== 'transformation';
+    // Show Rules Engine section if category does not include 'Transformation'
+    return !this.currentRecipe.category.some(c => c.toLowerCase() === 'transformation');
   }
 
   private buildTocItems(): void {

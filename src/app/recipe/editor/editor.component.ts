@@ -18,7 +18,8 @@ import { EDITOR_CONSTANTS } from './editor.constants';
 import {
   Recipe,
   RecipeData,
-  EditorTab
+  EditorTab,
+  normalizeCategory
 } from '../core/models/recipe.model';
 import { IOProgress } from '../core/services/io.types';
 
@@ -43,7 +44,7 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
 
   searchQuery = '';
   selectedCategory = '';
-  categories = ['Batch', 'Trigger', 'Data List', 'Action Button', 'Data Loader', 'General'];
+  categories = ['Batch', 'Trigger', 'Data List', 'Action Button', 'Data Loader', 'General', 'Transformation', 'Query'];
 
   expandedSteps: Set<number> = new Set();
   customStepNames: { [index: number]: string } = {};
@@ -77,6 +78,13 @@ export class RecipeEditorComponent implements OnInit, OnDestroy {
 
   trackByIndex = TrackByUtil.index;
   trackById = TrackByUtil.id;
+
+  // Get first category for components that expect a single string
+  get currentRecipeFirstCategory(): string {
+    if (!this.currentRecipe?.category) return '';
+    const categories = normalizeCategory(this.currentRecipe.category);
+    return categories[0] || '';
+  }
 
   private previousTitle: string = '';
 
