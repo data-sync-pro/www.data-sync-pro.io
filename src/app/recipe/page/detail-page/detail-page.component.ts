@@ -9,6 +9,7 @@ import {
   HostListener
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { HttpClient } from '@angular/common/http';
 import { Subject, combineLatest, fromEvent, firstValueFrom } from 'rxjs';
 import { takeUntil, throttleTime } from 'rxjs/operators';
@@ -60,6 +61,9 @@ export class RecipeDetailPageComponent implements OnInit, OnDestroy {
   // Search overlay
   isSearchOverlayOpen: boolean = false;
 
+  // YouTube URL cache to prevent flickering on scroll
+  private youtubeUrlCache = new Map<string, SafeResourceUrl>();
+
   @ViewChild('sidebarSearchInput') sidebarSearchInput!: ElementRef<HTMLInputElement>;
 
   constructor(
@@ -68,7 +72,8 @@ export class RecipeDetailPageComponent implements OnInit, OnDestroy {
     private http: HttpClient,
     private cacheService: CacheService,
     private searchService: SearchService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private sanitizer: DomSanitizer
   ) {}
 
   ngOnInit(): void {
@@ -421,6 +426,36 @@ export class RecipeDetailPageComponent implements OnInit, OnDestroy {
     if (this.isMediaModalOpen) {
       this.closeMediaPreview();
     }
+  }
+
+  isYouTubeUrl(url: string): boolean {
+    return url?.includes('youtu.be') || url?.includes('youtube.com');
+  }
+
+  getYouTubeEmbedUrl(url: string): SafeResourceUrl {
+    // Return cached URL to prevent iframe flickering on scroll
+    if (this.youtubeUrlCache.has(url)) {
+      return this.youtubeUrlCache.get(url)!;
+    }
+
+    let videoId = '';
+
+    if (url.includes('youtu.be/')) {
+      // Format: https://youtu.be/VIDEO_ID
+      videoId = url.split('youtu.be/')[1]?.split('?')[0] || '';
+    } else if (url.includes('youtube.com/watch')) {
+      // Format: https://www.youtube.com/watch?v=VIDEO_ID
+      const urlParams = new URL(url).searchParams;
+      videoId = urlParams.get('v') || '';
+    } else if (url.includes('youtube.com/embed/')) {
+      // Already embed format
+      videoId = url.split('youtube.com/embed/')[1]?.split('?')[0] || '';
+    }
+
+    const embedUrl = `https://www.youtube.com/embed/${videoId}?rel=0`;
+    const safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(embedUrl);
+    this.youtubeUrlCache.set(url, safeUrl);
+    return safeUrl;
   }
 
   ngOnDestroy(): void {

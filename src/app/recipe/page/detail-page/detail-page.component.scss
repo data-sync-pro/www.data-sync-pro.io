@@ -203,7 +203,7 @@
         font-size: 1rem;
         color: #2C2C2D;
         line-height: 1.7;
-        margin: 12px 0 20px 15px;
+        margin: 12px 0 20px 12px;
         white-space: pre-line;
 
         p {
@@ -352,6 +352,39 @@
         }
       }
 
+      // General Image styles
+      .general-image-media {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+        padding-left: 12px;
+
+        .general-image-item {
+          width: 100%;
+          padding-bottom: 24px;
+          
+
+          .general-image,
+          .general-video {
+            width: 100%;
+            height: auto;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+          }
+
+          .general-video {
+            max-height: 600px;
+          }
+
+          .youtube-embed {
+            aspect-ratio: 16 / 9;
+            height: auto;
+            min-height: 315px;
+          }
+        }
+      }
+
       // Verification GIF styles
       .verification-media {
         display: flex;
@@ -373,6 +406,12 @@
 
           .verification-video {
             max-height: 600px;
+          }
+
+          .youtube-embed {
+            aspect-ratio: 16 / 9;
+            height: auto;
+            min-height: 315px;
           }
         }
       }
