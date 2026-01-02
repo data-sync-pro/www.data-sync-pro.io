@@ -203,7 +203,7 @@
         font-size: 1rem;
         color: #2C2C2D;
         line-height: 1.7;
-        margin: 12px 0 20px 15px;
+        margin: 12px 0 20px 12px;
         white-space: pre-line;
 
         p {
@@ -357,11 +357,12 @@
         display: flex;
         flex-direction: column;
         gap: 24px;
-        margin: 12px 0 20px 15px;
+        padding-left: 12px;
 
         .general-image-item {
           width: 100%;
           padding-bottom: 24px;
+          
 
           .general-image,
           .general-video {
