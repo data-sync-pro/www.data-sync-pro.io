@@ -57,11 +57,9 @@
         <section id="overview" class="content-section">
           <h2 class="recipe-section-title">Overview</h2>
           <div class="section-content" [innerHTML]="currentRecipe.overview | codeBlock"></div>
-        </section>
-        
-        <!-- General Image Section -->
-        <section id="general-image" class="content-section" *ngIf="currentRecipe.generalImages && currentRecipe.generalImages.length > 0">
-          <div class="general-image-media">
+
+          <!-- General Images/Videos -->
+          <div class="general-image-media" *ngIf="currentRecipe.generalImages && currentRecipe.generalImages.length > 0">
             <div *ngFor="let media of currentRecipe.generalImages" class="general-image-item">
               <img
                 *ngIf="media.type === 'image' || media.type === 'gif'"
