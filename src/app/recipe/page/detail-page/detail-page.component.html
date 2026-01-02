@@ -58,6 +58,37 @@
           <h2 class="recipe-section-title">Overview</h2>
           <div class="section-content" [innerHTML]="currentRecipe.overview | codeBlock"></div>
         </section>
+        
+        <!-- General Image Section -->
+        <section id="general-image" class="content-section" *ngIf="currentRecipe.generalImages && currentRecipe.generalImages.length > 0">
+          <div class="general-image-media">
+            <div *ngFor="let media of currentRecipe.generalImages" class="general-image-item">
+              <img
+                *ngIf="media.type === 'image' || media.type === 'gif'"
+                [src]="media.displayUrl || media.url"
+                [alt]="media.alt"
+                class="general-image">
+              <!-- YouTube video uses iframe -->
+              <iframe
+                *ngIf="media.type === 'video' && isYouTubeUrl(media.url)"
+                [src]="getYouTubeEmbedUrl(media.url)"
+                class="general-video youtube-embed"
+                frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen>
+              </iframe>
+              <!-- Local video uses video tag -->
+              <video
+                *ngIf="media.type === 'video' && !isYouTubeUrl(media.url)"
+                [src]="media.displayUrl || media.url"
+                controls
+                class="general-video clickable"
+                (click)="openMediaPreview(media)">
+                Your browser does not support the video tag.
+              </video>
+            </div>
+          </div>
+        </section>
 
         <!-- General Use Case Section -->
         <section id="use-case" class="content-section" *ngIf="currentRecipe.generalUseCase && getGeneralUseCaseItems().length > 0">
@@ -89,36 +120,7 @@
           <div class="section-content">{{ currentRecipe.pipeline }}</div>
         </section>
 
-        <!-- General Image Section -->
-        <section id="general-image" class="content-section" *ngIf="currentRecipe.generalImages && currentRecipe.generalImages.length > 0">
-          <div class="general-image-media">
-            <div *ngFor="let media of currentRecipe.generalImages" class="general-image-item">
-              <img
-                *ngIf="media.type === 'image' || media.type === 'gif'"
-                [src]="media.displayUrl || media.url"
-                [alt]="media.alt"
-                class="general-image">
-              <!-- YouTube video uses iframe -->
-              <iframe
-                *ngIf="media.type === 'video' && isYouTubeUrl(media.url)"
-                [src]="getYouTubeEmbedUrl(media.url)"
-                class="general-video youtube-embed"
-                frameborder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowfullscreen>
-              </iframe>
-              <!-- Local video uses video tag -->
-              <video
-                *ngIf="media.type === 'video' && !isYouTubeUrl(media.url)"
-                [src]="media.displayUrl || media.url"
-                controls
-                class="general-video clickable"
-                (click)="openMediaPreview(media)">
-                Your browser does not support the video tag.
-              </video>
-            </div>
-          </div>
-        </section>
+
 
         <!-- Walkthrough Section -->
         <section id="walkthrough" class="content-section" *ngIf="currentRecipe.walkthrough && currentRecipe.walkthrough.length > 0">
