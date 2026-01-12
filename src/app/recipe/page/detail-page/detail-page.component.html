@@ -56,36 +56,7 @@
         <!-- Overview Section -->
         <section id="overview" class="content-section">
           <h2 class="recipe-section-title">Overview</h2>
-          <div class="section-content" [innerHTML]="currentRecipe.overview | codeBlock"></div>
-
-          <!-- General Images/Videos -->
-          <div class="general-image-media" *ngIf="currentRecipe.generalImages && currentRecipe.generalImages.length > 0">
-            <div *ngFor="let media of currentRecipe.generalImages" class="general-image-item">
-              <img
-                *ngIf="media.type === 'image' || media.type === 'gif'"
-                [src]="media.displayUrl || media.url"
-                [alt]="media.alt"
-                class="general-image">
-              <!-- YouTube video uses iframe -->
-              <iframe
-                *ngIf="media.type === 'video' && isYouTubeUrl(media.url)"
-                [src]="getYouTubeEmbedUrl(media.url)"
-                class="general-video youtube-embed"
-                frameborder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowfullscreen>
-              </iframe>
-              <!-- Local video uses video tag -->
-              <video
-                *ngIf="media.type === 'video' && !isYouTubeUrl(media.url)"
-                [src]="media.displayUrl || media.url"
-                controls
-                class="general-video clickable"
-                (click)="openMediaPreview(media)">
-                Your browser does not support the video tag.
-              </video>
-            </div>
-          </div>
+          <div class="section-content" [innerHTML]="currentRecipe.overview | codeBlock"></div>          
         </section>
 
         <!-- General Use Case Section -->
@@ -137,7 +108,8 @@
                   *ngIf="media.type === 'image' || media.type === 'gif'"
                   [src]="media.displayUrl || media.url"
                   [alt]="media.alt"
-                  class="step-image">
+                  class="step-image"
+                  (click)="openMediaPreview(media)">
                 <video
                   *ngIf="media.type === 'video'"
                   [src]="media.displayUrl || media.url"
@@ -152,10 +124,22 @@
         </section>
 
         <!-- Verification GIF Section -->
-        <section id="verification-gif" class="content-section" *ngIf="currentRecipe.verificationGIF && currentRecipe.verificationGIF.length > 0">
-          <h2 class="recipe-section-title">Verification GIF</h2>
+        <section id="verification-gif" class="content-section" *ngIf="(currentRecipe.verificationGIF && currentRecipe.verificationGIF.length > 0) || getYouTubeVideosFromGeneralImages().length > 0">
+          <h2 class="recipe-section-title">Verification</h2>
 
           <div class="verification-media">
+            <!-- YouTube videos from generalImages -->
+            <div *ngFor="let video of getYouTubeVideosFromGeneralImages()" class="verification-item">
+              <iframe
+                [src]="getYouTubeEmbedUrl(video.url)"
+                class="verification-video youtube-embed"
+                frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen>
+              </iframe>
+            </div>
+
+            <!-- Original verificationGIF items -->
             <div *ngFor="let media of currentRecipe.verificationGIF; let i = index" class="verification-item">
               <!-- GIF uses img tag -->
               <img

@@ -18,7 +18,30 @@
   "pipeline": "",
   "direction": "",
   "connection": "",
-  "walkthrough": [],
+  "walkthrough": [
+    {
+      "step": "Create Executable",
+      "config": [],
+      "media": [
+        {
+          "type": "image",
+          "url": "images/step-0-image-1767742229110.png",
+          "alt": "Screenshot 2026-01-06 at 6.06.10 PM"
+        }
+      ]
+    },
+    {
+      "step": "Upload File",
+      "config": [],
+      "media": [
+        {
+          "type": "image",
+          "url": "images/step-1-image-1767742284993.png",
+          "alt": "Screenshot 2026-01-06 at 6.08.15 PM"
+        }
+      ]
+    }
+  ],
   "verificationGIF": [],
   "downloadableExecutables": [],
   "relatedRecipes": [],

@@ -335,9 +335,9 @@ export class RecipeDetailPageComponent implements OnInit, OnDestroy {
       items.push({ id: 'walkthrough', label: 'Walkthrough' });
     }
 
-    // Verification GIF
-    if (this.currentRecipe.verificationGIF && this.currentRecipe.verificationGIF.length > 0) {
-      items.push({ id: 'verification-gif', label: 'Verification GIF' });
+    // Verification (includes verificationGIF and YouTube videos from generalImages)
+    if ((this.currentRecipe.verificationGIF && this.currentRecipe.verificationGIF.length > 0) || this.getYouTubeVideosFromGeneralImages().length > 0) {
+      items.push({ id: 'verificationGIF', label: 'Verification' });
     }
 
     // Downloadable Executables
@@ -430,6 +430,20 @@ export class RecipeDetailPageComponent implements OnInit, OnDestroy {
 
   isYouTubeUrl(url: string): boolean {
     return url?.includes('youtu.be') || url?.includes('youtube.com');
+  }
+
+  hasNonYouTubeGeneralImages(): boolean {
+    if (!this.currentRecipe?.generalImages?.length) return false;
+    return this.currentRecipe.generalImages.some(
+      media => !(media.type === 'video' && this.isYouTubeUrl(media.url))
+    );
+  }
+
+  getYouTubeVideosFromGeneralImages(): { url: string; alt: string }[] {
+    if (!this.currentRecipe?.generalImages?.length) return [];
+    return this.currentRecipe.generalImages
+      .filter(media => media.type === 'video' && this.isYouTubeUrl(media.url))
+      .map(media => ({ url: media.url, alt: media.alt }));
   }
 
   getYouTubeEmbedUrl(url: string): SafeResourceUrl {
