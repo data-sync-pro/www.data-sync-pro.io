@@ -64,6 +64,9 @@ export class RecipeDetailPageComponent implements OnInit, OnDestroy {
   // YouTube URL cache to prevent flickering on scroll
   private youtubeUrlCache = new Map<string, SafeResourceUrl>();
 
+  // Cached YouTube videos from generalImages to prevent re-rendering on scroll
+  private cachedYouTubeVideos: { url: string; alt: string }[] = [];
+
   @ViewChild('sidebarSearchInput') sidebarSearchInput!: ElementRef<HTMLInputElement>;
 
   constructor(
@@ -114,6 +117,9 @@ export class RecipeDetailPageComponent implements OnInit, OnDestroy {
 
           // Build TOC items dynamically
           this.buildTocItems();
+
+          // Cache YouTube videos to prevent re-rendering on scroll
+          this.buildYouTubeVideosCache();
 
           this.cdr.markForCheck();
 
@@ -440,8 +446,16 @@ export class RecipeDetailPageComponent implements OnInit, OnDestroy {
   }
 
   getYouTubeVideosFromGeneralImages(): { url: string; alt: string }[] {
-    if (!this.currentRecipe?.generalImages?.length) return [];
-    return this.currentRecipe.generalImages
+    // Return cached result to prevent iframe re-rendering on scroll
+    return this.cachedYouTubeVideos;
+  }
+
+  private buildYouTubeVideosCache(): void {
+    if (!this.currentRecipe?.generalImages?.length) {
+      this.cachedYouTubeVideos = [];
+      return;
+    }
+    this.cachedYouTubeVideos = this.currentRecipe.generalImages
       .filter(media => media.type === 'video' && this.isYouTubeUrl(media.url))
       .map(media => ({ url: media.url, alt: media.alt }));
   }
