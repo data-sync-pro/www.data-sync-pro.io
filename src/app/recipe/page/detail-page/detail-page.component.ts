@@ -115,11 +115,11 @@ export class RecipeDetailPageComponent implements OnInit, OnDestroy {
           // Expand the current category
           this.expandCategory(breadcrumbCategory);
 
+          // Cache YouTube videos first (before building TOC which depends on it)
+          this.buildYouTubeVideosCache();
+
           // Build TOC items dynamically
           this.buildTocItems();
-
-          // Cache YouTube videos to prevent re-rendering on scroll
-          this.buildYouTubeVideosCache();
 
           this.cdr.markForCheck();
 
@@ -341,10 +341,10 @@ export class RecipeDetailPageComponent implements OnInit, OnDestroy {
       items.push({ id: 'walkthrough', label: 'Walkthrough' });
     }
 
-    // Verification (includes verificationGIF and YouTube videos from generalImages)
-    if ((this.currentRecipe.verificationGIF && this.currentRecipe.verificationGIF.length > 0) || this.getYouTubeVideosFromGeneralImages().length > 0) {
-      items.push({ id: 'verificationGIF', label: 'Verification' });
-    }
+    // Verification (temporarily hidden - videos moved to overview)
+    // if ((this.currentRecipe.verificationGIF && this.currentRecipe.verificationGIF.length > 0) || this.getYouTubeVideosFromGeneralImages().length > 0) {
+    //   items.push({ id: 'verificationGIF', label: 'Verification' });
+    // }
 
     // Downloadable Executables
     if (this.currentRecipe.downloadableExecutables && this.currentRecipe.downloadableExecutables.length > 0) {

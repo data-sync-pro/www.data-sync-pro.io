@@ -56,7 +56,21 @@
         <!-- Overview Section -->
         <section id="overview" class="content-section">
           <h2 class="recipe-section-title">Overview</h2>
-          <div class="section-content" [innerHTML]="currentRecipe.overview | codeBlock"></div>          
+          <div class="section-content">
+            <div [innerHTML]="currentRecipe.overview | codeBlock"></div>
+            <!-- YouTube videos below overview text -->
+            <div class="overview-videos" *ngIf="getYouTubeVideosFromGeneralImages().length > 0">
+              <div *ngFor="let video of getYouTubeVideosFromGeneralImages()" class="overview-video-item">
+                <iframe
+                  [src]="getYouTubeEmbedUrl(video.url)"
+                  class="overview-video youtube-embed"
+                  frameborder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowfullscreen>
+                </iframe>
+              </div>
+            </div>
+          </div>
         </section>
 
         <!-- General Use Case Section -->
@@ -123,12 +137,11 @@
           </div>
         </section>
 
-        <!-- Verification GIF Section -->
-        <section id="verification-gif" class="content-section" *ngIf="(currentRecipe.verificationGIF && currentRecipe.verificationGIF.length > 0) || getYouTubeVideosFromGeneralImages().length > 0">
+        <!-- Verification GIF Section (temporarily hidden - videos moved to overview) -->
+        <!-- <section id="verification-gif" class="content-section" *ngIf="(currentRecipe.verificationGIF && currentRecipe.verificationGIF.length > 0) || getYouTubeVideosFromGeneralImages().length > 0">
           <h2 class="recipe-section-title">Verification</h2>
 
           <div class="verification-media">
-            <!-- YouTube videos from generalImages -->
             <div *ngFor="let video of getYouTubeVideosFromGeneralImages()" class="verification-item">
               <iframe
                 [src]="getYouTubeEmbedUrl(video.url)"
@@ -139,15 +152,12 @@
               </iframe>
             </div>
 
-            <!-- Original verificationGIF items -->
             <div *ngFor="let media of currentRecipe.verificationGIF; let i = index" class="verification-item">
-              <!-- GIF uses img tag -->
               <img
                 *ngIf="media.type === 'gif'"
                 [src]="media.displayUrl || media.url"
                 [alt]="media.alt"
                 class="verification-image">
-              <!-- YouTube video uses iframe -->
               <iframe
                 *ngIf="media.type === 'video' && isYouTubeUrl(media.url)"
                 [src]="getYouTubeEmbedUrl(media.url)"
@@ -156,7 +166,6 @@
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowfullscreen>
               </iframe>
-              <!-- Local video uses video tag -->
               <video
                 *ngIf="media.type === 'video' && !isYouTubeUrl(media.url)"
                 [src]="media.displayUrl || media.url"
@@ -167,7 +176,7 @@
               </video>
             </div>
           </div>
-        </section>
+        </section> -->
 
         <!-- Download Executable File Section -->
         <section id="download-file" class="content-section" *ngIf="currentRecipe.downloadableExecutables && currentRecipe.downloadableExecutables.length > 0">
