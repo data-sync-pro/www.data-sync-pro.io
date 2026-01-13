@@ -199,11 +199,40 @@
         line-height: normal;
       }
 
+      // Overview videos (YouTube embedded below overview text, inside section-content)
+      .overview-videos {
+        margin-top: 16px;
+        margin-left: -12px;  // Offset parent's left margin to align with section edge
+        margin-right: -12px; // Offset parent's right margin to align with section edge
+
+        .overview-video-item {
+          width: 100%;
+
+          &:not(:last-child) {
+            margin-bottom: 16px;
+          }
+
+          .overview-video {
+            width: 100%;
+            height: auto;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+          }
+
+          .youtube-embed {
+            aspect-ratio: 16 / 9;
+            height: auto;
+            min-height: 315px;
+          }
+        }
+      }
+
       .section-content {
         font-size: 1rem;
         color: #2C2C2D;
         line-height: 1.7;
-        margin: 12px 0 20px 12px;
+        margin: 12px 12px 20px 12px;
         white-space: pre-line;
 
         p {
