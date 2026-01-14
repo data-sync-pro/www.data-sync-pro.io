@@ -316,6 +316,11 @@ export class RecipeDetailPageComponent implements OnInit, OnDestroy {
     // Overview is always shown
     items.push({ id: 'overview', label: 'Overview' });
 
+    // Video Demo
+    if (this.cachedYouTubeVideos.length > 0) {
+      items.push({ id: 'video-demo', label: 'Video Demo' });
+    }
+
     // General Use Case
     if (this.currentRecipe.generalUseCase && this.getGeneralUseCaseItems().length > 0) {
       items.push({ id: 'use-case', label: 'General Use Case' });
@@ -373,6 +378,7 @@ export class RecipeDetailPageComponent implements OnInit, OnDestroy {
 
     const sections = [
       'overview',
+      'video-demo',
       'use-case',
       'rules-engine',
       'direction',

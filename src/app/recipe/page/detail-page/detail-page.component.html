@@ -58,12 +58,17 @@
           <h2 class="recipe-section-title">Overview</h2>
           <div class="section-content">
             <div [innerHTML]="currentRecipe.overview | codeBlock"></div>
-            <!-- YouTube videos below overview text -->
-            <div class="overview-videos" *ngIf="getYouTubeVideosFromGeneralImages().length > 0">
-              <div *ngFor="let video of getYouTubeVideosFromGeneralImages()" class="overview-video-item">
+          </div>
+        </section>
+
+        <section id="video-demo" class="content-section" *ngIf="getYouTubeVideosFromGeneralImages().length > 0">
+          <h2 class="recipe-section-title">Video Demo</h2>
+          <div class="section-content">
+            <div class="videos">
+              <div *ngFor="let video of getYouTubeVideosFromGeneralImages()" class="video-item">
                 <iframe
                   [src]="getYouTubeEmbedUrl(video.url)"
-                  class="overview-video youtube-embed"
+                  class="video youtube-embed"
                   frameborder="0"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowfullscreen>
