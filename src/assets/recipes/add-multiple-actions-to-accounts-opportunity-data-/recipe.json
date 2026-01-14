@@ -20,7 +20,7 @@
   "connection": "",
   "walkthrough": [
     {
-      "step": "Custom",
+      "step": "Create Pipeline - Account.OpenOpportunities.ActionButtons",
       "config": [],
       "media": [
         {
@@ -31,7 +31,7 @@
       ]
     },
     {
-      "step": "Custom",
+      "step": "Create Executable - Account.New.Opportunity",
       "config": [],
       "media": [
         {
@@ -42,7 +42,7 @@
       ]
     },
     {
-      "step": "Custom",
+      "step": "Action Button Settings - Account.New.Opportunity",
       "config": [],
       "media": [
         {
@@ -53,7 +53,7 @@
       ]
     },
     {
-      "step": "Custom",
+      "step": "Mapping - Account.New.Opportunity",
       "config": [],
       "media": [
         {
@@ -64,7 +64,7 @@
       ]
     },
     {
-      "step": "Custom",
+      "step": "Create Executable - Account.OpenOpportunities.CloseWon",
       "config": [],
       "media": [
         {
@@ -75,7 +75,7 @@
       ]
     },
     {
-      "step": "Custom",
+      "step": "Action Button Settings - Account.OpenOpportunities.CloseWon",
       "config": [],
       "media": [
         {
@@ -86,7 +86,7 @@
       ]
     },
     {
-      "step": "Custom",
+      "step": "Preview - Account.OpenOpportunities.CloseWon",
       "config": [],
       "media": [
         {
@@ -97,7 +97,7 @@
       ]
     },
     {
-      "step": "Custom",
+      "step": "Scoping - Account.OpenOpportunities.CloseWon",
       "config": [],
       "media": [
         {
@@ -108,7 +108,7 @@
       ]
     },
     {
-      "step": "Custom",
+      "step": "Match - Account.OpenOpportunities.CloseWon",
       "config": [],
       "media": [
         {
@@ -119,7 +119,7 @@
       ]
     },
     {
-      "step": "Custom",
+      "step": "Mapping - Account.OpenOpportunities.CloseWon",
       "config": [],
       "media": [
         {
@@ -130,7 +130,7 @@
       ]
     },
     {
-      "step": "Custom",
+      "step": "Create Executable - Account.OpenOpportunities",
       "config": [],
       "media": [
         {
@@ -141,7 +141,7 @@
       ]
     },
     {
-      "step": "Custom",
+      "step": "Retrieve - Account.OpenOpportunities",
       "config": [],
       "media": [
         {
@@ -152,7 +152,7 @@
       ]
     },
     {
-      "step": "Custom",
+      "step": "Data List Settings - Account.OpenOpportunities",
       "config": [],
       "media": [
         {
