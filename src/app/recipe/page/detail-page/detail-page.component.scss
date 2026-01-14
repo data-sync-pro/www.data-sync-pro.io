@@ -200,19 +200,19 @@
       }
 
       // Overview videos (YouTube embedded below overview text, inside section-content)
-      .overview-videos {
+      .videos {
         margin-top: 16px;
         margin-left: -12px;  // Offset parent's left margin to align with section edge
-        margin-right: -12px; // Offset parent's right margin to align with section edge
+        margin-right: -11px; // Offset parent's right margin to align with section edge
 
-        .overview-video-item {
+        .video-item {
           width: 100%;
 
           &:not(:last-child) {
             margin-bottom: 16px;
           }
 
-          .overview-video {
+          .video {
             width: 100%;
             height: auto;
             border: 1px solid #e5e7eb;
