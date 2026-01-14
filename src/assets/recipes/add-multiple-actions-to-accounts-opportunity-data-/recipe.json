@@ -1,18 +1,180 @@
 {
   "id": "c763e140-0623-4d14-ac37-9d731b30123e",
   "title": "Add Multiple Actions to Account's Opportunity Data List",
-  "category": "Data List",
+  "category": [
+    "Data List"
+  ],
   "DSPVersions": [],
   "overview": "A #Data List is configured to show an Account’s open Opportunities as a related list using a dynamic filter, with multiple action buttons combined in a single view. It uses the LWC Pipeline Data Lists, where all related Executables share the same source query, and each action is defined separately in its own Executable.",
   "generalUseCase": "Use a shared #Data List to present a focused view of records (e.g., “Open Opportunities”) and attach multiple custom actions so users can perform tailored tasks on selected records in a single place.",
-  "generalImages": [],
+  "generalImages": [
+    {
+      "type": "video",
+      "url": "https://youtu.be/M670km0eG_Q",
+      "alt": ""
+    }
+  ],
   "prerequisites": [],
   "pipeline": "",
   "direction": "",
   "connection": "",
-  "walkthrough": [],
+  "walkthrough": [
+    {
+      "step": "Create Pipeline - Account.OpenOpportunities.ActionButtons",
+      "config": [],
+      "media": [
+        {
+          "type": "image",
+          "url": "images/step-0-image-1768345165968.png",
+          "alt": "Screenshot 2026-01-13 at 5.53.04 PM"
+        }
+      ]
+    },
+    {
+      "step": "Create Executable - Account.New.Opportunity",
+      "config": [],
+      "media": [
+        {
+          "type": "image",
+          "url": "images/step-1-image-1768347299313.png",
+          "alt": "Screenshot 2026-01-13 at 6.34.48 PM"
+        }
+      ]
+    },
+    {
+      "step": "Action Button Settings - Account.New.Opportunity",
+      "config": [],
+      "media": [
+        {
+          "type": "image",
+          "url": "images/step-2-image-1768347083492.png",
+          "alt": "Screenshot 2026-01-13 at 6.31.08 PM"
+        }
+      ]
+    },
+    {
+      "step": "Mapping - Account.New.Opportunity",
+      "config": [],
+      "media": [
+        {
+          "type": "image",
+          "url": "images/step-3-image-1768347384417.png",
+          "alt": "Screenshot 2026-01-13 at 6.36.06 PM"
+        }
+      ]
+    },
+    {
+      "step": "Create Executable - Account.OpenOpportunities.CloseWon",
+      "config": [],
+      "media": [
+        {
+          "type": "image",
+          "url": "images/step-4-image-1768347707533.png",
+          "alt": "Screenshot 2026-01-13 at 6.40.38 PM"
+        }
+      ]
+    },
+    {
+      "step": "Action Button Settings - Account.OpenOpportunities.CloseWon",
+      "config": [],
+      "media": [
+        {
+          "type": "image",
+          "url": "images/step-5-image-1768347754190.png",
+          "alt": "Screenshot 2026-01-13 at 6.42.06 PM"
+        }
+      ]
+    },
+    {
+      "step": "Preview - Account.OpenOpportunities.CloseWon",
+      "config": [],
+      "media": [
+        {
+          "type": "image",
+          "url": "images/step-6-image-1768347841062.png",
+          "alt": "Screenshot 2026-01-13 at 6.43.46 PM"
+        }
+      ]
+    },
+    {
+      "step": "Scoping - Account.OpenOpportunities.CloseWon",
+      "config": [],
+      "media": [
+        {
+          "type": "image",
+          "url": "images/step-7-image-1768347871431.png",
+          "alt": "Screenshot 2026-01-13 at 6.43.16 PM"
+        }
+      ]
+    },
+    {
+      "step": "Match - Account.OpenOpportunities.CloseWon",
+      "config": [],
+      "media": [
+        {
+          "type": "image",
+          "url": "images/step-8-image-1768347915964.png",
+          "alt": "Screenshot 2026-01-13 at 6.45.11 PM"
+        }
+      ]
+    },
+    {
+      "step": "Mapping - Account.OpenOpportunities.CloseWon",
+      "config": [],
+      "media": [
+        {
+          "type": "image",
+          "url": "images/step-9-image-1768347946857.png",
+          "alt": "Screenshot 2026-01-13 at 6.45.21 PM"
+        }
+      ]
+    },
+    {
+      "step": "Create Executable - Account.OpenOpportunities",
+      "config": [],
+      "media": [
+        {
+          "type": "image",
+          "url": "images/step-10-image-1768348144937.png",
+          "alt": "Screenshot 2026-01-13 at 6.48.47 PM"
+        }
+      ]
+    },
+    {
+      "step": "Retrieve - Account.OpenOpportunities",
+      "config": [],
+      "media": [
+        {
+          "type": "image",
+          "url": "images/step-11-image-1768348260873.png",
+          "alt": "Screenshot 2026-01-13 at 6.50.53 PM"
+        }
+      ]
+    },
+    {
+      "step": "Data List Settings - Account.OpenOpportunities",
+      "config": [],
+      "media": [
+        {
+          "type": "image",
+          "url": "images/step-12-image-1768348356001.png",
+          "alt": "Screenshot 2026-01-13 at 6.52.25 PM"
+        },
+        {
+          "type": "image",
+          "url": "images/step-12-image-1768348378487.png",
+          "alt": "Screenshot 2026-01-13 at 6.52.44 PM"
+        }
+      ]
+    }
+  ],
   "verificationGIF": [],
-  "downloadableExecutables": [],
+  "downloadableExecutables": [
+    {
+      "filePath": "downloadExecutables/Account.OpenOpportunities.ActionButtons.json"
+    }
+  ],
   "relatedRecipes": [],
-  "keywords": []
+  "keywords": [],
+  "__folderId": "add-multiple-actions-to-accounts-opportunity-data-"
 }

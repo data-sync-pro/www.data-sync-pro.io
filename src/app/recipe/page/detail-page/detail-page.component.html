@@ -217,7 +217,7 @@
 
   <!-- Media Preview Modal -->
   <div class="media-modal-overlay" *ngIf="isMediaModalOpen" (click)="closeMediaPreview()">
-    <div class="media-modal-container" (click)="$event.stopPropagation()">
+    <div class="media-modal-container">
       <button class="modal-close-btn" (click)="closeMediaPreview()" aria-label="Close preview">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <line x1="18" y1="6" x2="6" y2="18"></line>
