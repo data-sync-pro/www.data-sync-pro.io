@@ -29,6 +29,7 @@ interface CategoryGroup {
 interface TocItem {
   id: string;
   label: string;
+  children?: TocItem[];
 }
 
 @Component({
@@ -208,7 +209,6 @@ export class RecipeDetailPageComponent implements OnInit, OnDestroy {
 
     // Set the active section immediately
     this.activeTocSection = sectionId;
-    this.isScrollingToSection = true;
     this.cdr.markForCheck();
 
     const element = document.getElementById(sectionId);
@@ -219,13 +219,8 @@ export class RecipeDetailPageComponent implements OnInit, OnDestroy {
 
       window.scrollTo({
         top: offsetPosition,
-        behavior: 'smooth'
+        behavior: 'auto'
       });
-
-      // Re-enable scroll tracking after smooth scroll completes
-      setTimeout(() => {
-        this.isScrollingToSection = false;
-      }, 1000);
     }
   }
 
@@ -341,9 +336,17 @@ export class RecipeDetailPageComponent implements OnInit, OnDestroy {
       items.push({ id: 'pipeline', label: 'Pipeline' });
     }
 
-    // Walkthrough
+    // Walkthrough with sub-items
     if (this.currentRecipe.walkthrough && this.currentRecipe.walkthrough.length > 0) {
-      items.push({ id: 'walkthrough', label: 'Walkthrough' });
+      const walkthroughChildren = this.currentRecipe.walkthrough.map((step, index) => {
+        // Only show content before the hyphen
+        const stepLabel = step.step.includes(' - ') ? step.step.split(' - ')[0] : step.step;
+        return {
+          id: `walkthrough-step-${index + 1}`,
+          label: `${index + 1}. ${stepLabel}`
+        };
+      });
+      items.push({ id: 'walkthrough', label: 'Walkthrough', children: walkthroughChildren });
     }
 
     // Verification (temporarily hidden - videos moved to overview)
@@ -376,6 +379,7 @@ export class RecipeDetailPageComponent implements OnInit, OnDestroy {
   private updateActiveTocSection(): void {
     if (!this.currentRecipe || this.isScrollingToSection) return;
 
+    // Build sections list including walkthrough steps
     const sections = [
       'overview',
       'video-demo',
@@ -383,10 +387,17 @@ export class RecipeDetailPageComponent implements OnInit, OnDestroy {
       'rules-engine',
       'direction',
       'pipeline',
-      'walkthrough',
-      'verification-gif',
-      'download-file'
+      'walkthrough'
     ];
+
+    // Add walkthrough step IDs
+    if (this.currentRecipe.walkthrough) {
+      this.currentRecipe.walkthrough.forEach((_, index) => {
+        sections.push(`walkthrough-step-${index + 1}`);
+      });
+    }
+
+    sections.push('verification-gif', 'download-file');
 
     // Find which section is currently most visible in the viewport
     const viewportMiddle = window.scrollY + window.innerHeight / 3;

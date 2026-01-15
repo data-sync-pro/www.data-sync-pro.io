@@ -114,7 +114,9 @@
         <section id="walkthrough" class="content-section" *ngIf="currentRecipe.walkthrough && currentRecipe.walkthrough.length > 0">
           <h2 class="recipe-section-title">Walkthrough</h2>
 
-          <div *ngFor="let step of currentRecipe.walkthrough; let i = index" class="walkthrough-step">
+          <div *ngFor="let step of currentRecipe.walkthrough; let i = index"
+               [id]="'walkthrough-step-' + (i + 1)"
+               class="walkthrough-step">
             <div class="step-header">
               <div class="step-number-badge">{{ i + 1 }}</div>
               <h3 class="step-title">{{ step.step }}</h3>
@@ -208,13 +210,24 @@
     <aside class="right-toc">
       <div class="toc-sticky">
         <nav class="toc-nav" *ngIf="tocItems.length > 0">
-          <a *ngFor="let item of tocItems"
-             [href]="'#' + item.id"
-             class="toc-link"
-             [class.active]="activeTocSection === item.id"
-             (click)="scrollToSection($event, item.id)">
-            {{ item.label }}
-          </a>
+          <ng-container *ngFor="let item of tocItems">
+            <a [href]="'#' + item.id"
+               class="toc-link"
+               [class.active]="activeTocSection === item.id"
+               (click)="scrollToSection($event, item.id)">
+              {{ item.label }}
+            </a>
+            <!-- Sub-items (e.g., walkthrough steps) -->
+            <ng-container *ngIf="item.children && item.children.length > 0">
+              <a *ngFor="let child of item.children"
+                 [href]="'#' + child.id"
+                 class="toc-link toc-child"
+                 [class.active]="activeTocSection === child.id"
+                 (click)="scrollToSection($event, child.id)">
+                {{ child.label }}
+              </a>
+            </ng-container>
+          </ng-container>
         </nav>
       </div>
     </aside>
