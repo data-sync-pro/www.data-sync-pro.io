@@ -15,7 +15,7 @@
 
 // Left Sidebar - Recipe List
 .left-sidebar {
-  flex: 0 0 23%;
+  flex: 0 0 22%;
   min-width: 0;
   border-radius: 2px;
   background-color: white;
@@ -489,7 +489,7 @@
 
 // Right Sidebar - TOC
 .right-toc {
-  flex: 0 0 18%;
+  flex: 0 0 20%;
   min-width: 150px;
 
   .toc-sticky {
@@ -532,6 +532,25 @@
           color: #2253B2;
           font-weight: 500;
           border-left: 3px solid #2253B2CC;
+        }
+
+        &.toc-child {
+          font-size: 0.8125rem;
+          padding-left: 32px;
+          color: #777;
+          display: block;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+
+          &:hover {
+            color: #2253B2;
+          }
+
+          &.active {
+            color: #2253B2;
+            font-weight: 500;
+          }
         }
       }
     }
