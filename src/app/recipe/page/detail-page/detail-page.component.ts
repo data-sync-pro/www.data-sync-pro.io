@@ -422,6 +422,15 @@ export class RecipeDetailPageComponent implements OnInit, OnDestroy {
       }
     }
 
+    // If scrolled to bottom, activate the last TOC item
+    const scrolledToBottom = (window.innerHeight + window.scrollY) >= (document.documentElement.scrollHeight - 50);
+    if (scrolledToBottom && this.tocItems.length > 0) {
+      const lastItem = this.tocItems[this.tocItems.length - 1];
+      activeSection = lastItem.children?.length
+        ? lastItem.children[lastItem.children.length - 1].id
+        : lastItem.id;
+    }
+
     if (this.activeTocSection !== activeSection) {
       this.activeTocSection = activeSection;
       this.cdr.markForCheck();
