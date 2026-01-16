@@ -1,7 +1,9 @@
 {
   "id": "70fc4e6b-ef41-4340-a8a5-26a2a0ef0ec9",
   "title": "Mark Account's Open Opportunities as Closed Won",
-  "category": "Data List",
+  "category": [
+    "Data List"
+  ],
   "DSPVersions": [],
   "overview": "A #Data List is configured to display Open Opportunities as an Account’s related list using a dynamic filter, with Pre-Action: Edit Fields specified. When users click the “Close Won” action button for selected records, a modal opens with target field values derived from the Executable’s field mappings, allowing them to review and adjust these values before executing the action.",
   "generalUseCase": "Use actionable #Data List with dynamic filters to display related data for the current record on a Lightning Record Page. Users can select records to run processes defined by Executables and, if enabled, review or edit transformed values before the action is applied.",
@@ -10,9 +12,64 @@
   "pipeline": "",
   "direction": "",
   "connection": "",
-  "walkthrough": [],
+  "walkthrough": [
+    {
+      "step": "Create Executable",
+      "config": [],
+      "media": [
+        {
+          "type": "image",
+          "url": "images/step-0-image-1768591152712.png",
+          "alt": "Screenshot 2026-01-16 at 2.19.00 PM"
+        }
+      ]
+    },
+    {
+      "step": "Data List Settings",
+      "config": [],
+      "media": [
+        {
+          "type": "image",
+          "url": "images/step-1-image-1768591244109.png",
+          "alt": "Screenshot 2026-01-16 at 2.19.47 PM"
+        },
+        {
+          "type": "image",
+          "url": "images/step-1-image-1768591247913.png",
+          "alt": "Screenshot 2026-01-16 at 2.20.24 PM"
+        }
+      ]
+    },
+    {
+      "step": "Retrieve",
+      "config": [],
+      "media": [
+        {
+          "type": "image",
+          "url": "images/step-2-image-1768591291123.png",
+          "alt": "Screenshot 2026-01-16 at 2.21.12 PM"
+        }
+      ]
+    },
+    {
+      "step": "Mapping",
+      "config": [],
+      "media": [
+        {
+          "type": "image",
+          "url": "images/step-3-image-1768591376199.png",
+          "alt": "Screenshot 2026-01-16 at 2.21.49 PM"
+        }
+      ]
+    }
+  ],
   "verificationGIF": [],
-  "downloadableExecutables": [],
+  "downloadableExecutables": [
+    {
+      "filePath": "downloadExecutables/Account.OpenOpportunities.CloseWon.json"
+    }
+  ],
   "relatedRecipes": [],
-  "keywords": []
+  "keywords": [],
+  "__folderId": "mark-accounts-open-opportunities-as-closed-won"
 }
