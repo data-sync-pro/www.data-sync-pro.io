@@ -86,17 +86,6 @@
       ]
     },
     {
-      "step": "Preview - Account.OpenOpportunities.CloseWon",
-      "config": [],
-      "media": [
-        {
-          "type": "image",
-          "url": "images/step-6-image-1768347841062.png",
-          "alt": "Screenshot 2026-01-13 at 6.43.46 PM"
-        }
-      ]
-    },
-    {
       "step": "Scoping - Account.OpenOpportunities.CloseWon",
       "config": [],
       "media": [
@@ -171,7 +160,8 @@
   "verificationGIF": [],
   "downloadableExecutables": [
     {
-      "filePath": "downloadExecutables/Account.OpenOpportunities.ActionButtons.json"
+      "filePath": "downloadExecutables/Account.OpenOpportunities.ActionButtons.json",
+      "url": "assets/recipes/add-multiple-actions-to-accounts-opportunity-data-/downloadExecutables/Account.OpenOpportunities.ActionButtons.json"
     }
   ],
   "relatedRecipes": [],

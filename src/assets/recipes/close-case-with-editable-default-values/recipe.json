@@ -42,17 +42,6 @@
       ]
     },
     {
-      "step": "Preview",
-      "config": [],
-      "media": [
-        {
-          "type": "image",
-          "url": "images/step-2-image-1768593863499.png",
-          "alt": "Screenshot 2026-01-16 at 3.03.16 PM"
-        }
-      ]
-    },
-    {
       "step": "Scoping",
       "config": [],
       "media": [
@@ -78,7 +67,8 @@
   "verificationGIF": [],
   "downloadableExecutables": [
     {
-      "filePath": "downloadExecutables/Case.Close.json"
+      "filePath": "downloadExecutables/Case.Close.json",
+      "url": "assets/recipes/close-case-with-editable-default-values/downloadExecutables/Case.Close.json"
     }
   ],
   "relatedRecipes": [],
