@@ -20,40 +20,18 @@
   "connection": "",
   "walkthrough": [
     {
-      "step": "Create Executable",
-      "config": [],
-      "media": [
-        {
-          "type": "image",
-          "url": "images/step-0-image-1768591152712.png",
-          "alt": "Screenshot 2026-01-16 at 2.19.00 PM"
-        }
-      ]
-    },
-    {
-      "step": "Data List Settings",
-      "config": [],
-      "media": [
-        {
-          "type": "image",
-          "url": "images/step-1-image-1768591244109.png",
-          "alt": "Screenshot 2026-01-16 at 2.19.47 PM"
-        },
-        {
-          "type": "image",
-          "url": "images/step-1-image-1768591247913.png",
-          "alt": "Screenshot 2026-01-16 at 2.20.24 PM"
-        }
-      ]
-    },
-    {
       "step": "Retrieve",
       "config": [],
       "media": [
         {
           "type": "image",
-          "url": "images/step-2-image-1768591291123.png",
-          "alt": "Screenshot 2026-01-16 at 2.21.12 PM"
+          "url": "images/step-0-image-1768940089634.png",
+          "alt": "Screenshot 2026-01-20 at 3.13.16 PM"
+        },
+        {
+          "type": "image",
+          "url": "images/step-0-image-1768940166079.png",
+          "alt": "Screenshot 2026-01-20 at 3.13.28 PM"
         }
       ]
     },
@@ -63,8 +41,40 @@
       "media": [
         {
           "type": "image",
-          "url": "images/step-3-image-1768591376199.png",
-          "alt": "Screenshot 2026-01-16 at 2.21.49 PM"
+          "url": "images/step-1-image-1768940177440.png",
+          "alt": "Screenshot 2026-01-20 at 3.13.41 PM"
+        }
+      ]
+    },
+    {
+      "step": "Data List Settings",
+      "config": [],
+      "media": [
+        {
+          "type": "image",
+          "url": "images/step-2-image-1768940194005.png",
+          "alt": "Screenshot 2026-01-20 at 3.13.52 PM"
+        }
+      ]
+    },
+    {
+      "step": "Close Won Opportunities",
+      "config": [],
+      "media": [
+        {
+          "type": "image",
+          "url": "images/step-3-image-1768940442506.png",
+          "alt": "Screenshot 2026-01-20 at 3.17.24 PM"
+        },
+        {
+          "type": "image",
+          "url": "images/step-3-image-1768940446787.png",
+          "alt": "Screenshot 2026-01-20 at 3.18.01 PM"
+        },
+        {
+          "type": "image",
+          "url": "images/step-3-image-1768940450712.png",
+          "alt": "Screenshot 2026-01-20 at 3.18.38 PM"
         }
       ]
     }

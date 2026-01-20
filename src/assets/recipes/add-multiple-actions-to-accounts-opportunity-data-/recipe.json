@@ -20,139 +20,62 @@
   "connection": "",
   "walkthrough": [
     {
-      "step": "Create Pipeline - Account.OpenOpportunities.ActionButtons",
+      "step": "Action Buttons Pipeline",
       "config": [],
       "media": [
         {
           "type": "image",
-          "url": "images/step-0-image-1768620216171.png",
-          "alt": "Screenshot 2026-01-16 at 10.22.36 PM"
+          "url": "images/step-0-image-1768941007656.png",
+          "alt": "Screenshot 2026-01-20 at 3.25.12 PM"
         }
       ]
     },
     {
-      "step": "Create Executable - Account.New.Opportunity",
+      "step": "Data List Executable",
       "config": [],
       "media": [
         {
           "type": "image",
-          "url": "images/step-1-image-1768347299313.png",
-          "alt": "Screenshot 2026-01-13 at 6.34.48 PM"
+          "url": "images/step-1-image-1768941117213.png",
+          "alt": "Screenshot 2026-01-20 at 3.31.48 PM"
         }
       ]
     },
     {
-      "step": "Action Button Settings - Account.New.Opportunity",
+      "step": "Retrieve",
       "config": [],
       "media": [
         {
           "type": "image",
-          "url": "images/step-2-image-1768347083492.png",
-          "alt": "Screenshot 2026-01-13 at 6.31.08 PM"
+          "url": "images/step-2-image-1768942284334.png",
+          "alt": "Screenshot 2026-01-20 at 3.50.52 PM"
         }
       ]
     },
     {
-      "step": "Mapping - Account.New.Opportunity",
+      "step": "Data List Settings",
       "config": [],
       "media": [
         {
           "type": "image",
-          "url": "images/step-3-image-1768347384417.png",
-          "alt": "Screenshot 2026-01-13 at 6.36.06 PM"
+          "url": "images/step-3-image-1768942329158.png",
+          "alt": "Screenshot 2026-01-20 at 3.28.52 PM"
         }
       ]
     },
     {
-      "step": "Create Executable - Account.OpenOpportunities.CloseWon",
+      "step": "New Opportunity",
       "config": [],
       "media": [
         {
           "type": "image",
-          "url": "images/step-4-image-1768347707533.png",
-          "alt": "Screenshot 2026-01-13 at 6.40.38 PM"
-        }
-      ]
-    },
-    {
-      "step": "Action Button Settings - Account.OpenOpportunities.CloseWon",
-      "config": [],
-      "media": [
-        {
-          "type": "image",
-          "url": "images/step-5-image-1768347754190.png",
-          "alt": "Screenshot 2026-01-13 at 6.42.06 PM"
-        }
-      ]
-    },
-    {
-      "step": "Scoping - Account.OpenOpportunities.CloseWon",
-      "config": [],
-      "media": [
-        {
-          "type": "image",
-          "url": "images/step-7-image-1768347871431.png",
-          "alt": "Screenshot 2026-01-13 at 6.43.16 PM"
-        }
-      ]
-    },
-    {
-      "step": "Match - Account.OpenOpportunities.CloseWon",
-      "config": [],
-      "media": [
-        {
-          "type": "image",
-          "url": "images/step-8-image-1768347915964.png",
-          "alt": "Screenshot 2026-01-13 at 6.45.11 PM"
-        }
-      ]
-    },
-    {
-      "step": "Mapping - Account.OpenOpportunities.CloseWon",
-      "config": [],
-      "media": [
-        {
-          "type": "image",
-          "url": "images/step-9-image-1768347946857.png",
-          "alt": "Screenshot 2026-01-13 at 6.45.21 PM"
-        }
-      ]
-    },
-    {
-      "step": "Create Executable - Account.OpenOpportunities",
-      "config": [],
-      "media": [
-        {
-          "type": "image",
-          "url": "images/step-10-image-1768348144937.png",
-          "alt": "Screenshot 2026-01-13 at 6.48.47 PM"
-        }
-      ]
-    },
-    {
-      "step": "Retrieve - Account.OpenOpportunities",
-      "config": [],
-      "media": [
-        {
-          "type": "image",
-          "url": "images/step-11-image-1768348260873.png",
-          "alt": "Screenshot 2026-01-13 at 6.50.53 PM"
-        }
-      ]
-    },
-    {
-      "step": "Data List Settings - Account.OpenOpportunities",
-      "config": [],
-      "media": [
-        {
-          "type": "image",
-          "url": "images/step-12-image-1768348356001.png",
-          "alt": "Screenshot 2026-01-13 at 6.52.25 PM"
+          "url": "images/step-4-image-1768942357317.png",
+          "alt": "Screenshot 2026-01-20 at 3.29.03 PM"
         },
         {
           "type": "image",
-          "url": "images/step-12-image-1768348378487.png",
-          "alt": "Screenshot 2026-01-13 at 6.52.44 PM"
+          "url": "images/step-4-image-1768942365280.png",
+          "alt": "Screenshot 2026-01-20 at 3.29.23 PM"
         }
       ]
     }

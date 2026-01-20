@@ -311,6 +311,12 @@ export class RecipeDetailPageComponent implements OnInit, OnDestroy {
     // Overview is always shown
     items.push({ id: 'overview', label: 'Overview' });
 
+
+    // Downloadable Executables
+    if (this.currentRecipe.downloadableExecutables && this.currentRecipe.downloadableExecutables.length > 0) {
+      items.push({ id: 'download-file', label: 'Downloadable Executables' });
+    }
+
     // Video Demo
     if (this.cachedYouTubeVideos.length > 0) {
       items.push({ id: 'video-demo', label: 'Video Demo' });
@@ -354,10 +360,7 @@ export class RecipeDetailPageComponent implements OnInit, OnDestroy {
     //   items.push({ id: 'verificationGIF', label: 'Verification' });
     // }
 
-    // Downloadable Executables
-    if (this.currentRecipe.downloadableExecutables && this.currentRecipe.downloadableExecutables.length > 0) {
-      items.push({ id: 'download-file', label: 'Downloadable Executables' });
-    }
+
 
     this.tocItems = items;
   }
