@@ -61,6 +61,19 @@
           </div>
         </section>
 
+        <!-- Download Executable File Section -->
+        <section id="download-file" class="content-section" *ngIf="currentRecipe.downloadableExecutables && currentRecipe.downloadableExecutables.length > 0">
+          <h2 class="recipe-section-title">Downloadable Executables</h2>
+
+          <a
+            class="download-item"
+            href="#"
+            (click)="downloadAllExecutables(); $event.preventDefault()">
+            <img class="download-icon" src="assets/icons/download.svg" alt="Download">
+            <span class="download-title">{{ currentRecipe.title }}</span>
+          </a>
+        </section>
+
         <section id="video-demo" class="content-section" *ngIf="getYouTubeVideosFromGeneralImages().length > 0">
           <h2 class="recipe-section-title">Video Demo</h2>
           <div class="section-content">
@@ -184,20 +197,6 @@
             </div>
           </div>
         </section> -->
-
-        <!-- Download Executable File Section -->
-        <section id="download-file" class="content-section" *ngIf="currentRecipe.downloadableExecutables && currentRecipe.downloadableExecutables.length > 0">
-          <h2 class="recipe-section-title">Downloadable Executables</h2>
-
-          <a
-            class="download-item"
-            href="#"
-            (click)="downloadAllExecutables(); $event.preventDefault()">
-            <img class="download-icon" src="assets/icons/download.svg" alt="Download">
-            <span class="download-title">{{ currentRecipe.title }}</span>
-          </a>
-        </section>
-
       </div>
 
       <!-- Loading State -->
