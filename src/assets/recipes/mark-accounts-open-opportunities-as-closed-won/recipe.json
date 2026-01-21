@@ -20,6 +20,17 @@
   "connection": "",
   "walkthrough": [
     {
+      "step": "Data List Settings",
+      "config": [],
+      "media": [
+        {
+          "type": "image",
+          "url": "images/step-2-image-1768940194005.png",
+          "alt": "Screenshot 2026-01-20 at 3.13.52 PM"
+        }
+      ]
+    },
+    {
       "step": "Retrieve",
       "config": [],
       "media": [
@@ -47,17 +58,6 @@
       ]
     },
     {
-      "step": "Data List Settings",
-      "config": [],
-      "media": [
-        {
-          "type": "image",
-          "url": "images/step-2-image-1768940194005.png",
-          "alt": "Screenshot 2026-01-20 at 3.13.52 PM"
-        }
-      ]
-    },
-    {
       "step": "Close Won Opportunities",
       "config": [],
       "media": [
@@ -70,11 +70,6 @@
           "type": "image",
           "url": "images/step-3-image-1768940446787.png",
           "alt": "Screenshot 2026-01-20 at 3.18.01 PM"
-        },
-        {
-          "type": "image",
-          "url": "images/step-3-image-1768940450712.png",
-          "alt": "Screenshot 2026-01-20 at 3.18.38 PM"
         }
       ]
     }

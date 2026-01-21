@@ -20,6 +20,17 @@
   "connection": "",
   "walkthrough": [
     {
+      "step": "Action Button Settings",
+      "config": [],
+      "media": [
+        {
+          "type": "image",
+          "url": "images/step-2-image-1768938381771.png",
+          "alt": "Screenshot 2026-01-20 at 2.28.50 PM"
+        }
+      ]
+    },
+    {
       "step": "Scoping",
       "config": [],
       "media": [
@@ -42,17 +53,6 @@
       ]
     },
     {
-      "step": "Action Button Settings",
-      "config": [],
-      "media": [
-        {
-          "type": "image",
-          "url": "images/step-2-image-1768938381771.png",
-          "alt": "Screenshot 2026-01-20 at 2.28.50 PM"
-        }
-      ]
-    },
-    {
       "step": "Close a Case",
       "config": [],
       "media": [
@@ -63,18 +63,8 @@
         },
         {
           "type": "image",
-          "url": "images/step-3-image-1768939443904.png",
-          "alt": "Screenshot 2026-01-20 at 2.31.56 PM"
-        },
-        {
-          "type": "image",
           "url": "images/step-3-image-1768939651541.png",
           "alt": "Screenshot 2026-01-20 at 3.07.04 PM"
-        },
-        {
-          "type": "image",
-          "url": "images/step-3-image-1768939663585.png",
-          "alt": "Screenshot 2026-01-20 at 2.32.16 PM"
         }
       ]
     }

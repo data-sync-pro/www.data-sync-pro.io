@@ -292,13 +292,13 @@ export class RecipeDetailPageComponent implements OnInit, OnDestroy {
       .filter(item => item.length > 0);
   }
 
-  shouldShowRulesEngine(): boolean {
-    if (!this.currentRecipe) {
-      return false;
-    }
-    // Show Rules Engine section if category does not include 'Transformation'
-    return !this.currentRecipe.category.some(c => c.toLowerCase() === 'transformation');
-  }
+  // shouldShowRulesEngine(): boolean {
+  //   if (!this.currentRecipe) {
+  //     return false;
+  //   }
+  //   // Show Rules Engine section if category does not include 'Transformation'
+  //   return !this.currentRecipe.category.some(c => c.toLowerCase() === 'transformation');
+  // }
 
   private buildTocItems(): void {
     if (!this.currentRecipe) {
@@ -327,10 +327,6 @@ export class RecipeDetailPageComponent implements OnInit, OnDestroy {
       items.push({ id: 'use-case', label: 'General Use Case' });
     }
 
-    // Rules Engine (if not Transformation category)
-    if (this.shouldShowRulesEngine()) {
-      items.push({ id: 'rules-engine', label: 'Rules Engine' });
-    }
 
     // Direction
     if (this.currentRecipe.direction && this.currentRecipe.direction.trim().length > 0) {
@@ -387,9 +383,6 @@ export class RecipeDetailPageComponent implements OnInit, OnDestroy {
       'overview',
       'video-demo',
       'use-case',
-      'rules-engine',
-      'direction',
-      'pipeline',
       'walkthrough'
     ];
 
