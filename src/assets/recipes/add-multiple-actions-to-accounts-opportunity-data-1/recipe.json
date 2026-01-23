@@ -20,62 +20,57 @@
   "connection": "",
   "walkthrough": [
     {
-      "step": "Create Data List Executable",
+      "step": "Action Buttons Pipeline",
       "config": [],
       "media": [
         {
           "type": "image",
-          "url": "images/step-0-image-1769201189907.png",
-          "alt": "1"
+          "url": "images/step-0-image-1768941007656.png",
+          "alt": "Screenshot 2026-01-20 at 3.25.12 PM"
         }
       ]
     },
     {
-      "step": "Configure Data List Retrieve Query",
+      "step": "Data List Executable",
       "config": [],
       "media": [
         {
           "type": "image",
-          "url": "images/step-1-image-1769201880725.png",
-          "alt": "2"
+          "url": "images/step-1-image-1768941117213.png",
+          "alt": "Screenshot 2026-01-20 at 3.31.48 PM"
         }
       ]
     },
     {
-      "step": "Prepare Action Buttons Pipeline",
+      "step": "Retrieve",
       "config": [],
       "media": [
         {
           "type": "image",
-          "url": "images/step-3-image-1769202241713.png",
-          "alt": "5"
+          "url": "images/step-2-image-1768942284334.png",
+          "alt": "Screenshot 2026-01-20 at 3.50.52 PM"
         }
       ]
     },
     {
-      "step": "Configure Data List Settings",
+      "step": "Data List Settings",
       "config": [],
       "media": [
         {
           "type": "image",
-          "url": "images/step-2-image-1769202080094.png",
-          "alt": "3-1"
-        },
-        {
-          "type": "image",
-          "url": "images/step-2-image-1769202083531.png",
-          "alt": "4"
+          "url": "images/step-3-image-1768942329158.png",
+          "alt": "Screenshot 2026-01-20 at 3.28.52 PM"
         }
       ]
     },
     {
-      "step": "Example Scenario",
+      "step": "New Opportunity",
       "config": [],
       "media": [
         {
           "type": "image",
-          "url": "images/step-4-image-1769204425663.png",
-          "alt": "6"
+          "url": "images/step-4-image-1768942357317.png",
+          "alt": "Screenshot 2026-01-20 at 3.29.03 PM"
         }
       ]
     }
